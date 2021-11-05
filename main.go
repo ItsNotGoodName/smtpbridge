@@ -3,12 +3,12 @@ package main
 import (
 	"errors"
 	"io"
-	"io/ioutil"
 	"log"
 	"time"
 
 	"github.com/emersion/go-sasl"
 	"github.com/emersion/go-smtp"
+	"github.com/jhillyerd/enmime"
 )
 
 // The Backend implements SMTP server methods.
@@ -43,10 +43,25 @@ func (s *Session) Rcpt(to string) error {
 }
 
 func (s *Session) Data(r io.Reader) error {
-	if b, err := ioutil.ReadAll(r); err != nil {
+	e, err := enmime.ReadEnvelope(r)
+	if err != nil {
 		return err
+	}
+
+	log.Println("SUBJECT:", e.GetHeader("Subject"))
+	log.Println("TEXT:", e.Text)
+	log.Println("HTML:", e.HTML)
+	log.Println("ATTACHMENTS: number of attachments is", len(e.Attachments))
+	for e := range e.Errors {
+		log.Println("ERROR:", e)
+	}
+	log.Println("FROM:", e.GetHeader("From"))
+	if to, err := e.AddressList("To"); err == nil {
+		for _, t := range to {
+			log.Println("TO:", t)
+		}
 	} else {
-		log.Println("Data:", string(b))
+		log.Println("TO_ERROR:", err)
 	}
 	return nil
 }
