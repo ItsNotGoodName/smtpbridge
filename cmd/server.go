@@ -22,7 +22,8 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"github.com/ItsNotGoodName/go-smtpbridge/server"
+	"github.com/ItsNotGoodName/go-smtpbridge/left/smtp"
+	"github.com/ItsNotGoodName/go-smtpbridge/service"
 	"github.com/spf13/cobra"
 )
 
@@ -37,7 +38,15 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		server.Start()
+		// Init services
+		authSVC := service.NewNoAuth()
+		messageSVC := service.NewMessage()
+
+		// Init smtp server
+		server := smtp.New(authSVC, messageSVC)
+
+		// Start smtp server
+		server.Start(":1025")
 	},
 }
 
