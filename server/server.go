@@ -1,7 +1,6 @@
 package server
 
 import (
-	"errors"
 	"io"
 	"log"
 	"time"
@@ -24,13 +23,6 @@ func (bkd Backend) Login(state *smtp.ConnectionState, username, password string)
 
 // A Session is returned after EHLO.
 type Session struct{}
-
-func (s *Session) AuthPlain(username, password string) error {
-	if username != "username" || password != "password" {
-		return errors.New("invalid username or password")
-	}
-	return nil
-}
 
 func (s *Session) Mail(from string, opts smtp.MailOptions) error {
 	log.Println("Mail from:", from)
