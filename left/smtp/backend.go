@@ -76,7 +76,8 @@ func (s *session) Data(r io.Reader) error {
 		log.Println("TO_ERROR:", err)
 	}
 
-	return s.messageSVC.Handle(&app.Message{Subject: e.GetHeader("Subject"), Text: e.Text, From: s.from, To: toMap})
+	m := app.NewMessage(e.GetHeader("Subject"), s.from, toMap, e.Text)
+	return s.messageSVC.Handle(m)
 }
 
 func (s *session) Reset() {}
