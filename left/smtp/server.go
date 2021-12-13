@@ -4,7 +4,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/ItsNotGoodName/go-smtpbridge/port"
+	"github.com/ItsNotGoodName/go-smtpbridge/app"
 	"github.com/emersion/go-sasl"
 	"github.com/emersion/go-smtp"
 )
@@ -29,7 +29,7 @@ type SMTP struct {
 	s *smtp.Server
 }
 
-func New(authSVC port.AuthService, messageSVC port.MessageService) SMTP {
+func New(authSVC app.AuthServicePort, messageSVC app.MessageServicePort) SMTP {
 	b := newBackend(authSVC, messageSVC)
 	s := smtp.NewServer(b)
 

@@ -2,6 +2,7 @@ package app
 
 import (
 	"errors"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -14,9 +15,12 @@ const (
 	StatusReceived  Status = iota // Message was received.
 	StatusUnmatched               // Message does not have corresponding Endpoint.
 	StatusUnsent                  // Message was not sent.
+	StatusSentToOne               // Message was sent to atleast one Endpoint, but not all.
+	StatusSent                    // Message was sent.
 )
 
 type Message struct {
+	Time    time.Time       `json:"time"`    // Time message was received.
 	UUID    string          `json:"uuid"`    // UUID of the message.
 	Saved   bool            `json:"saved"`   // Saved represents whether the message has been saved.
 	Status  Status          `json:"status"`  // Status of message.
@@ -29,6 +33,7 @@ type Message struct {
 
 func NewMessage(subject, from string, to map[string]bool, text string) *Message {
 	return &Message{
+		Time:    time.Now(),
 		UUID:    uuid.New().String(),
 		Saved:   false,
 		Status:  StatusReceived,

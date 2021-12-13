@@ -5,15 +5,14 @@ import (
 	"log"
 
 	"github.com/ItsNotGoodName/go-smtpbridge/app"
-	"github.com/ItsNotGoodName/go-smtpbridge/port"
 	"github.com/emersion/go-smtp"
 	"github.com/jhillyerd/enmime"
 )
 
 // backend implements SMTP server methods.
 type backend struct {
-	authSVC    port.AuthService
-	messageSVC port.MessageService
+	authSVC    app.AuthServicePort
+	messageSVC app.MessageServicePort
 }
 
 func (b backend) AnonymousLogin(state *smtp.ConnectionState) (smtp.Session, error) {
@@ -27,17 +26,17 @@ func (b backend) Login(state *smtp.ConnectionState, username, password string) (
 	return NewSession(b.messageSVC), nil
 }
 
-func newBackend(auth port.AuthService, messageSVC port.MessageService) *backend {
+func newBackend(auth app.AuthServicePort, messageSVC app.MessageServicePort) *backend {
 	return &backend{auth, messageSVC}
 }
 
 // A session is returned after EHLO.
 type session struct {
-	messageSVC port.MessageService
+	messageSVC app.MessageServicePort
 	from       string
 }
 
-func NewSession(messageSVC port.MessageService) *session {
+func NewSession(messageSVC app.MessageServicePort) *session {
 	return &session{messageSVC, ""}
 }
 
@@ -58,19 +57,19 @@ func (s *session) Data(r io.Reader) error {
 		return err
 	}
 
-	log.Println("SUBJECT:", e.GetHeader("Subject"))
-	log.Println("TEXT:", e.Text)
-	log.Println("HTML:", e.HTML)
-	log.Println("ATTACHMENTS:", len(e.Attachments))
-	for e := range e.Errors {
-		log.Println("ERROR:", e)
-	}
-	log.Println("FROM:", e.GetHeader("From"))
+	//log.Println("SUBJECT:", e.GetHeader("Subject"))
+	//log.Println("TEXT:", e.Text)
+	//log.Println("HTML:", e.HTML)
+	//log.Println("ATTACHMENTS:", len(e.Attachments))
+	//for e := range e.Errors {
+	//	log.Println("ERROR:", e)
+	//}
+	//log.Println("FROM:", e.GetHeader("From"))
 	toMap := make(map[string]bool)
 	if to, err := e.AddressList("To"); err == nil {
 		for _, t := range to {
 			toMap[t.Address] = true
-			log.Println("TO:", t.Address)
+			//log.Println("TO:", t.Address)
 		}
 	} else {
 		log.Println("TO_ERROR:", err)
