@@ -6,6 +6,16 @@ import (
 	"github.com/spf13/viper"
 )
 
+type Config struct {
+	Bridges         []Bridge         `json:"bridges" mapstructure:"bridges"`
+	ConfigEndpoints []ConfigEndpoint `json:"endpoints" mapstructure:"endpoints"`
+}
+type ConfigEndpoint struct {
+	Name   string            `json:"name" mapstructure:"name"`
+	Type   string            `json:"type" mapstructure:"type"`
+	Config map[string]string `json:"config" mapstructure:"config"`
+}
+
 func NewConfig() *Config {
 	// TODO: Make this do less stuff
 	err := viper.ReadInConfig()
@@ -19,19 +29,23 @@ func NewConfig() *Config {
 		log.Fatalf("app.NewConfig: %s", err)
 	}
 
-	// TODO: remove this line
-	log.Printf("app.NewConfig: loaded %d bridges and %d endpoints\n", len(config.Bridges), len(config.Endpoints))
+	// TODO: validate config (e.g. check that all bridges and endpoints have a unique name, make sure all bridges point to valid endpoints, and warn of empty endpoints that are orphaned)
+
+	log.Printf("app.NewConfig: loaded %d bridges and %d endpoints\n", len(config.Bridges), len(config.ConfigEndpoints))
 
 	return config
 }
 
-type Config struct {
-	Bridges   []Bridge         `json:"bridges" yaml:"bridges"`
-	Endpoints []ConfigEndpoint `json:"endpoints" yaml:"endpoints"`
-}
+// NewEndpoints creates a list of Endpoints from config file and factory.
+func (c *Config) NewEndpoints(factory func(senderType string, config map[string]string) (EndpointPort, error)) map[string]EndpointPort {
+	endpoints := make(map[string]EndpointPort)
+	for _, c := range c.ConfigEndpoints {
+		sender, err := factory(c.Type, c.Config)
+		if err != nil {
+			log.Fatalf("Error creating endpoint: %s", err)
+		}
+		endpoints[c.Name] = sender
+	}
 
-type ConfigEndpoint struct {
-	Name   string            `json:"name" yaml:"name"`
-	Type   string            `json:"type" yaml:"type"`
-	Config map[string]string `json:"config" yaml:"config"`
+	return endpoints
 }

@@ -15,18 +15,25 @@ func NewMessage(bridgeSVC app.BridgeServicePort, messageREPO app.MessageReposito
 	return &Message{bridgeSVC, messageREPO}
 }
 
-func (m *Message) Handle(msg *app.Message) error {
-	// TODO: move creation to a seperate function
-	m.messageREPO.Create(msg)
-
-	endpoints, err := m.bridgeSVC.GetEndpoints(msg)
+func (m *Message) Create(subject, from string, to map[string]bool, text string) (*app.Message, error) {
+	msg := app.NewMessage(subject, from, to, text)
+	err := m.messageREPO.Create(msg)
 	if err != nil {
-		return err
+		return nil, err
 	}
+	return msg, err
+}
+
+func (m *Message) Handle(msg *app.Message) error {
+	defer m.messageREPO.Update(msg)
+
+	endpoints := m.bridgeSVC.GetEndpoints(msg)
 	if len(endpoints) == 0 {
+		msg.Status = app.StatusNoMatch
 		return errors.New("no endpoints found")
 	}
 
+	// TODO: wait group and log errors
 	var errs []error
 	for _, endpoint := range endpoints {
 		err := endpoint.Send(msg)
@@ -36,10 +43,15 @@ func (m *Message) Handle(msg *app.Message) error {
 	}
 
 	if len(errs) == len(endpoints) {
+		msg.Status = app.StatusNotSent
 		return errs[0]
 	}
 
-	// TODO: update message
+	if len(errs) > 0 {
+		msg.Status = app.StatusPartiallySent
+	} else {
+		msg.Status = app.StatusSent
+	}
 
 	return nil
 }

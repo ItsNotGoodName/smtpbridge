@@ -9,3 +9,7 @@ func NewNoAuth() *NoAuth {
 func (NoAuth) Login(username, password string) error {
 	return nil
 }
+
+func (NoAuth) AnonymousLogin() bool {
+	return false
+}

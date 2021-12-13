@@ -22,8 +22,6 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"log"
-
 	"github.com/ItsNotGoodName/go-smtpbridge/app"
 	"github.com/ItsNotGoodName/go-smtpbridge/left/smtp"
 	"github.com/ItsNotGoodName/go-smtpbridge/right/database"
@@ -45,10 +43,9 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// Read config
 		config := app.NewConfig()
-		endpoints, err := app.NewEndpoints(config.Endpoints, endpoint.Factory)
-		if err != nil {
-			log.Fatalf("failed to create endpoints: %s", err)
-		}
+
+		// Init endpoints
+		endpoints := config.NewEndpoints(endpoint.Factory)
 
 		// Init repo
 		messageREPO := database.New()

@@ -13,11 +13,10 @@ func NewBridge(bridges []app.Bridge, endpoints map[string]app.EndpointPort) *Bri
 	return &Bridge{endpoints: endpoints, bridges: bridges}
 }
 
-func (b *Bridge) GetEndpoints(msg *app.Message) ([]app.EndpointPort, error) {
+func (b *Bridge) GetEndpoints(msg *app.Message) []app.EndpointPort {
 	var endpoints []app.EndpointPort
 	for _, bridge := range b.bridges {
-		match := bridge.Match(msg)
-		if !match {
+		if !bridge.Match(msg) {
 			continue
 		}
 
@@ -30,5 +29,5 @@ func (b *Bridge) GetEndpoints(msg *app.Message) ([]app.EndpointPort, error) {
 		}
 	}
 
-	return endpoints, nil
+	return endpoints
 }

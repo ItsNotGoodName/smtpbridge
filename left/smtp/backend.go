@@ -16,10 +16,14 @@ type backend struct {
 }
 
 func (b backend) AnonymousLogin(state *smtp.ConnectionState) (smtp.Session, error) {
-	return nil, smtp.ErrAuthRequired
+	if !b.authSVC.AnonymousLogin() {
+		return nil, smtp.ErrAuthRequired
+	}
+	return NewSession(b.messageSVC), nil
 }
 
 func (b backend) Login(state *smtp.ConnectionState, username, password string) (smtp.Session, error) {
+	// TODO: add meta data to message e.g. ip address
 	if err := b.authSVC.Login(username, password); err != nil {
 		return nil, err
 	}
@@ -37,7 +41,7 @@ type session struct {
 }
 
 func NewSession(messageSVC app.MessageServicePort) *session {
-	return &session{messageSVC, ""}
+	return &session{messageSVC: messageSVC}
 }
 
 func (s *session) Mail(from string, opts smtp.MailOptions) error {
@@ -75,7 +79,11 @@ func (s *session) Data(r io.Reader) error {
 		log.Println("TO_ERROR:", err)
 	}
 
-	m := app.NewMessage(e.GetHeader("Subject"), s.from, toMap, e.Text)
+	m, err := s.messageSVC.Create(e.GetHeader("Subject"), s.from, toMap, e.Text)
+	if err != nil {
+		return err
+	}
+
 	return s.messageSVC.Handle(m)
 }
 

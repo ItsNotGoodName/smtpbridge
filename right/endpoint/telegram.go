@@ -44,12 +44,12 @@ func (t *Telegram) Send(message *app.Message) error {
 	}
 	defer response.Body.Close()
 
-	tres := &TelegramResponse{}
-	err = json.NewDecoder(response.Body).Decode(&tres)
+	result := &TelegramResponse{}
+	err = json.NewDecoder(response.Body).Decode(&result)
 	if err != nil {
 		return err
 	}
-	if !tres.OK {
+	if !result.OK {
 		return errors.New("Telegram response is not OK")
 	}
 

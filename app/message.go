@@ -1,22 +1,19 @@
 package app
 
 import (
-	"errors"
 	"time"
 
 	"github.com/google/uuid"
 )
 
-var ErrNotAuthorized = errors.New("not authorized")
-
 type Status uint8
 
 const (
-	StatusReceived  Status = iota // Message was received.
-	StatusUnmatched               // Message does not have corresponding Endpoint.
-	StatusUnsent                  // Message was not sent.
-	StatusSentToOne               // Message was sent to atleast one Endpoint, but not all.
-	StatusSent                    // Message was sent.
+	StatusReceived      Status = iota // Message was received.
+	StatusNoMatch                     // Message does not have corresponding Endpoint.
+	StatusNotSent                     // Message was not sent.
+	StatusPartiallySent               // Message was sent to atleast one Endpoint, but not all.
+	StatusSent                        // Message was sent.
 )
 
 type Message struct {
