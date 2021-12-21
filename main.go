@@ -21,7 +21,7 @@ THE SOFTWARE.
 */
 package main
 
-import "github.com/ItsNotGoodName/go-smtpbridge/cmd"
+import "github.com/ItsNotGoodName/smtpbridge/cmd"
 
 func main() {
 	cmd.Execute()

@@ -4,7 +4,7 @@ import (
 	"io"
 	"log"
 
-	"github.com/ItsNotGoodName/go-smtpbridge/app"
+	"github.com/ItsNotGoodName/smtpbridge/app"
 	"github.com/emersion/go-smtp"
 	"github.com/jhillyerd/enmime"
 )

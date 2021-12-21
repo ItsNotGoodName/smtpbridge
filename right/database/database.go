@@ -3,7 +3,7 @@ package database
 import (
 	"log"
 
-	"github.com/ItsNotGoodName/go-smtpbridge/app"
+	"github.com/ItsNotGoodName/smtpbridge/app"
 )
 
 type Database struct {

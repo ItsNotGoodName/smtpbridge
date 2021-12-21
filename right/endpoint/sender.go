@@ -3,7 +3,7 @@ package endpoint
 import (
 	"fmt"
 
-	"github.com/ItsNotGoodName/go-smtpbridge/app"
+	"github.com/ItsNotGoodName/smtpbridge/app"
 )
 
 func Factory(endpointType string, config map[string]string) (app.EndpointPort, error) {

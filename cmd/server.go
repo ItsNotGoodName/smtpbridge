@@ -22,11 +22,11 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"github.com/ItsNotGoodName/go-smtpbridge/app"
-	"github.com/ItsNotGoodName/go-smtpbridge/left/smtp"
-	"github.com/ItsNotGoodName/go-smtpbridge/right/database"
-	"github.com/ItsNotGoodName/go-smtpbridge/right/endpoint"
-	"github.com/ItsNotGoodName/go-smtpbridge/service"
+	"github.com/ItsNotGoodName/smtpbridge/app"
+	"github.com/ItsNotGoodName/smtpbridge/left/smtp"
+	"github.com/ItsNotGoodName/smtpbridge/right/database"
+	"github.com/ItsNotGoodName/smtpbridge/right/endpoint"
+	"github.com/ItsNotGoodName/smtpbridge/service"
 	"github.com/spf13/cobra"
 )
 

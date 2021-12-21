@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/ItsNotGoodName/go-smtpbridge/app"
+	"github.com/ItsNotGoodName/smtpbridge/app"
 )
 
 type Telegram struct {

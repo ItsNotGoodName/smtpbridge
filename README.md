@@ -1,1 +1,1 @@
-# go-smtpbridge
+# smtpbridge

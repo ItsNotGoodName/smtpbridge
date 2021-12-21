@@ -3,7 +3,7 @@ package service
 import (
 	"errors"
 
-	"github.com/ItsNotGoodName/go-smtpbridge/app"
+	"github.com/ItsNotGoodName/smtpbridge/app"
 )
 
 type Message struct {

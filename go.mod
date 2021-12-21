@@ -1,4 +1,4 @@
-module github.com/ItsNotGoodName/go-smtpbridge
+module github.com/ItsNotGoodName/smtpbridge
 
 go 1.17
 
