@@ -21,14 +21,6 @@ func NewTelegram(token string, chatID string) *Telegram {
 	}
 }
 
-//func (t *Telegram) Name() string {
-//	return "telegram"
-//}
-
-//func (t *Telegram) Capabilities() []app.Capability {
-//	return []app.Capability{app.CapabilityText, app.CapabilityImage}
-//}
-
 type TelegramResponse struct {
 	OK bool `json:"ok"`
 }

@@ -1,28 +1,34 @@
 package app
 
+// AuthServicePort handles authenticating users.
 type AuthServicePort interface {
 	AnonymousLogin() bool
 	Login(username, password string) error
 }
 
+// BridgeServicePort handles finding endpoints for messages.
 type BridgeServicePort interface {
-	// GetEndpoints returns a list of endpoints that the message should be sent to.
 	GetEndpoints(msg *Message) []EndpointPort
 }
 
+// MessageServicePort handles creating and sending messages.
 type MessageServicePort interface {
-	// Handle receives message from drivers.
+	// Create creates a new message and saves it.
 	Create(subject, from string, to map[string]bool, text string) (*Message, error)
+	// Handle finds endpoints for the message and sends to it.
 	Handle(msg *Message) error
 }
 
+// MessageRepositoryPort handles storing messages.
 type MessageRepositoryPort interface {
+	// Create saves the message.
 	Create(msg *Message) error
+	// Update updates the message.
 	Update(msg *Message) error
 }
 
+// EndpointPort handles sending messages to an endpoint.
 type EndpointPort interface {
-	// Capabilities() []Capability
-	// Send sends a message to the given endpoint. It returns an error if the message could not be sent.
+	// Send sends the message to the endpoint.
 	Send(msg *Message) error
 }

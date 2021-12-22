@@ -1,7 +1,7 @@
 package service
 
 import (
-	"errors"
+	"log"
 
 	"github.com/ItsNotGoodName/smtpbridge/app"
 )
@@ -29,28 +29,20 @@ func (m *Message) Handle(msg *app.Message) error {
 
 	endpoints := m.bridgeSVC.GetEndpoints(msg)
 	if len(endpoints) == 0 {
-		msg.Status = app.StatusNoMatch
-		return errors.New("no endpoints found")
+		return app.ErrNoEndpoints
 	}
 
-	// TODO: wait group and log errors
 	var errs []error
 	for _, endpoint := range endpoints {
 		err := endpoint.Send(msg)
 		if err != nil {
 			errs = append(errs, err)
+			log.Println("service.Message.Handle:", err)
 		}
 	}
-
+	// Return first error if messsage could not be sent to atleast one endpoint.
 	if len(errs) == len(endpoints) {
-		msg.Status = app.StatusNotSent
 		return errs[0]
-	}
-
-	if len(errs) > 0 {
-		msg.Status = app.StatusPartiallySent
-	} else {
-		msg.Status = app.StatusSent
 	}
 
 	return nil

@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/ItsNotGoodName/smtpbridge/app"
 )
 
@@ -23,7 +25,7 @@ func (b *Bridge) GetEndpoints(msg *app.Message) []app.EndpointPort {
 		for _, endpointName := range bridge.Endpoints {
 			endpoint, ok := b.endpoints[endpointName]
 			if !ok {
-				panic("endpoint not found")
+				panic(fmt.Sprintf("endpoint '%s' not found", endpointName))
 			}
 			endpoints = append(endpoints, endpoint)
 		}

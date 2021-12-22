@@ -7,6 +7,9 @@ type Bridge struct {
 }
 
 func (b *Bridge) Match(msg *Message) bool {
+	if len(b.Filters) == 0 {
+		return true
+	}
 	for _, f := range b.Filters {
 		if f.Match(msg) {
 			return true

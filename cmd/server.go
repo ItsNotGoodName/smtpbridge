@@ -28,6 +28,7 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/right/endpoint"
 	"github.com/ItsNotGoodName/smtpbridge/service"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // serverCmd represents the server command
@@ -42,16 +43,18 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// Read config
-		config := app.NewConfig()
+		config := app.NewConfig(func(config *app.Config) error {
+			return viper.Unmarshal(config)
+		})
 
 		// Init endpoints
 		endpoints := config.NewEndpoints(endpoint.Factory)
 
 		// Init repo
-		messageREPO := database.New()
+		messageREPO := database.NewMock()
 
 		// Init services
-		authSVC := service.NewNoAuth()
+		authSVC := service.NewMockAuth()
 		bridgeSVC := service.NewBridge(config.Bridges, endpoints)
 		messageSVC := service.NewMessage(bridgeSVC, messageREPO)
 
@@ -59,12 +62,15 @@ to quickly create a Cobra application.`,
 		server := smtp.New(authSVC, messageSVC)
 
 		// Start smtp server
-		server.Start(":1025")
+		server.Start(":" + config.Port)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(serverCmd)
+
+	serverCmd.Flags().String("port", "1025", "port for smtp server")
+	viper.BindPFlag("port", serverCmd.Flags().Lookup("port"))
 
 	// Here you will define your flags and configuration settings.
 

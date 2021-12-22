@@ -47,8 +47,8 @@ func New(authSVC app.AuthServicePort, messageSVC app.MessageServicePort) SMTP {
 
 func (s SMTP) Start(address string) {
 	s.s.Addr = address
-	log.Println("smtp.SMTP.Start: Starting SMTP server on", address)
+	log.Println("smtp.SMTP.Start: starting SMTP server on", address)
 	if err := s.s.ListenAndServe(); err != nil {
-		log.Fatal("smtp.SMTP.Start: Starting SMTP server on", address)
+		log.Fatalf("smtp.SMTP.Start: %s", err)
 	}
 }
