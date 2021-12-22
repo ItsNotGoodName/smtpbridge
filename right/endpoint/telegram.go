@@ -1,8 +1,12 @@
 package endpoint
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"io/ioutil"
+	"mime/multipart"
 	"net/http"
 	"net/url"
 
@@ -44,6 +48,49 @@ func (t *Telegram) Send(message *app.Message) error {
 	if !result.OK {
 		return errors.New("Telegram response is not OK")
 	}
+
+	for _, attachment := range message.Attachments {
+		t.SendPicture(attachment.Name, attachment.Data)
+	}
+
+	return nil
+}
+
+func (t *Telegram) SendPicture(name string, pic []byte) error {
+	// just need bytes to send picture
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+	w, err := writer.CreateFormFile("photo", name)
+	if err != nil {
+		return err
+	}
+	w.Write(pic)
+	w, err = writer.CreateFormField("caption")
+	if err != nil {
+		return err
+	}
+	w.Write([]byte(name))
+	writer.Close()
+
+	// make a http post request
+	req, err := http.NewRequest("POST", "https://api.telegram.org/bot"+t.Token+"/sendPhoto?chat_id="+t.ChatID, bytes.NewReader(body.Bytes()))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+
+	client := &http.Client{}
+	res, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	b, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(b))
 
 	return nil
 }

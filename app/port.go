@@ -15,8 +15,10 @@ type BridgeServicePort interface {
 type MessageServicePort interface {
 	// Create creates a new message and saves it.
 	Create(subject, from string, to map[string]bool, text string) (*Message, error)
-	// Handle finds endpoints for the message and sends to it.
-	Handle(msg *Message) error
+	// AddAttachment adds an attachment to a message.
+	AddAttachment(msg *Message, name string, content []byte) error
+	// Send finds endpoints for the message and sends to it.
+	Send(msg *Message) error
 }
 
 // MessageRepositoryPort handles storing messages.

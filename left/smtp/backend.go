@@ -84,7 +84,13 @@ func (s *session) Data(r io.Reader) error {
 		return err
 	}
 
-	return s.messageSVC.Handle(m)
+	for _, a := range e.Attachments {
+		if err := s.messageSVC.AddAttachment(m, a.FileName, a.Content); err != nil {
+			log.Println("ATTACHMENT_ERROR:", err)
+		}
+	}
+
+	return s.messageSVC.Send(m)
 }
 
 func (s *session) Reset() {}
