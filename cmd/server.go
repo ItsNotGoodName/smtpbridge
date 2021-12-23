@@ -43,9 +43,7 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// Read config
-		config := app.NewConfig(func(config *app.Config) error {
-			return viper.Unmarshal(config)
-		})
+		config := app.NewConfig()
 
 		// Init endpoints
 		endpoints := config.NewEndpoints(endpoint.Factory)

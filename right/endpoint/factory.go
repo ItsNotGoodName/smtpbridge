@@ -14,7 +14,7 @@ func Factory(endpointType string, config map[string]string) (app.EndpointPort, e
 		return NewMock()
 	}
 
-	return nil, app.ErrInvalidEndpointType
+	return nil, fmt.Errorf("unknown endpointType %s: %v", endpointType, app.ErrInvalidEndpointType)
 }
 
 func telegramFactory(config map[string]string) (*Telegram, error) {

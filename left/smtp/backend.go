@@ -23,7 +23,6 @@ func (b backend) AnonymousLogin(state *smtp.ConnectionState) (smtp.Session, erro
 }
 
 func (b backend) Login(state *smtp.ConnectionState, username, password string) (smtp.Session, error) {
-	// TODO: add meta data to message e.g. ip address
 	if err := b.authSVC.Login(username, password); err != nil {
 		return nil, err
 	}
@@ -45,13 +44,13 @@ func NewSession(messageSVC app.MessageServicePort) *session {
 }
 
 func (s *session) Mail(from string, opts smtp.MailOptions) error {
-	log.Println("Mail from:", from)
+	// log.Println("Mail from:", from)
 	s.from = from
 	return nil
 }
 
 func (s *session) Rcpt(to string) error {
-	log.Println("Rcpt to:", to)
+	// log.Println("Rcpt to:", to)
 	return nil
 }
 

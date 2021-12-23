@@ -1,7 +1,7 @@
 package endpoint
 
 import (
-	"log"
+	"fmt"
 
 	"github.com/ItsNotGoodName/smtpbridge/app"
 )
@@ -13,6 +13,6 @@ func NewMock() (*Mock, error) {
 }
 
 func (m *Mock) Send(message *app.Message) error {
-	log.Println("Mock:", message)
+	fmt.Println("Mock:", message)
 	return nil
 }

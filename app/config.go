@@ -2,6 +2,8 @@ package app
 
 import (
 	"log"
+
+	"github.com/spf13/viper"
 )
 
 type Config struct {
@@ -16,10 +18,10 @@ type ConfigEndpoint struct {
 	Config map[string]string `json:"config" mapstructure:"config"`
 }
 
-func NewConfig(load func(config *Config) error) *Config {
+func NewConfig() *Config {
 	config := &Config{}
 
-	err := load(config)
+	err := viper.Unmarshal(config)
 	if err != nil {
 		log.Fatalf("app.NewConfig: %s", err)
 	}
