@@ -154,8 +154,5 @@ dist
 
 # End of https://www.toptal.com/developers/gitignore/api/go,node
 
-bin
 .DS_Store
-dist-ssr
-*.local
 tmp

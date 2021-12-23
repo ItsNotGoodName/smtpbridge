@@ -5,6 +5,8 @@
 Configuration file at `~/.smtpbridge.yml`.
 
 ```yaml
+port: 1025
+
 bridges:
   - name: test bridge
     filters:
