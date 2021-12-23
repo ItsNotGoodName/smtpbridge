@@ -38,7 +38,7 @@ func New(authSVC app.AuthServicePort, messageSVC app.MessageServicePort) SMTP {
 	s.Domain = "localhost"
 	s.ReadTimeout = 10 * time.Second
 	s.WriteTimeout = 10 * time.Second
-	s.MaxMessageBytes = 1024 * 1024
+	s.MaxMessageBytes = 1024 * 1024 * 25 // TODO: put this in config
 	s.MaxRecipients = 50
 	s.AllowInsecureAuth = true
 
