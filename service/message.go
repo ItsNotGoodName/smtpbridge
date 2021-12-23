@@ -24,8 +24,8 @@ func (m *Message) Create(subject, from string, to map[string]bool, text string) 
 	return msg, err
 }
 
-func (m *Message) AddAttachment(msg *app.Message, name string, content []byte) error {
-	att, err := app.NewAttachment(name, content)
+func (m *Message) AddAttachment(msg *app.Message, name string, data []byte) error {
+	att, err := app.NewAttachment(name, data)
 	if err != nil {
 		return err
 	}
@@ -39,23 +39,21 @@ func (m *Message) AddAttachment(msg *app.Message, name string, content []byte) e
 	return nil
 }
 
+func (m *Message) send(msg *app.Message, endpoint app.EndpointPort) {
+	err := endpoint.Send(msg)
+	if err != nil {
+		log.Printf("service.Message.send: %s", err)
+	}
+}
+
 func (m *Message) Send(msg *app.Message) error {
 	endpoints := m.bridgeSVC.GetEndpoints(msg)
 	if len(endpoints) == 0 {
 		return app.ErrNoEndpoints
 	}
 
-	var errs []error
 	for _, endpoint := range endpoints {
-		err := endpoint.Send(msg)
-		if err != nil {
-			errs = append(errs, err)
-			log.Println("service.Message.Handle:", err)
-		}
-	}
-	// Return first error if messsage could not be sent to atleast one endpoint.
-	if len(errs) == len(endpoints) {
-		return errs[0]
+		go m.send(msg, endpoint)
 	}
 
 	return nil
