@@ -59,7 +59,7 @@ func (s *session) Rcpt(to string) error {
 func (s *session) Data(r io.Reader) error {
 	e, err := enmime.ReadEnvelope(r)
 	if err != nil {
-		log.Println("ERROR: could not read email", err)
+		log.Println("ERROR: could not read email:", err)
 		return err
 	}
 
@@ -78,7 +78,7 @@ func (s *session) Data(r io.Reader) error {
 			//log.Println("TO:", t.Address)
 		}
 	} else {
-		log.Println("TO_ERROR: could not get To from email", err)
+		log.Println("TO_ERROR: could not get To from email:", err)
 	}
 	toMap[s.to] = true
 
@@ -90,7 +90,7 @@ func (s *session) Data(r io.Reader) error {
 
 	for _, a := range e.Attachments {
 		if err := s.messageSVC.AddAttachment(m, a.FileName, a.Content); err != nil {
-			log.Println("ATTACHMENT_ERROR: could not add attachment", err)
+			log.Println("ATTACHMENT_ERROR: could not add attachment:", err)
 		}
 	}
 
