@@ -27,11 +27,15 @@ type Filter struct {
 
 func (f *Filter) Match(msg *Message) bool {
 	// TODO: regex
-	if msg.From == f.From {
-		return true
+	if f.To != "" {
+		if !msg.To[f.To] {
+			return false
+		}
 	}
-	if msg.To[f.To] {
-		return true
+	if f.From != "" {
+		if msg.From != f.From {
+			return false
+		}
 	}
-	return false
+	return true
 }
