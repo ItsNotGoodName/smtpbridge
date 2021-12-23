@@ -37,6 +37,7 @@ func newBackend(auth app.AuthServicePort, messageSVC app.MessageServicePort) *ba
 type session struct {
 	messageSVC app.MessageServicePort
 	from       string
+	to         string
 }
 
 func NewSession(messageSVC app.MessageServicePort) *session {
@@ -51,6 +52,7 @@ func (s *session) Mail(from string, opts smtp.MailOptions) error {
 
 func (s *session) Rcpt(to string) error {
 	// log.Println("Rcpt to:", to)
+	s.to = to
 	return nil
 }
 
@@ -78,6 +80,7 @@ func (s *session) Data(r io.Reader) error {
 	} else {
 		log.Println("TO_ERROR: could not get To from email", err)
 	}
+	toMap[s.to] = true
 
 	m, err := s.messageSVC.Create(e.GetHeader("Subject"), s.from, toMap, e.Text)
 	if err != nil {
