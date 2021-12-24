@@ -15,21 +15,23 @@ func NewBridge(bridges []app.Bridge, endpoints map[string]app.EndpointPort) *Bri
 	return &Bridge{endpoints: endpoints, bridges: bridges}
 }
 
-func (b *Bridge) GetEndpoints(msg *app.Message) []app.EndpointPort {
-	var endpoints []app.EndpointPort
+func (b *Bridge) GetBridges(msg *app.Message) []app.Bridge {
+	var bridges []app.Bridge
 	for _, bridge := range b.bridges {
 		if !bridge.Match(msg) {
 			continue
 		}
-
-		for _, endpointName := range bridge.Endpoints {
-			endpoint, ok := b.endpoints[endpointName]
-			if !ok {
-				panic(fmt.Sprintf("endpoint '%s' not found", endpointName))
-			}
-			endpoints = append(endpoints, endpoint)
-		}
+		bridges = append(bridges, bridge)
 	}
 
-	return endpoints
+	return bridges
+}
+
+func (b *Bridge) GetEndpoint(name string) app.EndpointPort {
+	endpoint, ok := b.endpoints[name]
+	if !ok {
+		panic(fmt.Sprintf("endpoint '%s' not found", name))
+	}
+
+	return endpoint
 }

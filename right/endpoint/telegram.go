@@ -7,7 +7,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/url"
-	"sync"
 
 	"github.com/ItsNotGoodName/smtpbridge/app"
 )
@@ -15,14 +14,12 @@ import (
 type Telegram struct {
 	Token  string
 	ChatID string
-	SendMu sync.Mutex
 }
 
 func NewTelegram(token string, chatID string) *Telegram {
 	return &Telegram{
 		Token:  token,
 		ChatID: chatID,
-		SendMu: sync.Mutex{},
 	}
 }
 
@@ -31,10 +28,7 @@ type TelegramResponse struct {
 	Description string `json:"description"`
 }
 
-func (t *Telegram) Send(msg *app.Message) error {
-	t.SendMu.Lock()
-	defer t.SendMu.Unlock()
-
+func (t *Telegram) Send(msg *app.EndpointMessage) error {
 	if len(msg.Attachments) == 0 {
 		return t.sendMessage(msg.Text)
 	}

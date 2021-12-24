@@ -39,7 +39,7 @@ func (m *Message) AddAttachment(msg *app.Message, name string, data []byte) erro
 	return nil
 }
 
-func (m *Message) send(msg *app.Message, endpoint app.EndpointPort) {
+func (m *Message) send(msg *app.EndpointMessage, endpoint app.EndpointPort) {
 	err := endpoint.Send(msg)
 	if err != nil {
 		log.Printf("service.Message.send: %s", err)
@@ -47,13 +47,17 @@ func (m *Message) send(msg *app.Message, endpoint app.EndpointPort) {
 }
 
 func (m *Message) Send(msg *app.Message) error {
-	endpoints := m.bridgeSVC.GetEndpoints(msg)
-	if len(endpoints) == 0 {
-		return app.ErrNoEndpoints
+	bridges := m.bridgeSVC.GetBridges(msg)
+	if len(bridges) == 0 {
+		return app.ErrNoBridges
 	}
 
-	for _, endpoint := range endpoints {
-		go m.send(msg, endpoint)
+	for _, bridge := range bridges {
+		emsg := bridge.EndpointMessage(msg)
+		for _, name := range bridge.Endpoints {
+			endpoint := m.bridgeSVC.GetEndpoint(name)
+			go m.send(emsg, endpoint)
+		}
 	}
 
 	return nil

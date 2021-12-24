@@ -26,3 +26,8 @@ func NewMessage(subject, from string, to map[string]bool, text string) *Message 
 		Text:    text,
 	}
 }
+
+type EndpointMessage struct {
+	Text        string        `json:"text"`        // Text is the message body.
+	Attachments []*Attachment `json:"attachments"` // Attachments is a list of attachments.
+}

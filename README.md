@@ -9,8 +9,10 @@ port: 1025
 
 bridges:
   - name: test bridge
-    filters:
-      - to: test@example.com
+    email_to: foo@example.com
+    email_from: bar@example.com
+    only_text: false
+    only_attachments: false
     endpoints:
       - test endpoint
 
