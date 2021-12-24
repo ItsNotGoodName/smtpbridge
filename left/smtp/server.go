@@ -29,7 +29,7 @@ type SMTP struct {
 	s *smtp.Server
 }
 
-func New(authSVC app.AuthServicePort, messageSVC app.MessageServicePort) SMTP {
+func New(authSVC app.AuthServicePort, messageSVC app.MessageServicePort, size int) SMTP {
 	b := newBackend(authSVC, messageSVC)
 	s := smtp.NewServer(b)
 
@@ -38,7 +38,7 @@ func New(authSVC app.AuthServicePort, messageSVC app.MessageServicePort) SMTP {
 	s.Domain = "localhost"
 	s.ReadTimeout = 10 * time.Second
 	s.WriteTimeout = 10 * time.Second
-	s.MaxMessageBytes = 1024 * 1024 * 25 // TODO: put this in config
+	s.MaxMessageBytes = size
 	s.MaxRecipients = 50
 	s.AllowInsecureAuth = true
 

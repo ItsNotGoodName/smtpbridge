@@ -8,6 +8,7 @@ import (
 
 type Config struct {
 	Port            string           `json:"port" mapstructure:"port"`
+	Size            int              `json:"size" mapstructure:"size"`
 	Bridges         []Bridge         `json:"bridges" mapstructure:"bridges"`
 	ConfigEndpoints []ConfigEndpoint `json:"endpoints" mapstructure:"endpoints"`
 }
