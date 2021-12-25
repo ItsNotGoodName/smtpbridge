@@ -11,5 +11,5 @@ func (MockAuth) Login(username, password string) error {
 }
 
 func (MockAuth) AnonymousLogin() bool {
-	return false
+	return true
 }
