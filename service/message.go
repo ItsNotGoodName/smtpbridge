@@ -61,12 +61,14 @@ func (m *Message) Send(msg *app.Message) error {
 
 	for _, bridge := range bridges {
 		emsg := bridge.EndpointMessage(msg)
-		for _, name := range bridge.Endpoints {
-			endpoint, err := m.endpointREPO.Get(name)
-			if err != nil {
-				return err
+		if !emsg.IsEmpty() {
+			for _, name := range bridge.Endpoints {
+				endpoint, err := m.endpointREPO.Get(name)
+				if err != nil {
+					return err
+				}
+				go m.send(emsg, endpoint)
 			}
-			go m.send(emsg, endpoint)
 		}
 	}
 

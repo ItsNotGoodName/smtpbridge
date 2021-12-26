@@ -31,3 +31,7 @@ type EndpointMessage struct {
 	Text        string        `json:"text"`        // Text is the message body.
 	Attachments []*Attachment `json:"attachments"` // Attachments is a list of attachments.
 }
+
+func (em *EndpointMessage) IsEmpty() bool {
+	return em.Text == "" && len(em.Attachments) == 0
+}
