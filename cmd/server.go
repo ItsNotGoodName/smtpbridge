@@ -45,22 +45,20 @@ to quickly create a Cobra application.`,
 		// Read config
 		config := app.NewConfig()
 
-		// Init endpoints
-		endpoints := config.NewEndpoints(endpoint.Factory)
-
-		// Init repo
+		// Init repositories
+		endpointREPO := endpoint.NewRepository(config.ConfigEndpoints)
 		messageREPO := database.NewMock()
 
 		// Init services
 		authSVC := service.NewMockAuth()
-		bridgeSVC := service.NewBridge(config.Bridges, endpoints)
-		messageSVC := service.NewMessage(bridgeSVC, messageREPO)
+		bridgeSVC := service.NewBridge(endpointREPO, config.Bridges)
+		messageSVC := service.NewMessage(bridgeSVC, endpointREPO, messageREPO)
 
 		// Init smtp server
-		server := smtp.New(authSVC, messageSVC, config.Size)
+		smtpServer := smtp.New(authSVC, messageSVC, config.Size)
 
 		// Start smtp server
-		server.Start(":" + config.Port)
+		smtpServer.Start(":" + config.Port)
 	},
 }
 

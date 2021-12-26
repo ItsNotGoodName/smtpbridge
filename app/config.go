@@ -33,17 +33,3 @@ func NewConfig() *Config {
 
 	return config
 }
-
-// NewEndpoints creates a name to Endpoint map using a factory.
-func (c *Config) NewEndpoints(factory func(senderType string, config map[string]string) (EndpointPort, error)) map[string]EndpointPort {
-	endpoints := make(map[string]EndpointPort)
-	for _, c := range c.ConfigEndpoints {
-		endpoint, err := factory(c.Type, c.Config)
-		if err != nil {
-			log.Fatalf("app.Config.NewEndpoints: %s", err)
-		}
-		endpoints[c.Name] = endpoint
-	}
-
-	return endpoints
-}

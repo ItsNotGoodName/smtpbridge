@@ -1,18 +1,25 @@
 package service
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/ItsNotGoodName/smtpbridge/app"
 )
 
 type Bridge struct {
-	endpoints map[string]app.EndpointPort
-	bridges   []app.Bridge
+	bridges []app.Bridge
 }
 
-func NewBridge(bridges []app.Bridge, endpoints map[string]app.EndpointPort) *Bridge {
-	return &Bridge{endpoints: endpoints, bridges: bridges}
+func NewBridge(endpointREPO app.EndpointRepositoryPort, bridges []app.Bridge) *Bridge {
+	for _, bridge := range bridges {
+		for _, endpoint := range bridge.Endpoints {
+			if _, err := endpointREPO.Get(endpoint); err != nil {
+				log.Fatalln("service.NewBridge:", err)
+			}
+		}
+	}
+
+	return &Bridge{bridges: bridges}
 }
 
 func (b *Bridge) GetBridges(msg *app.Message) []app.Bridge {
@@ -25,13 +32,4 @@ func (b *Bridge) GetBridges(msg *app.Message) []app.Bridge {
 	}
 
 	return bridges
-}
-
-func (b *Bridge) GetEndpoint(name string) app.EndpointPort {
-	endpoint, ok := b.endpoints[name]
-	if !ok {
-		panic(fmt.Sprintf("endpoint '%s' not found", name))
-	}
-
-	return endpoint
 }

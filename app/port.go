@@ -8,7 +8,7 @@ type AuthServicePort interface {
 
 // BridgeServicePort handles finding endpoints for messages.
 type BridgeServicePort interface {
-	GetEndpoint(name string) EndpointPort
+	// GetBridges returns a list of bridges that the message belongs to.
 	GetBridges(msg *Message) []Bridge
 }
 
@@ -34,4 +34,9 @@ type MessageRepositoryPort interface {
 type EndpointPort interface {
 	// Send sends the message to the endpoint.
 	Send(msg *EndpointMessage) error
+}
+
+type EndpointRepositoryPort interface {
+	Create(name, endpointType string, config map[string]string) error
+	Get(name string) (EndpointPort, error)
 }
