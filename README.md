@@ -5,8 +5,9 @@
 Configuration file at `~/.smtpbridge.yml`.
 
 ```yaml
-port: 1025
-size: 26214400 # 25 MB
+smtp:
+  port: 1025
+  size: 26214400 # 25 MB
 
 bridges:
   - name: test bridge

@@ -7,8 +7,7 @@ import (
 )
 
 type Config struct {
-	Port            string           `json:"port" mapstructure:"port"`
-	Size            int              `json:"size" mapstructure:"size"`
+	ConfigSMTP      ConfigSMTP       `json:"smtp" mapstructure:"smtp"`
 	Bridges         []Bridge         `json:"bridges" mapstructure:"bridges"`
 	ConfigEndpoints []ConfigEndpoint `json:"endpoints" mapstructure:"endpoints"`
 }
@@ -19,6 +18,11 @@ type ConfigEndpoint struct {
 	Config map[string]string `json:"config" mapstructure:"config"`
 }
 
+type ConfigSMTP struct {
+	Port string `json:"port" mapstructure:"port"`
+	Size int    `json:"size" mapstructure:"size"`
+}
+
 func NewConfig() *Config {
 	config := &Config{}
 
@@ -27,9 +31,7 @@ func NewConfig() *Config {
 		log.Fatalf("app.NewConfig: %s", err)
 	}
 
-	// TODO: validate config (e.g. check that all bridges and endpoints have a unique name, make sure all bridges point to valid endpoints, and warn of empty endpoints that are orphaned)
-
-	log.Printf("app.NewConfig: loaded %d bridges and %d endpoints", len(config.Bridges), len(config.ConfigEndpoints))
+	log.Printf("app.NewConfig: read %d bridges and %d endpoints", len(config.Bridges), len(config.ConfigEndpoints))
 
 	return config
 }

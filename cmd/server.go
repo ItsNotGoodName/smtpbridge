@@ -55,10 +55,10 @@ to quickly create a Cobra application.`,
 		messageSVC := service.NewMessage(bridgeSVC, endpointREPO, messageREPO)
 
 		// Init smtp server
-		smtpServer := smtp.New(authSVC, messageSVC, config.Size)
+		smtpServer := smtp.New(authSVC, messageSVC, config.ConfigSMTP)
 
 		// Start smtp server
-		smtpServer.Start(":" + config.Port)
+		smtpServer.Start(":" + config.ConfigSMTP.Port)
 	},
 }
 
@@ -66,10 +66,10 @@ func init() {
 	rootCmd.AddCommand(serverCmd)
 
 	serverCmd.Flags().String("port", "1025", "port for smtp server")
-	viper.BindPFlag("port", serverCmd.Flags().Lookup("port"))
+	viper.BindPFlag("smtp.port", serverCmd.Flags().Lookup("port"))
 
 	serverCmd.Flags().Int("size", 1024*1024*25, "max message size in bytes")
-	viper.BindPFlag("size", serverCmd.Flags().Lookup("size"))
+	viper.BindPFlag("smtp.size", serverCmd.Flags().Lookup("size"))
 
 	// Here you will define your flags and configuration settings.
 
