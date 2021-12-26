@@ -35,20 +35,19 @@ func New(authSVC app.AuthServicePort, messageSVC app.MessageServicePort, config 
 
 	enableMechLogin(s, b)
 
+	s.Addr = config.Host + ":" + config.PortStr
 	s.Domain = "localhost"
 	s.ReadTimeout = 10 * time.Second
 	s.WriteTimeout = 10 * time.Second
 	s.MaxMessageBytes = config.Size
 	s.MaxRecipients = 50
 	s.AllowInsecureAuth = true
-
 	return SMTP{s}
 }
 
-func (s SMTP) Start(address string) {
-	s.s.Addr = address
-	log.Println("smtp.SMTP.Start: starting SMTP server on", address)
+func (s SMTP) Start() {
+	log.Println("smtp.SMTP.Start: starting SMTP server on", s.s.Addr)
 	if err := s.s.ListenAndServe(); err != nil {
-		log.Fatalf("smtp.SMTP.Start: %s", err)
+		log.Fatalln("smtp.SMTP.Start:", err)
 	}
 }

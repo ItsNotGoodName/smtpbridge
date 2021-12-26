@@ -34,13 +34,8 @@ import (
 // serverCmd represents the server command
 var serverCmd = &cobra.Command{
 	Use:   "server",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Start SMTP server",
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		// Read config
 		config := app.NewConfig()
@@ -58,17 +53,20 @@ to quickly create a Cobra application.`,
 		smtpServer := smtp.New(authSVC, messageSVC, config.ConfigSMTP)
 
 		// Start smtp server
-		smtpServer.Start(":" + config.ConfigSMTP.Port)
+		smtpServer.Start()
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(serverCmd)
 
-	serverCmd.Flags().String("port", "1025", "port for smtp server")
+	serverCmd.Flags().String("host", "", "host to listen on")
+	viper.BindPFlag("smtp.host", serverCmd.Flags().Lookup("host"))
+
+	serverCmd.Flags().Uint16("port", 1025, "port to listen on")
 	viper.BindPFlag("smtp.port", serverCmd.Flags().Lookup("port"))
 
-	serverCmd.Flags().Int("size", 1024*1024*25, "max message size in bytes")
+	serverCmd.Flags().Int("size", 1024*1024*25, "max size of email in bytes")
 	viper.BindPFlag("smtp.size", serverCmd.Flags().Lookup("size"))
 
 	// Here you will define your flags and configuration settings.

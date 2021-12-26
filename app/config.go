@@ -2,6 +2,7 @@ package app
 
 import (
 	"log"
+	"strconv"
 
 	"github.com/spf13/viper"
 )
@@ -19,8 +20,10 @@ type ConfigEndpoint struct {
 }
 
 type ConfigSMTP struct {
-	Port string `json:"port" mapstructure:"port"`
-	Size int    `json:"size" mapstructure:"size"`
+	Host    string `json:"host" mapstructure:"host"`
+	Port    uint16 `json:"port" mapstructure:"port"`
+	PortStr string `json:"-" mapstructure:"-"`
+	Size    int    `json:"size" mapstructure:"size"`
 }
 
 func NewConfig() *Config {
@@ -30,6 +33,8 @@ func NewConfig() *Config {
 	if err != nil {
 		log.Fatalf("app.NewConfig: %s", err)
 	}
+
+	config.ConfigSMTP.PortStr = strconv.FormatUint(uint64(config.ConfigSMTP.Port), 10)
 
 	log.Printf("app.NewConfig: read %d bridges and %d endpoints", len(config.Bridges), len(config.ConfigEndpoints))
 
