@@ -11,7 +11,7 @@ Do not expose this to the Internet, this is only intended to be used on your loc
 List of example senders.
 
 - Motion/AI detection from IP Cameras
-- Notifcations Linux servers such as unattended updates
+- Notifications from Linux servers such as unattended updates
 
 ## Endpoints
 

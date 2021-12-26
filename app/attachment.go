@@ -29,7 +29,7 @@ func NewAttachment(name string, data []byte) (*Attachment, error) {
 	} else if contentType == "image/jpeg" {
 		t = TypeJPEG
 	} else {
-		return nil, fmt.Errorf("invalid content type %s: %v", contentType, ErrAttachmentInvalid)
+		return nil, fmt.Errorf("%s: %v", contentType, ErrAttachmentInvalid)
 	}
 
 	return &Attachment{
