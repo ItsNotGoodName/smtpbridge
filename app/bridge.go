@@ -3,20 +3,37 @@ package app
 type Bridge struct {
 	Name            string   `json:"name" mapstructure:"name"`
 	Endpoints       []string `json:"endpoints" mapstructure:"endpoints"`
-	EmailFrom       string   `json:"email_from" mapstructure:"email_from"`
-	EmailTo         string   `json:"email_to" mapstructure:"email_to"`
 	OnlyText        bool     `json:"only_text" mapstructure:"only_text"`
 	OnlyAttachments bool     `json:"only_attachments" mapstructure:"only_attachments"`
+	Filters         []Filter `json:"filters" mapstructure:"filters"`
 }
 
 func (b *Bridge) Match(msg *Message) bool {
-	if b.EmailTo != "" {
-		if !msg.To[b.EmailTo] {
+	if len(b.Filters) == 0 {
+		return true
+	}
+	for _, f := range b.Filters {
+		if f.Match(msg) {
+			return true
+		}
+	}
+	return false
+}
+
+type Filter struct {
+	To   string `json:"to,omitempty" mapstructure:"to,omitempty"`
+	From string `json:"from,omitempty" mapstructure:"from,omitempty"`
+}
+
+func (f *Filter) Match(msg *Message) bool {
+	// TODO: regex
+	if f.To != "" {
+		if !msg.To[f.To] {
 			return false
 		}
 	}
-	if b.EmailFrom != "" {
-		if msg.From != b.EmailFrom {
+	if f.From != "" {
+		if msg.From != f.From {
 			return false
 		}
 	}

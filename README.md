@@ -47,8 +47,9 @@ smtp:
 
 bridges:
   - name: test bridge
-    email_to: foo@example.com # Filter based on to address
-    email_from: bar@example.com # Filter based on from address
+    filters:
+      - to: foo@example.com # Filter based on to address
+        from: bar@example.com # Filter based on from address
     only_text: false # When this is true, only the text of the email will be sent to endpoints
     only_attachments: false # When this is true, only the attachments of the email will be sent to endpoints
     endpoints:
