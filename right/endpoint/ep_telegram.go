@@ -46,6 +46,9 @@ func (t *Telegram) Send(msg *app.EndpointMessage) error {
 
 func (t *Telegram) sendMessage(text string) error {
 	// Create and send request
+	if len(text) > 4096 {
+		text = text[:4096]
+	}
 	resp, err := http.PostForm(
 		"https://api.telegram.org/bot"+t.Token+"/sendMessage",
 		url.Values{
@@ -84,6 +87,9 @@ func (t *Telegram) sendPhoto(caption, name string, photo []byte) error {
 	w, err = writer.CreateFormField("caption")
 	if err != nil {
 		return err
+	}
+	if len(caption) > 1024 {
+		caption = caption[:1024]
 	}
 	w.Write([]byte(caption))
 	writer.Close()
