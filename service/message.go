@@ -7,23 +7,25 @@ import (
 )
 
 type Message struct {
-	bridgeSVC    app.BridgeServicePort
-	endpointREPO app.EndpointRepositoryPort
-	messageREPO  app.MessageRepositoryPort
+	bridgeSVC      app.BridgeServicePort
+	endpointREPO   app.EndpointRepositoryPort
+	messageREPO    app.MessageRepositoryPort
+	attachmentREPO app.AttachmentRepositoryPort
 }
 
-func NewMessage(bridgeSVC app.BridgeServicePort, endpointREPO app.EndpointRepositoryPort, messageREPO app.MessageRepositoryPort) *Message {
+func NewMessage(bridgeSVC app.BridgeServicePort, endpointREPO app.EndpointRepositoryPort, messageREPO app.MessageRepositoryPort, attachmentREPO app.AttachmentRepositoryPort) *Message {
 	return &Message{
-		bridgeSVC:    bridgeSVC,
-		endpointREPO: endpointREPO,
-		messageREPO:  messageREPO,
+		bridgeSVC:      bridgeSVC,
+		endpointREPO:   endpointREPO,
+		messageREPO:    messageREPO,
+		attachmentREPO: attachmentREPO,
 	}
 }
 
 func (m *Message) Create(subject, from string, to map[string]bool, text string) (*app.Message, error) {
 	msg := app.NewMessage(subject, from, to, text)
 
-	err := m.messageREPO.Create(msg)
+	err := m.messageREPO.CreateMessage(msg)
 	if err != nil {
 		return nil, err
 	}
@@ -32,18 +34,12 @@ func (m *Message) Create(subject, from string, to map[string]bool, text string) 
 }
 
 func (m *Message) AddAttachment(msg *app.Message, name string, data []byte) error {
-	attachment, err := app.NewAttachment(name, data)
+	att, err := app.NewAttachment(msg, name, data)
 	if err != nil {
 		return err
 	}
 
-	msg.Attachments = append(msg.Attachments, attachment)
-	err = m.messageREPO.Update(msg)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return m.attachmentREPO.CreateAttachment(att, data)
 }
 
 func (m *Message) send(msg *app.EndpointMessage, endpoint app.EndpointPort) {
@@ -59,8 +55,13 @@ func (m *Message) Send(msg *app.Message) error {
 		return app.ErrBridgesNotFound
 	}
 
+	datts, err := m.attachmentREPO.GetDataAttachmentsByMessage(msg)
+	if err != nil {
+		return err
+	}
+
 	for _, bridge := range bridges {
-		emsg := bridge.EndpointMessage(msg)
+		emsg := bridge.EndpointMessage(msg, datts)
 		if !emsg.IsEmpty() {
 			for _, name := range bridge.Endpoints {
 				endpoint, err := m.endpointREPO.Get(name)

@@ -25,9 +25,15 @@ type MessageServicePort interface {
 // MessageRepositoryPort handles storing messages.
 type MessageRepositoryPort interface {
 	// Create saves the message.
-	Create(msg *Message) error
-	// Update updates the message.
-	Update(msg *Message) error
+	CreateMessage(msg *Message) error
+	//// Update updates the message.
+	// UpdateMessage(msg *Message, updateFN func(msg *Message) (*Message, error)) error
+	GetMessage(uuid string) (*Message, error)
+}
+
+type AttachmentRepositoryPort interface {
+	CreateAttachment(attachment *Attachment, data []byte) error
+	GetDataAttachmentsByMessage(message *Message) ([]DataAttachment, error)
 }
 
 // EndpointPort handles sending messages to an endpoint.

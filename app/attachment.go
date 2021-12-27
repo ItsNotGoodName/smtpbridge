@@ -8,10 +8,10 @@ import (
 )
 
 type Attachment struct {
-	UUID string
-	Name string
-	Type AttachmentType
-	Data []byte
+	UUID        string
+	Name        string
+	Type        AttachmentType
+	MessageUUID string
 }
 
 type AttachmentType uint
@@ -21,7 +21,7 @@ const (
 	TypeJPEG
 )
 
-func NewAttachment(name string, data []byte) (*Attachment, error) {
+func NewAttachment(msg *Message, name string, data []byte) (*Attachment, error) {
 	var t AttachmentType
 	contentType := http.DetectContentType(data)
 	if contentType == "image/png" {
@@ -33,9 +33,23 @@ func NewAttachment(name string, data []byte) (*Attachment, error) {
 	}
 
 	return &Attachment{
-		UUID: uuid.New().String(),
-		Name: name,
-		Type: t,
-		Data: data,
+		UUID:        uuid.New().String(),
+		Name:        name,
+		Type:        t,
+		MessageUUID: msg.UUID,
 	}, nil
+}
+
+type DataAttachment struct {
+	Name string
+	Type AttachmentType
+	Data []byte
+}
+
+func NewDataAttachment(attachment *Attachment, data []byte) *DataAttachment {
+	return &DataAttachment{
+		Name: attachment.Name,
+		Type: attachment.Type,
+		Data: data,
+	}
 }

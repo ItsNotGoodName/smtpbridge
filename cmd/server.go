@@ -42,12 +42,12 @@ var serverCmd = &cobra.Command{
 
 		// Init repositories
 		endpointREPO := endpoint.NewRepository(config.ConfigEndpoints)
-		messageREPO := database.NewMock()
+		databaseREPO := database.NewMock()
 
 		// Init services
 		authSVC := service.NewMockAuth()
 		bridgeSVC := service.NewBridge(endpointREPO, config.Bridges)
-		messageSVC := service.NewMessage(bridgeSVC, endpointREPO, messageREPO)
+		messageSVC := service.NewMessage(bridgeSVC, endpointREPO, databaseREPO, databaseREPO)
 
 		// Init smtp server
 		smtpServer := smtp.New(authSVC, messageSVC, config.ConfigSMTP)

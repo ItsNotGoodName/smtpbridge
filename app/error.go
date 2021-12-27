@@ -9,5 +9,7 @@ var (
 	ErrEndpointNameConflict  = fmt.Errorf("endpoint name conflit")
 	ErrBridgesNotFound       = fmt.Errorf("bridges not found")
 	ErrMessageNotFound       = fmt.Errorf("message not found")
+	ErrMessageAlreadyExists  = fmt.Errorf("message already exists")
 	ErrAttachmentInvalid     = fmt.Errorf("invalid attachment")
+	ErrNotImplemented        = fmt.Errorf("not implemented")
 )
