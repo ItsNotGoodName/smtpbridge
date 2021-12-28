@@ -40,12 +40,12 @@ func (f *Filter) Match(msg *Message) bool {
 	return true
 }
 
-func (b *Bridge) EndpointMessage(msg *Message, attachments []DataAttachment) *EndpointMessage {
+func (b *Bridge) EndpointMessage(msg *Message) *EndpointMessage {
 	if b.OnlyText && !b.OnlyAttachments {
 		return &EndpointMessage{Text: msg.Text}
 	}
 	if b.OnlyAttachments && !b.OnlyText {
-		return &EndpointMessage{Attachments: attachments}
+		return &EndpointMessage{Attachments: NewEndpointAttachments(msg.Attachments)}
 	}
-	return &EndpointMessage{Text: msg.Text, Attachments: attachments}
+	return &EndpointMessage{Text: msg.Text, Attachments: NewEndpointAttachments(msg.Attachments)}
 }

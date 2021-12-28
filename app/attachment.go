@@ -12,6 +12,7 @@ type Attachment struct {
 	Name        string
 	Type        AttachmentType
 	MessageUUID string
+	Data        []byte
 }
 
 type AttachmentType uint
@@ -32,24 +33,34 @@ func NewAttachment(msg *Message, name string, data []byte) (*Attachment, error) 
 		return nil, fmt.Errorf("%s: %v", contentType, ErrAttachmentInvalid)
 	}
 
-	return &Attachment{
+	att := Attachment{
 		UUID:        uuid.New().String(),
 		Name:        name,
 		Type:        t,
 		MessageUUID: msg.UUID,
-	}, nil
+		Data:        data,
+	}
+
+	msg.Attachments = append(msg.Attachments, att)
+
+	return &att, nil
 }
 
-type DataAttachment struct {
+type EndpointAttachment struct {
 	Name string
 	Type AttachmentType
 	Data []byte
 }
 
-func NewDataAttachment(attachment *Attachment, data []byte) *DataAttachment {
-	return &DataAttachment{
-		Name: attachment.Name,
-		Type: attachment.Type,
-		Data: data,
+func NewEndpointAttachments(atts []Attachment) []EndpointAttachment {
+	eats := make([]EndpointAttachment, len(atts))
+	for i, a := range atts {
+		eats[i] = EndpointAttachment{
+			Name: a.Name,
+			Type: a.Type,
+			Data: a.Data,
+		}
 	}
+
+	return eats
 }

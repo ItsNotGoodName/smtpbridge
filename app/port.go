@@ -16,24 +16,24 @@ type BridgeServicePort interface {
 type MessageServicePort interface {
 	// Create creates a new message and saves it.
 	Create(subject, from string, to map[string]bool, text string) (*Message, error)
+	// CreateAttachment adds an attachment to a message.
+	CreateAttachment(msg *Message, name string, data []byte) (*Attachment, error)
 	// AddAttachment adds an attachment to a message.
-	AddAttachment(msg *Message, name string, data []byte) error
-	// Send finds endpoints for the message and sends to it.
 	Send(msg *Message) error
+	SendBridges(msg *Message, bridges []Bridge) error
 }
 
 // MessageRepositoryPort handles storing messages.
 type MessageRepositoryPort interface {
-	// Create saves the message.
 	CreateMessage(msg *Message) error
-	//// Update updates the message.
-	// UpdateMessage(msg *Message, updateFN func(msg *Message) (*Message, error)) error
 	GetMessage(uuid string) (*Message, error)
+	UpdateMessage(uuid string, updateFN func(msg *Message) (*Message, error)) (*Message, error)
 }
 
 type AttachmentRepositoryPort interface {
-	CreateAttachment(attachment *Attachment, data []byte) error
-	GetDataAttachmentsByMessage(message *Message) ([]DataAttachment, error)
+	CreateAttachment(att *Attachment) error
+	GetAttachment(uuid string) (*Attachment, error)
+	LoadAttachment(msg *Message) error
 }
 
 // EndpointPort handles sending messages to an endpoint.
