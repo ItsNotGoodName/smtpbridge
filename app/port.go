@@ -21,6 +21,7 @@ type MessageServicePort interface {
 	// AddAttachment adds an attachment to a message.
 	Send(msg *Message) error
 	SendBridges(msg *Message, bridges []Bridge) error
+	UpdateStatus(msg *Message, status Status) error
 }
 
 // MessageRepositoryPort handles storing messages.

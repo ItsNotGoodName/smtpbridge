@@ -47,14 +47,21 @@ func (m *Message) CreateAttachment(msg *app.Message, name string, data []byte) (
 	return att, nil
 }
 
-func (m *Message) send(msg *app.EndpointMessage, endpoint app.EndpointPort) {
-	err := endpoint.Send(msg)
-	if err != nil {
-		log.Print("service.Message.send:", err)
-	}
+func (m *Message) UpdateStatus(msg *app.Message, status app.Status) error {
+	_, err := m.messageREPO.UpdateMessage(msg.UUID, func(msg *app.Message) (*app.Message, error) {
+		msg.Status = status
+		return msg, nil
+	})
+	return err
 }
 
 func (m *Message) SendBridges(msg *app.Message, bridges []app.Bridge) error {
+	if len(bridges) == 0 {
+		return app.ErrBridgesNotFound
+	}
+
+	var errs []error
+	sentCount := 0
 	for _, bridge := range bridges {
 		emsg := bridge.EndpointMessage(msg)
 		if !emsg.IsEmpty() {
@@ -63,19 +70,35 @@ func (m *Message) SendBridges(msg *app.Message, bridges []app.Bridge) error {
 				if err != nil {
 					return err
 				}
-				go m.send(emsg, endpoint)
+				err = endpoint.Send(emsg)
+				if err != nil {
+					errs = append(errs, err)
+				} else {
+					sentCount++
+				}
 			}
 		}
 	}
 
-	return nil
+	for _, err := range errs {
+		log.Println("service.Message.SendBridges:", err)
+	}
+
+	if sentCount == 0 {
+		if err := m.UpdateStatus(msg, app.StatusUnsent); err != nil {
+			return err
+		}
+
+		return app.ErrEndpointSendFailed
+	}
+
+	if len(errs) > 0 {
+		return m.UpdateStatus(msg, app.StatusPartial)
+	}
+
+	return m.UpdateStatus(msg, app.StatusSent)
 }
 
 func (m *Message) Send(msg *app.Message) error {
-	bridges := m.bridgeSVC.GetBridges(msg)
-	if len(bridges) == 0 {
-		return app.ErrBridgesNotFound
-	}
-
-	return m.SendBridges(msg, bridges)
+	return m.SendBridges(msg, m.bridgeSVC.GetBridges(msg))
 }

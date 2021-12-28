@@ -3,6 +3,7 @@ package app
 import "fmt"
 
 var (
+	ErrEndpointSendFailed    = fmt.Errorf("endpoint send failed")
 	ErrEndpointInvalidType   = fmt.Errorf("invalid endpoint type")
 	ErrEndpointInvalidConfig = fmt.Errorf("invalid endpoint config")
 	ErrEndpointNotFound      = fmt.Errorf("endpoint not found")

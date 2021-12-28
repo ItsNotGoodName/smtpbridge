@@ -14,7 +14,17 @@ type Message struct {
 	To          map[string]bool `json:"to"`         // To is the email addresses of the recipients.
 	Text        string          `json:"text"`       // Text is the message body.
 	Attachments []Attachment    `json:"attachment"` // Attachment is the attachments of the message.
+	Status      Status          `json:"status"`     // Status is the status of the message.
 }
+
+type Status string
+
+const (
+	StatusUnsent  Status = "unsent"
+	StatusPending Status = "pending"
+	StatusPartial Status = "partial"
+	StatusSent    Status = "sent"
+)
 
 func NewMessage(subject, from string, to map[string]bool, text string) *Message {
 	return &Message{
@@ -24,6 +34,7 @@ func NewMessage(subject, from string, to map[string]bool, text string) *Message 
 		From:    from,
 		To:      to,
 		Text:    text,
+		Status:  StatusPending,
 	}
 }
 
