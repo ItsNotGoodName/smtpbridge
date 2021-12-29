@@ -17,13 +17,12 @@ type Message struct {
 	Status      Status          `json:"status"`          // Status is the status of the message.
 }
 
-type Status string
+type Status uint8
 
 const (
-	StatusUnsent  Status = "unsent"
-	StatusPending Status = "pending"
-	StatusPartial Status = "partial"
-	StatusSent    Status = "sent"
+	StatusCreated Status = iota
+	StatusSent
+	StatusFailed
 )
 
 func NewMessage(subject, from string, to map[string]bool, text string) *Message {
@@ -34,7 +33,7 @@ func NewMessage(subject, from string, to map[string]bool, text string) *Message 
 		From:      from,
 		To:        to,
 		Text:      text,
-		Status:    StatusPending,
+		Status:    StatusCreated,
 	}
 }
 
