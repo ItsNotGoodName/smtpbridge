@@ -17,7 +17,7 @@ func (db *DB) GetMessage(uuid string) (*app.Message, error) {
 	return nil, app.ErrNotImplemented
 }
 
-func (db *DB) UpdateMessage(uuid string, updateFN func(msg *app.Message) (*app.Message, error)) (*app.Message, error) {
+func (db *DB) UpdateMessage(msg *app.Message, updateFN func(msg *app.Message) (*app.Message, error)) (*app.Message, error) {
 	return nil, app.ErrNotImplemented
 }
 

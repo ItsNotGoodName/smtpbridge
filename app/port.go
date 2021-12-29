@@ -28,7 +28,7 @@ type MessageServicePort interface {
 type MessageRepositoryPort interface {
 	CreateMessage(msg *Message) error
 	GetMessage(uuid string) (*Message, error)
-	UpdateMessage(uuid string, updateFN func(msg *Message) (*Message, error)) (*Message, error)
+	UpdateMessage(msg *Message, updateFN func(msg *Message) (*Message, error)) (*Message, error)
 }
 
 type AttachmentRepositoryPort interface {
