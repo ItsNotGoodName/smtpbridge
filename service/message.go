@@ -48,11 +48,10 @@ func (m *Message) CreateAttachment(msg *app.Message, name string, data []byte) (
 }
 
 func (m *Message) UpdateStatus(msg *app.Message, status app.Status) error {
-	_, err := m.messageREPO.UpdateMessage(msg, func(msg *app.Message) (*app.Message, error) {
+	return m.messageREPO.UpdateMessage(msg, func(msg *app.Message) (*app.Message, error) {
 		msg.Status = status
 		return msg, nil
 	})
-	return err
 }
 
 func (m *Message) SendBridges(msg *app.Message, bridges []app.Bridge) error {

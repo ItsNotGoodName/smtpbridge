@@ -40,6 +40,8 @@ endpoints:
 
 ```yaml
 # Full configuration
+db: ~/smtpbridge.db
+
 smtp:
   host: "" # Host to listen on
   port: 1025 # Port to listen on

@@ -7,14 +7,14 @@ import (
 )
 
 type Message struct {
-	Time        time.Time       `json:"time"`       // Time message was received.
-	UUID        string          `json:"uuid"`       // UUID of the message.
-	Subject     string          `json:"subject"`    // Subject of the message.
-	From        string          `json:"from"`       // From is the email address of the sender.
-	To          map[string]bool `json:"to"`         // To is the email addresses of the recipients.
-	Text        string          `json:"text"`       // Text is the message body.
-	Attachments []Attachment    `json:"attachment"` // Attachment is the attachments of the message.
-	Status      Status          `json:"status"`     // Status is the status of the message.
+	CreatedAt   time.Time       `json:"created_at"`      // Time message was received.
+	UUID        string          `json:"uuid" storm:"id"` // UUID of the message.
+	Subject     string          `json:"subject"`         // Subject of the message.
+	From        string          `json:"from"`            // From is the email address of the sender.
+	To          map[string]bool `json:"to"`              // To is the email addresses of the recipients.
+	Text        string          `json:"text"`            // Text is the message body.
+	Attachments []Attachment    `json:"-"`               // Attachment is the attachments of the message.
+	Status      Status          `json:"status"`          // Status is the status of the message.
 }
 
 type Status string
@@ -28,13 +28,13 @@ const (
 
 func NewMessage(subject, from string, to map[string]bool, text string) *Message {
 	return &Message{
-		Time:    time.Now(),
-		UUID:    uuid.New().String(),
-		Subject: subject,
-		From:    from,
-		To:      to,
-		Text:    text,
-		Status:  StatusPending,
+		CreatedAt: time.Now(),
+		UUID:      uuid.New().String(),
+		Subject:   subject,
+		From:      from,
+		To:        to,
+		Text:      text,
+		Status:    StatusPending,
 	}
 }
 

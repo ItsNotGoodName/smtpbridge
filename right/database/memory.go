@@ -34,23 +34,23 @@ func (db *Memory) CreateMessage(msg *app.Message) error {
 	return nil
 }
 
-func (db *Memory) UpdateMessage(msg *app.Message, updateFN func(msg *app.Message) (*app.Message, error)) (*app.Message, error) {
+func (db *Memory) UpdateMessage(msg *app.Message, updateFN func(msg *app.Message) (*app.Message, error)) error {
 	db.msgMu.Lock()
 	defer db.msgMu.Unlock()
 
 	dbMSG, ok := db.msg[msg.UUID]
 	if !ok {
-		return nil, app.ErrMessageNotFound
+		return app.ErrMessageNotFound
 	}
 
 	updatedMsg, err := updateFN(&dbMSG)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	db.msg[msg.UUID] = *updatedMsg
 
-	return updatedMsg, nil
+	return nil
 }
 
 func (db *Memory) GetAttachment(uuid string) (*app.Attachment, error) {

@@ -16,8 +16,9 @@ func (db *Mock) GetMessage(uuid string) (*app.Message, error) {
 	return nil, app.ErrNotImplemented
 }
 
-func (db *Mock) UpdateMessage(msg *app.Message, updateFN func(msg *app.Message) (*app.Message, error)) (*app.Message, error) {
-	return updateFN(msg)
+func (db *Mock) UpdateMessage(msg *app.Message, updateFN func(msg *app.Message) (*app.Message, error)) error {
+	_, err := updateFN(msg)
+	return err
 }
 
 func (db *Mock) CreateAttachment(att *app.Attachment) error {

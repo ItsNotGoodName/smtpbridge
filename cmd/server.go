@@ -22,6 +22,9 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"os"
+	"path"
+
 	"github.com/ItsNotGoodName/smtpbridge/app"
 	"github.com/ItsNotGoodName/smtpbridge/left/smtp"
 	"github.com/ItsNotGoodName/smtpbridge/right/database"
@@ -42,7 +45,7 @@ var serverCmd = &cobra.Command{
 
 		// Init repositories
 		endpointREPO := endpoint.NewRepository(config.ConfigEndpoints)
-		databaseREPO := database.NewMock()
+		databaseREPO := database.NewDB(config.DB)
 
 		// Init services
 		authSVC := service.NewMockAuth()
@@ -68,6 +71,11 @@ func init() {
 
 	serverCmd.Flags().Int("size", 1024*1024*25, "max size of email in bytes")
 	viper.BindPFlag("smtp.size", serverCmd.Flags().Lookup("size"))
+
+	home, err := os.UserHomeDir()
+	cobra.CheckErr(err)
+	serverCmd.Flags().String("db", path.Join(home, ".smtpbridge.db"), "database file")
+	viper.BindPFlag("db", serverCmd.Flags().Lookup("db"))
 
 	// Here you will define your flags and configuration settings.
 

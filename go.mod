@@ -3,6 +3,7 @@ module github.com/ItsNotGoodName/smtpbridge
 go 1.17
 
 require (
+	github.com/asdine/storm v2.1.2+incompatible
 	github.com/emersion/go-sasl v0.0.0-20211008083017-0b9dcfb154ac
 	github.com/emersion/go-smtp v0.15.0
 	github.com/google/uuid v1.3.0
@@ -14,6 +15,8 @@ require (
 require (
 	cloud.google.com/go v0.99.0 // indirect
 	cloud.google.com/go/storage v1.18.2 // indirect
+	github.com/DataDog/zstd v1.5.0 // indirect
+	github.com/Sereal/Sereal v0.0.0-20210713121911-8c71d8dbe594 // indirect
 	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
 	github.com/cention-sany/utf7 v0.0.0-20170124080048-26cad61bd60a // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
@@ -44,6 +47,8 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
+	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
+	go.etcd.io/bbolt v1.3.6 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	golang.org/x/net v0.0.0-20211216030914-fe4d6282115f // indirect
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8 // indirect

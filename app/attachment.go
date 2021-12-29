@@ -8,11 +8,11 @@ import (
 )
 
 type Attachment struct {
-	UUID        string
-	Name        string
-	Type        AttachmentType
-	MessageUUID string
-	Data        []byte
+	UUID        string         `json:"uuid" storm:"id"`
+	Name        string         `json:"name"`
+	Type        AttachmentType `json:"type"`
+	MessageUUID string         `json:"message_uuid"`
+	Data        []byte         `json:"-"`
 }
 
 type AttachmentType uint
