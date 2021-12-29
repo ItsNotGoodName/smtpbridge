@@ -45,7 +45,7 @@ var serverCmd = &cobra.Command{
 
 		// Init repositories
 		endpointREPO := endpoint.NewRepository(config.ConfigEndpoints)
-		databaseREPO := database.NewDB(config.DB)
+		databaseREPO := database.NewDB(config.DBPath, config.AttachmentsPath)
 
 		// Init services
 		authSVC := service.NewMockAuth()
@@ -74,8 +74,15 @@ func init() {
 
 	home, err := os.UserHomeDir()
 	cobra.CheckErr(err)
-	serverCmd.Flags().String("db", path.Join(home, ".smtpbridge.db"), "database file")
+	rootPath := path.Join(home, ".smtpbridge")
+	os.MkdirAll(rootPath, os.ModePerm)
+	cobra.CheckErr(err)
+
+	serverCmd.Flags().String("db", path.Join(rootPath, "smtpbridge.db"), "database file")
 	viper.BindPFlag("db", serverCmd.Flags().Lookup("db"))
+
+	serverCmd.Flags().String("attachments", path.Join(rootPath, "attachments"), "attachments directory")
+	viper.BindPFlag("attachments", serverCmd.Flags().Lookup("attachments"))
 
 	// Here you will define your flags and configuration settings.
 

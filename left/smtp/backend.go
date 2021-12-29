@@ -91,6 +91,7 @@ func (s *session) Data(r io.Reader) error {
 	for _, a := range e.Attachments {
 		if _, err := s.messageSVC.CreateAttachment(m, a.FileName, a.Content); err != nil {
 			log.Println("ATTACHMENT_ERROR: could not add attachment:", err)
+			return err
 		}
 	}
 

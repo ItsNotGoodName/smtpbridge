@@ -40,7 +40,8 @@ endpoints:
 
 ```yaml
 # Full configuration
-db: ~/smtpbridge.db
+db: /tmp/smtpbridge.db
+attachments: /tmp/attachments
 
 smtp:
   host: "" # Host to listen on

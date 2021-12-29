@@ -9,7 +9,8 @@ import (
 
 type Config struct {
 	ConfigSMTP      ConfigSMTP       `json:"smtp" mapstructure:"smtp"`
-	DB              string           `json:"db" mapstructure:"db"`
+	DBPath          string           `json:"db" mapstructure:"db"`
+	AttachmentsPath string           `json:"attachments" mapstructure:"attachments"`
 	Bridges         []Bridge         `json:"bridges" mapstructure:"bridges"`
 	ConfigEndpoints []ConfigEndpoint `json:"endpoints" mapstructure:"endpoints"`
 }

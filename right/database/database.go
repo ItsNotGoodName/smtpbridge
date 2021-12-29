@@ -2,23 +2,33 @@ package database
 
 import (
 	"log"
+	"os"
+	"path"
 
 	"github.com/ItsNotGoodName/smtpbridge/app"
 	"github.com/asdine/storm"
+	"github.com/asdine/storm/q"
 )
 
 type DB struct {
-	db *storm.DB
+	db      *storm.DB
+	attPath string
 }
 
-func NewDB(dbPath string) *DB {
+func NewDB(dbPath, attPath string) *DB {
 	db, err := storm.Open(dbPath)
 	if err != nil {
 		log.Fatal("database.NewDB:", err)
 	}
 
+	err = os.MkdirAll(attPath, 0755)
+	if err != nil {
+		log.Fatal("database.NewDB:", err)
+	}
+
 	return &DB{
-		db: db,
+		db:      db,
+		attPath: attPath,
 	}
 }
 
@@ -62,13 +72,41 @@ func (db *DB) UpdateMessage(msg *app.Message, updateFN func(msg *app.Message) (*
 }
 
 func (db *DB) CreateAttachment(att *app.Attachment) error {
-	return app.ErrNotImplemented
+	err := db.db.Save(att)
+	if err != nil {
+		return err
+	}
+
+	file := path.Join(db.attPath, att.UUID+att.EXT())
+
+	return os.WriteFile(file, att.Data, 0644)
 }
 
 func (db *DB) GetAttachment(uuid string) (*app.Attachment, error) {
-	return nil, app.ErrNotImplemented
+	var att app.Attachment
+	err := db.db.One("UUID", uuid, att)
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := os.ReadFile(path.Join(db.attPath, att.UUID+att.EXT()))
+	if err != nil {
+		return nil, err
+	}
+
+	att.Data = data
+
+	return &att, nil
 }
 
 func (db *DB) LoadAttachment(msg *app.Message) error {
-	return app.ErrNotImplemented
+	var atts []app.Attachment
+	err := db.db.Select(q.Eq("MessageUUID", msg.UUID)).Find(&atts)
+	if err != nil {
+		return err
+	}
+
+	msg.Attachments = atts
+
+	return nil
 }

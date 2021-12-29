@@ -11,7 +11,7 @@ type Attachment struct {
 	UUID        string         `json:"uuid" storm:"id"`
 	Name        string         `json:"name"`
 	Type        AttachmentType `json:"type"`
-	MessageUUID string         `json:"message_uuid"`
+	MessageUUID string         `json:"message_uuid" storm:"index"`
 	Data        []byte         `json:"-"`
 }
 
@@ -44,6 +44,17 @@ func NewAttachment(msg *Message, name string, data []byte) (*Attachment, error) 
 	msg.Attachments = append(msg.Attachments, att)
 
 	return &att, nil
+}
+
+func (a *Attachment) EXT() string {
+	switch a.Type {
+	case TypePNG:
+		return ".png"
+	case TypeJPEG:
+		return ".jpg"
+	default:
+		return ""
+	}
 }
 
 type EndpointAttachment struct {
