@@ -8,11 +8,19 @@ import (
 )
 
 type Config struct {
-	ConfigSMTP      ConfigSMTP       `json:"smtp" mapstructure:"smtp"`
-	DBPath          string           `json:"db" mapstructure:"db"`
 	AttachmentsPath string           `json:"attachments" mapstructure:"attachments"`
+	DBPath          string           `json:"db" mapstructure:"db"`
+	SMTP            ConfigSMTP       `json:"smtp" mapstructure:"smtp"`
+	HTTP            ConfigHTTP       `json:"http" mapstructure:"http"`
 	Bridges         []Bridge         `json:"bridges" mapstructure:"bridges"`
-	ConfigEndpoints []ConfigEndpoint `json:"endpoints" mapstructure:"endpoints"`
+	Endpoints       []ConfigEndpoint `json:"endpoints" mapstructure:"endpoints"`
+}
+
+type ConfigHTTP struct {
+	Enable  bool   `json:"enable" mapstructure:"enable"`
+	Address string `json:"-" mapstructure:"-"`
+	Host    string `json:"host" mapstructure:"host"`
+	Port    uint16 `json:"port" mapstructure:"port"`
 }
 
 type ConfigEndpoint struct {
@@ -36,9 +44,10 @@ func NewConfig() *Config {
 		log.Fatalf("app.NewConfig: %s", err)
 	}
 
-	config.ConfigSMTP.PortStr = strconv.FormatUint(uint64(config.ConfigSMTP.Port), 10)
+	config.SMTP.PortStr = strconv.FormatUint(uint64(config.SMTP.Port), 10)
+	config.HTTP.Address = config.HTTP.Host + ":" + strconv.FormatUint(uint64(config.HTTP.Port), 10)
 
-	log.Printf("app.NewConfig: read %d bridges and %d endpoints", len(config.Bridges), len(config.ConfigEndpoints))
+	log.Printf("app.NewConfig: read %d bridges and %d endpoints", len(config.Bridges), len(config.Endpoints))
 
 	return config
 }

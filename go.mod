@@ -6,6 +6,8 @@ require (
 	github.com/asdine/storm v2.1.2+incompatible
 	github.com/emersion/go-sasl v0.0.0-20211008083017-0b9dcfb154ac
 	github.com/emersion/go-smtp v0.15.0
+	github.com/go-chi/chi v1.5.4
+	github.com/go-chi/chi/v5 v5.0.7
 	github.com/google/uuid v1.3.0
 	github.com/jhillyerd/enmime v0.9.2
 	github.com/spf13/cobra v1.3.0

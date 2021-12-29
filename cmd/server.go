@@ -26,6 +26,7 @@ import (
 	"path"
 
 	"github.com/ItsNotGoodName/smtpbridge/app"
+	"github.com/ItsNotGoodName/smtpbridge/left/router"
 	"github.com/ItsNotGoodName/smtpbridge/left/smtp"
 	"github.com/ItsNotGoodName/smtpbridge/right/database"
 	"github.com/ItsNotGoodName/smtpbridge/right/endpoint"
@@ -44,7 +45,7 @@ var serverCmd = &cobra.Command{
 		config := app.NewConfig()
 
 		// Init repositories
-		endpointREPO := endpoint.NewRepository(config.ConfigEndpoints)
+		endpointREPO := endpoint.NewRepository(config.Endpoints)
 		databaseREPO := database.NewDB(config.DBPath, config.AttachmentsPath)
 
 		// Init services
@@ -53,7 +54,13 @@ var serverCmd = &cobra.Command{
 		messageSVC := service.NewMessage(bridgeSVC, endpointREPO, databaseREPO, databaseREPO)
 
 		// Init smtp server
-		smtpServer := smtp.New(authSVC, messageSVC, config.ConfigSMTP)
+		smtpServer := smtp.New(authSVC, messageSVC, config.SMTP)
+
+		// Init router
+		if config.HTTP.Enable {
+			httpServer := router.New(config.AttachmentsPath)
+			go httpServer.Start(config.HTTP.Address)
+		}
 
 		// Start smtp server
 		smtpServer.Start()
@@ -63,14 +70,14 @@ var serverCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(serverCmd)
 
-	serverCmd.Flags().String("host", "", "host to listen on")
-	viper.BindPFlag("smtp.host", serverCmd.Flags().Lookup("host"))
+	serverCmd.Flags().String("smtp-host", "", "smtp host address to listen on")
+	viper.BindPFlag("smtp.host", serverCmd.Flags().Lookup("smtp-host"))
 
-	serverCmd.Flags().Uint16("port", 1025, "port to listen on")
-	viper.BindPFlag("smtp.port", serverCmd.Flags().Lookup("port"))
+	serverCmd.Flags().Uint16("smtp-port", 1025, "smtp port to listen on")
+	viper.BindPFlag("smtp.port", serverCmd.Flags().Lookup("smtp-port"))
 
-	serverCmd.Flags().Int("size", 1024*1024*25, "max size of email in bytes")
-	viper.BindPFlag("smtp.size", serverCmd.Flags().Lookup("size"))
+	serverCmd.Flags().Int("smtp-size", 1024*1024*25, "max size of email in bytes")
+	viper.BindPFlag("smtp.size", serverCmd.Flags().Lookup("smtp-size"))
 
 	home, err := os.UserHomeDir()
 	cobra.CheckErr(err)
@@ -83,6 +90,15 @@ func init() {
 
 	serverCmd.Flags().String("attachments", path.Join(rootPath, "attachments"), "attachments directory")
 	viper.BindPFlag("attachments", serverCmd.Flags().Lookup("attachments"))
+
+	serverCmd.Flags().Bool("http", false, "enable http server")
+	viper.BindPFlag("http.enable", serverCmd.Flags().Lookup("http"))
+
+	serverCmd.Flags().String("http-host", "", "http host address to listen on")
+	viper.BindPFlag("http.host", serverCmd.Flags().Lookup("http-host"))
+
+	serverCmd.Flags().Uint16("http-port", 8080, "http port to listen on")
+	viper.BindPFlag("http.port", serverCmd.Flags().Lookup("http-port"))
 
 	// Here you will define your flags and configuration settings.
 
