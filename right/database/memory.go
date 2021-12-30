@@ -3,30 +3,30 @@ package database
 import (
 	"sync"
 
-	"github.com/ItsNotGoodName/smtpbridge/app"
+	"github.com/ItsNotGoodName/smtpbridge/domain"
 )
 
 type Memory struct {
 	attMu sync.RWMutex
-	att   map[string][]app.Attachment
+	att   map[string][]domain.Attachment
 	msgMu sync.RWMutex
-	msg   map[string]app.Message
+	msg   map[string]domain.Message
 }
 
 func NewMemory() *Memory {
 	return &Memory{
 		attMu: sync.RWMutex{},
-		att:   make(map[string][]app.Attachment),
+		att:   make(map[string][]domain.Attachment),
 		msgMu: sync.RWMutex{},
-		msg:   make(map[string]app.Message),
+		msg:   make(map[string]domain.Message),
 	}
 }
 
-func (db *Memory) CreateMessage(msg *app.Message) error {
+func (db *Memory) CreateMessage(msg *domain.Message) error {
 	db.msgMu.Lock()
 	defer db.msgMu.Unlock()
 	if _, ok := db.msg[msg.UUID]; ok {
-		return app.ErrMessageAlreadyExists
+		return domain.ErrMessageAlreadyExists
 	}
 
 	db.msg[msg.UUID] = *msg
@@ -34,13 +34,13 @@ func (db *Memory) CreateMessage(msg *app.Message) error {
 	return nil
 }
 
-func (db *Memory) UpdateMessage(msg *app.Message, updateFN func(msg *app.Message) (*app.Message, error)) error {
+func (db *Memory) UpdateMessage(msg *domain.Message, updateFN func(msg *domain.Message) (*domain.Message, error)) error {
 	db.msgMu.Lock()
 	defer db.msgMu.Unlock()
 
 	dbMSG, ok := db.msg[msg.UUID]
 	if !ok {
-		return app.ErrMessageNotFound
+		return domain.ErrMessageNotFound
 	}
 
 	updatedMsg, err := updateFN(&dbMSG)
@@ -53,11 +53,11 @@ func (db *Memory) UpdateMessage(msg *app.Message, updateFN func(msg *app.Message
 	return nil
 }
 
-func (db *Memory) GetAttachment(uuid string) (*app.Attachment, error) {
-	return nil, app.ErrNotImplemented
+func (db *Memory) GetAttachment(uuid string) (*domain.Attachment, error) {
+	return nil, domain.ErrNotImplemented
 }
 
-func (db *Memory) GetMessage(uuid string) (*app.Message, error) {
+func (db *Memory) GetMessage(uuid string) (*domain.Message, error) {
 	db.msgMu.RLock()
 	msg := db.msg[uuid]
 	db.msgMu.RUnlock()
@@ -71,11 +71,11 @@ func (db *Memory) GetMessage(uuid string) (*app.Message, error) {
 	return &msg, nil
 }
 
-func (db *Memory) CreateAttachment(att *app.Attachment) error {
+func (db *Memory) CreateAttachment(att *domain.Attachment) error {
 	db.attMu.Lock()
 	atts, ok := db.att[att.MessageUUID]
 	if !ok {
-		atts = []app.Attachment{}
+		atts = []domain.Attachment{}
 	}
 
 	atts = append(atts, *att)
@@ -85,7 +85,7 @@ func (db *Memory) CreateAttachment(att *app.Attachment) error {
 	return nil
 }
 
-func (db *Memory) LoadAttachment(msg *app.Message) error {
+func (db *Memory) LoadAttachment(msg *domain.Message) error {
 	atts, err := db.GetAttachmentsByMessage(msg)
 	if err != nil {
 		return err
@@ -96,11 +96,11 @@ func (db *Memory) LoadAttachment(msg *app.Message) error {
 	return nil
 }
 
-func (db *Memory) GetAttachmentsByMessage(message *app.Message) ([]app.Attachment, error) {
+func (db *Memory) GetAttachmentsByMessage(message *domain.Message) ([]domain.Attachment, error) {
 	db.attMu.RLock()
 	atts, ok := db.att[message.UUID]
 	if !ok {
-		atts = []app.Attachment{}
+		atts = []domain.Attachment{}
 	}
 	db.attMu.RUnlock()
 

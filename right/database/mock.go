@@ -1,6 +1,6 @@
 package database
 
-import "github.com/ItsNotGoodName/smtpbridge/app"
+import "github.com/ItsNotGoodName/smtpbridge/domain"
 
 type Mock struct{}
 
@@ -8,27 +8,27 @@ func NewMock() *Mock {
 	return &Mock{}
 }
 
-func (db *Mock) CreateMessage(msg *app.Message) error {
+func (db *Mock) CreateMessage(msg *domain.Message) error {
 	return nil
 }
 
-func (db *Mock) GetMessage(uuid string) (*app.Message, error) {
-	return nil, app.ErrNotImplemented
+func (db *Mock) GetMessage(uuid string) (*domain.Message, error) {
+	return nil, domain.ErrNotImplemented
 }
 
-func (db *Mock) UpdateMessage(msg *app.Message, updateFN func(msg *app.Message) (*app.Message, error)) error {
+func (db *Mock) UpdateMessage(msg *domain.Message, updateFN func(msg *domain.Message) (*domain.Message, error)) error {
 	_, err := updateFN(msg)
 	return err
 }
 
-func (db *Mock) CreateAttachment(att *app.Attachment) error {
+func (db *Mock) CreateAttachment(att *domain.Attachment) error {
 	return nil
 }
 
-func (db *Mock) GetAttachment(uuid string) (*app.Attachment, error) {
-	return nil, app.ErrNotImplemented
+func (db *Mock) GetAttachment(uuid string) (*domain.Attachment, error) {
+	return nil, domain.ErrNotImplemented
 }
 
-func (db *Mock) LoadAttachment(msg *app.Message) error {
-	return app.ErrNotImplemented
+func (db *Mock) LoadAttachment(msg *domain.Message) error {
+	return domain.ErrNotImplemented
 }

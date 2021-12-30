@@ -1,4 +1,4 @@
-package app
+package domain
 
 import (
 	"log"
@@ -41,13 +41,13 @@ func NewConfig() *Config {
 
 	err := viper.Unmarshal(config)
 	if err != nil {
-		log.Fatalf("app.NewConfig: %s", err)
+		log.Fatalf("domain.NewConfig: %s", err)
 	}
 
 	config.SMTP.PortStr = strconv.FormatUint(uint64(config.SMTP.Port), 10)
 	config.HTTP.Addr = config.HTTP.Host + ":" + strconv.FormatUint(uint64(config.HTTP.Port), 10)
 
-	log.Printf("app.NewConfig: read %d bridges and %d endpoints", len(config.Bridges), len(config.Endpoints))
+	log.Printf("domain.NewConfig: read %d bridges and %d endpoints", len(config.Bridges), len(config.Endpoints))
 
 	return config
 }

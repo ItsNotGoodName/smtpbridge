@@ -1,18 +1,16 @@
 package service
 
-import (
-	"github.com/ItsNotGoodName/smtpbridge/app"
-)
+import "github.com/ItsNotGoodName/smtpbridge/domain"
 
 type Message struct {
-	dao app.DAO
+	dao domain.DAO
 }
 
-func NewMessage(dao app.DAO) *Message {
+func NewMessage(dao domain.DAO) *Message {
 	return &Message{dao}
 }
 
-func (m *Message) List(limit, offset int) ([]app.Message, error) {
+func (m *Message) List(limit, offset int) ([]domain.Message, error) {
 	messages, err := m.dao.Message.GetMessages(limit, offset)
 	if err != nil {
 		return nil, err
@@ -28,8 +26,8 @@ func (m *Message) List(limit, offset int) ([]app.Message, error) {
 	return messages, nil
 }
 
-func (m *Message) Create(subject, from string, to map[string]bool, text string) (*app.Message, error) {
-	msg := app.NewMessage(subject, from, to, text)
+func (m *Message) Create(subject, from string, to map[string]bool, text string) (*domain.Message, error) {
+	msg := domain.NewMessage(subject, from, to, text)
 
 	err := m.dao.Message.CreateMessage(msg)
 	if err != nil {
@@ -39,8 +37,8 @@ func (m *Message) Create(subject, from string, to map[string]bool, text string) 
 	return msg, nil
 }
 
-func (m *Message) CreateAttachment(msg *app.Message, name string, data []byte) (*app.Attachment, error) {
-	att, err := app.NewAttachment(msg, name, data)
+func (m *Message) CreateAttachment(msg *domain.Message, name string, data []byte) (*domain.Attachment, error) {
+	att, err := domain.NewAttachment(msg, name, data)
 	if err != nil {
 		return nil, err
 	}
@@ -53,8 +51,8 @@ func (m *Message) CreateAttachment(msg *app.Message, name string, data []byte) (
 	return att, nil
 }
 
-func (m *Message) UpdateStatus(msg *app.Message, status app.Status) error {
-	return m.dao.Message.UpdateMessage(msg, func(msg *app.Message) (*app.Message, error) {
+func (m *Message) UpdateStatus(msg *domain.Message, status domain.Status) error {
+	return m.dao.Message.UpdateMessage(msg, func(msg *domain.Message) (*domain.Message, error) {
 		msg.Status = status
 		return msg, nil
 	})

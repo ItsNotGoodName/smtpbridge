@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/ItsNotGoodName/smtpbridge/app"
+	"github.com/ItsNotGoodName/smtpbridge/domain"
 )
 
 func (s *Router) GetAttachments(prefix string) http.HandlerFunc {
@@ -20,7 +20,7 @@ var templateFS embed.FS
 
 func (s *Router) GetIndex() http.HandlerFunc {
 	type Data struct {
-		Messages []app.Message
+		Messages []domain.Message
 	}
 
 	index, err := template.ParseFS(templateFS, "template/index.html")

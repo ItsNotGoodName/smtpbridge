@@ -1,4 +1,4 @@
-package app
+package domain
 
 type Bridge struct {
 	Name            string   `json:"name" mapstructure:"name"`

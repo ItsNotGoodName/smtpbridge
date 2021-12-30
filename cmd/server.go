@@ -25,7 +25,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/ItsNotGoodName/smtpbridge/app"
+	"github.com/ItsNotGoodName/smtpbridge/domain"
 	"github.com/ItsNotGoodName/smtpbridge/left/router"
 	"github.com/ItsNotGoodName/smtpbridge/left/smtp"
 	"github.com/ItsNotGoodName/smtpbridge/right/database"
@@ -42,11 +42,11 @@ var serverCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		// Read config
-		config := app.NewConfig()
+		config := domain.NewConfig()
 
 		// Init dao
 		db := database.NewDB(config.DBFile, config.AttDir)
-		dao := app.NewDAO(db, db, endpoint.NewRepository(config.Endpoints))
+		dao := domain.NewDAO(db, db, endpoint.NewRepository(config.Endpoints))
 
 		// Init services
 		authSVC := service.NewMockAuth()

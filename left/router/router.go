@@ -5,18 +5,18 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/ItsNotGoodName/smtpbridge/app"
+	"github.com/ItsNotGoodName/smtpbridge/domain"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 )
 
 type Router struct {
 	r              *chi.Mux
-	messageSVC     app.MessageServicePort
-	attachmentREPO app.AttachmentRepositoryPort
+	messageSVC     domain.MessageServicePort
+	attachmentREPO domain.AttachmentRepositoryPort
 }
 
-func New(messageSVC app.MessageServicePort, attachmentREPO app.AttachmentRepositoryPort) *Router {
+func New(messageSVC domain.MessageServicePort, attachmentREPO domain.AttachmentRepositoryPort) *Router {
 	s := Router{
 		r:              chi.NewRouter(),
 		messageSVC:     messageSVC,

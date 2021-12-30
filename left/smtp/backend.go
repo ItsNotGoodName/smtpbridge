@@ -4,17 +4,17 @@ import (
 	"io"
 	"log"
 
-	"github.com/ItsNotGoodName/smtpbridge/app"
+	"github.com/ItsNotGoodName/smtpbridge/domain"
 	"github.com/emersion/go-smtp"
 	"github.com/jhillyerd/enmime"
 )
 
 // Backend implements SMTP server methods.
 type Backend struct {
-	authSVC     app.AuthServicePort
-	bridgeSVC   app.BridgeServicePort
-	endpointSVC app.EndpointServicePort
-	messageSVC  app.MessageServicePort
+	authSVC     domain.AuthServicePort
+	bridgeSVC   domain.BridgeServicePort
+	endpointSVC domain.EndpointServicePort
+	messageSVC  domain.MessageServicePort
 }
 
 func (b Backend) AnonymousLogin(state *smtp.ConnectionState) (smtp.Session, error) {
@@ -31,20 +31,20 @@ func (b Backend) Login(state *smtp.ConnectionState, username, password string) (
 	return newSession(b.bridgeSVC, b.endpointSVC, b.messageSVC), nil
 }
 
-func NewBackend(authSVC app.AuthServicePort, bridgeSVC app.BridgeServicePort, endpointSVC app.EndpointServicePort, messageSVC app.MessageServicePort) Backend {
+func NewBackend(authSVC domain.AuthServicePort, bridgeSVC domain.BridgeServicePort, endpointSVC domain.EndpointServicePort, messageSVC domain.MessageServicePort) Backend {
 	return Backend{authSVC, bridgeSVC, endpointSVC, messageSVC}
 }
 
 // A session is returned after EHLO.
 type session struct {
-	bridgeSVC   app.BridgeServicePort
-	endpointSVC app.EndpointServicePort
-	messageSVC  app.MessageServicePort
+	bridgeSVC   domain.BridgeServicePort
+	endpointSVC domain.EndpointServicePort
+	messageSVC  domain.MessageServicePort
 	from        string
 	to          string
 }
 
-func newSession(bridgeSVC app.BridgeServicePort, endpointSVC app.EndpointServicePort, messageSVC app.MessageServicePort) *session {
+func newSession(bridgeSVC domain.BridgeServicePort, endpointSVC domain.EndpointServicePort, messageSVC domain.MessageServicePort) *session {
 	return &session{bridgeSVC: bridgeSVC, endpointSVC: endpointSVC, messageSVC: messageSVC}
 }
 

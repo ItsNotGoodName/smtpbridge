@@ -3,20 +3,20 @@ package service
 import (
 	"log"
 
-	"github.com/ItsNotGoodName/smtpbridge/app"
+	"github.com/ItsNotGoodName/smtpbridge/domain"
 )
 
 type Endpoint struct {
-	dao app.DAO
+	dao domain.DAO
 }
 
-func NewEndpoint(dao app.DAO) *Endpoint {
+func NewEndpoint(dao domain.DAO) *Endpoint {
 	return &Endpoint{dao}
 }
 
-func (e *Endpoint) SendBridges(msg *app.Message, bridges []app.Bridge) error {
+func (e *Endpoint) SendBridges(msg *domain.Message, bridges []domain.Bridge) error {
 	if len(bridges) == 0 {
-		return app.ErrBridgesNotFound
+		return domain.ErrBridgesNotFound
 	}
 
 	sent := 0
@@ -42,7 +42,7 @@ func (e *Endpoint) SendBridges(msg *app.Message, bridges []app.Bridge) error {
 	}
 
 	if sent == 0 {
-		return app.ErrEndpointSendFailed
+		return domain.ErrEndpointSendFailed
 	}
 
 	return nil

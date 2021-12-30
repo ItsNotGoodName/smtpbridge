@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/ItsNotGoodName/smtpbridge/app"
+	"github.com/ItsNotGoodName/smtpbridge/domain"
 )
 
 type Telegram struct {
@@ -28,7 +28,7 @@ type TelegramResponse struct {
 	Description string `json:"description"`
 }
 
-func (t *Telegram) Send(msg *app.EndpointMessage) error {
+func (t *Telegram) Send(msg *domain.EndpointMessage) error {
 	if len(msg.Attachments) == 0 {
 		return t.sendMessage(msg.Text)
 	}

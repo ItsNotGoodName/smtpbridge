@@ -4,7 +4,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/ItsNotGoodName/smtpbridge/app"
+	"github.com/ItsNotGoodName/smtpbridge/domain"
 	"github.com/emersion/go-sasl"
 	"github.com/emersion/go-smtp"
 )
@@ -30,7 +30,7 @@ type SMTP struct {
 	s *smtp.Server
 }
 
-func New(b Backend, config app.ConfigSMTP) SMTP {
+func New(b Backend, config domain.ConfigSMTP) SMTP {
 	s := smtp.NewServer(b)
 
 	enableMechLogin(s, b)

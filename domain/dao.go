@@ -1,4 +1,4 @@
-package app
+package domain
 
 type DAO struct {
 	Attachment AttachmentRepositoryPort

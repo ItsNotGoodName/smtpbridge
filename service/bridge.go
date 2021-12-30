@@ -3,14 +3,14 @@ package service
 import (
 	"log"
 
-	"github.com/ItsNotGoodName/smtpbridge/app"
+	"github.com/ItsNotGoodName/smtpbridge/domain"
 )
 
 type Bridge struct {
-	bridges []app.Bridge
+	bridges []domain.Bridge
 }
 
-func NewBridge(dao app.DAO, bridges []app.Bridge) *Bridge {
+func NewBridge(dao domain.DAO, bridges []domain.Bridge) *Bridge {
 	for _, bridge := range bridges {
 		for _, endpoint := range bridge.Endpoints {
 			if _, err := dao.Endpoint.Get(endpoint); err != nil {
@@ -22,8 +22,8 @@ func NewBridge(dao app.DAO, bridges []app.Bridge) *Bridge {
 	return &Bridge{bridges: bridges}
 }
 
-func (b *Bridge) GetBridges(msg *app.Message) []app.Bridge {
-	var bridges []app.Bridge
+func (b *Bridge) GetBridges(msg *domain.Message) []domain.Bridge {
+	var bridges []domain.Bridge
 	for _, bridge := range b.bridges {
 		if !bridge.Match(msg) {
 			continue
