@@ -3,7 +3,6 @@ package app
 import (
 	"fmt"
 	"net/http"
-	"path"
 
 	"github.com/google/uuid"
 )
@@ -16,11 +15,11 @@ type Attachment struct {
 	Data        []byte         `json:"-"`
 }
 
-type AttachmentType uint
+type AttachmentType string
 
 const (
-	TypePNG AttachmentType = iota
-	TypeJPEG
+	TypePNG  AttachmentType = "png"
+	TypeJPEG AttachmentType = "jpeg"
 )
 
 func NewAttachment(msg *Message, name string, data []byte) (*Attachment, error) {
@@ -45,21 +44,6 @@ func NewAttachment(msg *Message, name string, data []byte) (*Attachment, error) 
 	msg.Attachments = append(msg.Attachments, att)
 
 	return &att, nil
-}
-
-func (a *Attachment) EXT() string {
-	switch a.Type {
-	case TypePNG:
-		return ".png"
-	case TypeJPEG:
-		return ".jpg"
-	default:
-		return ""
-	}
-}
-
-func (a *Attachment) Path(directory string) string {
-	return path.Join(directory, a.UUID+a.EXT())
 }
 
 type EndpointAttachment struct {

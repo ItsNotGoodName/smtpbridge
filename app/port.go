@@ -1,5 +1,9 @@
 package app
 
+import (
+	"io/fs"
+)
+
 // AuthServicePort handles authenticating users.
 type AuthServicePort interface {
 	AnonymousLogin() bool
@@ -21,22 +25,37 @@ type MessageServicePort interface {
 	// AddAttachment adds an attachment to a message.
 	Send(msg *Message) error
 	SendBridges(msg *Message, bridges []Bridge) error
+	// UpdateStatus updates the status of a message.
 	UpdateStatus(msg *Message, status Status) error
+	// List messages with attachments.
+	List(limit, offset int) ([]Message, error)
 }
 
 // MessageRepositoryPort handles storing messages.
 type MessageRepositoryPort interface {
+	// CreateMessage saves a new message.
 	CreateMessage(msg *Message) error
+	// GetMessage returns a message by it's UUID.
 	GetMessage(uuid string) (*Message, error)
+	// GetMessages returns a list of messages.
 	GetMessages(limit, offset int) ([]Message, error)
+	// UpdateMessage updates a message.
 	UpdateMessage(msg *Message, updateFN func(msg *Message) (*Message, error)) error
 }
 
 type AttachmentRepositoryPort interface {
+	// CreateAttachment saves a new attachment.
 	CreateAttachment(att *Attachment) error
+	// GetAttachment returns an attachment by it's UUID.
 	GetAttachment(uuid string) (*Attachment, error)
+	// GetAttachmentData returns the data for an attachment.
 	GetAttachmentData(att *Attachment) ([]byte, error)
+	// GetAttachments returns a list of attachments for a message.
 	GetAttachments(msg *Message) ([]Attachment, error)
+	// GetAttachmentFile returns the filename of the attachment
+	GetAttachmentFile(att *Attachment) string
+	// GetFS returns the attachment file system
+	GetAttachmentFS() fs.FS
 }
 
 // EndpointPort handles sending messages to an endpoint.

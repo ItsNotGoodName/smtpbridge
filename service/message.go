@@ -22,6 +22,22 @@ func NewMessage(bridgeSVC app.BridgeServicePort, endpointREPO app.EndpointReposi
 	}
 }
 
+func (m *Message) List(limit, offset int) ([]app.Message, error) {
+	messages, err := m.messageREPO.GetMessages(limit, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	for i := range messages {
+		messages[i].Attachments, err = m.attachmentREPO.GetAttachments(&messages[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return messages, nil
+}
+
 func (m *Message) Create(subject, from string, to map[string]bool, text string) (*app.Message, error) {
 	msg := app.NewMessage(subject, from, to, text)
 

@@ -1,8 +1,11 @@
 package database
 
 import (
+	"fmt"
+	"io/fs"
 	"log"
 	"os"
+	"path"
 
 	"github.com/ItsNotGoodName/smtpbridge/app"
 	"github.com/asdine/storm"
@@ -10,8 +13,8 @@ import (
 )
 
 type DB struct {
-	db      *storm.DB
-	attPath string
+	db     *storm.DB
+	attDir string
 }
 
 func NewDB(dbFile, attDir string) *DB {
@@ -26,9 +29,22 @@ func NewDB(dbFile, attDir string) *DB {
 	}
 
 	return &DB{
-		db:      db,
-		attPath: attDir,
+		db:     db,
+		attDir: attDir,
 	}
+}
+
+// getAttachmentPath returns the path to the attachment file on the file system.
+func (db *DB) getAttachmentPath(att *app.Attachment) string {
+	return path.Join(db.attDir, db.GetAttachmentFile(att))
+}
+
+func (db *DB) GetAttachmentFile(att *app.Attachment) string {
+	return fmt.Sprintf("%s.%s", att.UUID, att.Type)
+}
+
+func (db *DB) GetAttachmentFS() fs.FS {
+	return os.DirFS(db.attDir)
 }
 
 func (db *DB) CreateMessage(msg *app.Message) error {
@@ -86,7 +102,7 @@ func (db *DB) CreateAttachment(att *app.Attachment) error {
 		return err
 	}
 
-	return os.WriteFile(att.Path(db.attPath), att.Data, 0644)
+	return os.WriteFile(db.getAttachmentPath(att), att.Data, 0644)
 }
 
 func (db *DB) GetAttachment(uuid string) (*app.Attachment, error) {
@@ -100,7 +116,7 @@ func (db *DB) GetAttachment(uuid string) (*app.Attachment, error) {
 }
 
 func (db *DB) GetAttachmentData(att *app.Attachment) ([]byte, error) {
-	data, err := os.ReadFile(att.Path(db.attPath))
+	data, err := os.ReadFile(db.getAttachmentPath(att))
 	if err != nil {
 		return nil, err
 	}
