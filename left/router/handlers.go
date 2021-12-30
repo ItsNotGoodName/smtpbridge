@@ -6,12 +6,13 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/ItsNotGoodName/smtpbridge/app"
 	"github.com/ItsNotGoodName/smtpbridge/domain"
 )
 
 func (s *Router) GetAttachments(prefix string) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
-		http.StripPrefix(prefix, http.FileServer(http.FS(s.attachmentREPO.GetAttachmentFS()))).ServeHTTP(rw, r)
+		http.StripPrefix(prefix, http.FileServer(http.FS(s.a.AttachmentGetFS()))).ServeHTTP(rw, r)
 	}
 }
 
@@ -29,7 +30,7 @@ func (s *Router) GetIndex() http.HandlerFunc {
 	}
 
 	return func(rw http.ResponseWriter, r *http.Request) {
-		messages, err := s.messageSVC.List(10, 0)
+		messages, err := s.a.MessageList(&app.MessageListRequest{Limit: 10, Offset: 0})
 		if err != nil {
 			http.Error(rw, err.Error(), http.StatusInternalServerError)
 			return

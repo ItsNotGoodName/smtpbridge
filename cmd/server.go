@@ -25,6 +25,7 @@ import (
 	"os"
 	"path"
 
+	"github.com/ItsNotGoodName/smtpbridge/app"
 	"github.com/ItsNotGoodName/smtpbridge/domain"
 	"github.com/ItsNotGoodName/smtpbridge/left/router"
 	"github.com/ItsNotGoodName/smtpbridge/left/smtp"
@@ -46,21 +47,28 @@ var serverCmd = &cobra.Command{
 
 		// Init dao
 		db := database.NewDB(config.DBFile, config.AttDir)
-		dao := domain.NewDAO(db, db, endpoint.NewRepository(config.Endpoints))
+		dao := domain.NewDAO(
+			db,
+			db,
+			endpoint.NewRepository(config.Endpoints),
+		)
 
-		// Init services
-		authSVC := service.NewMockAuth()
-		bridgeSVC := service.NewBridge(dao, config.Bridges)
-		messageSVC := service.NewMessage(dao)
-		endpointSVC := service.NewEndpoint(dao)
+		// Init app
+		app := app.New(
+			dao,
+			service.NewMockAuth(),
+			service.NewBridge(dao, config.Bridges),
+			service.NewEndpoint(dao),
+			service.NewMessage(dao),
+		)
 
 		// Init smtp server
-		backendServer := smtp.NewBackend(authSVC, bridgeSVC, endpointSVC, messageSVC)
+		backendServer := smtp.NewBackend(app)
 		smtpServer := smtp.New(backendServer, config.SMTP)
 
 		// Init router
 		if config.HTTP.Enable {
-			httpServer := router.New(messageSVC, dao.Attachment)
+			httpServer := router.New(app)
 			go httpServer.Start(config.HTTP.Addr)
 		}
 

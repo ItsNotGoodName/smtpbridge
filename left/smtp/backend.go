@@ -4,48 +4,43 @@ import (
 	"io"
 	"log"
 
-	"github.com/ItsNotGoodName/smtpbridge/domain"
+	"github.com/ItsNotGoodName/smtpbridge/app"
 	"github.com/emersion/go-smtp"
 	"github.com/jhillyerd/enmime"
 )
 
 // Backend implements SMTP server methods.
 type Backend struct {
-	authSVC     domain.AuthServicePort
-	bridgeSVC   domain.BridgeServicePort
-	endpointSVC domain.EndpointServicePort
-	messageSVC  domain.MessageServicePort
+	app *app.App
 }
 
 func (b Backend) AnonymousLogin(state *smtp.ConnectionState) (smtp.Session, error) {
-	if !b.authSVC.AnonymousLogin() {
+	if err := b.app.AuthLoginRequest(&app.AuthLoginRequest{}); err != nil {
 		return nil, smtp.ErrAuthRequired
 	}
-	return newSession(b.bridgeSVC, b.endpointSVC, b.messageSVC), nil
+	return newSession(b.app), nil
 }
 
 func (b Backend) Login(state *smtp.ConnectionState, username, password string) (smtp.Session, error) {
-	if err := b.authSVC.Login(username, password); err != nil {
+	if err := b.app.AuthLoginRequest(&app.AuthLoginRequest{Username: username, Password: password}); err != nil {
 		return nil, err
 	}
-	return newSession(b.bridgeSVC, b.endpointSVC, b.messageSVC), nil
+	return newSession(b.app), nil
 }
 
-func NewBackend(authSVC domain.AuthServicePort, bridgeSVC domain.BridgeServicePort, endpointSVC domain.EndpointServicePort, messageSVC domain.MessageServicePort) Backend {
-	return Backend{authSVC, bridgeSVC, endpointSVC, messageSVC}
+func NewBackend(app *app.App) Backend {
+	return Backend{app}
 }
 
 // A session is returned after EHLO.
 type session struct {
-	bridgeSVC   domain.BridgeServicePort
-	endpointSVC domain.EndpointServicePort
-	messageSVC  domain.MessageServicePort
-	from        string
-	to          string
+	app  *app.App
+	from string
+	to   string
 }
 
-func newSession(bridgeSVC domain.BridgeServicePort, endpointSVC domain.EndpointServicePort, messageSVC domain.MessageServicePort) *session {
-	return &session{bridgeSVC: bridgeSVC, endpointSVC: endpointSVC, messageSVC: messageSVC}
+func newSession(app *app.App) *session {
+	return &session{app: app}
 }
 
 func (s *session) Mail(from string, opts smtp.MailOptions) error {
@@ -86,23 +81,26 @@ func (s *session) Data(r io.Reader) error {
 	}
 	toMap[s.to] = true
 
-	msg, err := s.messageSVC.Create(e.GetHeader("Subject"), s.from, toMap, e.Text)
+	// Create message
+	req := app.MessageCreateRequest{
+		Subject: e.GetHeader("Subject"),
+		From:    s.from,
+		To:      toMap,
+		Text:    e.Text,
+	}
+	for _, a := range e.Attachments {
+		req.AddAttachment(a.FileName, a.Content)
+	}
+	msg, err := s.app.MessageCreate(&req)
 	if err != nil {
 		log.Println("ERROR: could not create message:", err)
 		return err
 	}
 
-	for _, a := range e.Attachments {
-		if _, err := s.messageSVC.CreateAttachment(msg, a.FileName, a.Content); err != nil {
-			log.Println("ATTACHMENT_ERROR: could not add attachment:", err)
-			return err
-		}
-	}
-
 	go func() {
-		err := s.endpointSVC.SendBridges(msg, s.bridgeSVC.GetBridges(msg))
+		err := s.app.MessageSend(&app.MessageSendRequest{Message: msg})
 		if err != nil {
-			log.Println("ERROR: could not send message:", err)
+			log.Println("ERROR: could not handle message:", err)
 		}
 	}()
 
