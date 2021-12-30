@@ -29,7 +29,7 @@ type MessageServicePort interface {
 }
 
 type EndpointServicePort interface {
-	Send(msg *Message) error
+	// SendBridges sends message through the given bridges, returns error if all sends failed.
 	SendBridges(msg *Message, bridges []Bridge) error
 }
 

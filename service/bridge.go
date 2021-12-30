@@ -10,10 +10,10 @@ type Bridge struct {
 	bridges []app.Bridge
 }
 
-func NewBridge(endpointREPO app.EndpointRepositoryPort, bridges []app.Bridge) *Bridge {
+func NewBridge(dao app.DAO, bridges []app.Bridge) *Bridge {
 	for _, bridge := range bridges {
 		for _, endpoint := range bridge.Endpoints {
-			if _, err := endpointREPO.Get(endpoint); err != nil {
+			if _, err := dao.Endpoint.Get(endpoint); err != nil {
 				log.Fatalln("service.NewBridge:", err)
 			}
 		}

@@ -7,21 +7,11 @@ import (
 )
 
 type Endpoint struct {
-	bridgeSVC    app.BridgeServicePort
-	messageSVC   app.MessageServicePort
-	endpointREPO app.EndpointRepositoryPort
+	dao app.DAO
 }
 
-func NewEndpoint(bridgeSVC app.BridgeServicePort, messageSVC app.MessageServicePort, endpointREPO app.EndpointRepositoryPort) *Endpoint {
-	return &Endpoint{
-		bridgeSVC:    bridgeSVC,
-		messageSVC:   messageSVC,
-		endpointREPO: endpointREPO,
-	}
-}
-
-func (e *Endpoint) Send(msg *app.Message) error {
-	return e.SendBridges(msg, e.bridgeSVC.GetBridges(msg))
+func NewEndpoint(dao app.DAO) *Endpoint {
+	return &Endpoint{dao}
 }
 
 func (e *Endpoint) SendBridges(msg *app.Message, bridges []app.Bridge) error {
@@ -29,7 +19,7 @@ func (e *Endpoint) SendBridges(msg *app.Message, bridges []app.Bridge) error {
 		return app.ErrBridgesNotFound
 	}
 
-	sentCount := 0
+	sent := 0
 	for _, bridge := range bridges {
 		emsg := bridge.EndpointMessage(msg)
 		if emsg.IsEmpty() {
@@ -37,27 +27,23 @@ func (e *Endpoint) SendBridges(msg *app.Message, bridges []app.Bridge) error {
 		}
 
 		for _, name := range bridge.Endpoints {
-			endpoint, err := e.endpointREPO.Get(name)
+			endpoint, err := e.dao.Endpoint.Get(name)
 			if err != nil {
 				return err
 			}
 
-			err = endpoint.Send(emsg)
-			if err != nil {
+			// TODO: worker pool
+			if err = endpoint.Send(emsg); err != nil {
 				log.Println("service.Endpoint.SendBridges:", err)
 			} else {
-				sentCount++
+				sent++
 			}
 		}
 	}
 
-	if sentCount == 0 {
-		if err := e.messageSVC.UpdateStatus(msg, app.StatusFailed); err != nil {
-			return err
-		}
-
+	if sent == 0 {
 		return app.ErrEndpointSendFailed
 	}
 
-	return e.messageSVC.UpdateStatus(msg, app.StatusSent)
+	return nil
 }

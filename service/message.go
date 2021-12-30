@@ -5,25 +5,21 @@ import (
 )
 
 type Message struct {
-	messageREPO    app.MessageRepositoryPort
-	attachmentREPO app.AttachmentRepositoryPort
+	dao app.DAO
 }
 
-func NewMessage(messageREPO app.MessageRepositoryPort, attachmentREPO app.AttachmentRepositoryPort) *Message {
-	return &Message{
-		messageREPO:    messageREPO,
-		attachmentREPO: attachmentREPO,
-	}
+func NewMessage(dao app.DAO) *Message {
+	return &Message{dao}
 }
 
 func (m *Message) List(limit, offset int) ([]app.Message, error) {
-	messages, err := m.messageREPO.GetMessages(limit, offset)
+	messages, err := m.dao.Message.GetMessages(limit, offset)
 	if err != nil {
 		return nil, err
 	}
 
 	for i := range messages {
-		messages[i].Attachments, err = m.attachmentREPO.GetAttachments(&messages[i])
+		messages[i].Attachments, err = m.dao.Attachment.GetAttachments(&messages[i])
 		if err != nil {
 			return nil, err
 		}
@@ -35,7 +31,7 @@ func (m *Message) List(limit, offset int) ([]app.Message, error) {
 func (m *Message) Create(subject, from string, to map[string]bool, text string) (*app.Message, error) {
 	msg := app.NewMessage(subject, from, to, text)
 
-	err := m.messageREPO.CreateMessage(msg)
+	err := m.dao.Message.CreateMessage(msg)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +45,7 @@ func (m *Message) CreateAttachment(msg *app.Message, name string, data []byte) (
 		return nil, err
 	}
 
-	err = m.attachmentREPO.CreateAttachment(att)
+	err = m.dao.Attachment.CreateAttachment(att)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +54,7 @@ func (m *Message) CreateAttachment(msg *app.Message, name string, data []byte) (
 }
 
 func (m *Message) UpdateStatus(msg *app.Message, status app.Status) error {
-	return m.messageREPO.UpdateMessage(msg, func(msg *app.Message) (*app.Message, error) {
+	return m.dao.Message.UpdateMessage(msg, func(msg *app.Message) (*app.Message, error) {
 		msg.Status = status
 		return msg, nil
 	})

@@ -17,10 +17,10 @@ type Config struct {
 }
 
 type ConfigHTTP struct {
-	Enable  bool   `json:"enable" mapstructure:"enable"`
-	Address string `json:"-" mapstructure:"-"`
-	Host    string `json:"host" mapstructure:"host"`
-	Port    uint16 `json:"port" mapstructure:"port"`
+	Enable bool   `json:"enable" mapstructure:"enable"`
+	Addr   string `json:"-" mapstructure:"-"`
+	Host   string `json:"host" mapstructure:"host"`
+	Port   uint16 `json:"port" mapstructure:"port"`
 }
 
 type ConfigEndpoint struct {
@@ -45,7 +45,7 @@ func NewConfig() *Config {
 	}
 
 	config.SMTP.PortStr = strconv.FormatUint(uint64(config.SMTP.Port), 10)
-	config.HTTP.Address = config.HTTP.Host + ":" + strconv.FormatUint(uint64(config.HTTP.Port), 10)
+	config.HTTP.Addr = config.HTTP.Host + ":" + strconv.FormatUint(uint64(config.HTTP.Port), 10)
 
 	log.Printf("app.NewConfig: read %d bridges and %d endpoints", len(config.Bridges), len(config.Endpoints))
 

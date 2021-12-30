@@ -44,24 +44,24 @@ var serverCmd = &cobra.Command{
 		// Read config
 		config := app.NewConfig()
 
-		// Init repositories
-		endpointREPO := endpoint.NewRepository(config.Endpoints)
-		databaseREPO := database.NewDB(config.DBFile, config.AttDir)
+		// Init dao
+		db := database.NewDB(config.DBFile, config.AttDir)
+		dao := app.NewDAO(db, db, endpoint.NewRepository(config.Endpoints))
 
 		// Init services
 		authSVC := service.NewMockAuth()
-		bridgeSVC := service.NewBridge(endpointREPO, config.Bridges)
-		messageSVC := service.NewMessage(databaseREPO, databaseREPO)
-		endpointSVC := service.NewEndpoint(bridgeSVC, messageSVC, endpointREPO)
+		bridgeSVC := service.NewBridge(dao, config.Bridges)
+		messageSVC := service.NewMessage(dao)
+		endpointSVC := service.NewEndpoint(dao)
 
 		// Init smtp server
-		backendServer := smtp.NewBackend(authSVC, endpointSVC, messageSVC)
+		backendServer := smtp.NewBackend(authSVC, bridgeSVC, endpointSVC, messageSVC)
 		smtpServer := smtp.New(backendServer, config.SMTP)
 
 		// Init router
 		if config.HTTP.Enable {
-			httpServer := router.New(config.AttDir, databaseREPO, databaseREPO)
-			go httpServer.Start(config.HTTP.Address)
+			httpServer := router.New(config.AttDir, db, db)
+			go httpServer.Start(config.HTTP.Addr)
 		}
 
 		// Start smtp server

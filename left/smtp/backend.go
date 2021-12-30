@@ -12,6 +12,7 @@ import (
 // Backend implements SMTP server methods.
 type Backend struct {
 	authSVC     app.AuthServicePort
+	bridgeSVC   app.BridgeServicePort
 	endpointSVC app.EndpointServicePort
 	messageSVC  app.MessageServicePort
 }
@@ -20,30 +21,31 @@ func (b Backend) AnonymousLogin(state *smtp.ConnectionState) (smtp.Session, erro
 	if !b.authSVC.AnonymousLogin() {
 		return nil, smtp.ErrAuthRequired
 	}
-	return newSession(b.endpointSVC, b.messageSVC), nil
+	return newSession(b.bridgeSVC, b.endpointSVC, b.messageSVC), nil
 }
 
 func (b Backend) Login(state *smtp.ConnectionState, username, password string) (smtp.Session, error) {
 	if err := b.authSVC.Login(username, password); err != nil {
 		return nil, err
 	}
-	return newSession(b.endpointSVC, b.messageSVC), nil
+	return newSession(b.bridgeSVC, b.endpointSVC, b.messageSVC), nil
 }
 
-func NewBackend(authSVC app.AuthServicePort, endpointSVC app.EndpointServicePort, messageSVC app.MessageServicePort) Backend {
-	return Backend{authSVC, endpointSVC, messageSVC}
+func NewBackend(authSVC app.AuthServicePort, bridgeSVC app.BridgeServicePort, endpointSVC app.EndpointServicePort, messageSVC app.MessageServicePort) Backend {
+	return Backend{authSVC, bridgeSVC, endpointSVC, messageSVC}
 }
 
 // A session is returned after EHLO.
 type session struct {
-	messageSVC  app.MessageServicePort
+	bridgeSVC   app.BridgeServicePort
 	endpointSVC app.EndpointServicePort
+	messageSVC  app.MessageServicePort
 	from        string
 	to          string
 }
 
-func newSession(endpointSVC app.EndpointServicePort, messageSVC app.MessageServicePort) *session {
-	return &session{messageSVC: messageSVC, endpointSVC: endpointSVC}
+func newSession(bridgeSVC app.BridgeServicePort, endpointSVC app.EndpointServicePort, messageSVC app.MessageServicePort) *session {
+	return &session{bridgeSVC: bridgeSVC, endpointSVC: endpointSVC, messageSVC: messageSVC}
 }
 
 func (s *session) Mail(from string, opts smtp.MailOptions) error {
@@ -84,24 +86,25 @@ func (s *session) Data(r io.Reader) error {
 	}
 	toMap[s.to] = true
 
-	m, err := s.messageSVC.Create(e.GetHeader("Subject"), s.from, toMap, e.Text)
+	msg, err := s.messageSVC.Create(e.GetHeader("Subject"), s.from, toMap, e.Text)
 	if err != nil {
 		log.Println("ERROR: could not create message:", err)
 		return err
 	}
 
 	for _, a := range e.Attachments {
-		if _, err := s.messageSVC.CreateAttachment(m, a.FileName, a.Content); err != nil {
+		if _, err := s.messageSVC.CreateAttachment(msg, a.FileName, a.Content); err != nil {
 			log.Println("ATTACHMENT_ERROR: could not add attachment:", err)
 			return err
 		}
 	}
 
-	err = s.endpointSVC.Send(m)
-	if err != nil {
-		log.Println("ERROR: could not send message:", err)
-		return err
-	}
+	go func() {
+		err := s.endpointSVC.SendBridges(msg, s.bridgeSVC.GetBridges(msg))
+		if err != nil {
+			log.Println("ERROR: could not send message:", err)
+		}
+	}()
 
 	return nil
 }
