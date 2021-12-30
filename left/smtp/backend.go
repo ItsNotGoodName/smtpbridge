@@ -9,39 +9,41 @@ import (
 	"github.com/jhillyerd/enmime"
 )
 
-// backend implements SMTP server methods.
-type backend struct {
-	authSVC    app.AuthServicePort
-	messageSVC app.MessageServicePort
+// Backend implements SMTP server methods.
+type Backend struct {
+	authSVC     app.AuthServicePort
+	endpointSVC app.EndpointServicePort
+	messageSVC  app.MessageServicePort
 }
 
-func (b backend) AnonymousLogin(state *smtp.ConnectionState) (smtp.Session, error) {
+func (b Backend) AnonymousLogin(state *smtp.ConnectionState) (smtp.Session, error) {
 	if !b.authSVC.AnonymousLogin() {
 		return nil, smtp.ErrAuthRequired
 	}
-	return NewSession(b.messageSVC), nil
+	return newSession(b.endpointSVC, b.messageSVC), nil
 }
 
-func (b backend) Login(state *smtp.ConnectionState, username, password string) (smtp.Session, error) {
+func (b Backend) Login(state *smtp.ConnectionState, username, password string) (smtp.Session, error) {
 	if err := b.authSVC.Login(username, password); err != nil {
 		return nil, err
 	}
-	return NewSession(b.messageSVC), nil
+	return newSession(b.endpointSVC, b.messageSVC), nil
 }
 
-func newBackend(auth app.AuthServicePort, messageSVC app.MessageServicePort) *backend {
-	return &backend{auth, messageSVC}
+func NewBackend(authSVC app.AuthServicePort, endpointSVC app.EndpointServicePort, messageSVC app.MessageServicePort) Backend {
+	return Backend{authSVC, endpointSVC, messageSVC}
 }
 
 // A session is returned after EHLO.
 type session struct {
-	messageSVC app.MessageServicePort
-	from       string
-	to         string
+	messageSVC  app.MessageServicePort
+	endpointSVC app.EndpointServicePort
+	from        string
+	to          string
 }
 
-func NewSession(messageSVC app.MessageServicePort) *session {
-	return &session{messageSVC: messageSVC}
+func newSession(endpointSVC app.EndpointServicePort, messageSVC app.MessageServicePort) *session {
+	return &session{messageSVC: messageSVC, endpointSVC: endpointSVC}
 }
 
 func (s *session) Mail(from string, opts smtp.MailOptions) error {
@@ -95,7 +97,7 @@ func (s *session) Data(r io.Reader) error {
 		}
 	}
 
-	err = s.messageSVC.Send(m)
+	err = s.endpointSVC.Send(m)
 	if err != nil {
 		log.Println("ERROR: could not send message:", err)
 		return err

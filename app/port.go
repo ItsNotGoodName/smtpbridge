@@ -22,13 +22,15 @@ type MessageServicePort interface {
 	Create(subject, from string, to map[string]bool, text string) (*Message, error)
 	// CreateAttachment adds an attachment to a message.
 	CreateAttachment(msg *Message, name string, data []byte) (*Attachment, error)
-	// AddAttachment adds an attachment to a message.
-	Send(msg *Message) error
-	SendBridges(msg *Message, bridges []Bridge) error
 	// UpdateStatus updates the status of a message.
 	UpdateStatus(msg *Message, status Status) error
 	// List messages with attachments.
 	List(limit, offset int) ([]Message, error)
+}
+
+type EndpointServicePort interface {
+	Send(msg *Message) error
+	SendBridges(msg *Message, bridges []Bridge) error
 }
 
 // MessageRepositoryPort handles storing messages.

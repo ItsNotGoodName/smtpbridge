@@ -51,10 +51,12 @@ var serverCmd = &cobra.Command{
 		// Init services
 		authSVC := service.NewMockAuth()
 		bridgeSVC := service.NewBridge(endpointREPO, config.Bridges)
-		messageSVC := service.NewMessage(bridgeSVC, endpointREPO, databaseREPO, databaseREPO)
+		messageSVC := service.NewMessage(databaseREPO, databaseREPO)
+		endpointSVC := service.NewEndpoint(bridgeSVC, messageSVC, endpointREPO)
 
 		// Init smtp server
-		smtpServer := smtp.New(authSVC, messageSVC, config.SMTP)
+		backendServer := smtp.NewBackend(authSVC, endpointSVC, messageSVC)
+		smtpServer := smtp.New(backendServer, config.SMTP)
 
 		// Init router
 		if config.HTTP.Enable {

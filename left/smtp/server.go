@@ -30,8 +30,7 @@ type SMTP struct {
 	s *smtp.Server
 }
 
-func New(authSVC app.AuthServicePort, messageSVC app.MessageServicePort, config app.ConfigSMTP) SMTP {
-	b := newBackend(authSVC, messageSVC)
+func New(b Backend, config app.ConfigSMTP) SMTP {
 	s := smtp.NewServer(b)
 
 	enableMechLogin(s, b)
