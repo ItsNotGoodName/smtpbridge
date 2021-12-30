@@ -1,6 +1,10 @@
 package database
 
-import "github.com/ItsNotGoodName/smtpbridge/domain"
+import (
+	"io/fs"
+
+	"github.com/ItsNotGoodName/smtpbridge/domain"
+)
 
 type Mock struct{}
 
@@ -8,27 +12,55 @@ func NewMock() *Mock {
 	return &Mock{}
 }
 
-func (db *Mock) CreateMessage(msg *domain.Message) error {
+func (Mock) CreateMessage(msg *domain.Message) error {
 	return nil
 }
 
-func (db *Mock) GetMessage(uuid string) (*domain.Message, error) {
+func (Mock) GetMessage(uuid string) (*domain.Message, error) {
 	return nil, domain.ErrNotImplemented
 }
 
-func (db *Mock) UpdateMessage(msg *domain.Message, updateFN func(msg *domain.Message) (*domain.Message, error)) error {
+func (Mock) UpdateMessage(msg *domain.Message, updateFN func(msg *domain.Message) (*domain.Message, error)) error {
 	_, err := updateFN(msg)
 	return err
 }
 
-func (db *Mock) CreateAttachment(att *domain.Attachment) error {
+func (Mock) CreateAttachment(att *domain.Attachment) error {
 	return nil
 }
 
-func (db *Mock) GetAttachment(uuid string) (*domain.Attachment, error) {
+func (Mock) GetAttachment(uuid string) (*domain.Attachment, error) {
 	return nil, domain.ErrNotImplemented
 }
 
-func (db *Mock) LoadAttachment(msg *domain.Message) error {
-	return domain.ErrNotImplemented
+func (Mock) LoadAttachment(msg *domain.Message) error {
+	return nil
+}
+
+func (Mock) DeleteMessage(msg *domain.Message) error {
+	return nil
+}
+
+func (Mock) GetMessages(limit, offset int) ([]domain.Message, error) {
+	return []domain.Message{}, nil
+}
+
+func (Mock) GetAttachmentData(att *domain.Attachment) ([]byte, error) {
+	return nil, domain.ErrNotImplemented
+}
+
+func (m Mock) GetAttachmentFS() fs.FS {
+	return m
+}
+
+func (Mock) Open(name string) (fs.File, error) {
+	return nil, fs.ErrNotExist
+}
+
+func (Mock) GetAttachmentFile(att *domain.Attachment) string {
+	return ""
+}
+
+func (Mock) GetAttachments(msg *domain.Message) ([]domain.Attachment, error) {
+	return []domain.Attachment{}, nil
 }
