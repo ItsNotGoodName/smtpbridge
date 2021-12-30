@@ -60,7 +60,7 @@ var serverCmd = &cobra.Command{
 
 		// Init router
 		if config.HTTP.Enable {
-			httpServer := router.New(config.AttDir, db, db)
+			httpServer := router.New(messageSVC, dao.Attachment)
 			go httpServer.Start(config.HTTP.Addr)
 		}
 

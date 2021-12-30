@@ -12,16 +12,14 @@ import (
 
 type Router struct {
 	r              *chi.Mux
-	attDir         string
-	messageREPO    app.MessageRepositoryPort
+	messageSVC     app.MessageServicePort
 	attachmentREPO app.AttachmentRepositoryPort
 }
 
-func New(attDir string, messageREPO app.MessageRepositoryPort, attachmentREPO app.AttachmentRepositoryPort) *Router {
+func New(messageSVC app.MessageServicePort, attachmentREPO app.AttachmentRepositoryPort) *Router {
 	s := Router{
 		r:              chi.NewRouter(),
-		attDir:         attDir,
-		messageREPO:    messageREPO,
+		messageSVC:     messageSVC,
 		attachmentREPO: attachmentREPO,
 	}
 

@@ -11,7 +11,7 @@ import (
 
 func (s *Router) GetAttachments(prefix string) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
-		http.StripPrefix(prefix, http.FileServer(http.Dir(s.attDir))).ServeHTTP(rw, r)
+		http.StripPrefix(prefix, http.FileServer(http.FS(s.attachmentREPO.GetAttachmentFS()))).ServeHTTP(rw, r)
 	}
 }
 
@@ -29,22 +29,12 @@ func (s *Router) GetIndex() http.HandlerFunc {
 	}
 
 	return func(rw http.ResponseWriter, r *http.Request) {
-		msg, err := s.messageREPO.GetMessages(10, 0)
+		messages, err := s.messageSVC.List(10, 0)
 		if err != nil {
 			http.Error(rw, err.Error(), http.StatusInternalServerError)
+			return
 		}
 
-		for i := range msg {
-			msg[i].Attachments, err = s.attachmentREPO.GetAttachments(&msg[i])
-			if err != nil {
-				http.Error(rw, err.Error(), http.StatusInternalServerError)
-			}
-		}
-
-		data := Data{
-			Messages: msg,
-		}
-
-		index.Execute(rw, data)
+		index.Execute(rw, Data{Messages: messages})
 	}
 }

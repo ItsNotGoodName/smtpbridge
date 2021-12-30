@@ -9,18 +9,28 @@
   <body>
     <h1>Messages</h1>
     {{range $msg := .Messages}}
-    <div>
-      <h2>{{ $msg.Subject }}</h2>
-      <div>Status: {{ $msg.Status }}</div>
+    <div style="border: 2px gray solid; padding-left: 5px; margin-bottom: 5px">
       <div>
-        <code>
-          <pre>{{ $msg.Text }}</pre>
-        </code>
-      </div>
+        {{ if $msg.Subject }}
+        <h2>{{ $msg.Subject }}</h2>
+        {{ else }}
+        <h2>No Subject</h2>
+        {{ end }}
+        <div>Status: {{ $msg.Status }}</div>
+        <div>
+          <code>
+            <pre>{{ $msg.Text }}</pre>
+          </code>
+        </div>
 
-      {{ range $att := $msg.Attachments }}
-      <img width="300" src="/attachments/{{ $att.UUID }}.jpg" alt="{{ $att.UUID }}" />
-      {{ end }}
+        {{ range $att := $msg.Attachments }}
+        <img
+          width="300"
+          src="/attachments/{{ $att.UUID }}.{{ $att.Type }}"
+          alt="{{ $att.UUID }}.{{ $att.Type }}"
+        />
+        {{ end }}
+      </div>
     </div>
     {{ end }}
   </body>

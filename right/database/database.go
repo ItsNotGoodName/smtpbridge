@@ -88,7 +88,7 @@ func (db *DB) UpdateMessage(msg *app.Message, updateFN func(msg *app.Message) (*
 
 func (db *DB) GetMessages(limit, offset int) ([]app.Message, error) {
 	var msgs []app.Message
-	err := db.db.All(&msgs, storm.Limit(limit), storm.Skip(offset), storm.Reverse())
+	err := db.db.Select().OrderBy("CreatedAt").Limit(limit).Skip(offset).Reverse().Find(&msgs)
 	if err != nil {
 		return nil, err
 	}
@@ -128,6 +128,9 @@ func (db *DB) GetAttachments(msg *app.Message) ([]app.Attachment, error) {
 	var atts []app.Attachment
 	err := db.db.Select(q.Eq("MessageUUID", msg.UUID)).Find(&atts)
 	if err != nil {
+		if err == storm.ErrNotFound {
+			return []app.Attachment{}, nil
+		}
 		return nil, err
 	}
 
