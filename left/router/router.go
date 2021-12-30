@@ -11,14 +11,16 @@ import (
 )
 
 type Router struct {
-	r *chi.Mux
-	a *app.App
+	r             *chi.Mux
+	a             *app.App
+	attachmentURI string
 }
 
 func New(app *app.App) *Router {
 	s := Router{
-		r: chi.NewRouter(),
-		a: app,
+		r:             chi.NewRouter(),
+		a:             app,
+		attachmentURI: "/attachments/",
 	}
 
 	// A good base middleware stack

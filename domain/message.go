@@ -25,6 +25,16 @@ const (
 	StatusFailed
 )
 
+var status []string = []string{
+	"created",
+	"sent",
+	"failed",
+}
+
+func (s Status) String() string {
+	return status[s]
+}
+
 func NewMessage(subject, from string, to map[string]bool, text string) *Message {
 	return &Message{
 		CreatedAt: time.Now(),

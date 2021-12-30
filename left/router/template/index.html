@@ -16,7 +16,7 @@
         {{ else }}
         <h2>No Subject</h2>
         {{ end }}
-        <div>Status: {{ $msg.Status }}</div>
+        <span>{{ $msg.Status }}</span>
         <div>
           <code>
             <pre>{{ $msg.Text }}</pre>
@@ -26,8 +26,8 @@
         {{ range $att := $msg.Attachments }}
         <img
           width="300"
-          src="/attachments/{{ $att.UUID }}.{{ $att.Type }}"
-          alt="{{ $att.UUID }}.{{ $att.Type }}"
+          src="{{ $att.Path }}"
+          alt="{{ $att.UUID }}"
         />
         {{ end }}
       </div>

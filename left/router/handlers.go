@@ -7,12 +7,12 @@ import (
 	"net/http"
 
 	"github.com/ItsNotGoodName/smtpbridge/app"
-	"github.com/ItsNotGoodName/smtpbridge/domain"
+	"github.com/ItsNotGoodName/smtpbridge/dto"
 )
 
-func (s *Router) GetAttachments(prefix string) http.HandlerFunc {
+func (s *Router) GetAttachments() http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
-		http.StripPrefix(prefix, http.FileServer(http.FS(s.a.AttachmentGetFS()))).ServeHTTP(rw, r)
+		http.StripPrefix(s.attachmentURI, http.FileServer(http.FS(s.a.AttachmentGetFS()))).ServeHTTP(rw, r)
 	}
 }
 
@@ -21,7 +21,7 @@ var templateFS embed.FS
 
 func (s *Router) GetIndex() http.HandlerFunc {
 	type Data struct {
-		Messages []domain.Message
+		Messages []dto.Message
 	}
 
 	index, err := template.ParseFS(templateFS, "template/index.html")
@@ -30,12 +30,17 @@ func (s *Router) GetIndex() http.HandlerFunc {
 	}
 
 	return func(rw http.ResponseWriter, r *http.Request) {
-		messages, err := s.a.MessageList(&app.MessageListRequest{Limit: 10, Offset: 0})
+		messages, err := s.a.MessageList(&app.MessageListRequest{AttachmentPath: s.attachmentURI, Page: 0})
 		if err != nil {
 			http.Error(rw, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		index.Execute(rw, Data{Messages: messages})
+		log.Println("router.Router.GetIndex:", len(messages), "messages")
+		err = index.Execute(rw, Data{Messages: messages})
+		if err != nil {
+			http.Error(rw, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 }
