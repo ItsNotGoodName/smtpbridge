@@ -3,7 +3,6 @@ package database
 import (
 	"log"
 	"os"
-	"path"
 
 	"github.com/ItsNotGoodName/smtpbridge/app"
 	"github.com/asdine/storm"
@@ -15,20 +14,20 @@ type DB struct {
 	attPath string
 }
 
-func NewDB(dbPath, attPath string) *DB {
-	db, err := storm.Open(dbPath)
+func NewDB(dbFile, attDir string) *DB {
+	db, err := storm.Open(dbFile)
 	if err != nil {
 		log.Fatal("database.NewDB:", err)
 	}
 
-	err = os.MkdirAll(attPath, 0755)
+	err = os.MkdirAll(attDir, 0755)
 	if err != nil {
 		log.Fatal("database.NewDB:", err)
 	}
 
 	return &DB{
 		db:      db,
-		attPath: attPath,
+		attPath: attDir,
 	}
 }
 
@@ -71,15 +70,23 @@ func (db *DB) UpdateMessage(msg *app.Message, updateFN func(msg *app.Message) (*
 	return tx.Commit()
 }
 
+func (db *DB) GetMessages(limit, offset int) ([]app.Message, error) {
+	var msgs []app.Message
+	err := db.db.All(&msgs, storm.Limit(limit), storm.Skip(offset), storm.Reverse())
+	if err != nil {
+		return nil, err
+	}
+
+	return msgs, nil
+}
+
 func (db *DB) CreateAttachment(att *app.Attachment) error {
 	err := db.db.Save(att)
 	if err != nil {
 		return err
 	}
 
-	file := path.Join(db.attPath, att.UUID+att.EXT())
-
-	return os.WriteFile(file, att.Data, 0644)
+	return os.WriteFile(att.Path(db.attPath), att.Data, 0644)
 }
 
 func (db *DB) GetAttachment(uuid string) (*app.Attachment, error) {
@@ -89,24 +96,24 @@ func (db *DB) GetAttachment(uuid string) (*app.Attachment, error) {
 		return nil, err
 	}
 
-	data, err := os.ReadFile(path.Join(db.attPath, att.UUID+att.EXT()))
+	return &att, nil
+}
+
+func (db *DB) GetAttachmentData(att *app.Attachment) ([]byte, error) {
+	data, err := os.ReadFile(att.Path(db.attPath))
 	if err != nil {
 		return nil, err
 	}
 
-	att.Data = data
-
-	return &att, nil
+	return data, nil
 }
 
-func (db *DB) LoadAttachment(msg *app.Message) error {
+func (db *DB) GetAttachments(msg *app.Message) ([]app.Attachment, error) {
 	var atts []app.Attachment
 	err := db.db.Select(q.Eq("MessageUUID", msg.UUID)).Find(&atts)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	msg.Attachments = atts
-
-	return nil
+	return atts, nil
 }

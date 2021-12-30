@@ -8,12 +8,12 @@ import (
 )
 
 type Config struct {
-	AttachmentsPath string           `json:"attachments" mapstructure:"attachments"`
-	DBPath          string           `json:"db" mapstructure:"db"`
-	SMTP            ConfigSMTP       `json:"smtp" mapstructure:"smtp"`
-	HTTP            ConfigHTTP       `json:"http" mapstructure:"http"`
-	Bridges         []Bridge         `json:"bridges" mapstructure:"bridges"`
-	Endpoints       []ConfigEndpoint `json:"endpoints" mapstructure:"endpoints"`
+	AttDir    string           `json:"attachments" mapstructure:"attachments"`
+	DBFile    string           `json:"db" mapstructure:"db"`
+	SMTP      ConfigSMTP       `json:"smtp" mapstructure:"smtp"`
+	HTTP      ConfigHTTP       `json:"http" mapstructure:"http"`
+	Bridges   []Bridge         `json:"bridges" mapstructure:"bridges"`
+	Endpoints []ConfigEndpoint `json:"endpoints" mapstructure:"endpoints"`
 }
 
 type ConfigHTTP struct {

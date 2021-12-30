@@ -3,6 +3,7 @@ package app
 import (
 	"fmt"
 	"net/http"
+	"path"
 
 	"github.com/google/uuid"
 )
@@ -55,6 +56,10 @@ func (a *Attachment) EXT() string {
 	default:
 		return ""
 	}
+}
+
+func (a *Attachment) Path(directory string) string {
+	return path.Join(directory, a.UUID+a.EXT())
 }
 
 type EndpointAttachment struct {

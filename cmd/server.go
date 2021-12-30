@@ -46,7 +46,7 @@ var serverCmd = &cobra.Command{
 
 		// Init repositories
 		endpointREPO := endpoint.NewRepository(config.Endpoints)
-		databaseREPO := database.NewDB(config.DBPath, config.AttachmentsPath)
+		databaseREPO := database.NewDB(config.DBFile, config.AttDir)
 
 		// Init services
 		authSVC := service.NewMockAuth()
@@ -58,7 +58,7 @@ var serverCmd = &cobra.Command{
 
 		// Init router
 		if config.HTTP.Enable {
-			httpServer := router.New(config.AttachmentsPath)
+			httpServer := router.New(config.AttDir, databaseREPO, databaseREPO)
 			go httpServer.Start(config.HTTP.Address)
 		}
 

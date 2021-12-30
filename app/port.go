@@ -28,13 +28,15 @@ type MessageServicePort interface {
 type MessageRepositoryPort interface {
 	CreateMessage(msg *Message) error
 	GetMessage(uuid string) (*Message, error)
+	GetMessages(limit, offset int) ([]Message, error)
 	UpdateMessage(msg *Message, updateFN func(msg *Message) (*Message, error)) error
 }
 
 type AttachmentRepositoryPort interface {
 	CreateAttachment(att *Attachment) error
 	GetAttachment(uuid string) (*Attachment, error)
-	LoadAttachment(msg *Message) error
+	GetAttachmentData(att *Attachment) ([]byte, error)
+	GetAttachments(msg *Message) ([]Attachment, error)
 }
 
 // EndpointPort handles sending messages to an endpoint.

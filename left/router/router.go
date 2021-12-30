@@ -5,19 +5,24 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/ItsNotGoodName/smtpbridge/app"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 )
 
 type Router struct {
-	r               *chi.Mux
-	AttachmentsPath string
+	r              *chi.Mux
+	attDir         string
+	messageREPO    app.MessageRepositoryPort
+	attachmentREPO app.AttachmentRepositoryPort
 }
 
-func New(AttachmentsPath string) *Router {
+func New(attDir string, messageREPO app.MessageRepositoryPort, attachmentREPO app.AttachmentRepositoryPort) *Router {
 	s := Router{
-		r:               chi.NewRouter(),
-		AttachmentsPath: AttachmentsPath,
+		r:              chi.NewRouter(),
+		attDir:         attDir,
+		messageREPO:    messageREPO,
+		attachmentREPO: attachmentREPO,
 	}
 
 	// A good base middleware stack

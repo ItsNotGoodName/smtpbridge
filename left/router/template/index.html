@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>Messages</h1>
+    {{range $msg := .Messages}}
+    <div>
+      <h2>{{ $msg.Subject }}</h2>
+      <div>Status: {{ $msg.Status }}</div>
+      <div>
+        <code>
+          <pre>{{ $msg.Text }}</pre>
+        </code>
+      </div>
+
+      {{ range $att := $msg.Attachments }}
+      <img width="300" src="/attachments/{{ $att.UUID }}.jpg" alt="{{ $att.UUID }}" />
+      {{ end }}
+    </div>
+    {{ end }}
+  </body>
+</html>
