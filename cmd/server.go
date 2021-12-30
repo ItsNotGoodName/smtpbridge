@@ -56,7 +56,7 @@ var serverCmd = &cobra.Command{
 		// Init app
 		app := app.New(
 			dao,
-			service.NewMockAuth(),
+			service.NewAuth(&config.Auth),
 			service.NewBridge(dao, config.Bridges),
 			service.NewEndpoint(dao),
 			service.NewMessage(dao),
@@ -66,7 +66,7 @@ var serverCmd = &cobra.Command{
 		backendServer := smtp.NewBackend(app)
 		smtpServer := smtp.New(backendServer, config.SMTP)
 
-		// Init router
+		// Init http server
 		if config.HTTP.Enable {
 			httpServer := router.New(app)
 			go httpServer.Start(config.HTTP.Addr)

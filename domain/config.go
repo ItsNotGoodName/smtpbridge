@@ -10,10 +10,17 @@ import (
 type Config struct {
 	AttDir    string           `json:"attachments" mapstructure:"attachments"`
 	DBFile    string           `json:"db" mapstructure:"db"`
+	Auth      ConfigAuth       `json:"auth" mapstructure:"auth"`
 	SMTP      ConfigSMTP       `json:"smtp" mapstructure:"smtp"`
 	HTTP      ConfigHTTP       `json:"http" mapstructure:"http"`
 	Bridges   []Bridge         `json:"bridges" mapstructure:"bridges"`
 	Endpoints []ConfigEndpoint `json:"endpoints" mapstructure:"endpoints"`
+}
+
+type ConfigAuth struct {
+	Enable   bool   `json:"enable" mapstructure:"enable"`
+	Username string `json:"username" mapstructure:"username"`
+	Password string `json:"password" mapstructure:"password"`
 }
 
 type ConfigHTTP struct {

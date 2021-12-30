@@ -12,5 +12,6 @@ var (
 	ErrMessageNotFound       = fmt.Errorf("message not found")
 	ErrMessageAlreadyExists  = fmt.Errorf("message already exists")
 	ErrAttachmentInvalid     = fmt.Errorf("invalid attachment")
+	ErrAuthInvalid           = fmt.Errorf("invalid credentials")
 	ErrNotImplemented        = fmt.Errorf("not implemented")
 )

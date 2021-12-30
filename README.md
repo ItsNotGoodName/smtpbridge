@@ -43,6 +43,11 @@ endpoints:
 db: /tmp/smtpbridge.db
 attachments: /tmp/attachments
 
+auth:
+  enable: false
+  username: user
+  password: 12345678
+
 smtp:
   host: "" # Host to listen on
   port: 1025 # Port to listen on
