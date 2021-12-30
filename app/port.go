@@ -39,6 +39,8 @@ type MessageRepositoryPort interface {
 	CreateMessage(msg *Message) error
 	// GetMessage returns a message by it's UUID.
 	GetMessage(uuid string) (*Message, error)
+	// DeleteMessage deletes a message.
+	DeleteMessage(msg *Message) error
 	// GetMessages returns a list of messages.
 	GetMessages(limit, offset int) ([]Message, error)
 	// UpdateMessage updates a message.

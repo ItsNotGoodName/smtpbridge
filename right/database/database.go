@@ -34,19 +34,6 @@ func NewDB(dbFile, attDir string) *DB {
 	}
 }
 
-// getAttachmentPath returns the path to the attachment file on the file system.
-func (db *DB) getAttachmentPath(att *app.Attachment) string {
-	return path.Join(db.attDir, db.GetAttachmentFile(att))
-}
-
-func (db *DB) GetAttachmentFile(att *app.Attachment) string {
-	return fmt.Sprintf("%s.%s", att.UUID, att.Type)
-}
-
-func (db *DB) GetAttachmentFS() fs.FS {
-	return os.DirFS(db.attDir)
-}
-
 func (db *DB) CreateMessage(msg *app.Message) error {
 	return db.db.Save(msg)
 }
@@ -89,11 +76,53 @@ func (db *DB) UpdateMessage(msg *app.Message, updateFN func(msg *app.Message) (*
 func (db *DB) GetMessages(limit, offset int) ([]app.Message, error) {
 	var msgs []app.Message
 	err := db.db.Select().OrderBy("CreatedAt").Limit(limit).Skip(offset).Reverse().Find(&msgs)
-	if err != nil {
+	if err != nil && err != storm.ErrNotFound {
 		return nil, err
 	}
 
 	return msgs, nil
+}
+
+func (db *DB) DeleteMessage(msg *app.Message) error {
+	tx, err := db.db.Begin(true)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	query := tx.Select(q.Eq("MessageUUID", msg.UUID))
+
+	// List attachments
+	var atts []app.Attachment
+	err = query.Find(&atts)
+	if err != storm.ErrNotFound {
+		if err != nil {
+			return err
+		}
+
+		// Delete attachments
+		err = query.Delete(&app.Attachment{})
+		if err != nil {
+			return err
+		}
+	}
+
+	// Delete message
+	if err := tx.DeleteStruct(msg); err != nil {
+		return err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+
+	for _, att := range atts {
+		if err := os.Remove(db.getAttachmentPath(&att)); err != nil {
+			log.Println("database.DB.DeleteMessage: could not delete attachment data:", err)
+		}
+	}
+
+	return nil
 }
 
 func (db *DB) CreateAttachment(att *app.Attachment) error {
@@ -103,6 +132,19 @@ func (db *DB) CreateAttachment(att *app.Attachment) error {
 	}
 
 	return os.WriteFile(db.getAttachmentPath(att), att.Data, 0644)
+}
+
+// getAttachmentPath returns the path to the attachment file on the file system.
+func (db *DB) getAttachmentPath(att *app.Attachment) string {
+	return path.Join(db.attDir, db.GetAttachmentFile(att))
+}
+
+func (db *DB) GetAttachmentFile(att *app.Attachment) string {
+	return fmt.Sprintf("%s.%s", att.UUID, att.Type)
+}
+
+func (db *DB) GetAttachmentFS() fs.FS {
+	return os.DirFS(db.attDir)
 }
 
 func (db *DB) GetAttachment(uuid string) (*app.Attachment, error) {
