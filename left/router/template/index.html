@@ -11,41 +11,43 @@
     <title>SMTP Bridge</title>
   </head>
   <body class="container">
-    <h1 class="title">Messages</h1>
-    <div>
+    <h1 class="title">Messages (Page {{ .Paginate.Page }})</h1>
+    <div class="is-flex is-flex-wrap-wrap is-justify-content-center">
       {{range $msg := .Messages}}
-      <div class="card my-2">
-        {{ if $msg.Attachments}}
-        <div class="card-image">
-          <figure class="image is-4by3">
-            <img
-              src="/attachments/{{ (index $msg.Attachments 0).File }}"
-              alt="Attachment Image"
-            />
-          </figure>
-        </div>
-        {{ end }}
-        <div class="card-content">
-          <div class="media">
-            <div class="media-content">
-              {{ if $msg.Subject }}
-              <p class="title is-4">{{ $msg.Subject }}</p>
-              {{ else }}
-              <p class="title is-4">No Subject</p>
-              {{ end }} {{ if eq $msg.Status 0 }}
-              <span class="tag is-warning is-medium">Created</span>
-              {{ else if eq $msg.Status 1 }}
-              <span class="tag is-success is-medium">Sent</span>
-              {{ else }}
-              <span class="tag is-danger is-medium">Failed</span>
-              {{ end }}
-
-              <span class="tag is-light is-medium">{{ $msg.CreatedAt}}</span>
-            </div>
+      <div class="m-2">
+        <div class="card">
+          {{ if $msg.Attachments}}
+          <div class="card-image">
+            <figure class="image is-4by3">
+              <img
+                src="/attachments/{{ (index $msg.Attachments 0).File }}"
+                alt="Attachment Image"
+              />
+            </figure>
           </div>
+          {{ end }}
+          <div class="card-content">
+            <div class="media">
+              <div class="media-content">
+                {{ if $msg.Subject }}
+                <p class="title is-4">{{ $msg.Subject }}</p>
+                {{ else }}
+                <p class="title is-4">No Subject</p>
+                {{ end }} {{ if eq $msg.Status 0 }}
+                <span class="tag is-warning is-medium">Created</span>
+                {{ else if eq $msg.Status 1 }}
+                <span class="tag is-success is-medium">Sent</span>
+                {{ else }}
+                <span class="tag is-danger is-medium">Failed</span>
+                {{ end }}
 
-          <div class="content">
-            <pre><code>{{ $msg.Text }}</code></pre>
+                <span class="tag is-light is-medium">{{ $msg.CreatedAt}}</span>
+              </div>
+            </div>
+
+            <div class="content">
+              <pre><code>{{ $msg.Text }}</code></pre>
+            </div>
           </div>
         </div>
       </div>
@@ -60,12 +62,11 @@
       <a href="{{ .Paginate.PrevLink }}" class="pagination-previous"
         >Previous</a
       >
-      {{ end }}
-      {{ if .Paginate.HasNext }}
+      {{ end }} {{ if .Paginate.HasNext }}
       <a href="{{ .Paginate.NextLink }}" class="pagination-next">Next</a>
       {{ end }}
       <ul class="pagination-list">
-      {{ if .Paginate.HasPrev }}
+        {{ if .Paginate.HasPrev }}
         <li>
           <a
             href="{{ .Paginate.FirstLink }}"
@@ -75,7 +76,7 @@
           >
         </li>
         <li><span class="pagination-ellipsis">&hellip;</span></li>
-      {{ end }}
+        {{ end }}
         <li>
           <a
             class="pagination-link is-current"
@@ -84,7 +85,7 @@
             >{{ .Paginate.Page }}</a
           >
         </li>
-      {{ if .Paginate.HasNext }}
+        {{ if .Paginate.HasNext }}
         <li><span class="pagination-ellipsis">&hellip;</span></li>
         <li>
           <a
