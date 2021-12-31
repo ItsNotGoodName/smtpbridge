@@ -45,6 +45,8 @@ type MessageRepositoryPort interface {
 	DeleteMessage(msg *Message) error
 	// GetMessages returns a list of messages.
 	GetMessages(limit, offset int) ([]Message, error)
+	// CountMessages returns the number of messages.
+	CountMessages() (int, error)
 	// UpdateMessage updates a message.
 	UpdateMessage(msg *Message, updateFN func(msg *Message) (*Message, error)) error
 }

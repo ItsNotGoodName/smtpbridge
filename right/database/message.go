@@ -58,6 +58,15 @@ func (db *DB) GetMessages(limit, offset int) ([]domain.Message, error) {
 	return msgs, nil
 }
 
+func (db *DB) CountMessages() (int, error) {
+	count, err := db.db.Count(&domain.Message{})
+	if err == storm.ErrNotFound {
+		return 0, nil
+	}
+
+	return count, err
+}
+
 func (db *DB) DeleteMessage(msg *domain.Message) error {
 	tx, err := db.db.Begin(true)
 	if err != nil {

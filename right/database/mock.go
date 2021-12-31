@@ -45,6 +45,10 @@ func (Mock) GetMessages(limit, offset int) ([]domain.Message, error) {
 	return []domain.Message{}, nil
 }
 
+func (Mock) CountMessages() (int, error) {
+	return 0, nil
+}
+
 func (Mock) GetAttachmentData(att *domain.Attachment) ([]byte, error) {
 	return nil, domain.ErrNotImplemented
 }

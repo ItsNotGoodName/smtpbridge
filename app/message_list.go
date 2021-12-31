@@ -1,6 +1,8 @@
 package app
 
 import (
+	"math"
+
 	"github.com/ItsNotGoodName/smtpbridge/dto"
 )
 
@@ -9,12 +11,27 @@ type MessageListRequest struct {
 	AttachmentPath string
 }
 
-func (a *App) MessageList(req *MessageListRequest) ([]dto.Message, error) {
-	if req.Page < 0 {
-		req.Page = 0
+type MessageListResponse struct {
+	Messages []dto.Message
+	Page     int
+	PageMax  int
+}
+
+func (a *App) MessageList(req *MessageListRequest) (*MessageListResponse, error) {
+	limit := 10
+
+	count, err := a.dao.Message.CountMessages()
+	if err != nil {
+		return nil, err
 	}
 
-	msgs, err := a.messageSVC.List(10, req.Page*10)
+	pageMax := int(math.Ceil(float64(count) / float64(limit)))
+
+	if req.Page < 1 || req.Page > pageMax {
+		req.Page = 1
+	}
+
+	msgs, err := a.messageSVC.List(limit, (req.Page-1)*10)
 	if err != nil {
 		return nil, err
 	}
@@ -24,5 +41,5 @@ func (a *App) MessageList(req *MessageListRequest) ([]dto.Message, error) {
 		result = append(result, *dto.NewMessage(&msg, req.AttachmentPath))
 	}
 
-	return result, nil
+	return &MessageListResponse{Messages: result, PageMax: pageMax, Page: req.Page}, nil
 }

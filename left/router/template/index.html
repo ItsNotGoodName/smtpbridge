@@ -8,7 +8,7 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css"
     />
-    <title>Document</title>
+    <title>SMTP Bridge</title>
   </head>
   <body class="container">
     <h1 class="title">Messages</h1>
@@ -51,5 +51,51 @@
       </div>
       {{ end }}
     </div>
+    <nav
+      class="pagination is-centered mb-2"
+      role="navigation"
+      aria-label="pagination"
+    >
+      {{ if .Paginate.HasPrev }}
+      <a href="{{ .Paginate.PrevLink }}" class="pagination-previous"
+        >Previous</a
+      >
+      {{ end }}
+      {{ if .Paginate.HasNext }}
+      <a href="{{ .Paginate.NextLink }}" class="pagination-next">Next</a>
+      {{ end }}
+      <ul class="pagination-list">
+      {{ if .Paginate.HasPrev }}
+        <li>
+          <a
+            href="{{ .Paginate.FirstLink }}"
+            class="pagination-link"
+            aria-label="Goto page 1"
+            >1</a
+          >
+        </li>
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+      {{ end }}
+        <li>
+          <a
+            class="pagination-link is-current"
+            aria-label="Page {{ .Paginate.Page }}"
+            aria-current="page"
+            >{{ .Paginate.Page }}</a
+          >
+        </li>
+      {{ if .Paginate.HasNext }}
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        <li>
+          <a
+            class="pagination-link"
+            href="{{ .Paginate.LastLink }}"
+            aria-label="Goto page {{ .Paginate.PageMax }}"
+            >{{ .Paginate.PageMax }}</a
+          >
+        </li>
+        {{ end }}
+      </ul>
+    </nav>
   </body>
 </html>
