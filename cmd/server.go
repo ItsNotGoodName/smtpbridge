@@ -61,7 +61,7 @@ var serverCmd = &cobra.Command{
 		// Init app
 		app := app.New(
 			dao,
-			service.NewAuth(&config.Auth),
+			service.NewAuth(&config.SMTP),
 			service.NewBridge(dao, config.Bridges),
 			service.NewEndpoint(dao),
 			service.NewMessage(dao),

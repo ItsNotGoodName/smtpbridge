@@ -12,9 +12,9 @@ type Auth struct {
 	password  string
 }
 
-func NewAuth(config *domain.ConfigAuth) *Auth {
+func NewAuth(config *domain.ConfigSMTP) *Auth {
 	return &Auth{
-		anonymous: !config.Enable,
+		anonymous: !config.Auth,
 		username:  strings.ToLower(config.Username),
 		password:  config.Password,
 	}

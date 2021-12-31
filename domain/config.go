@@ -9,7 +9,6 @@ import (
 
 type Config struct {
 	DB        ConfigDB         `json:"database" mapstructure:"database"`
-	Auth      ConfigAuth       `json:"auth" mapstructure:"auth"`
 	SMTP      ConfigSMTP       `json:"smtp" mapstructure:"smtp"`
 	HTTP      ConfigHTTP       `json:"http" mapstructure:"http"`
 	Bridges   []Bridge         `json:"bridges" mapstructure:"bridges"`
@@ -26,12 +25,6 @@ func (db *ConfigDB) IsBolt() bool {
 	return db.Type == "bolt"
 }
 
-type ConfigAuth struct {
-	Enable   bool   `json:"enable" mapstructure:"enable"`
-	Username string `json:"username" mapstructure:"username"`
-	Password string `json:"password" mapstructure:"password"`
-}
-
 type ConfigHTTP struct {
 	Enable bool   `json:"enable" mapstructure:"enable"`
 	Addr   string `json:"-" mapstructure:"-"`
@@ -46,10 +39,13 @@ type ConfigEndpoint struct {
 }
 
 type ConfigSMTP struct {
-	Host    string `json:"host" mapstructure:"host"`
-	Port    uint16 `json:"port" mapstructure:"port"`
-	PortStr string `json:"-" mapstructure:"-"`
-	Size    int    `json:"size" mapstructure:"size"`
+	Host     string `json:"host" mapstructure:"host"`
+	Port     uint16 `json:"port" mapstructure:"port"`
+	PortStr  string `json:"-" mapstructure:"-"`
+	Size     int    `json:"size" mapstructure:"size"`
+	Auth     bool   `json:"auth" mapstructure:"auth"`
+	Username string `json:"username" mapstructure:"username"`
+	Password string `json:"password" mapstructure:"password"`
 }
 
 func NewConfig() *Config {
