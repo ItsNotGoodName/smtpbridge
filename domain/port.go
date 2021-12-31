@@ -26,6 +26,8 @@ type MessageServicePort interface {
 	UpdateStatus(msg *Message, status Status) error
 	// List messages with attachments.
 	List(limit, offset int) ([]Message, error)
+	// Get a message with attachments.
+	Get(uuid string) (*Message, error)
 }
 
 type EndpointServicePort interface {

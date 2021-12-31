@@ -10,6 +10,20 @@ func NewMessage(dao domain.DAO) *Message {
 	return &Message{dao}
 }
 
+func (m *Message) Get(uuid string) (*domain.Message, error) {
+	msg, err := m.dao.Message.GetMessage(uuid)
+	if err != nil {
+		return nil, err
+	}
+
+	msg.Attachments, err = m.dao.Attachment.GetAttachments(msg)
+	if err != nil {
+		return nil, err
+	}
+
+	return msg, nil
+}
+
 func (m *Message) List(limit, offset int) ([]domain.Message, error) {
 	messages, err := m.dao.Message.GetMessages(limit, offset)
 	if err != nil {
