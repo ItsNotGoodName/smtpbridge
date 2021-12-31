@@ -58,8 +58,6 @@ type AttachmentRepositoryPort interface {
 	GetAttachmentData(att *Attachment) ([]byte, error)
 	// GetAttachments returns a list of attachments for a message.
 	GetAttachments(msg *Message) ([]Attachment, error)
-	// GetAttachmentFile returns the filename of the attachment
-	GetAttachmentFile(att *Attachment) string
 	// GetFS returns the attachment file system
 	GetAttachmentFS() fs.FS
 }

@@ -22,6 +22,10 @@ const (
 	TypeJPEG AttachmentType = "jpeg"
 )
 
+func (a *Attachment) File() string {
+	return fmt.Sprintf("%s.%s", a.UUID, a.Type)
+}
+
 func NewAttachment(msg *Message, name string, data []byte) (*Attachment, error) {
 	var t AttachmentType
 	contentType := http.DetectContentType(data)

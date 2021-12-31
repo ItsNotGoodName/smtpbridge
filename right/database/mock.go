@@ -57,10 +57,6 @@ func (Mock) Open(name string) (fs.File, error) {
 	return nil, fs.ErrNotExist
 }
 
-func (Mock) GetAttachmentFile(att *domain.Attachment) string {
-	return ""
-}
-
 func (Mock) GetAttachments(msg *domain.Message) ([]domain.Attachment, error) {
 	return []domain.Attachment{}, nil
 }

@@ -1,8 +1,6 @@
 package app
 
 import (
-	"path"
-
 	"github.com/ItsNotGoodName/smtpbridge/dto"
 )
 
@@ -23,29 +21,7 @@ func (a *App) MessageList(req *MessageListRequest) ([]dto.Message, error) {
 
 	var result []dto.Message
 	for _, msg := range msgs {
-		var attachments []dto.Attachment
-		for _, attachment := range msg.Attachments {
-			attachments = append(attachments, dto.Attachment{
-				UUID: attachment.UUID,
-				Name: attachment.Name,
-				Path: path.Join(req.AttachmentPath, a.dao.Attachment.GetAttachmentFile(&attachment)),
-			})
-		}
-
-		var to []string
-		for toAddr := range msg.To {
-			to = append(to, toAddr)
-		}
-
-		result = append(result, dto.Message{
-			UUID:        msg.UUID,
-			From:        msg.From,
-			To:          to,
-			Status:      msg.Status.String(),
-			Subject:     msg.Subject,
-			Text:        msg.Text,
-			Attachments: attachments,
-		})
+		result = append(result, *dto.NewMessage(&msg, req.AttachmentPath))
 	}
 
 	return result, nil

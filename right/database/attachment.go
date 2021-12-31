@@ -1,7 +1,6 @@
 package database
 
 import (
-	"fmt"
 	"io/fs"
 	"os"
 	"path"
@@ -22,11 +21,7 @@ func (db *DB) CreateAttachment(att *domain.Attachment) error {
 
 // getAttachmentPath returns the path to the attachment file on the file system.
 func (db *DB) getAttachmentPath(att *domain.Attachment) string {
-	return path.Join(db.attDir, db.GetAttachmentFile(att))
-}
-
-func (db *DB) GetAttachmentFile(att *domain.Attachment) string {
-	return fmt.Sprintf("%s.%s", att.UUID, att.Type)
+	return path.Join(db.attDir, att.File())
 }
 
 func (db *DB) GetAttachmentFS() fs.FS {
