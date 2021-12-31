@@ -40,8 +40,8 @@ endpoints:
 # Full configuration
 database: # Database to store past messages
   type: bolt # Needs to be 'bolt' to be enabled, Default ''
-  db: /tmp/smtpbridge.db # Optional, default '$HOME/.smtpbridge/smtpbridge.db'
-  attachments: /tmp/attachments # Optional, default '$HOME/.smtpbridge/attachments'
+  db: /tmp/smtpbridge.db # Default '$HOME/.smtpbridge/smtpbridge.db'
+  attachments: /tmp/attachments # Default '$HOME/.smtpbridge/attachments'
 
 http: # HTTP server that shows past messages
   enable: true # Enable http server, default 'false'
@@ -73,7 +73,7 @@ endpoints: # Endpoints send messages to messaging services such as Telegram
       token: 2222222222222222222222
       chat_id: 111111111111111111111
   - name: mock endpoint
-    type: mock # This endpoints just prints out the message to console
+    type: mock # This endpoints prints out the message to console
 ```
 
 ## Usage
@@ -84,4 +84,6 @@ smtpbridge server
 
 ## Todo
 
+- Embed assets for HTTP server
+- Attachments and database size limits
 - Regex from and to addresses
