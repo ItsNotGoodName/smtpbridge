@@ -19,7 +19,7 @@
         <div class="card-image">
           <figure class="image is-4by3">
             <img
-              src="{{ (index $msg.Attachments 0).Path }}"
+              src="/attachments/{{ (index $msg.Attachments 0).File }}"
               alt="Attachment Image"
             />
           </figure>
@@ -70,8 +70,8 @@
           <a
             href="{{ .Paginate.FirstLink }}"
             class="pagination-link"
-            aria-label="Goto page 1"
-            >1</a
+            aria-label="Goto page {{ .Paginate.PageMin }}"
+            >{{ .Paginate.PageMin }}</a
           >
         </li>
         <li><span class="pagination-ellipsis">&hellip;</span></li>

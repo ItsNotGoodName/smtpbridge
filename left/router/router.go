@@ -39,6 +39,11 @@ func New(app *app.App) *Router {
 	return &s
 }
 
+func (s *Router) route() {
+	s.r.Get(s.attachmentURI+"*", s.handleAttachmentsGET())
+	s.r.Get("/", s.handleIndexGET())
+}
+
 func (s *Router) Start(address string) {
 	log.Println("router.Router.Start: HTTP server listening on", address)
 	err := http.ListenAndServe(address, s.r)

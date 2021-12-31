@@ -1,7 +1,6 @@
 package dto
 
 import (
-	"path"
 	"time"
 
 	"github.com/ItsNotGoodName/smtpbridge/domain"
@@ -21,16 +20,16 @@ type Message struct {
 type Attachment struct {
 	UUID string `json:"uuid"`
 	Name string `json:"name"`
-	Path string `json:"path"`
+	File string `json:"path"`
 }
 
-func NewMessage(msg *domain.Message, attachmentPath string) *Message {
+func NewMessage(msg *domain.Message) *Message {
 	var attachments []Attachment
 	for _, attachment := range msg.Attachments {
 		attachments = append(attachments, Attachment{
 			UUID: attachment.UUID,
 			Name: attachment.Name,
-			Path: path.Join(attachmentPath, attachment.File()),
+			File: attachment.File(),
 		})
 	}
 

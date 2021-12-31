@@ -5,8 +5,7 @@ import (
 )
 
 type MessageGetRequest struct {
-	UUID           string
-	AttachmentPath string
+	UUID string
 }
 
 func (a *App) MessageGet(req *MessageGetRequest) (*dto.Message, error) {
@@ -15,5 +14,5 @@ func (a *App) MessageGet(req *MessageGetRequest) (*dto.Message, error) {
 		return nil, err
 	}
 
-	return dto.NewMessage(msg, req.AttachmentPath), nil
+	return dto.NewMessage(msg), nil
 }
