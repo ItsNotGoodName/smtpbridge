@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/ItsNotGoodName/smtpbridge/domain"
 	"github.com/asdine/storm"
 )
 
@@ -14,20 +15,20 @@ type DB struct {
 	fs     fs.FS
 }
 
-func NewDB(dbFile, attDir string) *DB {
-	db, err := storm.Open(dbFile)
+func New(config *domain.ConfigDB) *DB {
+	db, err := storm.Open(config.DB)
 	if err != nil {
 		log.Fatal("database.NewDB:", err)
 	}
 
-	err = os.MkdirAll(attDir, 0755)
+	err = os.MkdirAll(config.Attachments, 0755)
 	if err != nil {
 		log.Fatal("database.NewDB:", err)
 	}
 
 	return &DB{
 		db:     db,
-		fs:     os.DirFS(attDir),
-		attDir: attDir,
+		fs:     os.DirFS(config.Attachments),
+		attDir: config.Attachments,
 	}
 }

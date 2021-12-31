@@ -5,11 +5,3 @@ type DAO struct {
 	Message    MessageRepositoryPort
 	Endpoint   EndpointRepositoryPort
 }
-
-func NewDAO(Attachment AttachmentRepositoryPort, Message MessageRepositoryPort, Endpoint EndpointRepositoryPort) DAO {
-	return DAO{
-		Attachment,
-		Message,
-		Endpoint,
-	}
-}

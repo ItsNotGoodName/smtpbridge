@@ -8,13 +8,22 @@ import (
 )
 
 type Config struct {
-	AttDir    string           `json:"attachments" mapstructure:"attachments"`
-	DBFile    string           `json:"db" mapstructure:"db"`
+	DB        ConfigDB         `json:"database" mapstructure:"database"`
 	Auth      ConfigAuth       `json:"auth" mapstructure:"auth"`
 	SMTP      ConfigSMTP       `json:"smtp" mapstructure:"smtp"`
 	HTTP      ConfigHTTP       `json:"http" mapstructure:"http"`
 	Bridges   []Bridge         `json:"bridges" mapstructure:"bridges"`
 	Endpoints []ConfigEndpoint `json:"endpoints" mapstructure:"endpoints"`
+}
+
+type ConfigDB struct {
+	Type        string `json:"type" mapstructure:"type"`
+	DB          string `json:"db" mapstructure:"db"`
+	Attachments string `json:"attachments" mapstructure:"attachments"`
+}
+
+func (db *ConfigDB) IsBolt() bool {
+	return db.Type == "bolt"
 }
 
 type ConfigAuth struct {

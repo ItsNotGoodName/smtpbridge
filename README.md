@@ -40,18 +40,20 @@ endpoints:
 
 ```yaml
 # Full configuration
-db: /tmp/smtpbridge.db
-attachments: /tmp/attachments
-
 auth:
-  enable: false
+  enable: true # Enable auth, default 'false'
   username: user
   password: 12345678
 
+database:
+  type: bolt # Default ''
+  db: /tmp/smtpbridge.db # Optional, default '$HOME/.smtpbridge/smtpbridge.db'
+  attachments: /tmp/attachments # Optional, default '$HOME/.smtpbridge/attachments'
+
 smtp:
-  host: "" # Host to listen on
-  port: 1025 # Port to listen on
-  size: 26214400 # 25 MB, max allowed size of email in bytes
+  host: "localhost" # Host to listen on, default ''
+  port: 1025 # Port to listen on, default 1025
+  size: 26214400 # Max allowed size of email in bytes, default 26214400 (25 MB)
 
 bridges:
   - name: test bridge
@@ -61,7 +63,7 @@ bridges:
     only_text: false # When this is true, only the text of the email will be sent to endpoints
     only_attachments: false # When this is true, only the attachments of the email will be sent to endpoints
     endpoints:
-      - test endpoint # Must match a name in the endpoints list
+      - test endpoint # Match a name in the endpoints list
 
 endpoints:
   - name: test endpoint
@@ -81,5 +83,4 @@ smtpbridge server
 
 - SMTP authentication
 - Regex from and to addresses
-- Store past messages on filesystem
 - Web interface

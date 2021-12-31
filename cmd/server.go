@@ -46,12 +46,17 @@ var serverCmd = &cobra.Command{
 		config := domain.NewConfig()
 
 		// Init dao
-		db := database.NewDB(config.DBFile, config.AttDir)
-		dao := domain.NewDAO(
-			db,
-			db,
-			endpoint.NewRepository(config.Endpoints),
-		)
+		var dao domain.DAO
+		if config.DB.IsBolt() {
+			db := database.New(&config.DB)
+			dao.Attachment = db
+			dao.Message = db
+		} else {
+			db := database.NewMock()
+			dao.Attachment = db
+			dao.Message = db
+		}
+		dao.Endpoint = endpoint.NewRepository(config.Endpoints)
 
 		// Init app
 		app := app.New(
@@ -95,11 +100,8 @@ func init() {
 	os.MkdirAll(rootPath, os.ModePerm)
 	cobra.CheckErr(err)
 
-	serverCmd.Flags().String("db", path.Join(rootPath, "smtpbridge.db"), "database file")
-	viper.BindPFlag("db", serverCmd.Flags().Lookup("db"))
-
-	serverCmd.Flags().String("attachments", path.Join(rootPath, "attachments"), "attachments directory")
-	viper.BindPFlag("attachments", serverCmd.Flags().Lookup("attachments"))
+	viper.SetDefault("database.db", path.Join(rootPath, "smtpbridge.db"))
+	viper.SetDefault("database.attachments", path.Join(rootPath, "attachments"))
 
 	serverCmd.Flags().Bool("http", false, "enable http server")
 	viper.BindPFlag("http.enable", serverCmd.Flags().Lookup("http"))
