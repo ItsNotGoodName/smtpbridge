@@ -40,18 +40,23 @@ endpoints:
 
 ```yaml
 # Full configuration
-auth:
-  enable: true # Enable auth, default 'false'
-  username: user
-  password: 12345678
-
-database:
-  type: bolt # Default ''
+database: # Database to store past messages
+  type: bolt # Needs to be 'bolt' to be enabled, Default ''
   db: /tmp/smtpbridge.db # Optional, default '$HOME/.smtpbridge/smtpbridge.db'
   attachments: /tmp/attachments # Optional, default '$HOME/.smtpbridge/attachments'
 
+http: # HTTP server that shows past messages, requires database to configured
+  enable: true # Enable http server, default 'false'
+  host: "127.0.0.1" # Host to listen on, default ''
+  port: 9000 # Port to listen on, default 8080
+
+auth: # Authentication for SMTP server
+  enable: true # Enable auth, default 'false'
+  username: user # Default ''
+  password: 12345678 # Default ''
+
 smtp:
-  host: "localhost" # Host to listen on, default ''
+  host: "127.0.0.1" # Host to listen on, default ''
   port: 1025 # Port to listen on, default 1025
   size: 26214400 # Max allowed size of email in bytes, default 26214400 (25 MB)
 
