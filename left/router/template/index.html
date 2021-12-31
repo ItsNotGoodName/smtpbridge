@@ -4,34 +4,52 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css"
+    />
     <title>Document</title>
   </head>
-  <body>
-    <h1>Messages</h1>
-    {{range $msg := .Messages}}
-    <div style="border: 2px gray solid; padding-left: 5px; margin-bottom: 5px">
-      <div>
-        {{ if $msg.Subject }}
-        <h2>{{ $msg.Subject }}</h2>
-        {{ else }}
-        <h2>No Subject</h2>
-        {{ end }}
-        <span>{{ $msg.Status }}</span>
-        <div>
-          <code>
-            <pre>{{ $msg.Text }}</pre>
-          </code>
+  <body class="container">
+    <h1 class="title">Messages</h1>
+    <div>
+      {{range $msg := .Messages}}
+      <div class="card my-2">
+        {{ if $msg.Attachments}}
+        <div class="card-image">
+          <figure class="image is-4by3">
+            <img
+              src="{{ (index $msg.Attachments 0).Path }}"
+              alt="Attachment Image"
+            />
+          </figure>
         </div>
-
-        {{ range $att := $msg.Attachments }}
-        <img
-          width="300"
-          src="{{ $att.Path }}"
-          alt="{{ $att.UUID }}"
-        />
         {{ end }}
+        <div class="card-content">
+          <div class="media">
+            <div class="media-content">
+              {{ if $msg.Subject }}
+              <p class="title is-4">{{ $msg.Subject }}</p>
+              {{ else }}
+              <p class="title is-4">No Subject</p>
+              {{ end }} {{ if eq $msg.Status 0 }}
+              <span class="tag is-warning is-medium">Created</span>
+              {{ else if eq $msg.Status 1 }}
+              <span class="tag is-success is-medium">Sent</span>
+              {{ else }}
+              <span class="tag is-danger is-medium">Failed</span>
+              {{ end }}
+
+              <span class="tag is-light is-medium">{{ $msg.CreatedAt}}</span>
+            </div>
+          </div>
+
+          <div class="content">
+            <pre><code>{{ $msg.Text }}</code></pre>
+          </div>
+        </div>
       </div>
+      {{ end }}
     </div>
-    {{ end }}
   </body>
 </html>

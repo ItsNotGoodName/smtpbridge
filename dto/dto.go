@@ -2,18 +2,20 @@ package dto
 
 import (
 	"path"
+	"time"
 
 	"github.com/ItsNotGoodName/smtpbridge/domain"
 )
 
 type Message struct {
-	UUID        string       `json:"uuid"`
-	Status      string       `json:"status"`
-	From        string       `json:"from"`
-	To          []string     `json:"to"`
-	Subject     string       `json:"subject"`
-	Text        string       `json:"text"`
-	Attachments []Attachment `json:"attachments"`
+	UUID        string        `json:"uuid"`
+	Status      domain.Status `json:"status"`
+	From        string        `json:"from"`
+	To          []string      `json:"to"`
+	Subject     string        `json:"subject"`
+	Text        string        `json:"text"`
+	CreatedAt   string        `json:"created_at"`
+	Attachments []Attachment  `json:"attachments"`
 }
 
 type Attachment struct {
@@ -39,9 +41,10 @@ func NewMessage(msg *domain.Message, attachmentPath string) *Message {
 
 	return &Message{
 		UUID:        msg.UUID,
+		CreatedAt:   msg.CreatedAt.Format(time.RFC822),
 		From:        msg.From,
 		To:          to,
-		Status:      msg.Status.String(),
+		Status:      msg.Status,
 		Subject:     msg.Subject,
 		Text:        msg.Text,
 		Attachments: attachments,
