@@ -6,16 +6,14 @@ It only accepts attachments that are `image/png` or `image/jpeg`.
 
 Do not expose this to the Internet, this is only intended to be used on your local network.
 
-## Senders
+## Use Cases
 
-List of example senders.
-
-- Motion/AI detection from IP Cameras
-- Notifications from Linux servers such as unattended updates
+- Receive motion/AI detection from IP cameras
+- Receive notifications from Linux servers such as unattended updates
 
 ## Endpoints
 
-The following message endpoints have been implemented.
+The following endpoints for messages have been implemented.
 
 - Telegram
 
@@ -28,7 +26,7 @@ Configuration file is located at `~/.smtpbridge.yml`.
 bridges:
   - name: test bridge
     endpoints:
-      - test endpoint # Must match a name in the endpoints list
+      - test endpoint # Match a name in the endpoints list
 
 endpoints:
   - name: test endpoint
@@ -45,12 +43,12 @@ database: # Database to store past messages
   db: /tmp/smtpbridge.db # Optional, default '$HOME/.smtpbridge/smtpbridge.db'
   attachments: /tmp/attachments # Optional, default '$HOME/.smtpbridge/attachments'
 
-http: # HTTP server that shows past messages, requires database to configured
+http: # HTTP server that shows past messages
   enable: true # Enable http server, default 'false'
   host: "127.0.0.1" # Host to listen on, default ''
   port: 9000 # Port to listen on, default 8080
 
-smtp:
+smtp: # SMTP server that receives emails
   host: "127.0.0.1" # Host to listen on, default ''
   port: 1025 # Port to listen on, default 1025
   size: 26214400 # Max allowed size of email in bytes, default 26214400 (25 MB)
@@ -58,7 +56,7 @@ smtp:
   username: user # Default ''
   password: 12345678 # Default ''
 
-bridges:
+bridges: # Bridges modify and check if messages should be sent to endpoints
   - name: test bridge
     filters:
       - to: foo@example.com # Filter based on to address
@@ -68,12 +66,14 @@ bridges:
     endpoints:
       - test endpoint # Match a name in the endpoints list
 
-endpoints:
+endpoints: # Endpoints send messages to messaging services such as Telegram
   - name: test endpoint
     type: telegram
     config:
       token: 2222222222222222222222
       chat_id: 111111111111111111111
+  - name: mock endpoint
+    type: mock # This endpoints just prints out the message to console
 ```
 
 ## Usage
@@ -84,6 +84,4 @@ smtpbridge server
 
 ## Todo
 
-- SMTP authentication
 - Regex from and to addresses
-- Web interface
