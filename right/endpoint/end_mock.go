@@ -13,6 +13,6 @@ func NewMock() (*Mock, error) {
 }
 
 func (m *Mock) Send(message *domain.EndpointMessage) error {
-	fmt.Println("endpoint.Mock.Send:", message)
+	fmt.Printf("endpoint.Mock.Send: %+v\n", message)
 	return nil
 }

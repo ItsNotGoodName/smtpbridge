@@ -93,7 +93,7 @@ func (db *DB) DeleteMessage(msg *domain.Message) error {
 
 	for _, att := range atts {
 		if err := os.Remove(db.getAttachmentPath(&att)); err != nil {
-			log.Println("database.DB.DeleteMessage: could not delete attachment data:", err)
+			log.Println("database.DB.DeleteMessage: could not delete attachment file:", err)
 		}
 	}
 

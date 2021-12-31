@@ -26,7 +26,7 @@ func (s *Router) GetIndex() http.HandlerFunc {
 
 	index, err := template.ParseFS(templateFS, "template/index.html")
 	if err != nil {
-		log.Fatal("router.Router.GetIndex", err)
+		log.Fatalln("router.Router.GetIndex:", err)
 	}
 
 	return func(rw http.ResponseWriter, r *http.Request) {
@@ -36,7 +36,6 @@ func (s *Router) GetIndex() http.HandlerFunc {
 			return
 		}
 
-		log.Println("router.Router.GetIndex:", len(messages), "messages")
 		err = index.Execute(rw, Data{Messages: messages})
 		if err != nil {
 			http.Error(rw, err.Error(), http.StatusInternalServerError)

@@ -46,7 +46,7 @@ func New(b Backend, config domain.ConfigSMTP) SMTP {
 }
 
 func (s SMTP) Start() {
-	log.Println("smtp.SMTP.Start: starting SMTP server on", s.s.Addr)
+	log.Println("smtp.SMTP.Start: SMTP server listening on", s.s.Addr)
 	if err := s.s.ListenAndServe(); err != nil {
 		log.Fatalln("smtp.SMTP.Start:", err)
 	}

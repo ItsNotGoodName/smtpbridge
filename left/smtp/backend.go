@@ -16,6 +16,7 @@ type Backend struct {
 
 func (b Backend) AnonymousLogin(state *smtp.ConnectionState) (smtp.Session, error) {
 	if err := b.app.AuthLoginRequest(&app.AuthLoginRequest{}); err != nil {
+		log.Println("smtp.AnonymousLogin: login failure:", smtp.ErrAuthRequired)
 		return nil, smtp.ErrAuthRequired
 	}
 	return newSession(b.app), nil
@@ -23,6 +24,7 @@ func (b Backend) AnonymousLogin(state *smtp.ConnectionState) (smtp.Session, erro
 
 func (b Backend) Login(state *smtp.ConnectionState, username, password string) (smtp.Session, error) {
 	if err := b.app.AuthLoginRequest(&app.AuthLoginRequest{Username: username, Password: password}); err != nil {
+		log.Println("smtp.Login: login failure:", err)
 		return nil, err
 	}
 	return newSession(b.app), nil
@@ -58,7 +60,7 @@ func (s *session) Rcpt(to string) error {
 func (s *session) Data(r io.Reader) error {
 	e, err := enmime.ReadEnvelope(r)
 	if err != nil {
-		log.Println("ERROR: could not read email:", err)
+		log.Println("smtp.Data: could not read email:", err)
 		return err
 	}
 
@@ -77,7 +79,7 @@ func (s *session) Data(r io.Reader) error {
 			//log.Println("TO:", t.Address)
 		}
 	} else {
-		log.Println("TO_ERROR: could not get To from email:", err)
+		log.Println("smtp.Data: could not get To from email:", err)
 	}
 	toMap[s.to] = true
 
@@ -93,14 +95,14 @@ func (s *session) Data(r io.Reader) error {
 	}
 	msg, err := s.app.MessageCreate(&req)
 	if err != nil {
-		log.Println("ERROR: could not create message:", err)
+		log.Println("smtp.Data: could not create message:", err)
 		return err
 	}
 
 	go func() {
 		err := s.app.MessageSend(&app.MessageSendRequest{Message: msg})
 		if err != nil {
-			log.Println("ERROR: could not handle message:", err)
+			log.Println("smtp.Data: could not handle message:", err)
 		}
 	}()
 

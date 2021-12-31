@@ -40,9 +40,9 @@ func New(app *app.App) *Router {
 }
 
 func (s *Router) Start(address string) {
-	log.Println("router.Start: listening on", address)
+	log.Println("router.Router.Start: HTTP server listening on", address)
 	err := http.ListenAndServe(address, s.r)
 	if err != nil {
-		log.Fatal("Router.Start:", err)
+		log.Fatalln("router.Router.Start:", err)
 	}
 }

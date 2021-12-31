@@ -35,7 +35,7 @@ func (r *Repository) Get(name string) (domain.EndpointPort, error) {
 
 	endpoint, ok := r.endpointMap[name]
 	if !ok {
-		return nil, fmt.Errorf("%s: %v", name, domain.ErrEndpointNotFound)
+		return nil, fmt.Errorf("%v: %s", domain.ErrEndpointNotFound, name)
 	}
 
 	return endpoint, nil
@@ -46,7 +46,7 @@ func (r *Repository) Create(name, endpointType string, config map[string]string)
 	defer r.endpointMu.Unlock()
 
 	if _, ok := r.endpointMap[name]; ok {
-		return fmt.Errorf("%s: %v", name, domain.ErrEndpointNameConflict)
+		return fmt.Errorf("%v: %s", domain.ErrEndpointNameConflict, name)
 	}
 
 	endpoint, err := factory(endpointType, config)
