@@ -47,7 +47,7 @@ func (m *Message) List(limit, offset int) ([]domain.Message, error) {
 	return messages, nil
 }
 
-func (m *Message) Create(subject, from string, to map[string]bool, text string) (*domain.Message, error) {
+func (m *Message) Create(subject, from string, to map[string]struct{}, text string) (*domain.Message, error) {
 	msg := domain.NewMessage(subject, from, to, text)
 
 	err := m.messageREPO.Create(msg)

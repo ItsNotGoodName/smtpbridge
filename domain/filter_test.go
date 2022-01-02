@@ -10,7 +10,7 @@ func TestFilter(t *testing.T) {
 
 	msg := Message{
 		From: "foo",
-		To:   map[string]bool{"bar": true},
+		To:   map[string]struct{}{"bar": {}},
 	}
 
 	tests := []FilterTest{

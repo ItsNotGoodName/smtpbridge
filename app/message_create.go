@@ -7,7 +7,7 @@ import (
 type MessageCreateRequest struct {
 	Subject     string
 	From        string
-	To          map[string]bool
+	To          map[string]struct{}
 	Text        string
 	attachments []attachmentCreateRequest
 }

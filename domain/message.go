@@ -22,14 +22,14 @@ const (
 
 type (
 	Message struct {
-		UUID        string          `json:"uuid" storm:"id"` // UUID of the message.
-		From        string          `json:"from"`            // From is the email address of the sender.
-		To          map[string]bool `json:"to"`              // To is the email addresses of the recipients.
-		Subject     string          `json:"subject"`         // Subject of the message.
-		Text        string          `json:"text"`            // Text is the message body.
-		Attachments []Attachment    `json:"-"`               // Attachment is the attachments of the message.
-		Status      Status          `json:"status"`          // Status is the status of the message.
-		CreatedAt   time.Time       `json:"created_at"`      // Time message was received.
+		UUID        string              `json:"uuid" storm:"id"` // UUID of the message.
+		From        string              `json:"from"`            // From is the email address of the sender.
+		To          map[string]struct{} `json:"to"`              // To is the email addresses of the recipients.
+		Subject     string              `json:"subject"`         // Subject of the message.
+		Text        string              `json:"text"`            // Text is the message body.
+		Attachments []Attachment        `json:"-"`               // Attachment is the attachments of the message.
+		Status      Status              `json:"status"`          // Status is the status of the message.
+		CreatedAt   time.Time           `json:"created_at"`      // Time message was received.
 	}
 
 	EndpointMessage struct {
@@ -39,7 +39,7 @@ type (
 
 	MessageServicePort interface {
 		// Create a new message and saves it.
-		Create(subject, from string, to map[string]bool, text string) (*Message, error)
+		Create(subject, from string, to map[string]struct{}, text string) (*Message, error)
 		// CreateAttachment adds an attachment to a message and saves it.
 		CreateAttachment(msg *Message, name string, data []byte) (*Attachment, error)
 		// Get a message with attachments.
@@ -68,7 +68,7 @@ type (
 	Status uint8
 )
 
-func NewMessage(subject, from string, to map[string]bool, text string) *Message {
+func NewMessage(subject, from string, to map[string]struct{}, text string) *Message {
 	return &Message{
 		CreatedAt: time.Now(),
 		UUID:      uuid.New().String(),

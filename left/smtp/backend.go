@@ -72,16 +72,16 @@ func (s *session) Data(r io.Reader) error {
 	//	log.Println("ERROR:", e)
 	//}
 	//log.Println("FROM:", e.GetHeader("From"))
-	toMap := make(map[string]bool)
+	toMap := make(map[string]struct{})
 	if to, err := e.AddressList("To"); err == nil {
 		for _, t := range to {
-			toMap[t.Address] = true
+			toMap[t.Address] = struct{}{}
 			//log.Println("TO:", t.Address)
 		}
 	} else {
 		log.Println("smtp.Data: could not get To from email:", err)
 	}
-	toMap[s.to] = true
+	toMap[s.to] = struct{}{}
 
 	req := app.MessageCreateRequest{
 		Subject: e.GetHeader("Subject"),

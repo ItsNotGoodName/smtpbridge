@@ -8,7 +8,7 @@ type Filter struct {
 func (f *Filter) Match(msg *Message) bool {
 	// TODO: regex
 	if f.To != "" {
-		if !msg.To[f.To] {
+		if _, ok := msg.To[f.To]; !ok {
 			return false
 		}
 	}
