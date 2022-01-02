@@ -19,8 +19,7 @@ type (
 
 	// MessageServicePort handles creating and sending messages.
 	EndpointServicePort interface {
-		// SendBridges sends message through the given bridges, returns error if all sends failed.
-		SendBridges(msg *Message, bridges []Bridge) error
+		SendBridges(msg *Message, bridges []Bridge) (Status, error)
 	}
 
 	EndpointRepositoryPort interface {

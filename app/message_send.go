@@ -1,17 +1,23 @@
 package app
 
-import "github.com/ItsNotGoodName/smtpbridge/domain"
+import (
+	"fmt"
+
+	"github.com/ItsNotGoodName/smtpbridge/domain"
+)
 
 type MessageSendRequest struct {
 	Message *domain.Message
 }
 
 func (a *App) MessageSend(req *MessageSendRequest) error {
-	err := a.endpointSVC.SendBridges(req.Message, a.bridgeSVC.ListByMessage(req.Message))
-	if err != nil {
-		a.messageSVC.UpdateStatus(req.Message, domain.StatusFailed)
+	status, err := a.endpointSVC.SendBridges(req.Message, a.bridgeSVC.ListByMessage(req.Message))
+	err2 := a.messageSVC.UpdateStatus(req.Message, status)
+	if err == nil {
+		return err2
+	}
+	if err2 == nil {
 		return err
 	}
-
-	return a.messageSVC.UpdateStatus(req.Message, domain.StatusSent)
+	return fmt.Errorf("%s, %s", err, err2)
 }

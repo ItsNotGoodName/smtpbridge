@@ -37,8 +37,10 @@
                 <span class="tag is-warning is-medium">Created</span>
                 {{ else if eq $msg.Status 1 }}
                 <span class="tag is-success is-medium">Sent</span>
-                {{ else }}
+                {{ else if eq $msg.Status 2 }}
                 <span class="tag is-danger is-medium">Failed</span>
+                {{ else if eq $msg.Status 3 }}
+                <span class="tag is-info is-medium">Skipped</span>
                 {{ end }}
 
                 <span class="tag is-light is-medium">{{ $msg.CreatedAt}}</span>
