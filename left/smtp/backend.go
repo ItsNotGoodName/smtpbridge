@@ -98,7 +98,7 @@ func (s *session) Data(r io.Reader) error {
 	go func() {
 		err := s.app.MessageHandle(&req)
 		if err != nil {
-			log.Println("smtp.Data: could not send message:", err)
+			log.Println("smtp.Data: could not handle message:", err)
 		}
 	}()
 

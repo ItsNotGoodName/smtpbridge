@@ -15,11 +15,13 @@ func NewEndpoint(endpointREPO domain.EndpointRepositoryPort) *Endpoint {
 }
 
 func (e *Endpoint) SendBridges(msg *domain.Message, bridges []*domain.Bridge) (domain.Status, error) {
+	// TODO: refactor entire method
 	if len(bridges) == 0 {
+		log.Println("app.messageSend: no valid bridges: skipped message", msg.UUID)
 		return domain.StatusSkipped, nil
 	}
 
-	var err error
+	var errGet error
 	sent := 0
 	skipped := 0
 	for _, bridge := range bridges {
@@ -31,14 +33,14 @@ func (e *Endpoint) SendBridges(msg *domain.Message, bridges []*domain.Bridge) (d
 
 		for _, name := range bridge.Endpoints {
 			var endpoint domain.EndpointPort
-			endpoint, err = e.endpointREPO.Get(name)
-			if err != nil {
+			endpoint, errGet = e.endpointREPO.Get(name)
+			if errGet != nil {
 				break
 			}
 
 			// TODO: worker pool
-			if err = endpoint.Send(emsg); err != nil {
-				log.Println("service.Endpoint.SendBridges:", err)
+			if errEnd := endpoint.Send(emsg); errEnd != nil {
+				log.Println("service.Endpoint.SendBridges:", errEnd)
 			} else {
 				sent++
 			}
@@ -46,12 +48,14 @@ func (e *Endpoint) SendBridges(msg *domain.Message, bridges []*domain.Bridge) (d
 	}
 
 	if sent > 0 {
-		return domain.StatusSent, err
+		log.Println("app.messageSend: sent message", msg.UUID)
+		return domain.StatusSent, errGet
 	}
 
 	if skipped > 0 {
-		return domain.StatusSkipped, err
+		log.Println("app.messageSend: only_* produced empty message: skipped message", msg.UUID)
+		return domain.StatusSkipped, errGet
 	}
 
-	return domain.StatusFailed, err
+	return domain.StatusFailed, errGet
 }
