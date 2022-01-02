@@ -2,8 +2,6 @@ package app
 
 import (
 	"math"
-
-	"github.com/ItsNotGoodName/smtpbridge/dto"
 )
 
 type MessageListRequest struct {
@@ -11,7 +9,7 @@ type MessageListRequest struct {
 }
 
 type MessageListResponse struct {
-	Messages []dto.Message
+	Messages []Message
 	Page     int
 	PageMin  int
 	PageMax  int
@@ -37,9 +35,9 @@ func (a *App) MessageList(req *MessageListRequest) (*MessageListResponse, error)
 		return nil, err
 	}
 
-	var result []dto.Message
+	var result []Message
 	for _, msg := range msgs {
-		result = append(result, *dto.NewMessage(&msg))
+		result = append(result, *NewMessage(&msg))
 	}
 
 	return &MessageListResponse{Messages: result, PageMin: pageMin, PageMax: pageMax, Page: req.Page}, nil

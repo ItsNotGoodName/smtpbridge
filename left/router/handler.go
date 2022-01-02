@@ -7,7 +7,6 @@ import (
 	"strconv"
 
 	"github.com/ItsNotGoodName/smtpbridge/app"
-	"github.com/ItsNotGoodName/smtpbridge/dto"
 	"github.com/ItsNotGoodName/smtpbridge/left/web"
 	"github.com/ItsNotGoodName/smtpbridge/pkg/paginate"
 )
@@ -23,7 +22,7 @@ func handleImage(prefix string, dirFS fs.FS) http.HandlerFunc {
 
 func (s *Router) handleIndexGET() http.HandlerFunc {
 	type Data struct {
-		Messages []dto.Message
+		Messages []app.Message
 		Paginate paginate.Paginate
 	}
 

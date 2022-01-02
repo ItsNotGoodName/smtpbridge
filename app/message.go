@@ -1,4 +1,4 @@
-package dto
+package app
 
 import (
 	"time"
@@ -15,12 +15,6 @@ type Message struct {
 	Text        string        `json:"text"`
 	CreatedAt   string        `json:"created_at"`
 	Attachments []Attachment  `json:"attachments"`
-}
-
-type Attachment struct {
-	UUID string `json:"uuid"`
-	Name string `json:"name"`
-	File string `json:"path"`
 }
 
 func NewMessage(msg *domain.Message) *Message {
