@@ -83,7 +83,6 @@ func (s *session) Data(r io.Reader) error {
 	}
 	toMap[s.to] = true
 
-	// Create message
 	req := app.MessageCreateRequest{
 		Subject: e.GetHeader("Subject"),
 		From:    s.from,
@@ -93,6 +92,7 @@ func (s *session) Data(r io.Reader) error {
 	for _, a := range e.Attachments {
 		req.AddAttachment(a.FileName, a.Content)
 	}
+
 	msg, err := s.app.MessageCreate(&req)
 	if err != nil {
 		log.Println("smtp.Data: could not create message:", err)
@@ -102,7 +102,7 @@ func (s *session) Data(r io.Reader) error {
 	go func() {
 		err := s.app.MessageSend(&app.MessageSendRequest{Message: msg})
 		if err != nil {
-			log.Println("smtp.Data: could not handle message:", err)
+			log.Println("smtp.Data: could not send message:", err)
 		}
 	}()
 

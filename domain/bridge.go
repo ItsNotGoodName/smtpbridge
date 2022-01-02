@@ -13,9 +13,8 @@ type (
 		Filters         []Filter `json:"filters" mapstructure:"filters"`
 	}
 
-	// BridgeServicePort handles finding endpoints for messages.
 	BridgeServicePort interface {
-		// GetBridges returns a list of bridges that the message belongs to.
+		// ListByMessage returns bridges that the message belongs to.
 		ListByMessage(msg *Message) []Bridge
 	}
 )

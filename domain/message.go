@@ -38,9 +38,9 @@ type (
 	}
 
 	MessageServicePort interface {
-		// Create creates a new message and saves it.
+		// Create a new message and saves it.
 		Create(subject, from string, to map[string]bool, text string) (*Message, error)
-		// CreateAttachment adds an attachment to a message.
+		// CreateAttachment adds an attachment to a message and saves it.
 		CreateAttachment(msg *Message, name string, data []byte) (*Attachment, error)
 		// Get a message with attachments.
 		Get(uuid string) (*Message, error)
@@ -50,19 +50,18 @@ type (
 		UpdateStatus(msg *Message, status Status) error
 	}
 
-	// MessageRepositoryPort handles storing messages.
 	MessageRepositoryPort interface {
-		// CreateMessage saves a new message.
+		// Create saves a message.
 		Create(msg *Message) error
-		// CountMessages returns the number of messages.
+		// Count returns the number of messages.
 		Count() (int, error)
-		// GetMessage returns a message by it's UUID.
+		// Get returns a message by it's UUID.
 		Get(uuid string) (*Message, error)
-		// GetMessages returns a list of messages.
+		// List returns a list of messages.
 		List(limit, offset int) ([]Message, error)
-		// UpdateMessage updates a message.
+		// Update a message.
 		Update(msg *Message, updateFN func(msg *Message) (*Message, error)) error
-		// DeleteMessage deletes a message.
+		// Delete a message.
 		Delete(msg *Message) error
 	}
 
