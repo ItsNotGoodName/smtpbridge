@@ -22,6 +22,7 @@ func (c *MessageCreateRequest) AddAttachment(name string, data []byte) {
 }
 
 func (a *App) MessageCreate(req *MessageCreateRequest) (*domain.Message, error) {
+	// TODO: send message on create and just return an error
 	msg, err := a.messageSVC.Create(req.Subject, req.From, req.To, req.Text)
 	if err != nil {
 		return nil, err

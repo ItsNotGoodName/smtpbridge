@@ -14,11 +14,11 @@ var ErrAttachmentInvalid = fmt.Errorf("invalid attachment")
 
 type (
 	Attachment struct {
-		UUID        string         `json:"uuid" storm:"id"`
-		Name        string         `json:"name"`
-		Type        AttachmentType `json:"type"`
-		MessageUUID string         `json:"message_uuid" storm:"index"`
-		Data        []byte         `json:"-"`
+		UUID        string
+		Name        string
+		Type        AttachmentType
+		MessageUUID string
+		Data        []byte
 	}
 
 	EndpointAttachment struct {
