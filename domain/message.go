@@ -57,7 +57,7 @@ type (
 		Count() (int, error)
 		// Get returns a message by it's UUID.
 		Get(uuid string) (*Message, error)
-		// List returns a list of messages.
+		// List messages.
 		List(limit, offset int) ([]Message, error)
 		// Update a message.
 		Update(msg *Message, updateFN func(msg *Message) (*Message, error)) error

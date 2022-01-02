@@ -30,13 +30,13 @@ type (
 	AttachmentRepositoryPort interface {
 		// Create saves a new attachment.
 		Create(att *Attachment) error
-		// Get returns an attachment by it's UUID.
+		// Get returns an attachment by it's UUID without data.
 		Get(uuid string) (*Attachment, error)
 		// GetData returns the data for an attachment.
 		GetData(att *Attachment) ([]byte, error)
 		// GetFS returns the attachment file system.
 		GetFS() fs.FS
-		// ListByMessage returns a list of attachments for a message.
+		// ListByMessage returns a list of attachments for a message without data.
 		ListByMessage(msg *Message) ([]Attachment, error)
 		// DeleteData deletes the data for an attachment.
 		DeleteData(att *Attachment) error

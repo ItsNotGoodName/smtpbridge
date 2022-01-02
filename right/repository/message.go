@@ -45,10 +45,10 @@ func convertMessageD(msg *domain.Message) *messageModel {
 
 type Message struct {
 	db             *storm.DB
-	attachmentREPO domain.AttachmentRepositoryPort
+	attachmentREPO *Attachment
 }
 
-func NewMessage(db *storm.DB, attachmentREPO domain.AttachmentRepositoryPort) *Message {
+func NewMessage(db *storm.DB, attachmentREPO *Attachment) *Message {
 	return &Message{
 		db:             db,
 		attachmentREPO: attachmentREPO,
