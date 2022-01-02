@@ -6,7 +6,6 @@ import (
 	"path"
 	"strconv"
 
-	"github.com/ItsNotGoodName/smtpbridge/domain"
 	"github.com/spf13/viper"
 )
 
@@ -14,8 +13,21 @@ type Config struct {
 	DB        ConfigDB         `json:"database" mapstructure:"database"`
 	SMTP      ConfigSMTP       `json:"smtp" mapstructure:"smtp"`
 	HTTP      ConfigHTTP       `json:"http" mapstructure:"http"`
-	Bridges   []domain.Bridge  `json:"bridges" mapstructure:"bridges"`
+	Bridges   []ConfigBridge   `json:"bridges" mapstructure:"bridges"`
 	Endpoints []ConfigEndpoint `json:"endpoints" mapstructure:"endpoints"`
+}
+
+type ConfigBridge struct {
+	Name            string         `json:"name" mapstructure:"name"`
+	Endpoints       []string       `json:"endpoints" mapstructure:"endpoints"`
+	OnlyText        bool           `json:"only_text" mapstructure:"only_text"`
+	OnlyAttachments bool           `json:"only_attachments" mapstructure:"only_attachments"`
+	Filters         []ConfigFilter `json:"filters" mapstructure:"filters"`
+}
+
+type ConfigFilter struct {
+	To   string `json:"to,omitempty" mapstructure:"to,omitempty"`
+	From string `json:"from,omitempty" mapstructure:"from,omitempty"`
 }
 
 type ConfigDB struct {
@@ -72,7 +84,7 @@ func New() *Config {
 		HTTP: ConfigHTTP{
 			Port: 8080,
 		},
-		Bridges:   []domain.Bridge{},
+		Bridges:   []ConfigBridge{},
 		Endpoints: []ConfigEndpoint{},
 	}
 }

@@ -1,8 +1,15 @@
 package domain
 
 type Filter struct {
-	To   string `json:"to,omitempty" mapstructure:"to,omitempty"`
-	From string `json:"from,omitempty" mapstructure:"from,omitempty"`
+	To   string
+	From string
+}
+
+func NewFilter(to, from string) *Filter {
+	return &Filter{
+		To:   to,
+		From: from,
+	}
 }
 
 func (f *Filter) Match(msg *Message) bool {

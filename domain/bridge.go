@@ -6,18 +6,28 @@ var ErrBridgesNotFound = fmt.Errorf("bridges not found")
 
 type (
 	Bridge struct {
-		Name            string   `json:"name" mapstructure:"name"`
-		Endpoints       []string `json:"endpoints" mapstructure:"endpoints"`
-		OnlyText        bool     `json:"only_text" mapstructure:"only_text"`
-		OnlyAttachments bool     `json:"only_attachments" mapstructure:"only_attachments"`
-		Filters         []Filter `json:"filters" mapstructure:"filters"`
+		Name            string
+		Endpoints       []string
+		OnlyText        bool
+		OnlyAttachments bool
+		Filters         []Filter
 	}
 
 	BridgeServicePort interface {
 		// ListByMessage returns bridges that the message belongs to.
-		ListByMessage(msg *Message) []Bridge
+		ListByMessage(msg *Message) []*Bridge
 	}
 )
+
+func NewBridge(name string, endpoints []string, onlyText, onlyAttachments bool, filters []Filter) *Bridge {
+	return &Bridge{
+		Name:            name,
+		Endpoints:       endpoints,
+		OnlyText:        onlyText,
+		OnlyAttachments: onlyAttachments,
+		Filters:         filters,
+	}
+}
 
 func (b *Bridge) Match(msg *Message) bool {
 	if len(b.Filters) == 0 {

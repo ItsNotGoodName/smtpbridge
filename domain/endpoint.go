@@ -18,7 +18,7 @@ type (
 
 	EndpointServicePort interface {
 		// SendBridges sends the message to the bridge's endpoints if they pass the filter.
-		SendBridges(msg *Message, bridges []Bridge) (Status, error)
+		SendBridges(msg *Message, bridges []*Bridge) (Status, error)
 	}
 
 	EndpointRepositoryPort interface {

@@ -14,7 +14,7 @@ func NewEndpoint(endpointREPO domain.EndpointRepositoryPort) *Endpoint {
 	return &Endpoint{endpointREPO: endpointREPO}
 }
 
-func (e *Endpoint) SendBridges(msg *domain.Message, bridges []domain.Bridge) (domain.Status, error) {
+func (e *Endpoint) SendBridges(msg *domain.Message, bridges []*domain.Bridge) (domain.Status, error) {
 	if len(bridges) == 0 {
 		return domain.StatusSkipped, nil
 	}
