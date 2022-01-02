@@ -46,20 +46,18 @@ var serverCmd = &cobra.Command{
 		// Read config
 		serverConfig.Load()
 
-		// Init repositories
-		var (
-			attachmentREPO domain.AttachmentRepositoryPort
-			messageREPO    domain.MessageRepositoryPort
-			endpointREPO   = endpoint.NewRepository(serverConfig)
-		)
+		// Init database
+		var db domain.Database
 		if serverConfig.DB.IsBolt() {
-			db := repository.NewStorm(serverConfig)
-			attachmentREPO = repository.NewAttachment(serverConfig, db)
-			messageREPO = repository.NewMessage(db, attachmentREPO)
+			db = repository.NewDatabase(serverConfig)
 		} else {
-			attachmentREPO = repository.NewAttachmentMock()
-			messageREPO = repository.NewMessageMock()
+			db = repository.NewMock()
 		}
+
+		// Init repositories
+		attachmentREPO := db.AttachmentRepository()
+		messageREPO := db.MessageRepository()
+		endpointREPO := endpoint.NewRepository(serverConfig)
 
 		// Init service
 		authSVC := service.NewAuth(serverConfig)

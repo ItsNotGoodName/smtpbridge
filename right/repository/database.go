@@ -4,13 +4,40 @@ import (
 	"log"
 
 	"github.com/ItsNotGoodName/smtpbridge/config"
+	"github.com/ItsNotGoodName/smtpbridge/domain"
 	"github.com/asdine/storm"
 )
 
-func NewStorm(cfg *config.Config) *storm.DB {
+type Database struct {
+	db         *storm.DB
+	attachment *Attachment
+	message    *Message
+}
+
+func NewDatabase(cfg *config.Config) Database {
 	db, err := storm.Open(cfg.DB.DB)
 	if err != nil {
 		log.Fatalln("repository.NewStorm: could not open database:", err)
 	}
-	return db
+
+	attachment := NewAttachment(cfg, db)
+	message := NewMessage(db, attachment)
+
+	return Database{
+		db:         db,
+		attachment: attachment,
+		message:    message,
+	}
+}
+
+func (d Database) Close() error {
+	return d.db.Close()
+}
+
+func (d Database) AttachmentRepository() domain.AttachmentRepositoryPort {
+	return d.attachment
+}
+
+func (d Database) MessageRepository() domain.MessageRepositoryPort {
+	return d.message
 }
