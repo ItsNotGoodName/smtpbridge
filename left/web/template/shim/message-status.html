@@ -1,0 +1,11 @@
+{{ define "message-status" }}
+{{ if eq .Status 0 }}
+<span class="tag is-warning is-medium">Created</span>
+{{ else if eq .Status 1 }}
+<span class="tag is-success is-medium">Sent</span>
+{{ else if eq .Status 2 }}
+<span class="tag is-danger is-medium">Failed</span>
+{{ else if eq .Status 3 }}
+<span class="tag is-info is-medium">Skipped</span>
+{{ end }}
+{{ end }}

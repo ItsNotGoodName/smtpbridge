@@ -7,6 +7,7 @@ import (
 
 	"github.com/ItsNotGoodName/smtpbridge/app"
 	"github.com/ItsNotGoodName/smtpbridge/config"
+	"github.com/ItsNotGoodName/smtpbridge/left/web"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 )
@@ -15,14 +16,16 @@ type Router struct {
 	addr          string
 	r             *chi.Mux
 	a             *app.App
+	t             *web.Templater
 	attachmentURI string
 }
 
-func New(cfg *config.Config, app *app.App) *Router {
+func New(cfg *config.Config, app *app.App, templater *web.Templater) *Router {
 	s := Router{
 		addr:          cfg.HTTP.Addr,
 		r:             chi.NewRouter(),
 		a:             app,
+		t:             templater,
 		attachmentURI: "/attachments/",
 	}
 
@@ -37,14 +40,10 @@ func New(cfg *config.Config, app *app.App) *Router {
 	// processing should be stopped.
 	s.r.Use(middleware.Timeout(60 * time.Second))
 
-	s.route()
-
-	return &s
-}
-
-func (s *Router) route() {
 	s.r.Get(s.attachmentURI+"*", s.handleAttachmentsGET())
 	s.r.Get("/", s.handleIndexGET())
+
+	return &s
 }
 
 func (s *Router) Start() {

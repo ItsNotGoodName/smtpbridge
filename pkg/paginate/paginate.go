@@ -10,14 +10,14 @@ type Paginate struct {
 	Page    int
 	PageMax int
 	URL     *url.URL
-	Query   string
+	Param   string
 }
 
-func New(URL url.URL, query string, pageMin, page, pageMax int) Paginate {
-	URL.Query().Add(query, strconv.Itoa(page))
+func New(URL url.URL, param string, pageMin, page, pageMax int) Paginate {
+	URL.Query().Add(param, strconv.Itoa(page))
 	return Paginate{
 		PageMin: pageMin,
-		Query:   query,
+		Param:   param,
 		Page:    page,
 		PageMax: pageMax,
 		URL:     &URL,
@@ -26,7 +26,7 @@ func New(URL url.URL, query string, pageMin, page, pageMax int) Paginate {
 
 func (p Paginate) link(page int) string {
 	vals := p.URL.Query()
-	vals.Set(p.Query, strconv.Itoa(page))
+	vals.Set(p.Param, strconv.Itoa(page))
 	p.URL.RawQuery = vals.Encode()
 	return p.URL.String()
 }

@@ -27,6 +27,7 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/domain"
 	"github.com/ItsNotGoodName/smtpbridge/left/router"
 	"github.com/ItsNotGoodName/smtpbridge/left/smtp"
+	"github.com/ItsNotGoodName/smtpbridge/left/web"
 	"github.com/ItsNotGoodName/smtpbridge/right/endpoint"
 	"github.com/ItsNotGoodName/smtpbridge/right/repository"
 	"github.com/ItsNotGoodName/smtpbridge/service"
@@ -71,7 +72,8 @@ var serverCmd = &cobra.Command{
 
 		// Init and start http server
 		if serverConfig.HTTP.Enable {
-			httpServer := router.New(serverConfig, app)
+			templater := web.NewTemplater()
+			httpServer := router.New(serverConfig, app, templater)
 			go httpServer.Start()
 		}
 
