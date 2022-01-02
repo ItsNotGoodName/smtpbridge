@@ -80,21 +80,29 @@ func NewMessage(subject, from string, to map[string]struct{}, text string) *Mess
 	}
 }
 
-func (m *Message) NewAttachment(name string, data []byte) (*Attachment, error) {
-	var t AttachmentType
+// AttachmentDataValid returns the type of the attachment data.
+func AttachmentDataValid(data []byte) (AttachmentType, error) {
 	contentType := http.DetectContentType(data)
-	if contentType == "image/png" {
-		t = TypePNG
-	} else if contentType == "image/jpeg" {
-		t = TypeJPEG
-	} else {
-		return nil, fmt.Errorf("%s: %v", contentType, ErrAttachmentInvalid)
+	switch contentType {
+	case "image/png":
+		return TypePNG, nil
+	case "image/jpeg":
+		return TypeJPEG, nil
+	default:
+		return "", fmt.Errorf("%s: %v", contentType, ErrAttachmentInvalid)
+	}
+}
+
+func (m *Message) NewAttachment(name string, data []byte) (*Attachment, error) {
+	attType, err := AttachmentDataValid(data)
+	if err != nil {
+		return nil, err
 	}
 
 	att := Attachment{
 		UUID:        uuid.New().String(),
 		Name:        name,
-		Type:        t,
+		Type:        attType,
 		MessageUUID: m.UUID,
 		Data:        data,
 	}

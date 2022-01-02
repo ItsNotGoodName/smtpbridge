@@ -6,11 +6,11 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/domain"
 )
 
-type MessageSendRequest struct {
+type messageSendRequest struct {
 	Message *domain.Message
 }
 
-func (a *App) MessageSend(req *MessageSendRequest) error {
+func (a *App) messageSend(req *messageSendRequest) error {
 	status, err := a.endpointSVC.SendBridges(req.Message, a.bridgeSVC.ListByMessage(req.Message))
 	err2 := a.messageSVC.UpdateStatus(req.Message, status)
 	if err == nil {

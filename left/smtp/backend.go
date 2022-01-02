@@ -83,24 +83,20 @@ func (s *session) Data(r io.Reader) error {
 	}
 	toMap[s.to] = struct{}{}
 
-	req := app.MessageCreateRequest{
-		Subject: e.GetHeader("Subject"),
-		From:    s.from,
-		To:      toMap,
-		Text:    e.Text,
+	req := app.MessageHandleRequest{
+		Subject:               e.GetHeader("Subject"),
+		From:                  s.from,
+		To:                    toMap,
+		Text:                  e.Text,
+		IgnoreAttachmentError: true,
 	}
 	for _, a := range e.Attachments {
 		req.AddAttachment(a.FileName, a.Content)
 	}
 
-	msg, err := s.app.MessageCreate(&req)
-	if err != nil {
-		log.Println("smtp.Data: could not create message:", err)
-		return err
-	}
-
+	// TODO: remove goroutine when endpoint service workers are implemented
 	go func() {
-		err := s.app.MessageSend(&app.MessageSendRequest{Message: msg})
+		err := s.app.MessageHandle(&req)
 		if err != nil {
 			log.Println("smtp.Data: could not send message:", err)
 		}
