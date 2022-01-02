@@ -12,6 +12,31 @@ import (
 	"github.com/asdine/storm/q"
 )
 
+type attachmentModel struct {
+	UUID        string                `storm:"id"`
+	Name        string                ``
+	Type        domain.AttachmentType ``
+	MessageUUID string                ``
+}
+
+func convertAttachmentD(att *domain.Attachment) *attachmentModel {
+	return &attachmentModel{
+		UUID:        att.UUID,
+		Name:        att.Name,
+		Type:        att.Type,
+		MessageUUID: att.MessageUUID,
+	}
+}
+
+func convertAttachmentM(attM *attachmentModel) *domain.Attachment {
+	return &domain.Attachment{
+		UUID:        attM.UUID,
+		Name:        attM.Name,
+		Type:        attM.Type,
+		MessageUUID: attM.MessageUUID,
+	}
+}
+
 type Attachment struct {
 	attDir string
 	fs     fs.FS
@@ -32,7 +57,7 @@ func NewAttachment(cfg *config.Config, db *storm.DB) *Attachment {
 }
 
 func (a *Attachment) Create(att *domain.Attachment) error {
-	err := a.db.Save(att)
+	err := a.db.Save(convertAttachmentD(att))
 	if err != nil {
 		return err
 	}
@@ -50,13 +75,13 @@ func (a *Attachment) GetFS() fs.FS {
 }
 
 func (a *Attachment) Get(uuid string) (*domain.Attachment, error) {
-	var att domain.Attachment
-	err := a.db.One("UUID", uuid, att)
+	var attM *attachmentModel
+	err := a.db.One("UUID", uuid, attM)
 	if err != nil {
 		return nil, err
 	}
 
-	return &att, nil
+	return convertAttachmentM(attM), nil
 }
 
 func (a *Attachment) GetData(att *domain.Attachment) ([]byte, error) {
@@ -69,13 +94,18 @@ func (a *Attachment) GetData(att *domain.Attachment) ([]byte, error) {
 }
 
 func (a *Attachment) ListByMessage(msg *domain.Message) ([]domain.Attachment, error) {
-	var atts []domain.Attachment
-	err := a.db.Select(q.Eq("MessageUUID", msg.UUID)).Find(&atts)
+	var attsM []attachmentModel
+	err := a.db.Select(q.Eq("MessageUUID", msg.UUID)).Find(&attsM)
 	if err != nil {
 		if err == storm.ErrNotFound {
 			return []domain.Attachment{}, nil
 		}
 		return nil, err
+	}
+
+	var atts []domain.Attachment
+	for _, attM := range attsM {
+		atts = append(atts, *convertAttachmentM(&attM))
 	}
 
 	return atts, nil
