@@ -13,20 +13,16 @@ import (
 )
 
 type Router struct {
-	addr          string
-	r             *chi.Mux
-	a             *app.App
-	t             *web.Templater
-	attachmentURI string
+	r *chi.Mux
+	a *app.App
+	t *web.Templater
 }
 
-func New(cfg *config.Config, app *app.App, templater *web.Templater) *Router {
+func New(app *app.App, templater *web.Templater) *Router {
 	s := Router{
-		addr:          cfg.HTTP.Addr,
-		r:             chi.NewRouter(),
-		a:             app,
-		t:             templater,
-		attachmentURI: "/attachments/",
+		r: chi.NewRouter(),
+		a: app,
+		t: templater,
 	}
 
 	// A good base middleware stack
@@ -40,15 +36,16 @@ func New(cfg *config.Config, app *app.App, templater *web.Templater) *Router {
 	// processing should be stopped.
 	s.r.Use(middleware.Timeout(60 * time.Second))
 
-	s.r.Get(s.attachmentURI+"*", s.handleAttachmentsGET())
+	prefix := "/attachments/"
+	s.r.Get(prefix+"*", handleImage(prefix, app.AttachmentGetFS()))
 	s.r.Get("/", s.handleIndexGET())
 
 	return &s
 }
 
-func (s *Router) Start() {
-	log.Println("router.Router.Start: HTTP server listening on", s.addr)
-	err := http.ListenAndServe(s.addr, s.r)
+func (s *Router) Start(cfg *config.Config) {
+	log.Println("router.Router.Start: HTTP server listening on", cfg.HTTP.Addr)
+	err := http.ListenAndServe(cfg.HTTP.Addr, s.r)
 	if err != nil {
 		log.Fatalln("router.Router.Start:", err)
 	}

@@ -2,6 +2,7 @@ package router
 
 import (
 	_ "embed"
+	"io/fs"
 	"net/http"
 	"strconv"
 
@@ -11,9 +12,12 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/pkg/paginate"
 )
 
-func (s *Router) handleAttachmentsGET() http.HandlerFunc {
+func handleImage(prefix string, dirFS fs.FS) http.HandlerFunc {
+	h := http.StripPrefix(prefix, http.FileServer(http.FS(dirFS)))
+
 	return func(rw http.ResponseWriter, r *http.Request) {
-		http.StripPrefix(s.attachmentURI, http.FileServer(http.FS(s.a.AttachmentGetFS()))).ServeHTTP(rw, r)
+		rw.Header().Set("Cache-Control", "max-age=31536000")
+		h.ServeHTTP(rw, r)
 	}
 }
 
