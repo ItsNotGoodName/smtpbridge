@@ -6,18 +6,21 @@ import (
 	"time"
 
 	"github.com/ItsNotGoodName/smtpbridge/app"
+	"github.com/ItsNotGoodName/smtpbridge/config"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 )
 
 type Router struct {
+	addr          string
 	r             *chi.Mux
 	a             *app.App
 	attachmentURI string
 }
 
-func New(app *app.App) *Router {
+func New(cfg *config.Config, app *app.App) *Router {
 	s := Router{
+		addr:          cfg.HTTP.Addr,
 		r:             chi.NewRouter(),
 		a:             app,
 		attachmentURI: "/attachments/",
@@ -44,9 +47,9 @@ func (s *Router) route() {
 	s.r.Get("/", s.handleIndexGET())
 }
 
-func (s *Router) Start(address string) {
-	log.Println("router.Router.Start: HTTP server listening on", address)
-	err := http.ListenAndServe(address, s.r)
+func (s *Router) Start() {
+	log.Println("router.Router.Start: HTTP server listening on", s.addr)
+	err := http.ListenAndServe(s.addr, s.r)
 	if err != nil {
 		log.Fatalln("router.Router.Start:", err)
 	}

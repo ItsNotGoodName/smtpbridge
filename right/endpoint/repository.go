@@ -5,6 +5,7 @@ import (
 	"log"
 	"sync"
 
+	"github.com/ItsNotGoodName/smtpbridge/config"
 	"github.com/ItsNotGoodName/smtpbridge/domain"
 )
 
@@ -13,13 +14,13 @@ type Repository struct {
 	endpointMap map[string]domain.EndpointPort
 }
 
-func NewRepository(configEndpoints []domain.ConfigEndpoint) *Repository {
+func NewRepository(cfg *config.Config) *Repository {
 	r := Repository{
 		endpointMap: make(map[string]domain.EndpointPort),
 		endpointMu:  sync.RWMutex{},
 	}
 
-	for _, c := range configEndpoints {
+	for _, c := range cfg.Endpoints {
 		err := r.Create(c.Name, c.Type, c.Config)
 		if err != nil {
 			log.Fatalln("endpoint.NewRepository:", err)

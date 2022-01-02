@@ -2,58 +2,51 @@ package domain
 
 import (
 	"fmt"
-	"net/http"
-
-	"github.com/google/uuid"
+	"io/fs"
 )
-
-type Attachment struct {
-	UUID        string         `json:"uuid" storm:"id"`
-	Name        string         `json:"name"`
-	Type        AttachmentType `json:"type"`
-	MessageUUID string         `json:"message_uuid" storm:"index"`
-	Data        []byte         `json:"-"`
-}
-
-type AttachmentType string
 
 const (
 	TypePNG  AttachmentType = "png"
 	TypeJPEG AttachmentType = "jpeg"
 )
 
+var ErrAttachmentInvalid = fmt.Errorf("invalid attachment")
+
+type (
+	Attachment struct {
+		UUID        string         `json:"uuid" storm:"id"`
+		Name        string         `json:"name"`
+		Type        AttachmentType `json:"type"`
+		MessageUUID string         `json:"message_uuid" storm:"index"`
+		Data        []byte         `json:"-"`
+	}
+
+	EndpointAttachment struct {
+		Name string
+		Type AttachmentType
+		Data []byte
+	}
+
+	AttachmentRepositoryPort interface {
+		// CreateAttachment saves a new attachment.
+		Create(att *Attachment) error
+		// GetAttachment returns an attachment by it's UUID.
+		Get(uuid string) (*Attachment, error)
+		// GetAttachmentData returns the data for an attachment.
+		GetData(att *Attachment) ([]byte, error)
+		// GetFS returns the attachment file system
+		GetFS() fs.FS
+		// GetAttachments returns a list of attachments for a message.
+		ListByMessage(msg *Message) ([]Attachment, error)
+		// DeleteData deletes the data for an attachment.
+		DeleteData(att *Attachment) error
+	}
+
+	AttachmentType string
+)
+
 func (a *Attachment) File() string {
 	return fmt.Sprintf("%s.%s", a.UUID, a.Type)
-}
-
-func NewAttachment(msg *Message, name string, data []byte) (*Attachment, error) {
-	var t AttachmentType
-	contentType := http.DetectContentType(data)
-	if contentType == "image/png" {
-		t = TypePNG
-	} else if contentType == "image/jpeg" {
-		t = TypeJPEG
-	} else {
-		return nil, fmt.Errorf("%s: %v", contentType, ErrAttachmentInvalid)
-	}
-
-	att := Attachment{
-		UUID:        uuid.New().String(),
-		Name:        name,
-		Type:        t,
-		MessageUUID: msg.UUID,
-		Data:        data,
-	}
-
-	msg.Attachments = append(msg.Attachments, att)
-
-	return &att, nil
-}
-
-type EndpointAttachment struct {
-	Name string
-	Type AttachmentType
-	Data []byte
 }
 
 func NewEndpointAttachments(atts []Attachment) []EndpointAttachment {

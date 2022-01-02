@@ -18,11 +18,10 @@ type MessageListResponse struct {
 }
 
 func (a *App) MessageList(req *MessageListRequest) (*MessageListResponse, error) {
-	// TODO: move this logic into message service
 	limit := 10
 	pageMin := 1
 
-	count, err := a.dao.Message.CountMessages()
+	count, err := a.messageREPO.Count()
 	if err != nil {
 		return nil, err
 	}

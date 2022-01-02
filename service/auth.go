@@ -3,6 +3,7 @@ package service
 import (
 	"strings"
 
+	"github.com/ItsNotGoodName/smtpbridge/config"
 	"github.com/ItsNotGoodName/smtpbridge/domain"
 )
 
@@ -12,11 +13,11 @@ type Auth struct {
 	password  string
 }
 
-func NewAuth(config *domain.ConfigSMTP) *Auth {
+func NewAuth(cfg *config.Config) *Auth {
 	return &Auth{
-		anonymous: !config.Auth,
-		username:  strings.ToLower(config.Username),
-		password:  config.Password,
+		anonymous: !cfg.SMTP.Auth,
+		username:  strings.ToLower(cfg.SMTP.Username),
+		password:  cfg.SMTP.Password,
 	}
 }
 

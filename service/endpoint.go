@@ -7,11 +7,11 @@ import (
 )
 
 type Endpoint struct {
-	dao domain.DAO
+	endpointREPO domain.EndpointRepositoryPort
 }
 
-func NewEndpoint(dao domain.DAO) *Endpoint {
-	return &Endpoint{dao}
+func NewEndpoint(endpointREPO domain.EndpointRepositoryPort) *Endpoint {
+	return &Endpoint{endpointREPO: endpointREPO}
 }
 
 func (e *Endpoint) SendBridges(msg *domain.Message, bridges []domain.Bridge) error {
@@ -27,7 +27,7 @@ func (e *Endpoint) SendBridges(msg *domain.Message, bridges []domain.Bridge) err
 		}
 
 		for _, name := range bridge.Endpoints {
-			endpoint, err := e.dao.Endpoint.Get(name)
+			endpoint, err := e.endpointREPO.Get(name)
 			if err != nil {
 				return err
 			}

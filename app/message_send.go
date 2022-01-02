@@ -7,7 +7,7 @@ type MessageSendRequest struct {
 }
 
 func (a *App) MessageSend(req *MessageSendRequest) error {
-	err := a.endpointSVC.SendBridges(req.Message, a.bridgeSVC.GetBridges(req.Message))
+	err := a.endpointSVC.SendBridges(req.Message, a.bridgeSVC.ListByMessage(req.Message))
 	if err != nil {
 		a.messageSVC.UpdateStatus(req.Message, domain.StatusFailed)
 		return err

@@ -1,12 +1,24 @@
 package domain
 
-type Bridge struct {
-	Name            string   `json:"name" mapstructure:"name"`
-	Endpoints       []string `json:"endpoints" mapstructure:"endpoints"`
-	OnlyText        bool     `json:"only_text" mapstructure:"only_text"`
-	OnlyAttachments bool     `json:"only_attachments" mapstructure:"only_attachments"`
-	Filters         []Filter `json:"filters" mapstructure:"filters"`
-}
+import "fmt"
+
+var ErrBridgesNotFound = fmt.Errorf("bridges not found")
+
+type (
+	Bridge struct {
+		Name            string   `json:"name" mapstructure:"name"`
+		Endpoints       []string `json:"endpoints" mapstructure:"endpoints"`
+		OnlyText        bool     `json:"only_text" mapstructure:"only_text"`
+		OnlyAttachments bool     `json:"only_attachments" mapstructure:"only_attachments"`
+		Filters         []Filter `json:"filters" mapstructure:"filters"`
+	}
+
+	// BridgeServicePort handles finding endpoints for messages.
+	BridgeServicePort interface {
+		// GetBridges returns a list of bridges that the message belongs to.
+		ListByMessage(msg *Message) []Bridge
+	}
+)
 
 func (b *Bridge) Match(msg *Message) bool {
 	if len(b.Filters) == 0 {
@@ -18,26 +30,6 @@ func (b *Bridge) Match(msg *Message) bool {
 		}
 	}
 	return false
-}
-
-type Filter struct {
-	To   string `json:"to,omitempty" mapstructure:"to,omitempty"`
-	From string `json:"from,omitempty" mapstructure:"from,omitempty"`
-}
-
-func (f *Filter) Match(msg *Message) bool {
-	// TODO: regex
-	if f.To != "" {
-		if !msg.To[f.To] {
-			return false
-		}
-	}
-	if f.From != "" {
-		if msg.From != f.From {
-			return false
-		}
-	}
-	return true
 }
 
 func (b *Bridge) EndpointMessage(msg *Message) *EndpointMessage {

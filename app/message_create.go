@@ -1,6 +1,8 @@
 package app
 
-import "github.com/ItsNotGoodName/smtpbridge/domain"
+import (
+	"github.com/ItsNotGoodName/smtpbridge/domain"
+)
 
 type MessageCreateRequest struct {
 	Subject     string
@@ -28,7 +30,7 @@ func (a *App) MessageCreate(req *MessageCreateRequest) (*domain.Message, error) 
 	for _, attachment := range req.attachments {
 		_, err = a.messageSVC.CreateAttachment(msg, attachment.name, attachment.data)
 		if err != nil {
-			a.dao.Message.DeleteMessage(msg)
+			a.messageREPO.Delete(msg)
 			return nil, err
 		}
 	}

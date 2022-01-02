@@ -1,21 +1,32 @@
-package database
+package repository
 
 import (
 	"log"
-	"os"
 
 	"github.com/ItsNotGoodName/smtpbridge/domain"
 	"github.com/asdine/storm"
 	"github.com/asdine/storm/q"
 )
 
-func (db *DB) CreateMessage(msg *domain.Message) error {
-	return db.db.Save(msg)
+type Message struct {
+	db             *storm.DB
+	attachmentREPO domain.AttachmentRepositoryPort
 }
 
-func (db *DB) GetMessage(uuid string) (*domain.Message, error) {
+func NewMessage(db *storm.DB, attachmentREPO domain.AttachmentRepositoryPort) *Message {
+	return &Message{
+		db:             db,
+		attachmentREPO: attachmentREPO,
+	}
+}
+
+func (m *Message) Create(msg *domain.Message) error {
+	return m.db.Save(msg)
+}
+
+func (m *Message) Get(uuid string) (*domain.Message, error) {
 	var msg domain.Message
-	err := db.db.One("UUID", uuid, msg)
+	err := m.db.One("UUID", uuid, msg)
 	if err != nil {
 		return nil, err
 	}
@@ -23,8 +34,8 @@ func (db *DB) GetMessage(uuid string) (*domain.Message, error) {
 	return &msg, nil
 }
 
-func (db *DB) UpdateMessage(msg *domain.Message, updateFN func(msg *domain.Message) (*domain.Message, error)) error {
-	tx, err := db.db.Begin(true)
+func (m *Message) Update(msg *domain.Message, updateFN func(msg *domain.Message) (*domain.Message, error)) error {
+	tx, err := m.db.Begin(true)
 	if err != nil {
 		return err
 	}
@@ -48,9 +59,9 @@ func (db *DB) UpdateMessage(msg *domain.Message, updateFN func(msg *domain.Messa
 	return tx.Commit()
 }
 
-func (db *DB) GetMessages(limit, offset int) ([]domain.Message, error) {
+func (m *Message) List(limit, offset int) ([]domain.Message, error) {
 	var msgs []domain.Message
-	err := db.db.Select().OrderBy("CreatedAt").Limit(limit).Skip(offset).Reverse().Find(&msgs)
+	err := m.db.Select().OrderBy("CreatedAt").Limit(limit).Skip(offset).Reverse().Find(&msgs)
 	if err != nil && err != storm.ErrNotFound {
 		return nil, err
 	}
@@ -58,8 +69,8 @@ func (db *DB) GetMessages(limit, offset int) ([]domain.Message, error) {
 	return msgs, nil
 }
 
-func (db *DB) CountMessages() (int, error) {
-	count, err := db.db.Count(&domain.Message{})
+func (m *Message) Count() (int, error) {
+	count, err := m.db.Count(&domain.Message{})
 	if err == storm.ErrNotFound {
 		return 0, nil
 	}
@@ -67,8 +78,8 @@ func (db *DB) CountMessages() (int, error) {
 	return count, err
 }
 
-func (db *DB) DeleteMessage(msg *domain.Message) error {
-	tx, err := db.db.Begin(true)
+func (m *Message) Delete(msg *domain.Message) error {
+	tx, err := m.db.Begin(true)
 	if err != nil {
 		return err
 	}
@@ -96,12 +107,14 @@ func (db *DB) DeleteMessage(msg *domain.Message) error {
 		return err
 	}
 
+	// Commit
 	if err := tx.Commit(); err != nil {
 		return err
 	}
 
+	// Delete attachment's data
 	for _, att := range atts {
-		if err := os.Remove(db.getAttachmentPath(&att)); err != nil {
+		if err := m.attachmentREPO.DeleteData(&att); err != nil {
 			log.Println("database.DB.DeleteMessage: could not delete attachment file:", err)
 		}
 	}

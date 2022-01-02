@@ -1,9 +1,12 @@
-package domain
+package config
 
 import (
 	"log"
+	"os"
+	"path"
 	"strconv"
 
+	"github.com/ItsNotGoodName/smtpbridge/domain"
 	"github.com/spf13/viper"
 )
 
@@ -11,7 +14,7 @@ type Config struct {
 	DB        ConfigDB         `json:"database" mapstructure:"database"`
 	SMTP      ConfigSMTP       `json:"smtp" mapstructure:"smtp"`
 	HTTP      ConfigHTTP       `json:"http" mapstructure:"http"`
-	Bridges   []Bridge         `json:"bridges" mapstructure:"bridges"`
+	Bridges   []domain.Bridge  `json:"bridges" mapstructure:"bridges"`
 	Endpoints []ConfigEndpoint `json:"endpoints" mapstructure:"endpoints"`
 }
 
@@ -39,27 +42,56 @@ type ConfigEndpoint struct {
 }
 
 type ConfigSMTP struct {
+	Addr     string `json:"-" mapstructure:"-"`
 	Host     string `json:"host" mapstructure:"host"`
 	Port     uint16 `json:"port" mapstructure:"port"`
-	PortStr  string `json:"-" mapstructure:"-"`
 	Size     int    `json:"size" mapstructure:"size"`
 	Auth     bool   `json:"auth" mapstructure:"auth"`
 	Username string `json:"username" mapstructure:"username"`
 	Password string `json:"password" mapstructure:"password"`
 }
 
-func NewConfig() *Config {
-	config := &Config{}
-
-	err := viper.Unmarshal(config)
+func New() *Config {
+	home, err := os.UserHomeDir()
 	if err != nil {
-		log.Fatalf("domain.NewConfig: %s", err)
+		log.Fatalln("config.New: could not get user home dir:", err)
 	}
 
-	config.SMTP.PortStr = strconv.FormatUint(uint64(config.SMTP.Port), 10)
-	config.HTTP.Addr = config.HTTP.Host + ":" + strconv.FormatUint(uint64(config.HTTP.Port), 10)
+	rootPath := path.Join(home, ".smtpbridge")
 
-	log.Printf("domain.NewConfig: read %d bridges and %d endpoints", len(config.Bridges), len(config.Endpoints))
+	return &Config{
+		DB: ConfigDB{
+			Type:        "bolt",
+			DB:          path.Join(rootPath, "smtpbridge.db"),
+			Attachments: path.Join(rootPath, "attachments"),
+		},
+		SMTP: ConfigSMTP{
+			Size: 1024 * 1024 * 25,
+			Port: 1025,
+		},
+		HTTP: ConfigHTTP{
+			Port: 8080,
+		},
+		Bridges:   []domain.Bridge{},
+		Endpoints: []ConfigEndpoint{},
+	}
+}
 
-	return config
+func (c *Config) Load() {
+	if err := viper.Unmarshal(c); err != nil {
+		log.Fatalln("config.Config.Load:", err)
+	}
+
+	c.SMTP.Addr = c.SMTP.Host + ":" + strconv.FormatUint(uint64(c.SMTP.Port), 10)
+	c.HTTP.Addr = c.HTTP.Host + ":" + strconv.FormatUint(uint64(c.HTTP.Port), 10)
+
+	if err := os.MkdirAll(c.DB.Attachments, 0755); err != nil {
+		log.Fatalln("config.Config.Load: could not create attachments directory", err)
+	}
+
+	if err := os.MkdirAll(path.Dir(c.DB.DB), 0755); err != nil {
+		log.Fatalln("config.Config.Load: could not create database's parent directory", err)
+	}
+
+	log.Printf("config.Config.Load: read %d bridges and %d endpoints", len(c.Bridges), len(c.Endpoints))
 }
