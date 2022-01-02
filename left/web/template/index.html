@@ -2,6 +2,7 @@
 {{ define "content" }}
 <div class="my-2">
   <h1 class="title has-text-centered">Messages</h1>
+  {{ template "paginate" . }}
   <div class="is-flex is-flex-wrap-wrap is-justify-content-center">
     {{range $msg := .Messages}}
     {{ template "message" $msg }}
