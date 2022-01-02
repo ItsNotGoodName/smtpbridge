@@ -60,7 +60,9 @@ bridges: # Bridges modify and check if messages should be sent to endpoints
   - name: test bridge
     filters:
       - to: foo@example.com # Filter based on to address
+        to_regex: "foo" # To regex takes priority over to, must be surrounded by quotation marks
         from: bar@example.com # Filter based on from address
+        from_regex: "bar" # From regex takes priority over from, must be surrounded by quotation marks
     only_text: false # When this is true, only the text of the email will be sent to endpoints
     only_attachments: false # When this is true, only the attachments of the email will be sent to endpoints
     endpoints:
@@ -86,4 +88,3 @@ smtpbridge server
 
 - Embed assets for HTTP server
 - Attachments and database size limits
-- Regex from and to addresses

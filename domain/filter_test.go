@@ -14,11 +14,17 @@ func TestFilter(t *testing.T) {
 	}
 
 	tests := []FilterTest{
-		{Filter: Filter{To: "bar"}, Match: true},
-		{Filter: Filter{From: "foo", To: "bar"}, Match: true},
-		{Filter: Filter{From: "foorr", To: "bar"}, Match: false},
-		{Filter: Filter{To: "barr"}, Match: false},
-		{Filter: Filter{From: "barrr"}, Match: false},
+		{Filter: NewFilter("bar", "", "", ""), Match: true},
+		{Filter: NewFilter("bar", "foo", "", ""), Match: true},
+		{Filter: NewFilter("bar", "foorr", "", ""), Match: false},
+		{Filter: NewFilter("barr", "", "", ""), Match: false},
+		{Filter: NewFilter("", "barrr", "", ""), Match: false},
+		{Filter: NewFilter("", "", "", "f.$"), Match: false},
+		{Filter: NewFilter("", "", "", "f"), Match: true},
+		{Filter: NewFilter("", "", "b", ""), Match: true},
+		{Filter: NewFilter("bar", "", "f", ""), Match: false},
+		{Filter: NewFilter("bar", "", "b", ""), Match: true},
+		{Filter: NewFilter("bar", "", "b", "x"), Match: false},
 	}
 
 	for _, test := range tests {

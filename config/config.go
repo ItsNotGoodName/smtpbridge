@@ -26,8 +26,10 @@ type ConfigBridge struct {
 }
 
 type ConfigFilter struct {
-	To   string `json:"to,omitempty" mapstructure:"to,omitempty"`
-	From string `json:"from,omitempty" mapstructure:"from,omitempty"`
+	To        string `json:"to,omitempty" mapstructure:"to,omitempty"`
+	From      string `json:"from,omitempty" mapstructure:"from,omitempty"`
+	ToRegex   string `json:"to_regex,omitempty" mapstructure:"to_regex,omitempty"`
+	FromRegex string `json:"from_regex,omitempty" mapstructure:"from_regex,omitempty"`
 }
 
 type ConfigDB struct {
@@ -90,6 +92,12 @@ func New() *Config {
 }
 
 func (c *Config) Load() {
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigParseError); ok {
+			log.Fatalln("config.Load:", err)
+		}
+	}
+
 	if err := viper.Unmarshal(c); err != nil {
 		log.Fatalln("config.Config.Load: could not load config:", err)
 	}

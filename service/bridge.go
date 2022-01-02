@@ -23,7 +23,7 @@ func NewBridge(cfg *config.Config, endpointREPO domain.EndpointRepositoryPort) *
 
 		filters := make([]domain.Filter, len(bridge.Filters))
 		for i := range bridge.Filters {
-			filters[i] = *domain.NewFilter(bridge.Filters[i].To, bridge.Filters[i].From)
+			filters[i] = domain.NewFilter(bridge.Filters[i].To, bridge.Filters[i].From, bridge.Filters[i].ToRegex, bridge.Filters[i].FromRegex)
 		}
 
 		bridges = append(bridges, domain.NewBridge(bridge.Name, bridge.Endpoints, bridge.OnlyText, bridge.OnlyAttachments, filters))
