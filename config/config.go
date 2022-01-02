@@ -66,7 +66,7 @@ type ConfigSMTP struct {
 func New() *Config {
 	home, err := os.UserHomeDir()
 	if err != nil {
-		log.Fatalln("config.New: could not get user home dir:", err)
+		log.Fatalln("config.New: could not get user's home dir:", err)
 	}
 
 	rootPath := path.Join(home, ".smtpbridge")
@@ -91,19 +91,19 @@ func New() *Config {
 
 func (c *Config) Load() {
 	if err := viper.Unmarshal(c); err != nil {
-		log.Fatalln("config.Config.Load:", err)
+		log.Fatalln("config.Config.Load: could not load config:", err)
 	}
 
 	c.SMTP.Addr = c.SMTP.Host + ":" + strconv.FormatUint(uint64(c.SMTP.Port), 10)
 	c.HTTP.Addr = c.HTTP.Host + ":" + strconv.FormatUint(uint64(c.HTTP.Port), 10)
 
 	if err := os.MkdirAll(c.DB.Attachments, 0755); err != nil {
-		log.Fatalln("config.Config.Load: could not create attachments directory", err)
+		log.Fatalln("config.Config.Load: could not create attachments directory:", err)
 	}
 
 	if err := os.MkdirAll(path.Dir(c.DB.DB), 0755); err != nil {
-		log.Fatalln("config.Config.Load: could not create database's parent directory", err)
+		log.Fatalln("config.Config.Load: could not create database's parent directory:", err)
 	}
 
-	log.Printf("config.Config.Load: read %d bridges and %d endpoints", len(c.Bridges), len(c.Endpoints))
+	log.Printf("config.Config.Load: %d bridges and %d endpoints", len(c.Bridges), len(c.Endpoints))
 }

@@ -66,7 +66,15 @@ var serverCmd = &cobra.Command{
 		messageSVC := service.NewMessage(attachmentREPO, messageREPO)
 
 		// Init app
-		app := app.New(attachmentREPO, messageREPO, endpointREPO, authSVC, bridgeSVC, endpointSVC, messageSVC)
+		app := app.New(
+			attachmentREPO,
+			messageREPO,
+			endpointREPO,
+			authSVC,
+			bridgeSVC,
+			endpointSVC,
+			messageSVC,
+		)
 
 		// Init and start http server
 		if serverConfig.HTTP.Enable {
