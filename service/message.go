@@ -1,15 +1,15 @@
 package service
 
-import "github.com/ItsNotGoodName/smtpbridge/domain"
+import "github.com/ItsNotGoodName/smtpbridge/core"
 
 type Message struct {
-	attachmentREPO domain.AttachmentRepositoryPort
-	messageREPO    domain.MessageRepositoryPort
+	attachmentREPO core.AttachmentRepositoryPort
+	messageREPO    core.MessageRepositoryPort
 }
 
 func NewMessage(
-	attachmentREPO domain.AttachmentRepositoryPort,
-	messageREPO domain.MessageRepositoryPort,
+	attachmentREPO core.AttachmentRepositoryPort,
+	messageREPO core.MessageRepositoryPort,
 ) *Message {
 	return &Message{
 		attachmentREPO: attachmentREPO,
@@ -17,7 +17,7 @@ func NewMessage(
 	}
 }
 
-func (m *Message) Get(uuid string) (*domain.Message, error) {
+func (m *Message) Get(uuid string) (*core.Message, error) {
 	msg, err := m.messageREPO.Get(uuid)
 	if err != nil {
 		return nil, err
@@ -31,7 +31,7 @@ func (m *Message) Get(uuid string) (*domain.Message, error) {
 	return msg, nil
 }
 
-func (m *Message) List(limit, offset int) ([]domain.Message, error) {
+func (m *Message) List(limit, offset int) ([]core.Message, error) {
 	messages, err := m.messageREPO.List(limit, offset)
 	if err != nil {
 		return nil, err
@@ -47,8 +47,8 @@ func (m *Message) List(limit, offset int) ([]domain.Message, error) {
 	return messages, nil
 }
 
-func (m *Message) Create(subject, from string, to map[string]struct{}, text string) (*domain.Message, error) {
-	msg := domain.NewMessage(subject, from, to, text)
+func (m *Message) Create(subject, from string, to map[string]struct{}, text string) (*core.Message, error) {
+	msg := core.NewMessage(subject, from, to, text)
 
 	err := m.messageREPO.Create(msg)
 	if err != nil {
@@ -58,7 +58,7 @@ func (m *Message) Create(subject, from string, to map[string]struct{}, text stri
 	return msg, nil
 }
 
-func (m *Message) CreateAttachment(msg *domain.Message, name string, data []byte) (*domain.Attachment, error) {
+func (m *Message) CreateAttachment(msg *core.Message, name string, data []byte) (*core.Attachment, error) {
 	att, err := msg.NewAttachment(name, data)
 	if err != nil {
 		return nil, err
@@ -72,8 +72,8 @@ func (m *Message) CreateAttachment(msg *domain.Message, name string, data []byte
 	return att, nil
 }
 
-func (m *Message) UpdateStatus(msg *domain.Message, status domain.Status) error {
-	return m.messageREPO.Update(msg, func(msg *domain.Message) (*domain.Message, error) {
+func (m *Message) UpdateStatus(msg *core.Message, status core.Status) error {
+	return m.messageREPO.Update(msg, func(msg *core.Message) (*core.Message, error) {
 		msg.Status = status
 		return msg, nil
 	})

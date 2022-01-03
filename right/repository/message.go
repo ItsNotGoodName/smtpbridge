@@ -4,7 +4,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/ItsNotGoodName/smtpbridge/domain"
+	"github.com/ItsNotGoodName/smtpbridge/core"
 	"github.com/asdine/storm"
 	"github.com/asdine/storm/q"
 )
@@ -15,12 +15,12 @@ type messageModel struct {
 	To        map[string]struct{} ``           // To is the email addresses of the recipients.
 	Subject   string              ``           // Subject of the message.
 	Text      string              ``           // Text is the message body.
-	Status    domain.Status       ``           // Status is the status of the message.
+	Status    core.Status         ``           // Status is the status of the message.
 	CreatedAt time.Time           ``           // Time message was received.
 }
 
-func convertMessageM(msg *messageModel) *domain.Message {
-	return &domain.Message{
+func convertMessageM(msg *messageModel) *core.Message {
+	return &core.Message{
 		UUID:      msg.UUID,
 		From:      msg.From,
 		To:        msg.To,
@@ -31,7 +31,7 @@ func convertMessageM(msg *messageModel) *domain.Message {
 	}
 }
 
-func convertMessageD(msg *domain.Message) *messageModel {
+func convertMessageD(msg *core.Message) *messageModel {
 	return &messageModel{
 		UUID:      msg.UUID,
 		From:      msg.From,
@@ -55,11 +55,11 @@ func NewMessage(db *storm.DB, attachmentREPO *Attachment) *Message {
 	}
 }
 
-func (m *Message) Create(msg *domain.Message) error {
+func (m *Message) Create(msg *core.Message) error {
 	return m.db.Save(convertMessageD(msg))
 }
 
-func (m *Message) Get(uuid string) (*domain.Message, error) {
+func (m *Message) Get(uuid string) (*core.Message, error) {
 	var msgM messageModel
 	err := m.db.One("UUID", uuid, &msgM)
 	if err != nil {
@@ -69,7 +69,7 @@ func (m *Message) Get(uuid string) (*domain.Message, error) {
 	return convertMessageM(&msgM), nil
 }
 
-func (m *Message) Update(msg *domain.Message, updateFN func(msg *domain.Message) (*domain.Message, error)) error {
+func (m *Message) Update(msg *core.Message, updateFN func(msg *core.Message) (*core.Message, error)) error {
 	tx, err := m.db.Begin(true)
 	if err != nil {
 		return err
@@ -94,14 +94,14 @@ func (m *Message) Update(msg *domain.Message, updateFN func(msg *domain.Message)
 	return tx.Commit()
 }
 
-func (m *Message) List(limit, offset int) ([]domain.Message, error) {
+func (m *Message) List(limit, offset int) ([]core.Message, error) {
 	var msgsM []messageModel
 	err := m.db.Select().OrderBy("CreatedAt").Limit(limit).Skip(offset).Reverse().Find(&msgsM)
 	if err != nil && err != storm.ErrNotFound {
 		return nil, err
 	}
 
-	var msgs []domain.Message
+	var msgs []core.Message
 	for _, msgM := range msgsM {
 		msgs = append(msgs, *convertMessageM(&msgM))
 	}
@@ -118,7 +118,7 @@ func (m *Message) Count() (int, error) {
 	return count, err
 }
 
-func (m *Message) Delete(msg *domain.Message) error {
+func (m *Message) Delete(msg *core.Message) error {
 	tx, err := m.db.Begin(true)
 	if err != nil {
 		return err

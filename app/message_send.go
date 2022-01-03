@@ -3,11 +3,11 @@ package app
 import (
 	"fmt"
 
-	"github.com/ItsNotGoodName/smtpbridge/domain"
+	"github.com/ItsNotGoodName/smtpbridge/core"
 )
 
 type messageSendRequest struct {
-	Message *domain.Message
+	Message *core.Message
 }
 
 func (a *App) messageSend(req *messageSendRequest) error {

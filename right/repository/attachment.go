@@ -7,19 +7,19 @@ import (
 	"path"
 
 	"github.com/ItsNotGoodName/smtpbridge/config"
-	"github.com/ItsNotGoodName/smtpbridge/domain"
+	"github.com/ItsNotGoodName/smtpbridge/core"
 	"github.com/asdine/storm"
 	"github.com/asdine/storm/q"
 )
 
 type attachmentModel struct {
-	UUID        string                `storm:"id"`
-	Name        string                ``
-	Type        domain.AttachmentType ``
-	MessageUUID string                ``
+	UUID        string              `storm:"id"`
+	Name        string              ``
+	Type        core.AttachmentType ``
+	MessageUUID string              ``
 }
 
-func convertAttachmentD(att *domain.Attachment) *attachmentModel {
+func convertAttachmentD(att *core.Attachment) *attachmentModel {
 	return &attachmentModel{
 		UUID:        att.UUID,
 		Name:        att.Name,
@@ -28,8 +28,8 @@ func convertAttachmentD(att *domain.Attachment) *attachmentModel {
 	}
 }
 
-func convertAttachmentM(attM *attachmentModel) *domain.Attachment {
-	return &domain.Attachment{
+func convertAttachmentM(attM *attachmentModel) *core.Attachment {
+	return &core.Attachment{
 		UUID:        attM.UUID,
 		Name:        attM.Name,
 		Type:        attM.Type,
@@ -56,7 +56,7 @@ func NewAttachment(cfg *config.Config, db *storm.DB) *Attachment {
 	}
 }
 
-func (a *Attachment) Create(att *domain.Attachment) error {
+func (a *Attachment) Create(att *core.Attachment) error {
 	err := a.db.Save(convertAttachmentD(att))
 	if err != nil {
 		return err
@@ -66,7 +66,7 @@ func (a *Attachment) Create(att *domain.Attachment) error {
 }
 
 // getAttachmentPath returns the path to the attachment file on the file system.
-func (a *Attachment) getPath(att *domain.Attachment) string {
+func (a *Attachment) getPath(att *core.Attachment) string {
 	return path.Join(a.attDir, att.File())
 }
 
@@ -74,7 +74,7 @@ func (a *Attachment) GetFS() fs.FS {
 	return a.fs
 }
 
-func (a *Attachment) Get(uuid string) (*domain.Attachment, error) {
+func (a *Attachment) Get(uuid string) (*core.Attachment, error) {
 	var attM *attachmentModel
 	err := a.db.One("UUID", uuid, attM)
 	if err != nil {
@@ -84,7 +84,7 @@ func (a *Attachment) Get(uuid string) (*domain.Attachment, error) {
 	return convertAttachmentM(attM), nil
 }
 
-func (a *Attachment) GetData(att *domain.Attachment) ([]byte, error) {
+func (a *Attachment) GetData(att *core.Attachment) ([]byte, error) {
 	data, err := os.ReadFile(a.getPath(att))
 	if err != nil {
 		return nil, err
@@ -93,17 +93,17 @@ func (a *Attachment) GetData(att *domain.Attachment) ([]byte, error) {
 	return data, nil
 }
 
-func (a *Attachment) ListByMessage(msg *domain.Message) ([]domain.Attachment, error) {
+func (a *Attachment) ListByMessage(msg *core.Message) ([]core.Attachment, error) {
 	var attsM []attachmentModel
 	err := a.db.Select(q.Eq("MessageUUID", msg.UUID)).Find(&attsM)
 	if err != nil {
 		if err == storm.ErrNotFound {
-			return []domain.Attachment{}, nil
+			return []core.Attachment{}, nil
 		}
 		return nil, err
 	}
 
-	var atts []domain.Attachment
+	var atts []core.Attachment
 	for _, attM := range attsM {
 		atts = append(atts, *convertAttachmentM(&attM))
 	}
@@ -111,6 +111,6 @@ func (a *Attachment) ListByMessage(msg *domain.Message) ([]domain.Attachment, er
 	return atts, nil
 }
 
-func (a *Attachment) DeleteData(att *domain.Attachment) error {
+func (a *Attachment) DeleteData(att *core.Attachment) error {
 	return os.Remove(a.getPath(att))
 }

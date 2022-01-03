@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/ItsNotGoodName/smtpbridge/config"
-	"github.com/ItsNotGoodName/smtpbridge/domain"
+	"github.com/ItsNotGoodName/smtpbridge/core"
 )
 
 type Auth struct {
@@ -27,7 +27,7 @@ func (m *Auth) Login(username, password string) error {
 	}
 
 	if strings.ToLower(username) != m.username || password != m.password {
-		return domain.ErrAuthInvalid
+		return core.ErrAuthInvalid
 	}
 
 	return nil

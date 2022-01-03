@@ -1,25 +1,25 @@
 package app
 
-import "github.com/ItsNotGoodName/smtpbridge/domain"
+import "github.com/ItsNotGoodName/smtpbridge/core"
 
 type App struct {
-	attachmentREPO domain.AttachmentRepositoryPort
-	messageREPO    domain.MessageRepositoryPort
-	endpointREPO   domain.EndpointRepositoryPort
-	authSVC        domain.AuthServicePort
-	bridgeSVC      domain.BridgeServicePort
-	endpointSVC    domain.EndpointServicePort
-	messageSVC     domain.MessageServicePort
+	attachmentREPO core.AttachmentRepositoryPort
+	messageREPO    core.MessageRepositoryPort
+	endpointREPO   core.EndpointRepositoryPort
+	authSVC        core.AuthServicePort
+	bridgeSVC      core.BridgeServicePort
+	endpointSVC    core.EndpointServicePort
+	messageSVC     core.MessageServicePort
 }
 
 func New(
-	attachmentREPO domain.AttachmentRepositoryPort,
-	messageREPO domain.MessageRepositoryPort,
-	endpointREPO domain.EndpointRepositoryPort,
-	authSVC domain.AuthServicePort,
-	bridgeSVC domain.BridgeServicePort,
-	endpointSVC domain.EndpointServicePort,
-	messageSVC domain.MessageServicePort,
+	attachmentREPO core.AttachmentRepositoryPort,
+	messageREPO core.MessageRepositoryPort,
+	endpointREPO core.EndpointRepositoryPort,
+	authSVC core.AuthServicePort,
+	bridgeSVC core.BridgeServicePort,
+	endpointSVC core.EndpointServicePort,
+	messageSVC core.MessageServicePort,
 ) *App {
 	return &App{
 		attachmentREPO,

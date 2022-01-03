@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/ItsNotGoodName/smtpbridge/config"
-	"github.com/ItsNotGoodName/smtpbridge/domain"
+	"github.com/ItsNotGoodName/smtpbridge/core"
 	"github.com/asdine/storm"
 )
 
@@ -34,10 +34,10 @@ func (d Database) Close() error {
 	return d.db.Close()
 }
 
-func (d Database) AttachmentRepository() domain.AttachmentRepositoryPort {
+func (d Database) AttachmentRepository() core.AttachmentRepositoryPort {
 	return d.attachment
 }
 
-func (d Database) MessageRepository() domain.MessageRepositoryPort {
+func (d Database) MessageRepository() core.MessageRepositoryPort {
 	return d.message
 }

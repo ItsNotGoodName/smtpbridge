@@ -1,4 +1,4 @@
-package domain
+package core
 
 import (
 	"log"
@@ -19,13 +19,13 @@ func NewFilter(to, from, toRegex, fromRegex string) Filter {
 	if toRegex != "" {
 		toRegexp, err = regexp.Compile(toRegex)
 		if err != nil {
-			log.Fatalln("domain.NewFilter: bad to regex:", err)
+			log.Fatalln("core.NewFilter: bad to regex:", err)
 		}
 	}
 	if fromRegex != "" {
 		fromRegexp, err = regexp.Compile(fromRegex)
 		if err != nil {
-			log.Fatalln("domain.NewFilter: bad from regex:", err)
+			log.Fatalln("core.NewFilter: bad from regex:", err)
 		}
 	}
 

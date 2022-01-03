@@ -24,7 +24,7 @@ package cmd
 import (
 	"github.com/ItsNotGoodName/smtpbridge/app"
 	"github.com/ItsNotGoodName/smtpbridge/config"
-	"github.com/ItsNotGoodName/smtpbridge/domain"
+	"github.com/ItsNotGoodName/smtpbridge/core"
 	"github.com/ItsNotGoodName/smtpbridge/left/router"
 	"github.com/ItsNotGoodName/smtpbridge/left/smtp"
 	"github.com/ItsNotGoodName/smtpbridge/left/web"
@@ -47,7 +47,7 @@ var serverCmd = &cobra.Command{
 		serverConfig.Load()
 
 		// Init database
-		var db domain.Database
+		var db core.Database
 		if serverConfig.DB.IsBolt() {
 			db = repository.NewDatabase(serverConfig)
 		} else {

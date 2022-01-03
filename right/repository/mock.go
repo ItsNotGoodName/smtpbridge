@@ -1,6 +1,6 @@
 package repository
 
-import "github.com/ItsNotGoodName/smtpbridge/domain"
+import "github.com/ItsNotGoodName/smtpbridge/core"
 
 type Mock struct{}
 
@@ -12,10 +12,10 @@ func (Mock) Close() error {
 	return nil
 }
 
-func (Mock) AttachmentRepository() domain.AttachmentRepositoryPort {
+func (Mock) AttachmentRepository() core.AttachmentRepositoryPort {
 	return NewAttachmentMock()
 }
 
-func (Mock) MessageRepository() domain.MessageRepositoryPort {
+func (Mock) MessageRepository() core.MessageRepositoryPort {
 	return NewMessageMock()
 }
