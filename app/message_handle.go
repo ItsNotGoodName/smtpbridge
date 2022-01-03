@@ -36,8 +36,5 @@ func (a *App) MessageHandle(req *MessageHandleRequest) error {
 		}
 	}
 
-	// TODO: send to service
-	return a.messageSend(&messageSendRequest{
-		Message: msg,
-	})
+	return a.messageSVC.Process(msg, a.bridgeSVC.ListByMessage(msg))
 }

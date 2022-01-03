@@ -1,6 +1,8 @@
 package core
 
-import "fmt"
+import (
+	"fmt"
+)
 
 var (
 	ErrEndpointSendFailed    = fmt.Errorf("endpoint send failed")
@@ -17,8 +19,7 @@ type (
 	}
 
 	EndpointServicePort interface {
-		// SendBridges sends the message to the bridge's endpoints if they pass the filter.
-		SendBridges(msg *Message, bridges []*Bridge) (Status, error)
+		SendByEndpointNames(emsg *EndpointMessage, endpointNames []string) error
 	}
 
 	EndpointRepositoryPort interface {

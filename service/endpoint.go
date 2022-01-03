@@ -11,51 +11,36 @@ type Endpoint struct {
 }
 
 func NewEndpoint(endpointREPO core.EndpointRepositoryPort) *Endpoint {
-	return &Endpoint{endpointREPO: endpointREPO}
+	e := Endpoint{
+		endpointREPO: endpointREPO,
+	}
+	return &e
 }
 
-func (e *Endpoint) SendBridges(msg *core.Message, bridges []*core.Bridge) (core.Status, error) {
-	// TODO: refactor entire method
-	if len(bridges) == 0 {
-		log.Println("app.messageSend: no valid bridges: skipped message", msg.UUID)
-		return core.StatusSkipped, nil
-	}
-
-	var errGet error
-	sent := 0
-	skipped := 0
-	for _, bridge := range bridges {
-		emsg := bridge.EndpointMessage(msg)
-		if emsg.IsEmpty() {
-			skipped++
-			continue
+func (e *Endpoint) SendByEndpointNames(emsg *core.EndpointMessage, endpointNames []string) error {
+	endpoints := make([]core.EndpointPort, len(endpointNames))
+	for i, endpointName := range endpointNames {
+		endpoint, err := e.endpointREPO.Get(endpointName)
+		if err != nil {
+			return err
 		}
 
-		for _, name := range bridge.Endpoints {
-			var endpoint core.EndpointPort
-			endpoint, errGet = e.endpointREPO.Get(name)
-			if errGet != nil {
-				break
-			}
+		endpoints[i] = endpoint
+	}
 
-			// TODO: worker pool
-			if errEnd := endpoint.Send(emsg); errEnd != nil {
-				log.Println("service.Endpoint.SendBridges:", errEnd)
-			} else {
-				sent++
-			}
+	sent := false
+	for _, endpoint := range endpoints {
+		err := endpoint.Send(emsg)
+		if err != nil {
+			log.Println("service.Endpoint.SendByBridge:", err)
+		} else {
+			sent = true
 		}
 	}
 
-	if sent > 0 {
-		log.Println("app.messageSend: sent message", msg.UUID)
-		return core.StatusSent, errGet
+	if !sent {
+		return core.ErrEndpointSendFailed
 	}
 
-	if skipped > 0 {
-		log.Println("app.messageSend: only_* produced empty message: skipped message", msg.UUID)
-		return core.StatusSkipped, errGet
-	}
-
-	return core.StatusFailed, errGet
+	return nil
 }

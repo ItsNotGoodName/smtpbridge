@@ -1,17 +1,24 @@
 package service
 
-import "github.com/ItsNotGoodName/smtpbridge/core"
+import (
+	"log"
+
+	"github.com/ItsNotGoodName/smtpbridge/core"
+)
 
 type Message struct {
+	endpointSVC    core.EndpointServicePort
 	attachmentREPO core.AttachmentRepositoryPort
 	messageREPO    core.MessageRepositoryPort
 }
 
 func NewMessage(
+	endpointSVC core.EndpointServicePort,
 	attachmentREPO core.AttachmentRepositoryPort,
 	messageREPO core.MessageRepositoryPort,
 ) *Message {
 	return &Message{
+		endpointSVC:    endpointSVC,
 		attachmentREPO: attachmentREPO,
 		messageREPO:    messageREPO,
 	}
@@ -77,4 +84,31 @@ func (m *Message) UpdateStatus(msg *core.Message, status core.Status) error {
 		msg.Status = status
 		return msg, nil
 	})
+}
+
+func (m *Message) Process(msg *core.Message, bridges []*core.Bridge) error {
+	skipped := 0
+	failed := 0
+	for _, bridge := range bridges {
+		emsg := bridge.EndpointMessage(msg)
+		if emsg.IsEmpty() {
+			skipped++
+			continue
+		}
+
+		if err := m.endpointSVC.SendByEndpointNames(emsg, bridge.Endpoints); err != nil {
+			failed++
+			log.Println("service.Message.Process:", err)
+		}
+	}
+
+	length := len(bridges)
+	status := core.StatusSent
+	if skipped == length {
+		status = core.StatusSkipped
+	} else if failed+skipped == len(bridges) {
+		status = core.StatusFailed
+	}
+
+	return m.UpdateStatus(msg, status)
 }

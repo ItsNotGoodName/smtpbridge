@@ -46,6 +46,8 @@ type (
 		Get(uuid string) (*Message, error)
 		// List messages with attachments.
 		List(limit, offset int) ([]Message, error)
+		// Process handles sending message to bridge's endpoints.
+		Process(msg *Message, bridges []*Bridge) error
 		// UpdateStatus updates the status of a message.
 		UpdateStatus(msg *Message, status Status) error
 	}
