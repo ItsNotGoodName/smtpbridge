@@ -26,9 +26,10 @@ func New(a *app.App, t *web.Templater) http.Handler {
 	// processing should be stopped.
 	r.Use(middleware.Timeout(60 * time.Second))
 
-	r.Get("/attachments/*", handleImageFS("/attachments/", a.AttachmentGetFS()))
+	r.Get("/attachments/*", mwCacheControl(handleFS("/attachments/", a.AttachmentGetFS())))
 	r.Get("/message/{uuid}", handleMessageGet(t, a))
 	r.Get("/message/{uuid}/send", handleMessageSendGet(a))
+	r.Get("/assets/*", handleFS("/assets/", web.GetAssetFS()))
 	r.Get("/", handleIndexGet(t, a))
 
 	return r

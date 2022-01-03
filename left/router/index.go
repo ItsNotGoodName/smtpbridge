@@ -1,7 +1,6 @@
 package router
 
 import (
-	_ "embed"
 	"net/http"
 	"strconv"
 
