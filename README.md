@@ -86,5 +86,4 @@ smtpbridge server
 
 ## Todo
 
-- Embed assets for HTTP server
 - Attachments and database size limits
