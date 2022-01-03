@@ -1,29 +1,28 @@
 package web
 
 import (
-	"embed"
 	"html/template"
 	"io/fs"
 	"log"
 	"net/http"
+	"path"
 )
+
+//go:generate npm run css-build
 
 type Page string
 
 const (
-	PageIndex   = "index.html"
-	PageMessage = "message.html"
+	PageIndex   Page = "index.html"
+	PageMessage Page = "message.html"
 )
 
 const (
-	shimDIR     = "template/shim"
+	packageDIR  = "left/web"
+	assetDIR    = "dist"
 	templateDIR = "template"
 	templateEXT = "/*.html"
-)
-
-var (
-	//go:embed template
-	templateFS embed.FS
+	shimDIR     = "shim"
 )
 
 type Templater struct {
@@ -31,35 +30,42 @@ type Templater struct {
 }
 
 func NewTemplater() *Templater {
-	t := Templater{
-		templates: make(map[string]*template.Template),
+	return &Templater{
+		templates: parseTemplateFS(getTemplateFS()),
+	}
+}
+
+func (t *Templater) Render(page Page, rw http.ResponseWriter, data interface{}) {
+	err := t.getTemplate(string(page)).Execute(rw, data)
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func parseTemplateFS(dirFS fs.FS) map[string]*template.Template {
+	tmplFiles, err := fs.ReadDir(dirFS, ".")
+	if err != nil {
+		log.Fatalln("web.parseTemplateFS:", err)
 	}
 
-	tmplFiles, err := fs.ReadDir(templateFS, templateDIR)
-	if err != nil {
-		log.Fatalln("web.NewTemplater:", err)
-	}
+	templates := make(map[string]*template.Template)
 
 	for _, tmpl := range tmplFiles {
 		if tmpl.IsDir() {
 			continue
 		}
 
-		pt, err := template.ParseFS(templateFS, templateDIR+"/"+tmpl.Name(), shimDIR+templateEXT)
-		if err != nil {
-			log.Fatalln("web.NewTemplater:", err)
-		}
-
-		t.templates[tmpl.Name()] = pt
+		templates[tmpl.Name()] = parseTemplate(dirFS, tmpl.Name())
 	}
 
-	return &t
+	return templates
 }
 
-func (t *Templater) Render(page Page, rw http.ResponseWriter, data interface{}) {
-	err := t.templates[string(page)].Execute(rw, data)
+func parseTemplate(dirFS fs.FS, name string) *template.Template {
+	pt, err := template.ParseFS(dirFS, name, path.Join(shimDIR, templateEXT))
 	if err != nil {
-		http.Error(rw, err.Error(), http.StatusInternalServerError)
-		return
+		panic(err)
 	}
+
+	return pt
 }
