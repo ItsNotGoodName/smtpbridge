@@ -8,8 +8,8 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/app"
 	"github.com/ItsNotGoodName/smtpbridge/config"
 	"github.com/ItsNotGoodName/smtpbridge/left/web"
-	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
 type Router struct {

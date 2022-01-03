@@ -5,7 +5,7 @@ import (
 
 	"github.com/ItsNotGoodName/smtpbridge/config"
 	"github.com/ItsNotGoodName/smtpbridge/core"
-	"github.com/asdine/storm"
+	"github.com/asdine/storm/v3"
 )
 
 type Database struct {

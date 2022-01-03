@@ -3,10 +3,9 @@ module github.com/ItsNotGoodName/smtpbridge
 go 1.17
 
 require (
-	github.com/asdine/storm v2.1.2+incompatible
+	github.com/asdine/storm/v3 v3.2.1
 	github.com/emersion/go-sasl v0.0.0-20211008083017-0b9dcfb154ac
 	github.com/emersion/go-smtp v0.15.0
-	github.com/go-chi/chi v1.5.4
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/google/uuid v1.3.0
 	github.com/jhillyerd/enmime v0.9.2
@@ -49,7 +48,6 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
-	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	golang.org/x/net v0.0.0-20211216030914-fe4d6282115f // indirect
