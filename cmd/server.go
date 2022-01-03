@@ -80,7 +80,7 @@ var serverCmd = &cobra.Command{
 		if serverConfig.HTTP.Enable {
 			templater := web.NewTemplater()
 			httpServer := router.New(app, templater)
-			go httpServer.Start(serverConfig)
+			go router.Start(serverConfig, httpServer)
 		}
 
 		// Init and start smtp server

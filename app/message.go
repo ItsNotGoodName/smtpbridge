@@ -17,7 +17,7 @@ type Message struct {
 	Attachments []Attachment `json:"attachments"`
 }
 
-func NewMessage(msg *core.Message) *Message {
+func NewMessage(msg *core.Message) Message {
 	var attachments []Attachment
 	for _, attachment := range msg.Attachments {
 		attachments = append(attachments, Attachment{
@@ -32,7 +32,7 @@ func NewMessage(msg *core.Message) *Message {
 		to = append(to, toAddr)
 	}
 
-	return &Message{
+	return Message{
 		UUID:        msg.UUID,
 		CreatedAt:   msg.CreatedAt.Format(time.RFC822),
 		From:        msg.From,

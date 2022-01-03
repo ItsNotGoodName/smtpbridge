@@ -37,7 +37,7 @@ func (a *App) MessageList(req *MessageListRequest) (*MessageListResponse, error)
 
 	var result []Message
 	for _, msg := range msgs {
-		result = append(result, *NewMessage(&msg))
+		result = append(result, NewMessage(&msg))
 	}
 
 	return &MessageListResponse{Messages: result, PageMin: pageMin, PageMax: pageMax, Page: req.Page}, nil

@@ -10,7 +10,10 @@ const (
 	TypeJPEG AttachmentType = "jpeg"
 )
 
-var ErrAttachmentInvalid = fmt.Errorf("invalid attachment")
+var (
+	ErrAttachmentInvalid  = fmt.Errorf("invalid attachment")
+	ErrAttachmentNotFound = fmt.Errorf("attachment not found")
+)
 
 type (
 	Attachment struct {

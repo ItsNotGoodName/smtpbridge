@@ -78,6 +78,9 @@ func (a *Attachment) Get(uuid string) (*core.Attachment, error) {
 	var attM *attachmentModel
 	err := a.db.One("UUID", uuid, attM)
 	if err != nil {
+		if err == storm.ErrNotFound {
+			return nil, core.ErrAttachmentNotFound
+		}
 		return nil, err
 	}
 
@@ -87,6 +90,9 @@ func (a *Attachment) Get(uuid string) (*core.Attachment, error) {
 func (a *Attachment) GetData(att *core.Attachment) ([]byte, error) {
 	data, err := os.ReadFile(a.getPath(att))
 	if err != nil {
+		if err == os.ErrNotExist {
+			return nil, core.ErrAttachmentNotFound
+		}
 		return nil, err
 	}
 

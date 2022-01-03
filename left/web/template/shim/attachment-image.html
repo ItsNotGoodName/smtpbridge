@@ -1,3 +1,5 @@
 {{ define "attachment-image" }}
-<img src="/attachments/{{ .File }}" alt="Attachment Image" />
+<a href="/attachments/{{ .File }}">
+  <img src="/attachments/{{ .File }}" alt="Attachment Image" />
+</a>
 {{ end }}

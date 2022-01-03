@@ -12,41 +12,31 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-type Router struct {
-	r *chi.Mux
-	a *app.App
-	t *web.Templater
-}
-
-func New(app *app.App, templater *web.Templater) *Router {
-	s := Router{
-		r: chi.NewRouter(),
-		a: app,
-		t: templater,
-	}
+func New(a *app.App, t *web.Templater) http.Handler {
+	r := chi.NewRouter()
 
 	// A good base middleware stack
-	s.r.Use(middleware.RequestID)
-	s.r.Use(middleware.RealIP)
-	s.r.Use(middleware.Logger)
-	s.r.Use(middleware.Recoverer)
+	r.Use(middleware.RequestID)
+	r.Use(middleware.RealIP)
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
 
 	// Set a timeout value on the request context (ctx), that will signal
 	// through ctx.Done() that the request has timed out and further
 	// processing should be stopped.
-	s.r.Use(middleware.Timeout(60 * time.Second))
+	r.Use(middleware.Timeout(60 * time.Second))
 
-	prefix := "/attachments/"
-	s.r.Get(prefix+"*", handleImage(prefix, app.AttachmentGetFS()))
-	s.r.Get("/", s.handleIndexGET())
+	r.Get("/attachments/*", handleImageFS("/attachments/", a.AttachmentGetFS()))
+	r.Get("/message/{uuid}", handleMessageGet(t, a))
+	r.Get("/", handleIndexGet(t, a))
 
-	return &s
+	return r
 }
 
-func (s *Router) Start(cfg *config.Config) {
-	log.Println("router.Router.Start: HTTP server listening on", cfg.HTTP.Addr)
-	err := http.ListenAndServe(cfg.HTTP.Addr, s.r)
+func Start(cfg *config.Config, r http.Handler) {
+	log.Println("router.Start: HTTP server listening on", cfg.HTTP.Addr)
+	err := http.ListenAndServe(cfg.HTTP.Addr, r)
 	if err != nil {
-		log.Fatalln("router.Router.Start:", err)
+		log.Fatalln("router.Start:", err)
 	}
 }

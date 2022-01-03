@@ -11,7 +11,8 @@ import (
 type Page string
 
 const (
-	PageIndex = "index.html"
+	PageIndex   = "index.html"
+	PageMessage = "message.html"
 )
 
 const (

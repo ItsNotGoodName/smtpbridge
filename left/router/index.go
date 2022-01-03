@@ -2,7 +2,6 @@ package router
 
 import (
 	_ "embed"
-	"io/fs"
 	"net/http"
 	"strconv"
 
@@ -11,16 +10,7 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/pkg/paginate"
 )
 
-func handleImage(prefix string, dirFS fs.FS) http.HandlerFunc {
-	h := http.StripPrefix(prefix, http.FileServer(http.FS(dirFS)))
-
-	return func(rw http.ResponseWriter, r *http.Request) {
-		rw.Header().Set("Cache-Control", "max-age=31536000")
-		h.ServeHTTP(rw, r)
-	}
-}
-
-func (s *Router) handleIndexGET() http.HandlerFunc {
+func handleIndexGet(t *web.Templater, a *app.App) http.HandlerFunc {
 	type Data struct {
 		Messages []app.Message
 		Paginate paginate.Paginate
@@ -36,7 +26,7 @@ func (s *Router) handleIndexGET() http.HandlerFunc {
 			}
 		}
 
-		res, err := s.a.MessageList(&app.MessageListRequest{Page: page})
+		res, err := a.MessageList(&app.MessageListRequest{Page: page})
 		if err != nil {
 			http.Error(rw, err.Error(), http.StatusInternalServerError)
 			return
@@ -45,6 +35,6 @@ func (s *Router) handleIndexGET() http.HandlerFunc {
 		pag := paginate.New(*r.URL, param, res.PageMin, res.Page, res.PageMax)
 		data := Data{Messages: res.Messages, Paginate: pag}
 
-		s.t.Render(web.PageIndex, rw, data)
+		t.Render(web.PageIndex, rw, data)
 	}
 }

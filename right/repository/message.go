@@ -63,6 +63,9 @@ func (m *Message) Get(uuid string) (*core.Message, error) {
 	var msgM messageModel
 	err := m.db.One("UUID", uuid, &msgM)
 	if err != nil {
+		if err == storm.ErrNotFound {
+			return nil, core.ErrMessageNotFound
+		}
 		return nil, err
 	}
 
@@ -78,6 +81,9 @@ func (m *Message) Update(msg *core.Message, updateFN func(msg *core.Message) (*c
 
 	var existingMSGM messageModel
 	if err := tx.One("UUID", msg.UUID, &existingMSGM); err != nil {
+		if err == storm.ErrNotFound {
+			return core.ErrMessageNotFound
+		}
 		return err
 	}
 
