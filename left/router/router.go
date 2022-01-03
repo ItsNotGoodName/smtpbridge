@@ -28,6 +28,7 @@ func New(a *app.App, t *web.Templater) http.Handler {
 
 	r.Get("/attachments/*", handleImageFS("/attachments/", a.AttachmentGetFS()))
 	r.Get("/message/{uuid}", handleMessageGet(t, a))
+	r.Get("/message/{uuid}/send", handleMessageSendGet(a))
 	r.Get("/", handleIndexGet(t, a))
 
 	return r
