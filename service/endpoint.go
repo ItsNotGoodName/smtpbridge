@@ -28,11 +28,18 @@ func (e *Endpoint) SendByEndpointNames(emsg *core.EndpointMessage, endpointNames
 		endpoints[i] = endpoint
 	}
 
+	errC := make(chan error, len(endpoints))
+	for _, end := range endpoints {
+		go func(emessage *core.EndpointMessage, endpoint core.EndpointPort) {
+			errC <- endpoint.Send(emessage)
+		}(emsg, end)
+	}
+
 	sent := false
-	for _, endpoint := range endpoints {
-		err := endpoint.Send(emsg)
+	for i := 0; i < len(endpoints); i++ {
+		err := <-errC
 		if err != nil {
-			log.Println("service.Endpoint.SendByBridge:", err)
+			log.Println("service.Endpoint.SendByEndpointNames:", err)
 		} else {
 			sent = true
 		}
