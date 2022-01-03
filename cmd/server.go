@@ -22,6 +22,10 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"log"
+	"os"
+	"os/signal"
+
 	"github.com/ItsNotGoodName/smtpbridge/app"
 	"github.com/ItsNotGoodName/smtpbridge/config"
 	"github.com/ItsNotGoodName/smtpbridge/core"
@@ -86,7 +90,20 @@ var serverCmd = &cobra.Command{
 		// Init and start smtp server
 		smtpBackend := smtp.NewBackend(app)
 		smtpServer := smtp.New(serverConfig, smtpBackend)
-		smtpServer.Start()
+		go smtpServer.Start()
+
+		// Wait for interrupt
+		stop := make(chan os.Signal, 1)
+		signal.Notify(stop, os.Interrupt)
+		<-stop
+
+		// Close database
+		err := db.Close()
+		if err != nil {
+			log.Println("error closing database:", err)
+		}
+
+		log.Println("server stopped")
 	},
 }
 

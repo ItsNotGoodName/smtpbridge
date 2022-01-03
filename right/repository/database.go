@@ -17,7 +17,7 @@ type Database struct {
 func NewDatabase(cfg *config.Config) Database {
 	db, err := storm.Open(cfg.DB.DB)
 	if err != nil {
-		log.Fatalln("repository.NewStorm: could not open database:", err)
+		log.Fatalln("repository.NewDatabase: could not open database:", err)
 	}
 
 	attachment := NewAttachment(cfg, db)

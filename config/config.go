@@ -94,7 +94,7 @@ func New() *Config {
 func (c *Config) Load() {
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigParseError); ok {
-			log.Fatalln("config.Load:", err)
+			log.Fatalln("config.Config.Load:", err)
 		}
 	}
 
