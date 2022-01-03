@@ -32,13 +32,18 @@ func NewMessage(msg *core.Message) Message {
 		to = append(to, toAddr)
 	}
 
+	subject := msg.Subject
+	if msg.Subject == "" {
+		subject = "No Subject"
+	}
+
 	return Message{
 		UUID:        msg.UUID,
 		CreatedAt:   msg.CreatedAt.Format(time.RFC822),
 		From:        msg.From,
 		To:          to,
 		Status:      msg.Status,
-		Subject:     msg.Subject,
+		Subject:     subject,
 		Text:        msg.Text,
 		Attachments: attachments,
 	}

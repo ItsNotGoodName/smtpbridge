@@ -1,11 +1,7 @@
 {{ define "message-subject" }}
-{{ if .Subject }}
 <p class="title is-4">
   <a href="/message/{{ .UUID }}">
     {{ .Subject }}
   </a>
 </p>
-{{ else }}
-<p class="title is-4">No Subject</p>
-{{ end }}
 {{ end }}

@@ -11,7 +11,10 @@
 </head>
 
 <body class="container">
-  {{ template "content" . }}
+  {{ template "nav" . }}
+  <div class="container is-fluid">
+    {{ template "content" . }}
+  </div>
 </body>
 
 </html>
