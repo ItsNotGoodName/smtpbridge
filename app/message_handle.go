@@ -36,5 +36,5 @@ func (a *App) MessageHandle(req *MessageHandleRequest) error {
 		}
 	}
 
-	return a.messageSVC.Process(msg, a.bridgeSVC.ListByMessage(msg))
+	return a.endpointSVC.Process(msg, a.bridgeSVC.ListByMessage(msg))
 }

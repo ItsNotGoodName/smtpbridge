@@ -1,27 +1,47 @@
 package service
 
 import (
-	"log"
-
 	"github.com/ItsNotGoodName/smtpbridge/core"
 )
 
 type Message struct {
-	endpointSVC    core.EndpointServicePort
 	attachmentREPO core.AttachmentRepositoryPort
 	messageREPO    core.MessageRepositoryPort
 }
 
 func NewMessage(
-	endpointSVC core.EndpointServicePort,
 	attachmentREPO core.AttachmentRepositoryPort,
 	messageREPO core.MessageRepositoryPort,
 ) *Message {
 	return &Message{
-		endpointSVC:    endpointSVC,
 		attachmentREPO: attachmentREPO,
 		messageREPO:    messageREPO,
 	}
+}
+
+func (m *Message) Create(subject, from string, to map[string]struct{}, text string) (*core.Message, error) {
+	msg := core.NewMessage(subject, from, to, text)
+
+	err := m.messageREPO.Create(msg)
+	if err != nil {
+		return nil, err
+	}
+
+	return msg, nil
+}
+
+func (m *Message) CreateAttachment(msg *core.Message, name string, data []byte) (*core.Attachment, error) {
+	att, err := msg.NewAttachment(name, data)
+	if err != nil {
+		return nil, err
+	}
+
+	err = m.attachmentREPO.Create(att)
+	if err != nil {
+		return nil, err
+	}
+
+	return att, nil
 }
 
 func (m *Message) Get(uuid string) (*core.Message, error) {
@@ -54,29 +74,16 @@ func (m *Message) List(limit, offset int) ([]core.Message, error) {
 	return messages, nil
 }
 
-func (m *Message) Create(subject, from string, to map[string]struct{}, text string) (*core.Message, error) {
-	msg := core.NewMessage(subject, from, to, text)
-
-	err := m.messageREPO.Create(msg)
-	if err != nil {
-		return nil, err
+func (m *Message) LoadData(msg *core.Message) error {
+	for i := range msg.Attachments {
+		var err error
+		msg.Attachments[i].Data, err = m.attachmentREPO.GetData(&msg.Attachments[i])
+		if err != nil {
+			return err
+		}
 	}
 
-	return msg, nil
-}
-
-func (m *Message) CreateAttachment(msg *core.Message, name string, data []byte) (*core.Attachment, error) {
-	att, err := msg.NewAttachment(name, data)
-	if err != nil {
-		return nil, err
-	}
-
-	err = m.attachmentREPO.Create(att)
-	if err != nil {
-		return nil, err
-	}
-
-	return att, nil
+	return nil
 }
 
 func (m *Message) UpdateStatus(msg *core.Message, status core.Status) error {
@@ -84,31 +91,4 @@ func (m *Message) UpdateStatus(msg *core.Message, status core.Status) error {
 		msg.Status = status
 		return msg, nil
 	})
-}
-
-func (m *Message) Process(msg *core.Message, bridges []*core.Bridge) error {
-	skipped := 0
-	failed := 0
-	for _, bridge := range bridges {
-		emsg := bridge.EndpointMessage(msg)
-		if emsg.IsEmpty() {
-			skipped++
-			continue
-		}
-
-		if err := m.endpointSVC.SendByEndpointNames(emsg, bridge.Endpoints); err != nil {
-			failed++
-			log.Println("service.Message.Process:", err)
-		}
-	}
-
-	length := len(bridges)
-	status := core.StatusSent
-	if skipped == length {
-		status = core.StatusSkipped
-	} else if failed+skipped == len(bridges) {
-		status = core.StatusFailed
-	}
-
-	return m.UpdateStatus(msg, status)
 }

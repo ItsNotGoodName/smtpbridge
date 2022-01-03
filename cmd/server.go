@@ -66,8 +66,8 @@ var serverCmd = &cobra.Command{
 		// Init service
 		authSVC := service.NewAuth(serverConfig)
 		bridgeSVC := service.NewBridge(serverConfig, endpointREPO)
-		endpointSVC := service.NewEndpoint(endpointREPO)
-		messageSVC := service.NewMessage(endpointSVC, attachmentREPO, messageREPO)
+		messageSVC := service.NewMessage(attachmentREPO, messageREPO)
+		endpointSVC := service.NewEndpoint(endpointREPO, messageSVC)
 
 		// Init app
 		app := app.New(

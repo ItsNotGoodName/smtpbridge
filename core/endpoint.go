@@ -19,7 +19,8 @@ type (
 	}
 
 	EndpointServicePort interface {
-		SendByEndpointNames(emsg *EndpointMessage, endpointNames []string) error
+		// Process handles sending message to bridge's endpoints.
+		Process(msg *Message, bridges []*Bridge) error
 	}
 
 	EndpointRepositoryPort interface {

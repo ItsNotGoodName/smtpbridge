@@ -10,13 +10,9 @@ func (a *App) MessageSend(req *MessageSendRequest) error {
 		return err
 	}
 
-	for i := range msg.Attachments {
-		var err error
-		msg.Attachments[i].Data, err = a.attachmentREPO.GetData(&msg.Attachments[i])
-		if err != nil {
-			return err
-		}
+	if err := a.messageSVC.LoadData(msg); err != nil {
+		return err
 	}
 
-	return a.messageSVC.Process(msg, a.bridgeSVC.ListByMessage(msg))
+	return a.endpointSVC.Process(msg, a.bridgeSVC.ListByMessage(msg))
 }
