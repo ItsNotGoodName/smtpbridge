@@ -17,11 +17,11 @@ func (AttachmentMock) Create(att *core.Attachment) error {
 }
 
 func (AttachmentMock) Get(uuid string) (*core.Attachment, error) {
-	return nil, core.ErrNotImplemented
+	return nil, core.ErrAttachmentNotFound
 }
 
 func (AttachmentMock) GetData(att *core.Attachment) ([]byte, error) {
-	return nil, core.ErrNotImplemented
+	return nil, core.ErrAttachmentNotFound
 }
 
 func (a AttachmentMock) GetFS() fs.FS {

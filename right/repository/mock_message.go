@@ -17,7 +17,7 @@ func (MessageMock) Count() (int, error) {
 }
 
 func (MessageMock) Get(uuid string) (*core.Message, error) {
-	return nil, core.ErrNotImplemented
+	return nil, core.ErrMessageNotFound
 }
 
 func (MessageMock) GetSizeAll() (int64, error) {
