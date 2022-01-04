@@ -76,7 +76,7 @@ func New() *Config {
 
 	return &Config{
 		DB: ConfigDB{
-			Type:        "bolt",
+			Type:        "",
 			DB:          path.Join(rootPath, "smtpbridge.db"),
 			Attachments: path.Join(rootPath, "attachments"),
 			Size:        1024 * 1024 * 2048,

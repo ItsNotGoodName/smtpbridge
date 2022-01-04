@@ -46,7 +46,7 @@ type (
 		Get(uuid string) (*Message, error)
 		// List messages with attachments.
 		List(limit, offset int) ([]Message, error)
-		// LoadData loads all the data for the message.
+		// LoadData loads all the data for the message's attachments.
 		LoadData(msg *Message) error
 		// UpdateStatus updates the status of a message.
 		UpdateStatus(msg *Message, status Status) error
@@ -61,8 +61,12 @@ type (
 		Count() (int, error)
 		// Get returns a message by it's UUID.
 		Get(uuid string) (*Message, error)
+		// GetSizeAll returns the size of all the messages.
+		GetSizeAll() (int64, error)
 		// List messages.
 		List(limit, offset int, reverse bool) ([]Message, error)
+		// ListOldest returns the oldest messages.
+		ListOldest(limit int) ([]Message, error)
 		// Update a message.
 		Update(msg *Message, updateFN func(msg *Message) (*Message, error)) error
 		// Delete a message.

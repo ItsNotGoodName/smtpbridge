@@ -108,7 +108,7 @@ var serverCmd = &cobra.Command{
 		// Close database
 		err := db.Close()
 		if err != nil {
-			log.Println("error closing database:", err)
+			log.Println("could not close database:", err)
 		}
 
 		// Wait for background message service

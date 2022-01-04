@@ -103,21 +103,31 @@ func (m *Message) UpdateStatus(msg *core.Message, status core.Status) error {
 }
 
 func (m *Message) CleanUp() error {
+	if m.size == 0 {
+		return nil
+	}
+
 	for {
-		size, err := m.attachmentREPO.GetSizeAll()
+		attSize, err := m.attachmentREPO.GetSizeAll()
 		if err != nil {
 			return err
 		}
+		msgSize, err := m.messageREPO.GetSizeAll()
+		if err != nil {
+			return err
+		}
+		size := attSize + msgSize
+
 		if size < m.size {
 			return nil
 		}
 
-		msgs, err := m.messageREPO.List(10, 0, false)
+		msgs, err := m.messageREPO.ListOldest(5)
 		if err != nil {
 			return err
 		}
 		if len(msgs) == 0 {
-			return fmt.Errorf("%w: database over %d bytes, but no messages to delete", core.ErrDatabaseCleanup, size)
+			return fmt.Errorf("%w: database is over capacity (%d bytes > %d bytes), but no messages to delete", core.ErrDatabaseCleanup, size, m.size)
 		}
 
 		for i := range msgs {
@@ -125,20 +135,27 @@ func (m *Message) CleanUp() error {
 			if err != nil {
 				return err
 			}
+			log.Printf("service.Message.CleanUp: deleted message '%s' with %d attachments", msgs[i].UUID, len(msgs[i].Attachments))
 		}
 	}
 }
 
 func (m *Message) Run(ctx context.Context, done chan struct{}) {
 	log.Println("service.Message.Run: started")
+
+	cleanUp := func() {
+		if err := m.CleanUp(); err != nil {
+			log.Printf("service.Message.Run: %s", err)
+		}
+	}
+	cleanUp()
+
 	t := time.NewTicker(time.Minute * 10)
 
 	for {
 		select {
 		case <-t.C:
-			if err := m.CleanUp(); err != nil {
-				log.Printf("service.Message.Run: %s", err)
-			}
+			cleanUp()
 		case <-ctx.Done():
 			log.Println("service.Message.Run: stopped")
 			done <- struct{}{}

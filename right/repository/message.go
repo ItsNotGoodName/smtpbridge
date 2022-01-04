@@ -10,13 +10,13 @@ import (
 )
 
 type messageModel struct {
-	UUID      string              `storm:"id"` // UUID of the message.
-	From      string              ``           // From is the email address of the sender.
-	To        map[string]struct{} ``           // To is the email addresses of the recipients.
-	Subject   string              ``           // Subject of the message.
-	Text      string              ``           // Text is the message body.
-	Status    core.Status         ``           // Status is the status of the message.
-	CreatedAt time.Time           ``           // Time message was received.
+	UUID      string              `json:"uuid" storm:"id"` // UUID of the message.
+	From      string              `json:"from"`            // From is the email address of the sender.
+	To        map[string]struct{} `json:"to"`              // To is the email addresses of the recipients.
+	Subject   string              `json:"subject"`         // Subject of the message.
+	Text      string              `json:"text"`            // Text is the message body.
+	Status    core.Status         `json:"status"`          // Status is the status of the message.
+	CreatedAt time.Time           `json:"created_at"`      // Time message was received.
 }
 
 func convertMessageM(msg *messageModel) *core.Message {
@@ -72,6 +72,10 @@ func (m *Message) Get(uuid string) (*core.Message, error) {
 	return convertMessageM(&msgM), nil
 }
 
+func (m *Message) GetSizeAll() (int64, error) {
+	return 0, nil
+}
+
 func (m *Message) Update(msg *core.Message, updateFN func(msg *core.Message) (*core.Message, error)) error {
 	tx, err := m.db.Begin(true)
 	if err != nil {
@@ -120,6 +124,10 @@ func (m *Message) List(limit, offset int, reverse bool) ([]core.Message, error) 
 	return msgs, nil
 }
 
+func (m *Message) ListOldest(limit int) ([]core.Message, error) {
+	return m.List(limit, 0, true)
+}
+
 func (m *Message) Count() (int, error) {
 	count, err := m.db.Count(&messageModel{})
 	if err == storm.ErrNotFound {
@@ -165,7 +173,7 @@ func (m *Message) Delete(msg *core.Message) error {
 
 	// Delete attachment's data
 	for _, attM := range attsM {
-		if err := m.attachmentREPO.DeleteData(convertAttachmentM(&attM)); err != nil {
+		if err := m.attachmentREPO.deleteData(convertAttachmentM(&attM)); err != nil {
 			log.Println("database.DB.DeleteMessage: could not delete attachment file:", err)
 		}
 	}

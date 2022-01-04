@@ -42,7 +42,7 @@ database: # Database to store past messages
   type: bolt # Needs to be 'bolt' to be enabled, Default ''
   db: /tmp/smtpbridge.db # Default '$HOME/.smtpbridge/smtpbridge.db'
   attachments: /tmp/attachments # Default '$HOME/.smtpbridge/attachments'
-  size: 2147483648 #  Max total size of attachments in bytes, Default 2147483648 (2 GiB)
+  size: 2147483648 #  Max size of database in bytes, Default 2147483648 (2 GiB)
 
 http: # HTTP server that shows past messages
   enable: true # Enable http server, default 'false'
@@ -86,5 +86,3 @@ smtpbridge server
 ```
 
 ## Todo
-
-- Attachments and database size limits

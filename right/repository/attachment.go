@@ -14,10 +14,10 @@ import (
 )
 
 type attachmentModel struct {
-	UUID        string              `storm:"id"`
-	Name        string              ``
-	Type        core.AttachmentType ``
-	MessageUUID string              ``
+	UUID        string              `json:"uuid" storm:"id"`
+	Name        string              `json:"name"`
+	Type        core.AttachmentType `json:"type"`
+	MessageUUID string              `json:"message_uuid"`
 }
 
 func convertAttachmentD(att *core.Attachment) *attachmentModel {
@@ -138,6 +138,6 @@ func (a *Attachment) ListByMessage(msg *core.Message) ([]core.Attachment, error)
 	return atts, nil
 }
 
-func (a *Attachment) DeleteData(att *core.Attachment) error {
+func (a *Attachment) deleteData(att *core.Attachment) error {
 	return os.Remove(a.getPath(att))
 }
