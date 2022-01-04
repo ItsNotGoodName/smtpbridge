@@ -9,22 +9,22 @@ import (
 	"path"
 )
 
-func getTemplateFS() fs.FS {
-	cwd, err := os.Getwd()
+var projectDIR string
+
+func init() {
+	var err error
+	projectDIR, err = os.Getwd()
 	if err != nil {
 		panic(err)
 	}
+}
 
-	return os.DirFS(path.Join(cwd, packageDIR, templateDIR))
+func getTemplateFS() fs.FS {
+	return os.DirFS(path.Join(projectDIR, packageDIR, templateDIR))
 }
 
 func GetAssetFS() fs.FS {
-	cwd, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
-
-	return os.DirFS(path.Join(cwd, packageDIR, assetDIR))
+	return os.DirFS(path.Join(projectDIR, packageDIR, assetDIR))
 }
 
 func (t *Templater) getTemplate(page string) *template.Template {

@@ -42,6 +42,7 @@ database: # Database to store past messages
   type: bolt # Needs to be 'bolt' to be enabled, Default ''
   db: /tmp/smtpbridge.db # Default '$HOME/.smtpbridge/smtpbridge.db'
   attachments: /tmp/attachments # Default '$HOME/.smtpbridge/attachments'
+  size: 2147483648 #  Max total size of attachments in bytes, Default 2147483648 (2 GiB)
 
 http: # HTTP server that shows past messages
   enable: true # Enable http server, default 'false'
@@ -51,7 +52,7 @@ http: # HTTP server that shows past messages
 smtp: # SMTP server that receives emails
   host: "127.0.0.1" # Host to listen on, default ''
   port: 1025 # Port to listen on, default 1025
-  size: 26214400 # Max allowed size of email in bytes, default 26214400 (25 MB)
+  size: 26214400 # Max allowed size of email in bytes, default 26214400 (25 MiB)
   auth: true # Enable auth, default 'false'
   username: user # Default ''
   password: 12345678 # Default ''

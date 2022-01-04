@@ -28,6 +28,10 @@ func (a AttachmentMock) GetFS() fs.FS {
 	return a
 }
 
+func (a AttachmentMock) GetSizeAll() (int64, error) {
+	return 0, nil
+}
+
 func (AttachmentMock) ListByMessage(msg *core.Message) ([]core.Attachment, error) {
 	return []core.Attachment{}, nil
 }

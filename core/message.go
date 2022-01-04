@@ -50,6 +50,8 @@ type (
 		LoadData(msg *Message) error
 		// UpdateStatus updates the status of a message.
 		UpdateStatus(msg *Message, status Status) error
+		// CleanUp removes messages and attachments if full.
+		CleanUp() error
 	}
 
 	MessageRepositoryPort interface {
@@ -60,7 +62,7 @@ type (
 		// Get returns a message by it's UUID.
 		Get(uuid string) (*Message, error)
 		// List messages.
-		List(limit, offset int) ([]Message, error)
+		List(limit, offset int, reverse bool) ([]Message, error)
 		// Update a message.
 		Update(msg *Message, updateFN func(msg *Message) (*Message, error)) error
 		// Delete a message.

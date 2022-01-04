@@ -36,6 +36,7 @@ type ConfigDB struct {
 	Type        string `json:"type" mapstructure:"type"`
 	DB          string `json:"db" mapstructure:"db"`
 	Attachments string `json:"attachments" mapstructure:"attachments"`
+	Size        int64  `json:"size" mapstructure:"size"`
 }
 
 func (db *ConfigDB) IsBolt() bool {
@@ -78,6 +79,7 @@ func New() *Config {
 			Type:        "bolt",
 			DB:          path.Join(rootPath, "smtpbridge.db"),
 			Attachments: path.Join(rootPath, "attachments"),
+			Size:        1024 * 1024 * 2048,
 		},
 		SMTP: ConfigSMTP{
 			Size: 1024 * 1024 * 25,

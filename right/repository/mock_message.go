@@ -20,7 +20,7 @@ func (MessageMock) Get(uuid string) (*core.Message, error) {
 	return nil, core.ErrNotImplemented
 }
 
-func (MessageMock) List(limit, offset int) ([]core.Message, error) {
+func (MessageMock) List(limit, offset int, reverse bool) ([]core.Message, error) {
 	return []core.Message{}, nil
 }
 

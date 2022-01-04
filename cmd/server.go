@@ -22,6 +22,7 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"context"
 	"log"
 	"os"
 	"os/signal"
@@ -66,7 +67,7 @@ var serverCmd = &cobra.Command{
 		// Init service
 		authSVC := service.NewAuth(serverConfig)
 		bridgeSVC := service.NewBridge(serverConfig, endpointREPO)
-		messageSVC := service.NewMessage(attachmentREPO, messageREPO)
+		messageSVC := service.NewMessage(serverConfig, attachmentREPO, messageREPO)
 		endpointSVC := service.NewEndpoint(endpointREPO, messageSVC)
 
 		// Init app
@@ -92,16 +93,26 @@ var serverCmd = &cobra.Command{
 		smtpServer := smtp.New(serverConfig, smtpBackend)
 		go smtpServer.Start()
 
+		// Start background message service
+		done := make(chan struct{})
+		ctx := context.Background()
+		ctx, cancel := context.WithCancel(ctx)
+		go messageSVC.Run(ctx, done)
+
 		// Wait for interrupt
-		stop := make(chan os.Signal, 1)
-		signal.Notify(stop, os.Interrupt)
-		<-stop
+		c := make(chan os.Signal, 1)
+		signal.Notify(c, os.Interrupt)
+		<-c
+		cancel()
 
 		// Close database
 		err := db.Close()
 		if err != nil {
 			log.Println("error closing database:", err)
 		}
+
+		// Wait for background message service
+		<-done
 
 		log.Println("server stopped")
 	},

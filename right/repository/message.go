@@ -100,9 +100,14 @@ func (m *Message) Update(msg *core.Message, updateFN func(msg *core.Message) (*c
 	return tx.Commit()
 }
 
-func (m *Message) List(limit, offset int) ([]core.Message, error) {
+func (m *Message) List(limit, offset int, reverse bool) ([]core.Message, error) {
 	var msgsM []messageModel
-	err := m.db.Select().OrderBy("CreatedAt").Limit(limit).Skip(offset).Reverse().Find(&msgsM)
+	query := m.db.Select().OrderBy("CreatedAt").Limit(limit).Skip(offset)
+	if reverse {
+		query = query.Reverse()
+	}
+
+	err := query.Find(&msgsM)
 	if err != nil && err != storm.ErrNotFound {
 		return nil, err
 	}

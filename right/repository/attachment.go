@@ -2,6 +2,7 @@ package repository
 
 import (
 	"io/fs"
+	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -97,6 +98,26 @@ func (a *Attachment) GetData(att *core.Attachment) ([]byte, error) {
 	}
 
 	return data, nil
+}
+
+func (a *Attachment) GetSizeAll() (int64, error) {
+	if err := os.Chdir(a.attDir); err != nil {
+		return 0, err
+	}
+
+	files, err := ioutil.ReadDir(a.attDir)
+	if err != nil {
+		return 0, err
+	}
+
+	dirSize := int64(0)
+	for _, file := range files {
+		if file.Mode().IsRegular() {
+			dirSize += file.Size()
+		}
+	}
+
+	return dirSize, nil
 }
 
 func (a *Attachment) ListByMessage(msg *core.Message) ([]core.Attachment, error) {

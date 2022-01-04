@@ -1,21 +1,30 @@
 package service
 
 import (
+	"context"
+	"fmt"
+	"log"
+	"time"
+
+	"github.com/ItsNotGoodName/smtpbridge/config"
 	"github.com/ItsNotGoodName/smtpbridge/core"
 )
 
 type Message struct {
 	attachmentREPO core.AttachmentRepositoryPort
 	messageREPO    core.MessageRepositoryPort
+	size           int64
 }
 
 func NewMessage(
+	cfg *config.Config,
 	attachmentREPO core.AttachmentRepositoryPort,
 	messageREPO core.MessageRepositoryPort,
 ) *Message {
 	return &Message{
 		attachmentREPO: attachmentREPO,
 		messageREPO:    messageREPO,
+		size:           cfg.DB.Size,
 	}
 }
 
@@ -59,7 +68,7 @@ func (m *Message) Get(uuid string) (*core.Message, error) {
 }
 
 func (m *Message) List(limit, offset int) ([]core.Message, error) {
-	messages, err := m.messageREPO.List(limit, offset)
+	messages, err := m.messageREPO.List(limit, offset, true)
 	if err != nil {
 		return nil, err
 	}
@@ -91,4 +100,49 @@ func (m *Message) UpdateStatus(msg *core.Message, status core.Status) error {
 		msg.Status = status
 		return msg, nil
 	})
+}
+
+func (m *Message) CleanUp() error {
+	for {
+		size, err := m.attachmentREPO.GetSizeAll()
+		if err != nil {
+			return err
+		}
+		if size < m.size {
+			return nil
+		}
+
+		msgs, err := m.messageREPO.List(10, 0, false)
+		if err != nil {
+			return err
+		}
+		if len(msgs) == 0 {
+			return fmt.Errorf("%w: database over %d bytes, but no messages to delete", core.ErrDatabaseCleanup, size)
+		}
+
+		for i := range msgs {
+			err := m.messageREPO.Delete(&msgs[i])
+			if err != nil {
+				return err
+			}
+		}
+	}
+}
+
+func (m *Message) Run(ctx context.Context, done chan struct{}) {
+	log.Println("service.Message.Run: started")
+	t := time.NewTicker(time.Minute * 10)
+
+	for {
+		select {
+		case <-t.C:
+			if err := m.CleanUp(); err != nil {
+				log.Printf("service.Message.Run: %s", err)
+			}
+		case <-ctx.Done():
+			log.Println("service.Message.Run: stopped")
+			done <- struct{}{}
+			return
+		}
+	}
 }
