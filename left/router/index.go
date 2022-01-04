@@ -31,9 +31,11 @@ func handleIndexGet(t *web.Templater, a *app.App) http.HandlerFunc {
 			return
 		}
 
-		pag := paginate.New(*r.URL, param, res.PageMin, res.Page, res.PageMax)
-		data := Data{Messages: res.Messages, Paginate: pag}
+		data := Data{
+			Messages: res.Messages,
+			Paginate: paginate.New(*r.URL, param, res.PageMin, res.Page, res.PageMax),
+		}
 
-		t.Render(web.PageIndex, rw, data)
+		t.Render(web.PageIndex, rw, &data)
 	}
 }

@@ -27,7 +27,7 @@ func handleMessageGet(t *web.Templater, a *app.App) http.HandlerFunc {
 			return
 		}
 
-		t.Render(web.PageMessage, rw, Data{Message: res.Message})
+		t.Render(web.PageMessage, rw, &Data{Message: res.Message})
 	}
 }
 
