@@ -20,10 +20,6 @@ func (MessageMock) Get(uuid string) (*core.Message, error) {
 	return nil, core.ErrMessageNotFound
 }
 
-func (MessageMock) GetSizeAll() (int64, error) {
-	return 0, nil
-}
-
 func (MessageMock) List(limit, offset int, reverse bool) ([]core.Message, error) {
 	return []core.Message{}, nil
 }

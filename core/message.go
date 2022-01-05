@@ -52,8 +52,6 @@ type (
 		Count() (int, error)
 		// Get returns a message by it's UUID.
 		Get(uuid string) (*Message, error)
-		// GetSizeAll returns the size of all the messages in bytes.
-		GetSizeAll() (int64, error)
 		// List messages.
 		List(limit, offset int, reverse bool) ([]Message, error)
 		// ListOldest returns the oldest messages.

@@ -28,16 +28,10 @@ func NewJanitor(cfg *config.Config, attachmentREPO core.AttachmentRepositoryPort
 
 func (j *Janitor) clean() error {
 	for {
-		attSize, err := j.attachmentREPO.GetSizeAll()
+		size, err := j.attachmentREPO.GetSizeAll()
 		if err != nil {
 			return err
 		}
-		msgSize, err := j.messageREPO.GetSizeAll()
-		if err != nil {
-			return err
-		}
-		size := attSize + msgSize
-
 		if size < j.size {
 			return nil
 		}
@@ -47,7 +41,7 @@ func (j *Janitor) clean() error {
 			return err
 		}
 		if len(msgs) == 0 {
-			return fmt.Errorf("database is over capacity (%d bytes > %d bytes), but no messages to delete", size, j.size)
+			return fmt.Errorf("attachments are over capacity (%d bytes > %d bytes), but no messages to delete", size, j.size)
 		}
 
 		for i := range msgs {

@@ -71,11 +71,6 @@ func (m *Message) Get(uuid string) (*core.Message, error) {
 
 	return convertMessageM(&msgM), nil
 }
-
-func (m *Message) GetSizeAll() (int64, error) {
-	return 0, nil
-}
-
 func (m *Message) Update(msg *core.Message, updateFN func(msg *core.Message) (*core.Message, error)) error {
 	tx, err := m.db.Begin(true)
 	if err != nil {
