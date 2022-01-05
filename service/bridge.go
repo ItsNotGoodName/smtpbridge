@@ -23,7 +23,11 @@ func NewBridge(cfg *config.Config, endpointREPO core.EndpointRepositoryPort) *Br
 
 		filters := make([]core.Filter, len(bridge.Filters))
 		for i := range bridge.Filters {
-			filters[i] = core.NewFilter(bridge.Filters[i].To, bridge.Filters[i].From, bridge.Filters[i].ToRegex, bridge.Filters[i].FromRegex)
+			filter, err := core.NewFilter(bridge.Filters[i].To, bridge.Filters[i].From, bridge.Filters[i].ToRegex, bridge.Filters[i].FromRegex)
+			if err != nil {
+				log.Fatalln("service.NewBridge:", err)
+			}
+			filters[i] = filter
 		}
 
 		bridges = append(bridges, core.NewBridge(bridge.Name, bridge.Endpoints, bridge.OnlyText, bridge.OnlyAttachments, filters))

@@ -1,7 +1,7 @@
 package core
 
 import (
-	"log"
+	"fmt"
 	"regexp"
 )
 
@@ -12,20 +12,19 @@ type Filter struct {
 	fromRegexp *regexp.Regexp
 }
 
-func NewFilter(to, from, toRegex, fromRegex string) Filter {
+func NewFilter(to, from, toRegex, fromRegex string) (Filter, error) {
 	var toRegexp, fromRegexp *regexp.Regexp
 	var err error
-	// TODO: move error handling to config
 	if toRegex != "" {
 		toRegexp, err = regexp.Compile(toRegex)
 		if err != nil {
-			log.Fatalln("core.NewFilter: bad to regex:", err)
+			return Filter{}, fmt.Errorf("invalid to regex: %s", err)
 		}
 	}
 	if fromRegex != "" {
 		fromRegexp, err = regexp.Compile(fromRegex)
 		if err != nil {
-			log.Fatalln("core.NewFilter: bad from regex:", err)
+			return Filter{}, fmt.Errorf("invalid from regex: %s", err)
 		}
 	}
 
@@ -34,7 +33,7 @@ func NewFilter(to, from, toRegex, fromRegex string) Filter {
 		From:       from,
 		toRegexp:   toRegexp,
 		fromRegexp: fromRegexp,
-	}
+	}, nil
 }
 
 func (f *Filter) Match(msg *Message) bool {

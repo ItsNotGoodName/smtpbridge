@@ -8,23 +8,31 @@ func TestFilter(t *testing.T) {
 		Match  bool
 	}
 
+	newFilter := func(to, from, toRegex, fromRegex string) Filter {
+		filter, err := NewFilter(to, from, toRegex, fromRegex)
+		if err != nil {
+			t.Fatalf("newFilter(%s, %s, %s, %s): %s", to, from, toRegex, fromRegex, err)
+		}
+		return filter
+	}
+
 	msg := Message{
 		From: "foo",
 		To:   map[string]struct{}{"bar": {}},
 	}
 
 	tests := []FilterTest{
-		{Filter: NewFilter("bar", "", "", ""), Match: true},
-		{Filter: NewFilter("bar", "foo", "", ""), Match: true},
-		{Filter: NewFilter("bar", "foorr", "", ""), Match: false},
-		{Filter: NewFilter("barr", "", "", ""), Match: false},
-		{Filter: NewFilter("", "barrr", "", ""), Match: false},
-		{Filter: NewFilter("", "", "", "f.$"), Match: false},
-		{Filter: NewFilter("", "", "", "f"), Match: true},
-		{Filter: NewFilter("", "", "b", ""), Match: true},
-		{Filter: NewFilter("bar", "", "f", ""), Match: false},
-		{Filter: NewFilter("bar", "", "b", ""), Match: true},
-		{Filter: NewFilter("bar", "", "b", "x"), Match: false},
+		{Filter: newFilter("bar", "", "", ""), Match: true},
+		{Filter: newFilter("bar", "foo", "", ""), Match: true},
+		{Filter: newFilter("bar", "foorr", "", ""), Match: false},
+		{Filter: newFilter("barr", "", "", ""), Match: false},
+		{Filter: newFilter("", "barrr", "", ""), Match: false},
+		{Filter: newFilter("", "", "", "f.$"), Match: false},
+		{Filter: newFilter("", "", "", "f"), Match: true},
+		{Filter: newFilter("", "", "b", ""), Match: true},
+		{Filter: newFilter("bar", "", "f", ""), Match: false},
+		{Filter: newFilter("bar", "", "b", ""), Match: true},
+		{Filter: newFilter("bar", "", "b", "x"), Match: false},
 	}
 
 	for _, test := range tests {
