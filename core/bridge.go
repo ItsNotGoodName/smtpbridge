@@ -41,12 +41,12 @@ func (b *Bridge) Match(msg *Message) bool {
 	return false
 }
 
-func (b *Bridge) EndpointMessage(msg *Message) *EndpointMessage {
+func (b *Bridge) EndpointMessage(msg *Message, atts []Attachment) *EndpointMessage {
 	if b.OnlyText && !b.OnlyAttachments {
 		return &EndpointMessage{Text: msg.Text}
 	}
 	if b.OnlyAttachments && !b.OnlyText {
-		return &EndpointMessage{Attachments: NewEndpointAttachments(msg.Attachments)}
+		return &EndpointMessage{Attachments: NewEndpointAttachments(atts)}
 	}
-	return &EndpointMessage{Text: msg.Text, Attachments: NewEndpointAttachments(msg.Attachments)}
+	return &EndpointMessage{Text: msg.Text, Attachments: NewEndpointAttachments(atts)}
 }

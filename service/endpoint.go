@@ -54,11 +54,11 @@ func (e *Endpoint) sendByEndpointNames(emsg *core.EndpointMessage, endpointNames
 	return nil
 }
 
-func (e *Endpoint) Process(msg *core.Message, bridges []*core.Bridge) error {
+func (e *Endpoint) Process(msg *core.Message, atts []core.Attachment, bridges []*core.Bridge) error {
 	skipped := 0
 	failed := 0
 	for _, bridge := range bridges {
-		emsg := bridge.EndpointMessage(msg)
+		emsg := bridge.EndpointMessage(msg, atts)
 		if emsg.IsEmpty() {
 			skipped++
 			continue

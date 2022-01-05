@@ -30,14 +30,18 @@ func (a *App) MessageList(req *MessageListRequest) (*MessageListResponse, error)
 		req.Page = pageMin
 	}
 
-	msgs, err := a.messageSVC.List(limit, (req.Page-pageMin)*limit)
+	msgs, err := a.messageREPO.List(limit, (req.Page-pageMin)*limit, true)
 	if err != nil {
 		return nil, err
 	}
 
 	var result []Message
 	for _, msg := range msgs {
-		result = append(result, NewMessage(&msg))
+		atts, err := a.attachmentREPO.ListByMessage(&msg)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, NewMessage(&msg, atts))
 	}
 
 	return &MessageListResponse{Messages: result, PageMin: pageMin, PageMax: pageMax, Page: req.Page}, nil

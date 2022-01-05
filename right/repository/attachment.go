@@ -66,6 +66,16 @@ func (a *Attachment) Create(att *core.Attachment) error {
 	return os.WriteFile(a.getPath(att), att.Data, 0644)
 }
 
+func (a *Attachment) CountByMessage(msg *core.Message) (int, error) {
+	// TODO: do i use MessageUUID or message_uuid?
+	count, err := a.db.Select(q.Eq("MessageUUID", msg.UUID)).Count(&attachmentModel{})
+	if err == storm.ErrNotFound {
+		return 0, nil
+	}
+
+	return count, nil
+}
+
 // getAttachmentPath returns the path to the attachment file on the file system.
 func (a *Attachment) getPath(att *core.Attachment) string {
 	return path.Join(a.attDir, att.File())
@@ -86,18 +96,6 @@ func (a *Attachment) Get(uuid string) (*core.Attachment, error) {
 	}
 
 	return convertAttachmentM(attM), nil
-}
-
-func (a *Attachment) GetData(att *core.Attachment) ([]byte, error) {
-	data, err := os.ReadFile(a.getPath(att))
-	if err != nil {
-		if err == os.ErrNotExist {
-			return nil, core.ErrAttachmentNotFound
-		}
-		return nil, err
-	}
-
-	return data, nil
 }
 
 func (a *Attachment) GetSizeAll() (int64, error) {
@@ -122,6 +120,7 @@ func (a *Attachment) GetSizeAll() (int64, error) {
 
 func (a *Attachment) ListByMessage(msg *core.Message) ([]core.Attachment, error) {
 	var attsM []attachmentModel
+	// TODO: do i use MessageUUID or message_uuid?
 	err := a.db.Select(q.Eq("MessageUUID", msg.UUID)).Find(&attsM)
 	if err != nil {
 		if err == storm.ErrNotFound {
@@ -136,6 +135,20 @@ func (a *Attachment) ListByMessage(msg *core.Message) ([]core.Attachment, error)
 	}
 
 	return atts, nil
+}
+
+func (a *Attachment) LoadData(att *core.Attachment) error {
+	data, err := os.ReadFile(a.getPath(att))
+	if err != nil {
+		if err == os.ErrNotExist {
+			return core.ErrAttachmentNotFound
+		}
+		return err
+	}
+
+	att.Data = data
+
+	return nil
 }
 
 func (a *Attachment) deleteData(att *core.Attachment) error {

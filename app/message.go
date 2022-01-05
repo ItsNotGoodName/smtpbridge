@@ -17,9 +17,9 @@ type Message struct {
 	Attachments []Attachment `json:"attachments"`
 }
 
-func NewMessage(msg *core.Message) Message {
+func NewMessage(msg *core.Message, atts []core.Attachment) Message {
 	var attachments []Attachment
-	for _, attachment := range msg.Attachments {
+	for _, attachment := range atts {
 		attachments = append(attachments, Attachment{
 			UUID: attachment.UUID,
 			Name: attachment.Name,

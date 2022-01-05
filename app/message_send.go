@@ -5,14 +5,21 @@ type MessageSendRequest struct {
 }
 
 func (a *App) MessageSend(req *MessageSendRequest) error {
-	msg, err := a.messageSVC.Get(req.UUID)
+	msg, err := a.messageREPO.Get(req.UUID)
 	if err != nil {
 		return err
 	}
 
-	if err := a.messageSVC.LoadData(msg); err != nil {
+	atts, err := a.attachmentREPO.ListByMessage(msg)
+	if err != nil {
 		return err
 	}
 
-	return a.endpointSVC.Process(msg, a.bridgeSVC.ListByMessage(msg))
+	for i := range atts {
+		if err := a.attachmentREPO.LoadData(&atts[i]); err != nil {
+			return err
+		}
+	}
+
+	return a.endpointSVC.Process(msg, atts, a.bridgeSVC.ListByMessage(msg))
 }

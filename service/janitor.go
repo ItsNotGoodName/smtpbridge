@@ -55,7 +55,11 @@ func (j *Janitor) clean() error {
 			if err != nil {
 				return err
 			}
-			log.Printf("service.Janitor.clean: deleted message '%s' with %d attachments", msgs[i].UUID, len(msgs[i].Attachments))
+			attsCount, err := j.attachmentREPO.CountByMessage(&msgs[i])
+			if err != nil {
+				log.Println("service.Janitor.clean: could not count attachments:", err)
+			}
+			log.Printf("service.Janitor.clean: deleted message '%s' with %d attachments", msgs[i].UUID, attsCount)
 		}
 	}
 }

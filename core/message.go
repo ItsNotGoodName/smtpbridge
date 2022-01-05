@@ -22,14 +22,13 @@ const (
 
 type (
 	Message struct {
-		UUID        string              // UUID of the message.
-		From        string              // From is the email address of the sender.
-		To          map[string]struct{} // To is the email addresses of the recipients.
-		Subject     string              // Subject of the message.
-		Text        string              // Text is the message body.
-		Attachments []Attachment        // Attachment is the attachments of the message.
-		Status      Status              // Status is the status of the message.
-		CreatedAt   time.Time           // Time message was received.
+		UUID      string              // UUID of the message.
+		From      string              // From is the email address of the sender.
+		To        map[string]struct{} // To is the email addresses of the recipients.
+		Subject   string              // Subject of the message.
+		Text      string              // Text is the message body.
+		Status    Status              // Status is the status of the message.
+		CreatedAt time.Time           // Time message was received.
 	}
 
 	EndpointMessage struct {
@@ -42,12 +41,6 @@ type (
 		Create(subject, from string, to map[string]struct{}, text string) (*Message, error)
 		// CreateAttachment adds an attachment to a message and saves it.
 		CreateAttachment(msg *Message, name string, data []byte) (*Attachment, error)
-		// Get a message with attachments.
-		Get(uuid string) (*Message, error)
-		// List messages with attachments.
-		List(limit, offset int) ([]Message, error)
-		// LoadData loads all the data for the message's attachments.
-		LoadData(msg *Message) error
 		// UpdateStatus updates the status of a message.
 		UpdateStatus(msg *Message, status Status) error
 	}
@@ -105,17 +98,13 @@ func (m *Message) NewAttachment(name string, data []byte) (*Attachment, error) {
 		return nil, err
 	}
 
-	att := Attachment{
+	return &Attachment{
 		UUID:        uuid.New().String(),
 		Name:        name,
 		Type:        attType,
 		MessageUUID: m.UUID,
 		Data:        data,
-	}
-
-	m.Attachments = append(m.Attachments, att)
-
-	return &att, nil
+	}, nil
 }
 
 func (em *EndpointMessage) IsEmpty() bool {

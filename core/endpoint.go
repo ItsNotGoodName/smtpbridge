@@ -20,7 +20,7 @@ type (
 
 	EndpointServicePort interface {
 		// Process handles sending message to bridge's endpoints.
-		Process(msg *Message, bridges []*Bridge) error
+		Process(msg *Message, atts []Attachment, bridges []*Bridge) error
 	}
 
 	EndpointRepositoryPort interface {

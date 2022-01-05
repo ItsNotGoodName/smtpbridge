@@ -9,10 +9,15 @@ type MessageGetResponse struct {
 }
 
 func (a *App) MessageGet(req *MessageGetRequest) (*MessageGetResponse, error) {
-	msg, err := a.messageSVC.Get(req.UUID)
+	msg, err := a.messageREPO.Get(req.UUID)
 	if err != nil {
 		return nil, err
 	}
 
-	return &MessageGetResponse{Message: NewMessage(msg)}, nil
+	atts, err := a.attachmentREPO.ListByMessage(msg)
+	if err != nil {
+		return nil, err
+	}
+
+	return &MessageGetResponse{Message: NewMessage(msg, atts)}, nil
 }

@@ -1,6 +1,10 @@
 package app
 
-import "log"
+import (
+	"log"
+
+	"github.com/ItsNotGoodName/smtpbridge/core"
+)
 
 type MessageHandleRequest struct {
 	Subject               string
@@ -26,15 +30,18 @@ func (a *App) MessageHandle(req *MessageHandleRequest) error {
 		return err
 	}
 
+	var atts []core.Attachment
 	for _, attachment := range req.attachments {
-		_, err = a.messageSVC.CreateAttachment(msg, attachment.name, attachment.data)
+		att, err := a.messageSVC.CreateAttachment(msg, attachment.name, attachment.data)
 		if err != nil {
 			if !req.IgnoreAttachmentError {
 				return err
 			}
 			log.Println("app.App.MessageHandle: could not create attachment:", err)
+		} else {
+			atts = append(atts, *att)
 		}
 	}
 
-	return a.endpointSVC.Process(msg, a.bridgeSVC.ListByMessage(msg))
+	return a.endpointSVC.Process(msg, atts, a.bridgeSVC.ListByMessage(msg))
 }

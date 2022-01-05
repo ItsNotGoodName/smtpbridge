@@ -16,11 +16,11 @@ func (AttachmentMock) Create(att *core.Attachment) error {
 	return nil
 }
 
-func (AttachmentMock) Get(uuid string) (*core.Attachment, error) {
-	return nil, core.ErrAttachmentNotFound
+func (AttachmentMock) CountByMessage(msg *core.Message) (int, error) {
+	return 0, nil
 }
 
-func (AttachmentMock) GetData(att *core.Attachment) ([]byte, error) {
+func (AttachmentMock) Get(uuid string) (*core.Attachment, error) {
 	return nil, core.ErrAttachmentNotFound
 }
 
@@ -34,6 +34,10 @@ func (a AttachmentMock) GetSizeAll() (int64, error) {
 
 func (AttachmentMock) ListByMessage(msg *core.Message) ([]core.Attachment, error) {
 	return []core.Attachment{}, nil
+}
+
+func (AttachmentMock) LoadData(att *core.Attachment) error {
+	return core.ErrAttachmentNotFound
 }
 
 func (AttachmentMock) Open(name string) (fs.File, error) {
