@@ -50,3 +50,23 @@ func handleMessageSendGet(a *app.App) http.HandlerFunc {
 		http.Redirect(rw, r, "/message/"+req.UUID, http.StatusTemporaryRedirect)
 	}
 }
+
+func handleMessageDeleteGet(a *app.App) http.HandlerFunc {
+	return func(rw http.ResponseWriter, r *http.Request) {
+		req := &app.MessageSendRequest{
+			UUID: chi.URLParam(r, "uuid"),
+		}
+
+		err := a.MessageDelete(app.MessageDeleteRequest{UUID: req.UUID})
+		if err != nil {
+			status := http.StatusInternalServerError
+			if err == core.ErrMessageNotFound {
+				status = http.StatusNotFound
+			}
+			http.Error(rw, err.Error(), status)
+			return
+		}
+
+		http.Redirect(rw, r, "/", http.StatusTemporaryRedirect)
+	}
+}
