@@ -39,7 +39,7 @@ type (
 		GetData(att *Attachment) ([]byte, error)
 		// GetFS returns the attachment file system.
 		GetFS() fs.FS
-		// GetSizeAll returns the size of all attachments.
+		// GetSizeAll returns the size of all attachments in bytes.
 		GetSizeAll() (int64, error)
 		// ListByMessage returns a list of attachments for a message.
 		ListByMessage(msg *Message) ([]Attachment, error)

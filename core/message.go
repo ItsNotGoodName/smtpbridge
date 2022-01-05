@@ -50,8 +50,6 @@ type (
 		LoadData(msg *Message) error
 		// UpdateStatus updates the status of a message.
 		UpdateStatus(msg *Message, status Status) error
-		// CleanUp removes messages and attachments if full.
-		CleanUp() error
 	}
 
 	MessageRepositoryPort interface {
@@ -61,7 +59,7 @@ type (
 		Count() (int, error)
 		// Get returns a message by it's UUID.
 		Get(uuid string) (*Message, error)
-		// GetSizeAll returns the size of all the messages.
+		// GetSizeAll returns the size of all the messages in bytes.
 		GetSizeAll() (int64, error)
 		// List messages.
 		List(limit, offset int, reverse bool) ([]Message, error)

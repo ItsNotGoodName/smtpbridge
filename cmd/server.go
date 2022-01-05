@@ -22,11 +22,6 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"context"
-	"log"
-	"os"
-	"os/signal"
-
 	"github.com/ItsNotGoodName/smtpbridge/app"
 	"github.com/ItsNotGoodName/smtpbridge/config"
 	"github.com/ItsNotGoodName/smtpbridge/core"
@@ -51,27 +46,43 @@ var serverCmd = &cobra.Command{
 		// Read config
 		serverConfig.Load()
 
-		// Init database
-		var db core.Database
+		var (
+			background     []core.BackgroundPort
+			db             core.DatabasePort
+			attachmentREPO core.AttachmentRepositoryPort
+			messageREPO    core.MessageRepositoryPort
+		)
+
+		// Init database and repositories
 		if serverConfig.DB.IsBolt() {
-			db = repository.NewDatabase(serverConfig)
+			d := repository.NewDatabase(serverConfig)
+			att := repository.NewAttachment(serverConfig, &d)
+			msg := repository.NewMessage(&d, att)
+
+			db, attachmentREPO, messageREPO = d, att, msg
 		} else {
 			db = repository.NewMock()
+			attachmentREPO = repository.NewAttachmentMock()
+			messageREPO = repository.NewMessageMock()
 		}
 
-		// Init repositories
-		attachmentREPO := db.AttachmentRepository()
-		messageREPO := db.MessageRepository()
+		// Init endpoint repository
 		endpointREPO := endpoint.NewRepository(serverConfig)
 
-		// Init service
+		// Init services
 		authSVC := service.NewAuth(serverConfig)
 		bridgeSVC := service.NewBridge(serverConfig, endpointREPO)
 		messageSVC := service.NewMessage(serverConfig, attachmentREPO, messageREPO)
 		endpointSVC := service.NewEndpoint(endpointREPO, messageSVC)
+		janitorSVC := service.NewJanitor(serverConfig, attachmentREPO, messageREPO)
+
+		// Add janitor to background
+		background = append(background, janitorSVC)
 
 		// Init app
 		app := app.New(
+			background,
+			db,
 			attachmentREPO,
 			messageREPO,
 			endpointREPO,
@@ -93,28 +104,8 @@ var serverCmd = &cobra.Command{
 		smtpServer := smtp.New(serverConfig, smtpBackend)
 		go smtpServer.Start()
 
-		// Start background message service
-		done := make(chan struct{})
-		ctx := context.Background()
-		ctx, cancel := context.WithCancel(ctx)
-		go messageSVC.Run(ctx, done)
-
-		// Wait for interrupt
-		c := make(chan os.Signal, 1)
-		signal.Notify(c, os.Interrupt)
-		<-c
-		cancel()
-
-		// Close database
-		err := db.Close()
-		if err != nil {
-			log.Println("could not close database:", err)
-		}
-
-		// Wait for background message service
-		<-done
-
-		log.Println("server stopped")
+		// Start app
+		app.Run()
 	},
 }
 

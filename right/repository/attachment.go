@@ -44,7 +44,7 @@ type Attachment struct {
 	db     *storm.DB
 }
 
-func NewAttachment(cfg *config.Config, db *storm.DB) *Attachment {
+func NewAttachment(cfg *config.Config, db *Database) *Attachment {
 	err := os.MkdirAll(cfg.DB.Attachments, 0755)
 	if err != nil {
 		log.Fatalln("repository.NewAttachment: could not create attachments directory:", err)
@@ -53,7 +53,7 @@ func NewAttachment(cfg *config.Config, db *storm.DB) *Attachment {
 	return &Attachment{
 		attDir: cfg.DB.Attachments,
 		fs:     os.DirFS(cfg.DB.Attachments),
-		db:     db,
+		db:     db.db,
 	}
 }
 

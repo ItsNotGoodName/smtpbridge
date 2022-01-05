@@ -4,14 +4,11 @@ import (
 	"log"
 
 	"github.com/ItsNotGoodName/smtpbridge/config"
-	"github.com/ItsNotGoodName/smtpbridge/core"
 	"github.com/asdine/storm/v3"
 )
 
 type Database struct {
-	db         *storm.DB
-	attachment *Attachment
-	message    *Message
+	db *storm.DB
 }
 
 func NewDatabase(cfg *config.Config) Database {
@@ -20,24 +17,11 @@ func NewDatabase(cfg *config.Config) Database {
 		log.Fatalln("repository.NewDatabase: could not open database:", err)
 	}
 
-	attachment := NewAttachment(cfg, db)
-	message := NewMessage(db, attachment)
-
 	return Database{
-		db:         db,
-		attachment: attachment,
-		message:    message,
+		db: db,
 	}
 }
 
 func (d Database) Close() error {
 	return d.db.Close()
-}
-
-func (d Database) AttachmentRepository() core.AttachmentRepositoryPort {
-	return d.attachment
-}
-
-func (d Database) MessageRepository() core.MessageRepositoryPort {
-	return d.message
 }

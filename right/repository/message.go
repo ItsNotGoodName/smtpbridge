@@ -48,9 +48,9 @@ type Message struct {
 	attachmentREPO *Attachment
 }
 
-func NewMessage(db *storm.DB, attachmentREPO *Attachment) *Message {
+func NewMessage(db *Database, attachmentREPO *Attachment) *Message {
 	return &Message{
-		db:             db,
+		db:             db.db,
 		attachmentREPO: attachmentREPO,
 	}
 }

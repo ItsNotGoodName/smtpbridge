@@ -30,7 +30,7 @@ func (a *App) MessageList(req *MessageListRequest) (*MessageListResponse, error)
 		req.Page = pageMin
 	}
 
-	msgs, err := a.messageSVC.List(limit, (req.Page-pageMin)*10)
+	msgs, err := a.messageSVC.List(limit, (req.Page-pageMin)*limit)
 	if err != nil {
 		return nil, err
 	}
