@@ -15,6 +15,7 @@ type Page string
 const (
 	PageIndex   Page = "index.html"
 	PageMessage Page = "message.html"
+	PageInfo    Page = "info.html"
 )
 
 const (

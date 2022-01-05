@@ -66,6 +66,15 @@ func (a *Attachment) Create(att *core.Attachment) error {
 	return os.WriteFile(a.getPath(att), att.Data, 0644)
 }
 
+func (a *Attachment) Count() (int, error) {
+	count, err := a.db.Count(&attachmentModel{})
+	if err == storm.ErrNotFound {
+		return 0, nil
+	}
+
+	return count, nil
+}
+
 func (a *Attachment) CountByMessage(msg *core.Message) (int, error) {
 	// TODO: do i use MessageUUID or message_uuid?
 	count, err := a.db.Select(q.Eq("MessageUUID", msg.UUID)).Count(&attachmentModel{})

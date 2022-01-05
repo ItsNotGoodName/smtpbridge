@@ -1,0 +1,23 @@
+{{ template "layout" . }}
+{{ define "content" }}
+<nav class="level">
+  <div class="level-item has-text-centered">
+    <div>
+      <p class="heading">Messages</p>
+      <p class="title">{{ .Info.MessageCount }}</p>
+    </div>
+  </div>
+  <div class="level-item has-text-centered">
+    <div>
+      <p class="heading">Attachments</p>
+      <p class="title">{{ .Info.AttachmentCount }}</p>
+    </div>
+  </div>
+  <div class="level-item has-text-centered">
+    <div>
+      <p class="heading">Attachments Size</p>
+      <p class="title">{{ .Info.AttachmentSizeMiB }} MiB</p>
+    </div>
+  </div>
+</nav>
+{{ end }}

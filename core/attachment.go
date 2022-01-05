@@ -33,6 +33,8 @@ type (
 	AttachmentRepositoryPort interface {
 		// Create saves a new attachment.
 		Create(att *Attachment) error
+		// Count returns the number of attachments.
+		Count() (int, error)
 		// CountByMessage returns the number of attachments for a message.
 		CountByMessage(msg *Message) (int, error)
 		// Get returns an attachment by it's UUID.

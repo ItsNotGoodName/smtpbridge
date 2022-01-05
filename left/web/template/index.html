@@ -2,12 +2,12 @@
 {{ define "content" }}
 <div class="is-flex is-flex-wrap-wrap is-justify-content-center">
   {{range $msg := .Messages}}
-  <div class="is-flex-grow-1 m-1">
+  <div class="is-flex-grow-1">
     {{ template "message" $msg }}
   </div>
   {{ end }}
 </div>
-<div class="mb-2 mt-1">
+<div class="">
   {{ template "paginate" . }}
 </div>
 {{ end }}

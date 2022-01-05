@@ -30,6 +30,7 @@ func New(a *app.App, t *web.Templater) http.Handler {
 	r.Get("/message/{uuid}", handleMessageGet(t, a))
 	r.Get("/message/{uuid}/send", handleMessageSendGet(a))
 	r.Get("/assets/*", handleFS("/assets/", web.GetAssetFS()))
+	r.Get("/info", handleInfoGet(t, a))
 	r.Get("/", handleIndexGet(t, a))
 
 	return r

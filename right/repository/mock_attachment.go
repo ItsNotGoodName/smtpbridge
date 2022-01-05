@@ -16,6 +16,10 @@ func (AttachmentMock) Create(att *core.Attachment) error {
 	return nil
 }
 
+func (AttachmentMock) Count() (int, error) {
+	return 0, nil
+}
+
 func (AttachmentMock) CountByMessage(msg *core.Message) (int, error) {
 	return 0, nil
 }
