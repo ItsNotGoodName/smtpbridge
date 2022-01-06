@@ -29,14 +29,22 @@ type TelegramResponse struct {
 }
 
 func (t *Telegram) Send(msg *core.EndpointMessage) error {
+	// Send with 0 attachments
 	if len(msg.Attachments) == 0 {
 		return t.sendMessage(msg.Text)
 	}
 
 	// TODO: use sendMediaGroup when more than 1 attachment
-	for _, attachment := range msg.Attachments {
-		err := t.sendPhoto(msg.Text, attachment.Name, attachment.Data)
-		if err != nil {
+
+	// Send with 1 attachment
+	if err := t.sendPhoto(msg.Text, msg.Attachments[0].Name, msg.Attachments[0].Data); err != nil {
+		return err
+	}
+
+	// Send rest of attachments
+	length := len(msg.Attachments)
+	for i := 1; i < length; i++ {
+		if err := t.sendPhoto("", msg.Attachments[i].Name, msg.Attachments[i].Data); err != nil {
 			return err
 		}
 	}
@@ -84,14 +92,16 @@ func (t *Telegram) sendPhoto(caption, name string, photo []byte) error {
 	w.Write(photo)
 
 	// Caption
-	w, err = writer.CreateFormField("caption")
-	if err != nil {
-		return err
+	if caption != "" {
+		w, err = writer.CreateFormField("caption")
+		if err != nil {
+			return err
+		}
+		if len(caption) > 1024 {
+			caption = caption[:1024]
+		}
+		w.Write([]byte(caption))
 	}
-	if len(caption) > 1024 {
-		caption = caption[:1024]
-	}
-	w.Write([]byte(caption))
 	writer.Close()
 
 	// Create request
