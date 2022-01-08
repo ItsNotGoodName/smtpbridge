@@ -10,10 +10,13 @@
   <div class="card-content">
     <div class="media">
       <div class="media-content">
-        {{ template "message/subject" . }}
-        {{ template "message/tag-status" . }}
-        {{ template "message/tag-date" . }}
-        {{ template "message/tag-attachments" . }}
+        <div class="mb-1">
+          {{ template "message/subject" . }}
+          {{ template "message/tag-status" . }}
+          {{ template "message/tag-date" . }}
+          {{ template "message/tag-attachments" . }}
+        </div>
+        {{ template "message/toolbar" . }}
       </div>
     </div>
   </div>

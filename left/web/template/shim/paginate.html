@@ -1,29 +1,29 @@
 {{ define "shim/paginate" }}
 <nav class="pagination is-centered" role="navigation" aria-label="pagination">
-  {{ if .Paginate.HasPrev }}
-  <a href="{{ .Paginate.PrevLink }}" class="pagination-previous">Previous</a>
-  {{ end }} {{ if .Paginate.HasNext }}
-  <a href="{{ .Paginate.NextLink }}" class="pagination-next">Next</a>
+  {{ if .HasPrev }}
+  <a href="{{ .PrevLink }}" class="pagination-previous">Previous</a>
+  {{ end }} {{ if .HasNext }}
+  <a href="{{ .NextLink }}" class="pagination-next">Next</a>
   {{ end }}
   <ul class="pagination-list">
-    {{ if .Paginate.HasPrev }}
+    {{ if .HasPrev }}
     <li>
-      <a href="{{ .Paginate.FirstLink }}" class="pagination-link" aria-label="Goto page {{ .Paginate.PageMin }}">
-        {{ .Paginate.PageMin }}
+      <a href="{{ .FirstLink }}" class="pagination-link" aria-label="Goto page {{ .PageMin }}">
+        {{ .PageMin }}
       </a>
     </li>
     <li><span class="pagination-ellipsis">&hellip;</span></li>
     {{ end }}
     <li>
-      <a class="pagination-link is-current" aria-label="Page {{ .Paginate.Page }}" aria-current="page">
-        {{ .Paginate.Page }}
+      <a class="pagination-link is-current" aria-label="Page {{ .Page }}" aria-current="page">
+        {{ .Page }}
       </a>
     </li>
-    {{ if .Paginate.HasNext }}
+    {{ if .HasNext }}
     <li><span class="pagination-ellipsis">&hellip;</span></li>
     <li>
-      <a class="pagination-link" href="{{ .Paginate.LastLink }}" aria-label="Goto page {{ .Paginate.PageMax }}">
-        {{ .Paginate.PageMax }}
+      <a class="pagination-link" href="{{ .LastLink }}" aria-label="Goto page {{ .PageMax }}">
+        {{ .PageMax }}
       </a>
     </li>
     {{ end }}

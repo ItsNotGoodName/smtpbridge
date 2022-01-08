@@ -1,15 +1,22 @@
 package router
 
 import (
+	"fmt"
 	"io/fs"
 	"net/http"
 
 	"github.com/ItsNotGoodName/smtpbridge/left"
 )
 
-func mwCacheControl(next http.HandlerFunc) http.HandlerFunc {
+const (
+	SecondsInYear = 31536000
+	SecondsInDay  = 86400
+)
+
+func mwCacheControl(next http.HandlerFunc, maxAge int) http.HandlerFunc {
+	maxAgeString := fmt.Sprintf("max-age=%d", maxAge)
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		rw.Header().Set("Cache-Control", "max-age=31536000")
+		rw.Header().Set("Cache-Control", maxAgeString)
 		next(rw, r)
 	})
 }
@@ -24,6 +31,10 @@ func handleFS(prefix string, dirFS fs.FS) http.HandlerFunc {
 func render(rw http.ResponseWriter, w left.WebRepository, page left.Page, data interface{}) {
 	err := w.GetTemplate(page).Execute(rw, data)
 	if err != nil {
-		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		renderError(rw, err, http.StatusInternalServerError)
 	}
+}
+
+func renderError(rw http.ResponseWriter, err error, status int) {
+	http.Error(rw, err.Error(), status)
 }

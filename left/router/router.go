@@ -26,8 +26,8 @@ func New(a *app.App, w left.WebRepository) http.Handler {
 	// processing should be stopped.
 	r.Use(middleware.Timeout(60 * time.Second))
 
-	r.Get("/attachments/*", mwCacheControl(handleFS("/attachments/", a.AttachmentGetFS())))
-	r.Get("/assets/*", handleFS("/assets/", w.GetAssetFS()))
+	r.Get("/attachments/*", mwCacheControl(handleFS("/attachments/", a.AttachmentGetFS()), SecondsInYear))
+	r.Get("/assets/*", mwCacheControl(handleFS("/assets/", w.GetAssetFS()), SecondsInDay))
 	r.Get("/message/{uuid}", handleMessageGet(w, a))
 	r.Get("/message/{uuid}/send", handleMessageSendGet(a))
 	r.Get("/message/{uuid}/delete", handleMessageDeleteGet(a))

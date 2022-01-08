@@ -19,7 +19,7 @@ func handleMessageGet(w left.WebRepository, a *app.App) http.HandlerFunc {
 			if err == core.ErrMessageNotFound {
 				status = http.StatusNotFound
 			}
-			http.Error(rw, err.Error(), status)
+			renderError(rw, err, status)
 			return
 		}
 
@@ -40,11 +40,11 @@ func handleMessageSendGet(a *app.App) http.HandlerFunc {
 			if err == core.ErrMessageNotFound {
 				status = http.StatusNotFound
 			}
-			http.Error(rw, err.Error(), status)
+			renderError(rw, err, status)
 			return
 		}
 
-		http.Redirect(rw, r, "/message/"+req.UUID, http.StatusTemporaryRedirect)
+		http.Redirect(rw, r, r.Referer(), http.StatusTemporaryRedirect)
 	}
 }
 
@@ -60,10 +60,10 @@ func handleMessageDeleteGet(a *app.App) http.HandlerFunc {
 			if err == core.ErrMessageNotFound {
 				status = http.StatusNotFound
 			}
-			http.Error(rw, err.Error(), status)
+			renderError(rw, err, status)
 			return
 		}
 
-		http.Redirect(rw, r, "/", http.StatusTemporaryRedirect)
+		http.Redirect(rw, r, r.Referer(), http.StatusTemporaryRedirect)
 	}
 }

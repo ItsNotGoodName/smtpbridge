@@ -1,9 +1,8 @@
 {{ define "message/tag-attachments" }}
 {{ $length := len .Attachments }}
 {{ if gt $length 0 }}
-<a style="text-decoration: none;" href="/message/{{ .UUID }}#attachments" title="{{ $length }} Attachments"
-  class="tag is-medium is-warning">{{ $length
-  }}
+<a style="text-decoration: none;" href="/message/{{ .UUID }}#attachments" title="{{ $length }} Attachments">
+  <span class="tag is-medium is-warning">{{ $length }}</span>
 </a>
 {{ end }}
 {{ end }}

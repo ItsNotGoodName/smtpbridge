@@ -30,7 +30,7 @@ func handleIndexGet(w left.WebRepository, a *app.App) http.HandlerFunc {
 
 		res, err := a.MessageList(&app.MessageListRequest{Page: page, Status: status})
 		if err != nil {
-			http.Error(rw, err.Error(), http.StatusInternalServerError)
+			renderError(rw, err, http.StatusInternalServerError)
 			return
 		}
 

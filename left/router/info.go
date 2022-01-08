@@ -11,7 +11,7 @@ func handleInfoGet(w left.WebRepository, a *app.App) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		info, err := a.Info()
 		if err != nil {
-			http.Error(rw, err.Error(), http.StatusInternalServerError)
+			renderError(rw, err, http.StatusInternalServerError)
 			return
 		}
 
