@@ -2,10 +2,13 @@ package app
 
 import (
 	"math"
+
+	"github.com/ItsNotGoodName/smtpbridge/core"
 )
 
 type MessageListRequest struct {
-	Page int
+	Page   int
+	Status int
 }
 
 type MessageListResponse struct {
@@ -19,7 +22,14 @@ func (a *App) MessageList(req *MessageListRequest) (*MessageListResponse, error)
 	limit := 10
 	pageMin := 1
 
-	count, err := a.messageREPO.Count()
+	searchParam := &core.MessageParam{
+		Limit:   limit,
+		Offset:  (req.Page - pageMin) * limit,
+		Reverse: true,
+		Status:  core.Status(req.Status),
+	}
+
+	count, err := a.messageREPO.Count(searchParam)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +40,7 @@ func (a *App) MessageList(req *MessageListRequest) (*MessageListResponse, error)
 		req.Page = pageMin
 	}
 
-	msgs, err := a.messageREPO.List(limit, (req.Page-pageMin)*limit, true)
+	msgs, err := a.messageREPO.List(searchParam)
 	if err != nil {
 		return nil, err
 	}

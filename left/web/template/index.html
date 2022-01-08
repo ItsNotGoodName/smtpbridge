@@ -1,5 +1,8 @@
 {{ template "layout/default" . }}
 {{ define "content" }}
+<div class="mb-2">
+  {{ template "shim/status" . }}
+</div>
 <div class="is-flex is-flex-wrap-wrap is-justify-content-center">
   {{ range $msg := .Messages }}
   <div class="is-flex-grow-1 m-1">

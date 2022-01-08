@@ -99,12 +99,20 @@ func (m *Message) Update(msg *core.Message, updateFN func(msg *core.Message) (*c
 	return tx.Commit()
 }
 
-func (m *Message) List(limit, offset int, reverse bool) ([]core.Message, error) {
+func (m *Message) List(search *core.MessageParam) ([]core.Message, error) {
+	var filters []q.Matcher
+	if search.Status != core.StatusAll {
+		filters = append(filters, q.Eq("Status", search.Status))
+	}
+
 	var msgsM []messageModel
-	query := m.db.Select().OrderBy("CreatedAt").Limit(limit).Skip(offset)
-	if reverse {
+	query := m.db.Select(filters...).OrderBy("CreatedAt")
+
+	if search.Reverse {
 		query = query.Reverse()
 	}
+
+	query = query.Limit(search.Limit).Skip(search.Offset)
 
 	err := query.Find(&msgsM)
 	if err != nil && err != storm.ErrNotFound {
@@ -119,12 +127,13 @@ func (m *Message) List(limit, offset int, reverse bool) ([]core.Message, error) 
 	return msgs, nil
 }
 
-func (m *Message) ListOldest(limit int) ([]core.Message, error) {
-	return m.List(limit, 0, true)
-}
+func (m *Message) Count(search *core.MessageParam) (int, error) {
+	var filters []q.Matcher
+	if search.Status != core.StatusAll {
+		filters = append(filters, q.Eq("Status", search.Status))
+	}
 
-func (m *Message) Count() (int, error) {
-	count, err := m.db.Count(&messageModel{})
+	count, err := m.db.Select(filters...).Count(&messageModel{})
 	if err == storm.ErrNotFound {
 		return 0, nil
 	}

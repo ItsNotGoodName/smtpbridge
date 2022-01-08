@@ -1,6 +1,10 @@
 package app
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/ItsNotGoodName/smtpbridge/core"
+)
 
 type Info struct {
 	AttachmentSize    int64
@@ -10,7 +14,7 @@ type Info struct {
 }
 
 func (a *App) Info() (*Info, error) {
-	msgCount, err := a.messageREPO.Count()
+	msgCount, err := a.messageREPO.Count(&core.MessageParam{})
 	if err != nil {
 		return nil, err
 	}

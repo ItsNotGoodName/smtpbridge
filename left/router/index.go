@@ -10,17 +10,25 @@ import (
 )
 
 func handleIndexGet(w left.WebRepository, a *app.App) http.HandlerFunc {
-	param := "page"
+	pageParam := "page"
+	statusParam := "status"
 
 	return func(rw http.ResponseWriter, r *http.Request) {
 		var page int
-		if p := r.URL.Query().Get(param); p != "" {
+		if p := r.URL.Query().Get(pageParam); p != "" {
 			if i, err := strconv.Atoi(p); err == nil {
 				page = i
 			}
 		}
 
-		res, err := a.MessageList(&app.MessageListRequest{Page: page})
+		var status int
+		if p := r.URL.Query().Get(statusParam); p != "" {
+			if i, err := strconv.Atoi(p); err == nil {
+				status = i
+			}
+		}
+
+		res, err := a.MessageList(&app.MessageListRequest{Page: page, Status: status})
 		if err != nil {
 			http.Error(rw, err.Error(), http.StatusInternalServerError)
 			return
@@ -28,7 +36,7 @@ func handleIndexGet(w left.WebRepository, a *app.App) http.HandlerFunc {
 
 		data := left.IndexData{
 			Messages: res.Messages,
-			Paginate: paginate.New(*r.URL, param, res.PageMin, res.Page, res.PageMax),
+			Paginate: paginate.New(*r.URL, pageParam, res.PageMin, res.Page, res.PageMax),
 		}
 		render(rw, w, left.IndexPage, &data)
 	}

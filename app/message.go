@@ -8,7 +8,7 @@ import (
 
 type Message struct {
 	UUID        string       `json:"uuid"`
-	Status      core.Status  `json:"status"`
+	Status      int          `json:"status"`
 	From        string       `json:"from"`
 	To          []string     `json:"to"`
 	Subject     string       `json:"subject"`
@@ -42,7 +42,7 @@ func NewMessage(msg *core.Message, atts []core.Attachment) Message {
 		CreatedAt:   msg.CreatedAt.Format(time.RFC822),
 		From:        msg.From,
 		To:          to,
-		Status:      msg.Status,
+		Status:      int(msg.Status),
 		Subject:     subject,
 		Text:        msg.Text,
 		Attachments: attachments,

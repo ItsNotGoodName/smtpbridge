@@ -12,7 +12,7 @@ func (MessageMock) Create(msg *core.Message) error {
 	return nil
 }
 
-func (MessageMock) Count() (int, error) {
+func (MessageMock) Count(search *core.MessageParam) (int, error) {
 	return 0, nil
 }
 
@@ -20,11 +20,7 @@ func (MessageMock) Get(uuid string) (*core.Message, error) {
 	return nil, core.ErrMessageNotFound
 }
 
-func (MessageMock) List(limit, offset int, reverse bool) ([]core.Message, error) {
-	return []core.Message{}, nil
-}
-
-func (MessageMock) ListOldest(limit int) ([]core.Message, error) {
+func (MessageMock) List(search *core.MessageParam) ([]core.Message, error) {
 	return []core.Message{}, nil
 }
 

@@ -14,13 +14,21 @@ var (
 )
 
 const (
-	StatusCreated Status = iota
+	StatusAll Status = iota
+	StatusCreated
 	StatusSent
 	StatusFailed
 	StatusSkipped
 )
 
 type (
+	MessageParam struct {
+		Limit   int
+		Offset  int
+		Status  Status
+		Reverse bool
+	}
+
 	Message struct {
 		UUID      string              // UUID of the message.
 		From      string              // From is the email address of the sender.
@@ -49,13 +57,11 @@ type (
 		// Create saves a message.
 		Create(msg *Message) error
 		// Count returns the number of messages.
-		Count() (int, error)
+		Count(search *MessageParam) (int, error)
 		// Get returns a message by it's UUID.
 		Get(uuid string) (*Message, error)
 		// List messages.
-		List(limit, offset int, reverse bool) ([]Message, error)
-		// ListOldest returns the oldest messages.
-		ListOldest(limit int) ([]Message, error)
+		List(search *MessageParam) ([]Message, error)
 		// Update a message.
 		Update(msg *Message, updateFN func(msg *Message) (*Message, error)) error
 		// Delete a message.

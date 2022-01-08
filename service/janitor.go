@@ -36,7 +36,11 @@ func (j *Janitor) clean() error {
 			return nil
 		}
 
-		msgs, err := j.messageREPO.ListOldest(5)
+		msgs, err := j.messageREPO.List(&core.MessageParam{
+			Limit:   5,
+			Offset:  0,
+			Reverse: false,
+		})
 		if err != nil {
 			return err
 		}
