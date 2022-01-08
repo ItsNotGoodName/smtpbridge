@@ -1,3 +1,4 @@
+// Package paginate provides url links for a paginated resource.
 package paginate
 
 import (
@@ -9,8 +10,8 @@ type Paginate struct {
 	PageMin int
 	Page    int
 	PageMax int
-	URL     *url.URL
 	Param   string
+	url     *url.URL
 }
 
 func New(URL url.URL, param string, pageMin, page, pageMax int) Paginate {
@@ -20,15 +21,15 @@ func New(URL url.URL, param string, pageMin, page, pageMax int) Paginate {
 		Param:   param,
 		Page:    page,
 		PageMax: pageMax,
-		URL:     &URL,
+		url:     &URL,
 	}
 }
 
 func (p Paginate) link(page int) string {
-	vals := p.URL.Query()
+	vals := p.url.Query()
 	vals.Set(p.Param, strconv.Itoa(page))
-	p.URL.RawQuery = vals.Encode()
-	return p.URL.String()
+	p.url.RawQuery = vals.Encode()
+	return p.url.String()
 }
 
 func (p Paginate) HasPrev() bool {
