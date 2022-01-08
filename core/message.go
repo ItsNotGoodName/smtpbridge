@@ -85,6 +85,10 @@ func NewMessage(subject, from string, to map[string]struct{}, text string) *Mess
 
 // AttachmentDataValid returns the type of the attachment data.
 func AttachmentDataValid(data []byte) (AttachmentType, error) {
+	if len(data) == 0 {
+		return "", ErrAttachmentNoData
+	}
+
 	contentType := http.DetectContentType(data)
 	switch contentType {
 	case "image/png":
@@ -107,7 +111,7 @@ func (m *Message) NewAttachment(name string, data []byte) (*Attachment, error) {
 		Name:        name,
 		Type:        attType,
 		MessageUUID: m.UUID,
-		Data:        data,
+		data:        data,
 	}, nil
 }
 

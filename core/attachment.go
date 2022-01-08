@@ -13,6 +13,7 @@ const (
 var (
 	ErrAttachmentInvalid  = fmt.Errorf("invalid attachment")
 	ErrAttachmentNotFound = fmt.Errorf("attachment not found")
+	ErrAttachmentNoData   = fmt.Errorf("attachment has no data")
 )
 
 type (
@@ -21,7 +22,7 @@ type (
 		Name        string
 		Type        AttachmentType
 		MessageUUID string
-		Data        []byte
+		data        []byte
 	}
 
 	EndpointAttachment struct {
@@ -56,13 +57,30 @@ func (a *Attachment) File() string {
 	return fmt.Sprintf("%s.%s", a.UUID, a.Type)
 }
 
+func (a *Attachment) SetData(data []byte) error {
+	if _, err := AttachmentDataValid(data); err != nil {
+		return err
+	}
+
+	a.data = data
+	return nil
+}
+
+func (a *Attachment) Data() []byte {
+	if len(a.data) == 0 {
+		panic("attachment data not loaded")
+	}
+
+	return a.data
+}
+
 func NewEndpointAttachments(atts []Attachment) []EndpointAttachment {
 	eats := make([]EndpointAttachment, len(atts))
 	for i, a := range atts {
 		eats[i] = EndpointAttachment{
 			Name: a.Name,
 			Type: a.Type,
-			Data: a.Data,
+			Data: a.Data(),
 		}
 	}
 

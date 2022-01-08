@@ -148,7 +148,6 @@ func (m *Message) Delete(msg *core.Message) error {
 	}
 	defer tx.Rollback()
 
-	// TODO: do i use MessageUUID or message_uuid?
 	query := tx.Select(q.Eq("MessageUUID", msg.UUID))
 
 	// List attachments

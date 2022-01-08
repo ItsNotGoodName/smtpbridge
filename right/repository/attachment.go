@@ -63,7 +63,7 @@ func (a *Attachment) Create(att *core.Attachment) error {
 		return err
 	}
 
-	return os.WriteFile(a.getPath(att), att.Data, 0644)
+	return os.WriteFile(a.getPath(att), att.Data(), 0644)
 }
 
 func (a *Attachment) Count() (int, error) {
@@ -76,7 +76,6 @@ func (a *Attachment) Count() (int, error) {
 }
 
 func (a *Attachment) CountByMessage(msg *core.Message) (int, error) {
-	// TODO: do i use MessageUUID or message_uuid?
 	count, err := a.db.Select(q.Eq("MessageUUID", msg.UUID)).Count(&attachmentModel{})
 	if err == storm.ErrNotFound {
 		return 0, nil
@@ -129,7 +128,6 @@ func (a *Attachment) GetSizeAll() (int64, error) {
 
 func (a *Attachment) ListByMessage(msg *core.Message) ([]core.Attachment, error) {
 	var attsM []attachmentModel
-	// TODO: do i use MessageUUID or message_uuid?
 	err := a.db.Select(q.Eq("MessageUUID", msg.UUID)).Find(&attsM)
 	if err != nil {
 		if err == storm.ErrNotFound {
@@ -155,7 +153,9 @@ func (a *Attachment) LoadData(att *core.Attachment) error {
 		return err
 	}
 
-	att.Data = data
+	if err := att.SetData(data); err != nil {
+		return err
+	}
 
 	return nil
 }
