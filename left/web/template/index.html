@@ -1,13 +1,13 @@
-{{ template "layout" . }}
+{{ template "layout/default" . }}
 {{ define "content" }}
 <div class="is-flex is-flex-wrap-wrap is-justify-content-center">
-  {{range $msg := .Messages}}
+  {{ range $msg := .Messages }}
   <div class="is-flex-grow-1 m-1">
-    {{ template "message" $msg }}
+    {{ template "message/card" $msg }}
   </div>
   {{ end }}
 </div>
-<div class="mt-2">
-  {{ template "paginate" . }}
+<div class="mt-2 mb-3">
+  {{ template "shim/paginate" . }}
 </div>
 {{ end }}

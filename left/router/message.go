@@ -5,15 +5,11 @@ import (
 
 	"github.com/ItsNotGoodName/smtpbridge/app"
 	"github.com/ItsNotGoodName/smtpbridge/core"
-	"github.com/ItsNotGoodName/smtpbridge/left/web"
+	"github.com/ItsNotGoodName/smtpbridge/left"
 	"github.com/go-chi/chi/v5"
 )
 
-func handleMessageGet(t *web.Templater, a *app.App) http.HandlerFunc {
-	type Data struct {
-		Message app.Message
-	}
-
+func handleMessageGet(w left.WebRepository, a *app.App) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		uuid := chi.URLParam(r, "uuid")
 
@@ -27,7 +23,8 @@ func handleMessageGet(t *web.Templater, a *app.App) http.HandlerFunc {
 			return
 		}
 
-		t.Render(web.PageMessage, rw, &Data{Message: res.Message})
+		data := left.MessageData{Message: res.Message}
+		render(rw, w, left.MessagePage, &data)
 	}
 }
 

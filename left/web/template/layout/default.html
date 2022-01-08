@@ -1,4 +1,4 @@
-{{ define "layout" }}
+{{ define "layout/default" }}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -11,7 +11,7 @@
 </head>
 
 <body class="container">
-  {{ template "nav" . }}
+  {{ template "shim/nav" . }}
   <div class="m-2">
     {{ template "content" . }}
   </div>

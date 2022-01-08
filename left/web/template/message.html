@@ -1,32 +1,4 @@
-{{ template "layout" . }}
+{{ template "layout/default" . }}
 {{ define "content" }}
-<div class="card">
-  <div class="card-content">
-    <div class="media">
-      <div class="media-content">
-        {{ template "message-subject" .Message }}
-        {{ template "message-status-tag" .Message }}
-        <span class="tag is-light is-medium mr-auto">{{ .Message.CreatedAt }}</span>
-        <a href="/message/{{ .Message.UUID }}/delete">
-          <span class="tag is-danger is-medium">Delete</span>
-        </a>
-      </div>
-    </div>
-
-    <div class="content">
-      <pre>{{ .Message.Text }}</pre>
-    </div>
-  </div>
-</div>
-<div id="attachments">
-  {{ range.Message.Attachments }}
-  <div class="card mt-2">
-    <div class="card-image">
-      <figure class="image">
-        {{ template "attachment-image" . }}
-      </figure>
-    </div>
-  </div>
-</div>
-{{ end }}
+{{ template "message/card-full" . }}
 {{ end }}

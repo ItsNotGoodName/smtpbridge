@@ -4,14 +4,10 @@ import (
 	"net/http"
 
 	"github.com/ItsNotGoodName/smtpbridge/app"
-	"github.com/ItsNotGoodName/smtpbridge/left/web"
+	"github.com/ItsNotGoodName/smtpbridge/left"
 )
 
-func handleInfoGet(t *web.Templater, a *app.App) http.HandlerFunc {
-	type Data struct {
-		Info *app.InfoResponse
-	}
-
+func handleInfoGet(w left.WebRepository, a *app.App) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		info, err := a.Info()
 		if err != nil {
@@ -19,8 +15,7 @@ func handleInfoGet(t *web.Templater, a *app.App) http.HandlerFunc {
 			return
 		}
 
-		t.Render(web.PageInfo, rw, &Data{
-			Info: info,
-		})
+		data := left.InfoData{Info: *info}
+		render(rw, w, left.InfoPage, &data)
 	}
 }

@@ -1,4 +1,4 @@
-{{ define "message-attachments-tag" }}
+{{ define "message/tag-attachments" }}
 {{ $length := len .Attachments }}
 {{ if gt $length 0 }}
 <a style="text-decoration: none;" href="/message/{{ .UUID }}#attachments" title="{{ $length }} Attachments"

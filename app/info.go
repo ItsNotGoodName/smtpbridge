@@ -2,14 +2,14 @@ package app
 
 import "fmt"
 
-type InfoResponse struct {
+type Info struct {
 	AttachmentSize    int64
 	AttachmentSizeMiB string
 	MessageCount      int
 	AttachmentCount   int
 }
 
-func (a *App) Info() (*InfoResponse, error) {
+func (a *App) Info() (*Info, error) {
 	msgCount, err := a.messageREPO.Count()
 	if err != nil {
 		return nil, err
@@ -27,7 +27,7 @@ func (a *App) Info() (*InfoResponse, error) {
 
 	attSizeMiB := fmt.Sprintf("%.2f", float64(attSize)/1024/1024)
 
-	return &InfoResponse{
+	return &Info{
 		AttachmentSize:    attSize,
 		MessageCount:      msgCount,
 		AttachmentCount:   attCount,

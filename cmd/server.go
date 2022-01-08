@@ -94,8 +94,8 @@ var serverCmd = &cobra.Command{
 
 		// Init and start http server
 		if serverConfig.HTTP.Enable {
-			templater := web.NewTemplater()
-			httpServer := router.New(app, templater)
+			web := web.New()
+			httpServer := router.New(app, web)
 			go router.Start(serverConfig, httpServer)
 		}
 

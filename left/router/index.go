@@ -5,16 +5,11 @@ import (
 	"strconv"
 
 	"github.com/ItsNotGoodName/smtpbridge/app"
-	"github.com/ItsNotGoodName/smtpbridge/left/web"
+	"github.com/ItsNotGoodName/smtpbridge/left"
 	"github.com/ItsNotGoodName/smtpbridge/pkg/paginate"
 )
 
-func handleIndexGet(t *web.Templater, a *app.App) http.HandlerFunc {
-	type Data struct {
-		Messages []app.Message
-		Paginate paginate.Paginate
-	}
-
+func handleIndexGet(w left.WebRepository, a *app.App) http.HandlerFunc {
 	param := "page"
 
 	return func(rw http.ResponseWriter, r *http.Request) {
@@ -31,11 +26,10 @@ func handleIndexGet(t *web.Templater, a *app.App) http.HandlerFunc {
 			return
 		}
 
-		data := Data{
+		data := left.IndexData{
 			Messages: res.Messages,
 			Paginate: paginate.New(*r.URL, param, res.PageMin, res.Page, res.PageMax),
 		}
-
-		t.Render(web.PageIndex, rw, &data)
+		render(rw, w, left.IndexPage, &data)
 	}
 }

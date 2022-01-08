@@ -7,12 +7,12 @@ import (
 
 	"github.com/ItsNotGoodName/smtpbridge/app"
 	"github.com/ItsNotGoodName/smtpbridge/config"
-	"github.com/ItsNotGoodName/smtpbridge/left/web"
+	"github.com/ItsNotGoodName/smtpbridge/left"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-func New(a *app.App, t *web.Templater) http.Handler {
+func New(a *app.App, w left.WebRepository) http.Handler {
 	r := chi.NewRouter()
 
 	// A good base middleware stack
@@ -27,12 +27,12 @@ func New(a *app.App, t *web.Templater) http.Handler {
 	r.Use(middleware.Timeout(60 * time.Second))
 
 	r.Get("/attachments/*", mwCacheControl(handleFS("/attachments/", a.AttachmentGetFS())))
-	r.Get("/assets/*", handleFS("/assets/", web.GetAssetFS()))
-	r.Get("/message/{uuid}", handleMessageGet(t, a))
+	r.Get("/assets/*", handleFS("/assets/", w.GetAssetFS()))
+	r.Get("/message/{uuid}", handleMessageGet(w, a))
 	r.Get("/message/{uuid}/send", handleMessageSendGet(a))
 	r.Get("/message/{uuid}/delete", handleMessageDeleteGet(a))
-	r.Get("/info", handleInfoGet(t, a))
-	r.Get("/", handleIndexGet(t, a))
+	r.Get("/info", handleInfoGet(w, a))
+	r.Get("/", handleIndexGet(w, a))
 
 	return r
 }
