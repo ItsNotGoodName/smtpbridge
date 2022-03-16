@@ -6,7 +6,7 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/core/dto"
 )
 
-func (a *App) MessageGet(ctx context.Context, req *dto.MessageGetRequest) (*dto.MessageGetResponse, error) {
+func (a *App) MessageGet(ctx context.Context, req *dto.MessageGetRequest) (*dto.Message, error) {
 	msg, err := a.messageRepository.Get(ctx, req.ID)
 	if err != nil {
 		return nil, err
@@ -17,5 +17,6 @@ func (a *App) MessageGet(ctx context.Context, req *dto.MessageGetRequest) (*dto.
 		return nil, err
 	}
 
-	return &dto.MessageGetResponse{Message: newMessage(msg, atts)}, nil
+	dtomsg := newMessage(msg, atts)
+	return &dtomsg, nil
 }

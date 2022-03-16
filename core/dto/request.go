@@ -21,10 +21,6 @@ type MessageGetRequest struct {
 	ID int64
 }
 
-type MessageGetResponse struct {
-	Message Message `json:"message"`
-}
-
 type MessageListRequest struct {
 	Cursor    int64
 	Ascending bool
