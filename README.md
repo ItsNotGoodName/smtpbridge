@@ -26,7 +26,7 @@ Configuration file is located at `~/.smtpbridge.yml`.
 bridges:
   - name: test bridge
     endpoints:
-      - test endpoint # Match a name in the endpoints list
+      - name: test endpoint # Match a name in the endpoints list
 
 endpoints:
   - name: test endpoint
@@ -59,15 +59,17 @@ smtp: # SMTP server that receives emails
 
 bridges: # Bridges modify and check if messages should be sent to endpoints
   - name: test bridge
+    no_text: false # When this is true, text will not be sent to endpoints
+    no_attachments: false # When this is true, attachments will not be sent to endpoints
     filters:
       - to: foo@example.com # Filter based on to address
         to_regex: "foo" # To regex takes priority over to, must be surrounded by quotation marks
         from: bar@example.com # Filter based on from address
         from_regex: "bar" # From regex takes priority over from, must be surrounded by quotation marks
-    only_text: false # When this is true, only the text of the email will be sent to endpoints
-    only_attachments: false # When this is true, only the attachments of the email will be sent to endpoints
     endpoints:
-      - test endpoint # Match a name in the endpoints list
+      - name: test endpoint # Match a name in the endpoints list
+        no_text: false # When this is true, text will not be sent to endpoints
+        no_attachments: false # When this is true, attachments will not be sent to endpoints
 
 endpoints: # Endpoints send messages to messaging services such as Telegram
   - name: test endpoint

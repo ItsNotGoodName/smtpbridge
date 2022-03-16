@@ -4,10 +4,10 @@ npm:
 	npm i --prefix left/web
 
 dev-backend:
-	air
+	go run --tags dev . server
 
 dev-frontend:
-	npm run css-watch --prefix left/web
+	npm run dev --prefix left/web
 
 snapshot: 
 	goreleaser release --snapshot --rm-dist

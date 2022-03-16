@@ -1,18 +1,23 @@
 package router
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"time"
 
-	"github.com/ItsNotGoodName/smtpbridge/app"
-	"github.com/ItsNotGoodName/smtpbridge/config"
-	"github.com/ItsNotGoodName/smtpbridge/left"
+	"github.com/ItsNotGoodName/smtpbridge/core/dto"
+	"github.com/ItsNotGoodName/smtpbridge/left/api"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-func New(a *app.App, w left.WebRepository) http.Handler {
+type Router struct {
+	r    chi.Router
+	addr string
+}
+
+func New(app dto.App, rd api.Renderer, addr string) *Router {
 	r := chi.NewRouter()
 
 	// A good base middleware stack
@@ -26,21 +31,38 @@ func New(a *app.App, w left.WebRepository) http.Handler {
 	// processing should be stopped.
 	r.Use(middleware.Timeout(60 * time.Second))
 
-	r.Get("/attachments/*", mwCacheControl(handleFS("/attachments/", a.AttachmentGetFS()), SecondsInYear))
-	r.Get("/assets/*", mwCacheControl(handleFS("/assets/", w.GetAssetFS()), SecondsInDay))
-	r.Get("/message/{uuid}", handleMessageGet(w, a))
-	r.Get("/message/{uuid}/send", handleMessageSendGet(a))
-	r.Get("/message/{uuid}/delete", handleMessageDeleteGet(a))
-	r.Get("/info", handleInfoGet(w, a))
-	r.Get("/", handleIndexGet(w, a))
+	hookMiddleware(r)
 
-	return r
+	r.Get("/attachments/*", mwCacheControl(handleFS("/attachments/", app.AttachmentFS()), SecondsInYear))
+
+	// API Routes
+	r.Route("/api", func(r chi.Router) {
+		r.Get("/version", render(rd, api.VersionGet(app)))
+		r.Get("/info", render(rd, api.InfoGet(app)))
+		r.Get("/events", render(rd, api.EventsGet(app)))
+		r.Get("/messages", render(rd, api.MessagesGet(app)))
+		r.Get("/message/{id}", render(rd, api.MessageGet(app)))
+		r.Delete("/message/{id}", render(rd, api.MessageDelete(app)))
+		r.Get("/message/{id}/events", render(rd, api.MessageEventsGet(app)))
+	})
+
+	hookRoutes(r)
+
+	return &Router{
+		r:    r,
+		addr: addr,
+	}
 }
 
-func Start(cfg *config.Config, r http.Handler) {
-	log.Println("router.Start: HTTP server listening on", cfg.HTTP.Addr)
-	err := http.ListenAndServe(cfg.HTTP.Addr, r)
+func (r *Router) Start() {
+	log.Println("router.Router.Start: HTTP server listening on", r.addr)
+	err := http.ListenAndServe(r.addr, r.r)
 	if err != nil {
-		log.Fatalln("router.Start:", err)
+		log.Fatalln("router.Router.Start:", err)
 	}
+}
+
+func (r *Router) Run(ctx context.Context, done chan<- struct{}) {
+	go r.Start()
+	done <- struct{}{}
 }

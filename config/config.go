@@ -10,7 +10,7 @@ import (
 )
 
 type Config struct {
-	DB        ConfigDB         `json:"database" mapstructure:"database"`
+	Database  ConfigDB         `json:"database" mapstructure:"database"`
 	SMTP      ConfigSMTP       `json:"smtp" mapstructure:"smtp"`
 	HTTP      ConfigHTTP       `json:"http" mapstructure:"http"`
 	Bridges   []ConfigBridge   `json:"bridges" mapstructure:"bridges"`
@@ -18,11 +18,19 @@ type Config struct {
 }
 
 type ConfigBridge struct {
-	Name            string         `json:"name" mapstructure:"name"`
-	Endpoints       []string       `json:"endpoints" mapstructure:"endpoints"`
-	OnlyText        bool           `json:"only_text" mapstructure:"only_text"`
-	OnlyAttachments bool           `json:"only_attachments" mapstructure:"only_attachments"`
-	Filters         []ConfigFilter `json:"filters" mapstructure:"filters"`
+	Name          string                 `json:"name" mapstructure:"name"`
+	NoText        bool                   `json:"no_text" mapstructure:"no_text"`
+	NoAttachments bool                   `json:"no_attachments" mapstructure:"no_attachments"`
+	Endpoints     []ConfigBridgeEndpoint `json:"endpoints" mapstructure:"endpoints"`
+	Filters       []ConfigFilter         `json:"filters" mapstructure:"filters"`
+}
+
+type ConfigBridgeEndpoint struct {
+	Name             string `json:"name" mapstructure:"name"`
+	NoTextStr        string `json:"no_text" mapstructure:"no_text"`
+	NoAttachmentsStr string `json:"no_attachments" mapstructure:"no_attachments"`
+	NoText           bool   `json:"-" mapstructure:"-"`
+	NoAttachments    bool   `json:"-" mapstructure:"-"`
 }
 
 type ConfigFilter struct {
@@ -75,9 +83,9 @@ func New() *Config {
 	rootPath := path.Join(home, ".smtpbridge")
 
 	return &Config{
-		DB: ConfigDB{
+		Database: ConfigDB{
 			Type:        "",
-			DB:          path.Join(rootPath, "smtpbridge.db"),
+			DB:          path.Join(rootPath, "bolt.db"),
 			Attachments: path.Join(rootPath, "attachments"),
 			Size:        1024 * 1024 * 2048,
 		},
@@ -107,11 +115,26 @@ func (c *Config) Load() {
 	c.SMTP.Addr = c.SMTP.Host + ":" + strconv.FormatUint(uint64(c.SMTP.Port), 10)
 	c.HTTP.Addr = c.HTTP.Host + ":" + strconv.FormatUint(uint64(c.HTTP.Port), 10)
 
-	if err := os.MkdirAll(c.DB.Attachments, 0755); err != nil {
+	for _, bridge := range c.Bridges {
+		for j, endpoint := range bridge.Endpoints {
+			if endpoint.NoTextStr != "" {
+				bridge.Endpoints[j].NoText, _ = strconv.ParseBool(endpoint.NoTextStr)
+			} else {
+				bridge.Endpoints[j].NoText = bridge.NoText
+			}
+			if endpoint.NoAttachmentsStr != "" {
+				bridge.Endpoints[j].NoAttachments, _ = strconv.ParseBool(endpoint.NoAttachmentsStr)
+			} else {
+				bridge.Endpoints[j].NoAttachments = bridge.NoAttachments
+			}
+		}
+	}
+
+	if err := os.MkdirAll(c.Database.Attachments, 0755); err != nil {
 		log.Fatalln("config.Config.Load: could not create attachments directory:", err)
 	}
 
-	if err := os.MkdirAll(path.Dir(c.DB.DB), 0755); err != nil {
+	if err := os.MkdirAll(path.Dir(c.Database.DB), 0755); err != nil {
 		log.Fatalln("config.Config.Load: could not create database's parent directory:", err)
 	}
 

@@ -1,47 +1,48 @@
 package smtp
 
 import (
+	"context"
 	"io"
 	"log"
 
-	"github.com/ItsNotGoodName/smtpbridge/app"
+	"github.com/ItsNotGoodName/smtpbridge/core/dto"
 	"github.com/emersion/go-smtp"
 	"github.com/jhillyerd/enmime"
 )
 
 // Backend implements SMTP server methods.
 type Backend struct {
-	app *app.App
+	app dto.App
 }
 
 func (b Backend) AnonymousLogin(state *smtp.ConnectionState) (smtp.Session, error) {
-	if err := b.app.AuthLoginRequest(&app.AuthLoginRequest{}); err != nil {
-		log.Println("smtp.AnonymousLogin: login failure:", smtp.ErrAuthRequired)
+	if err := b.app.SMTPLogin(context.Background(), &dto.SMTPLoginRequest{}); err != nil {
+		log.Println("smtp.AnonymousLogin: login failure:", err)
 		return nil, smtp.ErrAuthRequired
 	}
 	return newSession(b.app), nil
 }
 
 func (b Backend) Login(state *smtp.ConnectionState, username, password string) (smtp.Session, error) {
-	if err := b.app.AuthLoginRequest(&app.AuthLoginRequest{Username: username, Password: password}); err != nil {
+	if err := b.app.SMTPLogin(context.Background(), &dto.SMTPLoginRequest{Username: username, Password: password}); err != nil {
 		log.Println("smtp.Login: login failure:", err)
 		return nil, err
 	}
 	return newSession(b.app), nil
 }
 
-func NewBackend(app *app.App) Backend {
+func NewBackend(app dto.App) Backend {
 	return Backend{app}
 }
 
 // A session is returned after EHLO.
 type session struct {
-	app  *app.App
+	app  dto.App
 	from string
 	to   string
 }
 
-func newSession(app *app.App) *session {
+func newSession(app dto.App) *session {
 	return &session{app: app}
 }
 
@@ -60,7 +61,7 @@ func (s *session) Rcpt(to string) error {
 func (s *session) Data(r io.Reader) error {
 	e, err := enmime.ReadEnvelope(r)
 	if err != nil {
-		log.Println("smtp.Data: could not read email:", err)
+		log.Println("smtp.session.Data: could not read email:", err)
 		return err
 	}
 
@@ -79,26 +80,24 @@ func (s *session) Data(r io.Reader) error {
 			//log.Println("TO:", t.Address)
 		}
 	} else {
-		log.Println("smtp.Data: could not get To from email:", err)
+		log.Println("smtp.session.Data: could not get To from email:", err)
 	}
 	toMap[s.to] = struct{}{}
 
-	req := app.MessageHandleRequest{
-		Subject:               e.GetHeader("Subject"),
-		From:                  s.from,
-		To:                    toMap,
-		Text:                  e.Text,
-		IgnoreAttachmentError: true,
+	req := dto.MessageHandleRequest{
+		Subject: e.GetHeader("Subject"),
+		From:    s.from,
+		To:      toMap,
+		Text:    e.Text,
 	}
 	for _, a := range e.Attachments {
 		req.AddAttachment(a.FileName, a.Content)
 	}
 
-	// TODO: remove goroutine when endpoint service workers are implemented
 	go func() {
-		err := s.app.MessageHandle(&req)
+		err := s.app.MessageHandle(context.Background(), &req)
 		if err != nil {
-			log.Println("smtp.Data: could not handle message:", err)
+			log.Println("smtp.session.Data: could not handle message:", err)
 		}
 	}()
 

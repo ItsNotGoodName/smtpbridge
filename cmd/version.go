@@ -24,14 +24,8 @@ package cmd
 import (
 	"fmt"
 
+	vs "github.com/ItsNotGoodName/smtpbridge/core/version"
 	"github.com/spf13/cobra"
-)
-
-var (
-	version = "dev"
-	commit  = "none"
-	date    = "unknown"
-	builtBy = "unknown"
 )
 
 var (
@@ -45,9 +39,9 @@ var versionCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		if Verbose {
-			fmt.Printf("Version: %s\nCommit: %s\nDate: %s\nBuilt by: %s\n", version, commit, date, builtBy)
+			fmt.Printf("Version: %s\nCommit: %s\nDate: %s\nBuilt by: %s\n", vs.CurrentVersion.Version, vs.CurrentVersion.Commit, vs.CurrentVersion.Date, vs.CurrentVersion.BuiltBy)
 		} else {
-			fmt.Println(version)
+			fmt.Println(vs.CurrentVersion.Version)
 		}
 	},
 }

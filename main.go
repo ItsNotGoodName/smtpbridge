@@ -21,8 +21,23 @@ THE SOFTWARE.
 */
 package main
 
-import "github.com/ItsNotGoodName/smtpbridge/cmd"
+import (
+	"github.com/ItsNotGoodName/smtpbridge/cmd"
+	vs "github.com/ItsNotGoodName/smtpbridge/core/version"
+)
+
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+	builtBy = "unknown"
+)
 
 func main() {
+	vs.CurrentVersion.BuiltBy = builtBy
+	vs.CurrentVersion.Commit = commit
+	vs.CurrentVersion.Version = version
+	vs.CurrentVersion.Date = date
+
 	cmd.Execute()
 }

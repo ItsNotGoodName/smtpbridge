@@ -7,7 +7,7 @@ require (
 	github.com/emersion/go-sasl v0.0.0-20211008083017-0b9dcfb154ac
 	github.com/emersion/go-smtp v0.15.0
 	github.com/go-chi/chi/v5 v5.0.7
-	github.com/google/uuid v1.3.0
+	github.com/go-chi/cors v1.2.0
 	github.com/jhillyerd/enmime v0.9.2
 	github.com/spf13/cobra v1.3.0
 	github.com/spf13/viper v1.10.1
@@ -30,6 +30,7 @@ require (
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-cmp v0.5.6 // indirect
+	github.com/google/uuid v1.3.0 // indirect
 	github.com/googleapis/gax-go/v2 v2.1.1 // indirect
 	github.com/googleapis/google-cloud-go-testing v0.0.0-20210719221736-1c9a4c676720 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect

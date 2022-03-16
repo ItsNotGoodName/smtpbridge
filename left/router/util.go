@@ -3,9 +3,11 @@ package router
 import (
 	"fmt"
 	"io/fs"
+	"log"
 	"net/http"
 
-	"github.com/ItsNotGoodName/smtpbridge/left"
+	"github.com/ItsNotGoodName/smtpbridge/left/api"
+	"github.com/go-chi/chi/v5"
 )
 
 const (
@@ -28,13 +30,50 @@ func handleFS(prefix string, dirFS fs.FS) http.HandlerFunc {
 	}
 }
 
-func render(rw http.ResponseWriter, w left.WebRepository, page left.Page, data interface{}) {
-	err := w.GetTemplate(page).Execute(rw, data)
-	if err != nil {
-		renderError(rw, err, http.StatusInternalServerError)
+func render(rd api.Renderer, h api.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		rd.Render(w, h(w, r))
 	}
 }
 
-func renderError(rw http.ResponseWriter, err error, status int) {
-	http.Error(rw, err.Error(), status)
+// mountFS adds GET handlers for all files and folders using the given filesystem.
+func mountFS(r chi.Router, f fs.FS) {
+	httpFS := http.FS(f)
+	fsHandler := http.StripPrefix("/", http.FileServer(httpFS))
+
+	if files, err := fs.ReadDir(f, "."); err == nil {
+		for _, f := range files {
+			name := f.Name()
+			if f.IsDir() {
+				r.Get("/"+name+"/*", fsHandler.ServeHTTP)
+			} else if name == "index.html" {
+				indexHandler := indexGet(httpFS)
+				r.Get("/", indexHandler)
+				r.Get("/index.html", indexHandler)
+			} else {
+				r.Get("/"+name, fsHandler.ServeHTTP)
+			}
+		}
+	} else {
+		log.Fatal("router.mountFS:", err)
+	}
+}
+
+// indexGet returns index.html from the given filesystem.
+func indexGet(httpFS http.FileSystem) http.HandlerFunc {
+	index, err := httpFS.Open("/index.html")
+	if err != nil {
+		log.Fatal("router.indexGet:", err)
+	}
+
+	stat, err := index.Stat()
+	if err != nil {
+		log.Fatal("router.indexGet:", err)
+	}
+
+	modtime := stat.ModTime()
+
+	return func(rw http.ResponseWriter, r *http.Request) {
+		http.ServeContent(rw, r, "index.html", modtime, index)
+	}
 }

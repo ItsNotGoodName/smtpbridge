@@ -1,10 +1,10 @@
 package smtp
 
 import (
+	"context"
 	"log"
 	"time"
 
-	"github.com/ItsNotGoodName/smtpbridge/config"
 	"github.com/emersion/go-sasl"
 	"github.com/emersion/go-smtp"
 )
@@ -30,16 +30,16 @@ type SMTP struct {
 	s *smtp.Server
 }
 
-func New(cfg *config.Config, b Backend) SMTP {
+func New(b Backend, addr string, size int) SMTP {
 	s := smtp.NewServer(b)
 
 	enableMechLogin(s, b)
 
-	s.Addr = cfg.SMTP.Addr
+	s.Addr = addr
 	s.Domain = "localhost"
 	s.ReadTimeout = 10 * time.Second
 	s.WriteTimeout = 10 * time.Second
-	s.MaxMessageBytes = cfg.SMTP.Size
+	s.MaxMessageBytes = size
 	s.MaxRecipients = 50
 	s.AllowInsecureAuth = true
 
@@ -51,4 +51,9 @@ func (s SMTP) Start() {
 	if err := s.s.ListenAndServe(); err != nil {
 		log.Fatalln("smtp.SMTP.Start:", err)
 	}
+}
+
+func (s SMTP) Run(ctx context.Context, done chan<- struct{}) {
+	go s.Start()
+	done <- struct{}{}
 }
