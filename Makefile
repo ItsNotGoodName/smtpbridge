@@ -9,5 +9,8 @@ dev-backend:
 dev-frontend:
 	npm run dev --prefix left/web
 
+build-frontend:
+	npm run build --prefix left/web
+
 snapshot: 
 	goreleaser release --snapshot --rm-dist
