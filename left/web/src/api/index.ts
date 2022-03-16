@@ -18,11 +18,6 @@ export interface ICursor {
   cursor?: Number
 }
 
-export interface INextCursor {
-  next_cursor: Number
-  has_more: Boolean
-}
-
 export interface IVersion {
   version: String
   commit: String
@@ -40,10 +35,10 @@ export interface IInfo {
 export interface IMessage {
   id: number
   from: string
-  to: [string]
+  to: string[]
   subject: string
   text: string
-  attachment: [IAttachment]
+  attachments: IAttachment[]
   created_at: string
 }
 
@@ -62,13 +57,15 @@ export interface IEvent {
 }
 
 export interface IMessages {
-  cursor: INextCursor
-  messages: [IMessage]
+  has_more: boolean
+  next_cursor: number
+  messages: IMessage[]
 }
 
 export interface IEvents {
-  cursor: INextCursor
-  events: [IEvent]
+  has_more: boolean
+  next_cursor: number
+  events: IEvent[]
 }
 
 export default {
@@ -87,13 +84,13 @@ export default {
     return jsonResponse(fetch(API_URL + "/api/message/" + id));
   },
   getMessageEvents(id: Number, cursor: ICursor): Promise<IResponse<IEvents>> {
-    return jsonResponse(fetch(API_URL + "/api/message/" + id + new URLSearchParams(cursor as any)));
+    return jsonResponse(fetch(API_URL + "/api/message/" + id + "?" + new URLSearchParams(cursor as any)));
   },
   getMessages(cursor: ICursor): Promise<IResponse<IMessages>> {
-    return jsonResponse(fetch(API_URL + "/api/messages" + new URLSearchParams(cursor as any)));
+    return jsonResponse(fetch(API_URL + "/api/messages?" + new URLSearchParams(cursor as any)));
   },
   getEvents(cursor: ICursor): Promise<IResponse<IEvents>> {
-    return jsonResponse(fetch(API_URL + "/api/events" + new URLSearchParams(cursor as any)));
+    return jsonResponse(fetch(API_URL + "/api/events?" + new URLSearchParams(cursor as any)));
   },
   attachmentUrl(attachment: IAttachment): string {
     return API_URL + "/attachment/" + attachment.file
