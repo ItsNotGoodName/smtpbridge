@@ -39,7 +39,7 @@ func New(config *config.Config) Server {
 		eventRepository      event.Repository
 	)
 	endpointRepository := endpoints.NewRepository()
-	dataRepository := filedb.NewData(config.Database.Attachments)
+	dataRepository := filedb.NewData(config.Storage.AttachmentsPath)
 	for _, e := range config.Endpoints {
 		err := endpointRepository.Create(e.Name, e.Type, e.Config)
 		if err != nil {
@@ -47,7 +47,7 @@ func New(config *config.Config) Server {
 		}
 	}
 	if config.Database.IsBolt() {
-		db := boltdb.NewDatabase(config.Database.DB)
+		db := boltdb.NewDatabase(config.Database.BoltPath)
 		att := boltdb.NewAttachment(&db, dataRepository)
 		msg := boltdb.NewMessage(&db, dataRepository)
 
@@ -94,8 +94,8 @@ func New(config *config.Config) Server {
 	} else {
 		smtpAuthService = auth.NewAnonymousService()
 	}
-	if config.Database.Size != 0 {
-		background = append(background, janitor.NewJanitorService(attachmentRepository, messageRepository, dataRepository, config.Database.Size))
+	if config.Storage.Size > 0 {
+		background = append(background, janitor.NewJanitorService(attachmentRepository, messageRepository, dataRepository, config.Storage.Size))
 	}
 	eventService := event.NewEventService(eventRepository)
 	endpointService := event.NewEndpointService(eventService, endpoint.NewEndpointService())

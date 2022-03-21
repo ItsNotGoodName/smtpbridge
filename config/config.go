@@ -10,9 +10,10 @@ import (
 )
 
 type Config struct {
-	Database  ConfigDB         `json:"database" mapstructure:"database"`
-	SMTP      ConfigSMTP       `json:"smtp" mapstructure:"smtp"`
+	Storage   ConfigStorage    `json:"storage" mapstructure:"storage"`
+	Database  ConfigDatabase   `json:"database" mapstructure:"database"`
 	HTTP      ConfigHTTP       `json:"http" mapstructure:"http"`
+	SMTP      ConfigSMTP       `json:"smtp" mapstructure:"smtp"`
 	Bridges   []ConfigBridge   `json:"bridges" mapstructure:"bridges"`
 	Endpoints []ConfigEndpoint `json:"endpoints" mapstructure:"endpoints"`
 }
@@ -40,14 +41,20 @@ type ConfigFilter struct {
 	FromRegex string `json:"from_regex,omitempty" mapstructure:"from_regex,omitempty"`
 }
 
-type ConfigDB struct {
-	Type        string `json:"type" mapstructure:"type"`
-	DB          string `json:"db" mapstructure:"db"`
-	Attachments string `json:"attachments" mapstructure:"attachments"`
-	Size        int64  `json:"size" mapstructure:"size"`
+type ConfigDatabase struct {
+	Type     string `json:"type" mapstructure:"type"`
+	BoltFile string `json:"-" mapstructure:"-"`
+	BoltPath string `json:"-" mapstructure:"-"`
 }
 
-func (db *ConfigDB) IsBolt() bool {
+type ConfigStorage struct {
+	Size                 int64  `json:"size" mapstructure:"size"`
+	Path                 string `json:"path" mapstructure:"path"`
+	AttachmentsDirectory string `json:"-" mapstructure:"-"`
+	AttachmentsPath      string `json:"-" mapstructure:"-"`
+}
+
+func (db ConfigDatabase) IsBolt() bool {
 	return db.Type == "bolt"
 }
 
@@ -80,21 +87,21 @@ func New() *Config {
 		log.Fatalln("config.New: could not get user's home dir:", err)
 	}
 
-	rootPath := path.Join(home, ".smtpbridge")
-
 	return &Config{
-		Database: ConfigDB{
-			Type:        "",
-			DB:          path.Join(rootPath, "bolt.db"),
-			Attachments: path.Join(rootPath, "attachments"),
-			Size:        1024 * 1024 * 2048,
+		Storage: ConfigStorage{
+			Size:                 1024 * 1024 * 2048,
+			Path:                 path.Join(home, ".smtpbridge"),
+			AttachmentsDirectory: "attachments",
+		},
+		Database: ConfigDatabase{
+			BoltFile: "bolt.db",
+		},
+		HTTP: ConfigHTTP{
+			Port: 8080,
 		},
 		SMTP: ConfigSMTP{
 			Size: 1024 * 1024 * 25,
 			Port: 1025,
-		},
-		HTTP: ConfigHTTP{
-			Port: 8080,
 		},
 		Bridges:   []ConfigBridge{},
 		Endpoints: []ConfigEndpoint{},
@@ -114,6 +121,8 @@ func (c *Config) Load() {
 
 	c.SMTP.Addr = c.SMTP.Host + ":" + strconv.FormatUint(uint64(c.SMTP.Port), 10)
 	c.HTTP.Addr = c.HTTP.Host + ":" + strconv.FormatUint(uint64(c.HTTP.Port), 10)
+	c.Storage.AttachmentsPath = path.Join(c.Storage.Path, c.Storage.AttachmentsDirectory)
+	c.Database.BoltPath = path.Join(c.Storage.Path, c.Database.BoltFile)
 
 	for _, bridge := range c.Bridges {
 		for j, endpoint := range bridge.Endpoints {
@@ -130,12 +139,12 @@ func (c *Config) Load() {
 		}
 	}
 
-	if err := os.MkdirAll(c.Database.Attachments, 0755); err != nil {
-		log.Fatalln("config.Config.Load: could not create attachments directory:", err)
+	if err := os.MkdirAll(c.Storage.Path, 0755); err != nil {
+		log.Println("config.Config.Load: could not create storage directory:", err)
 	}
 
-	if err := os.MkdirAll(path.Dir(c.Database.DB), 0755); err != nil {
-		log.Fatalln("config.Config.Load: could not create database's parent directory:", err)
+	if err := os.MkdirAll(c.Storage.AttachmentsPath, 0755); err != nil {
+		log.Println("config.Config.Load: could not create attachments directory:", err)
 	}
 
 	log.Printf("config.Config.Load: %d bridges and %d endpoints", len(c.Bridges), len(c.Endpoints))

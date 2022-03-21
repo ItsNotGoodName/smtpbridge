@@ -33,7 +33,7 @@ var serverConfig *config.Config
 // serverCmd represents the server command
 var serverCmd = &cobra.Command{
 	Use:   "server",
-	Short: "Start SMTP server",
+	Short: "Start server",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		// Load config
@@ -49,17 +49,8 @@ func init() {
 
 	serverConfig = config.New()
 
-	serverCmd.Flags().String("smtp-host", serverConfig.SMTP.Host, "smtp host address to listen on")
-	viper.BindPFlag("smtp.host", serverCmd.Flags().Lookup("smtp-host"))
-
-	serverCmd.Flags().Uint16("smtp-port", serverConfig.SMTP.Port, "smtp port to listen on")
-	viper.BindPFlag("smtp.port", serverCmd.Flags().Lookup("smtp-port"))
-
-	serverCmd.Flags().Int("smtp-size", serverConfig.SMTP.Size, "max size of email in bytes")
-	viper.BindPFlag("smtp.size", serverCmd.Flags().Lookup("smtp-size"))
-
-	viper.SetDefault("database.db", serverConfig.Database.DB)
-	viper.SetDefault("database.attachments", serverConfig.Database.Attachments)
+	serverCmd.Flags().String("database-type", serverConfig.Database.Type, "database type to use")
+	viper.BindPFlag("database.type", serverCmd.Flags().Lookup("database-type"))
 
 	serverCmd.Flags().Bool("http", serverConfig.HTTP.Enable, "enable http server")
 	viper.BindPFlag("http.enable", serverCmd.Flags().Lookup("http"))
@@ -69,6 +60,12 @@ func init() {
 
 	serverCmd.Flags().Uint16("http-port", serverConfig.HTTP.Port, "http port to listen on")
 	viper.BindPFlag("http.port", serverCmd.Flags().Lookup("http-port"))
+
+	serverCmd.Flags().String("smtp-host", serverConfig.SMTP.Host, "smtp host address to listen on")
+	viper.BindPFlag("smtp.host", serverCmd.Flags().Lookup("smtp-host"))
+
+	serverCmd.Flags().Uint16("smtp-port", serverConfig.SMTP.Port, "smtp port to listen on")
+	viper.BindPFlag("smtp.port", serverCmd.Flags().Lookup("smtp-port"))
 
 	// Here you will define your flags and configuration settings.
 
