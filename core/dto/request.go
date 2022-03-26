@@ -33,8 +33,6 @@ type MessageListResponse struct {
 	HasMore    bool      `json:"has_more"`
 }
 
-type InfoRequest struct{}
-
 type InfoResponse struct {
 	EventsCount      int   `json:"events_count"`
 	MessagesCount    int   `json:"messages_count"`

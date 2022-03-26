@@ -140,8 +140,8 @@ func (m *Message) List(ctx context.Context, param *message.ListParam) error {
 	}
 
 	if len(msgsM) == param.Cursor.Limit+1 {
-		param.Cursor.HasMore = true
-		param.Cursor.NextCursor = msgsM[param.Cursor.Limit-cursorOffset].ID
+		param.Cursor.SetHasMore(true)
+		param.Cursor.SetNextCursor(msgsM[param.Cursor.Limit-cursorOffset].ID)
 		msgsM = msgsM[:param.Cursor.Limit]
 	}
 

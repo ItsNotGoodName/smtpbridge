@@ -54,6 +54,10 @@ type ConfigStorage struct {
 	AttachmentsPath      string `json:"-" mapstructure:"-"`
 }
 
+func (db ConfigDatabase) IsMock() bool {
+	return db.Type == ""
+}
+
 func (db ConfigDatabase) IsBolt() bool {
 	return db.Type == "bolt"
 }
@@ -127,24 +131,34 @@ func (c *Config) Load() {
 	for _, bridge := range c.Bridges {
 		for j, endpoint := range bridge.Endpoints {
 			if endpoint.NoTextStr != "" {
-				bridge.Endpoints[j].NoText, _ = strconv.ParseBool(endpoint.NoTextStr)
+				var err error
+				bridge.Endpoints[j].NoText, err = strconv.ParseBool(endpoint.NoTextStr)
+				if err != nil {
+					log.Fatalln("config.Config.Load: could not parse no_text:", err)
+				}
 			} else {
 				bridge.Endpoints[j].NoText = bridge.NoText
 			}
 			if endpoint.NoAttachmentsStr != "" {
-				bridge.Endpoints[j].NoAttachments, _ = strconv.ParseBool(endpoint.NoAttachmentsStr)
+				var err error
+				bridge.Endpoints[j].NoAttachments, err = strconv.ParseBool(endpoint.NoAttachmentsStr)
+				if err != nil {
+					log.Fatalln("config.Config.Load: could not parse no_attachments:", err)
+				}
 			} else {
 				bridge.Endpoints[j].NoAttachments = bridge.NoAttachments
 			}
 		}
 	}
 
-	if err := os.MkdirAll(c.Storage.Path, 0755); err != nil {
-		log.Println("config.Config.Load: could not create storage directory:", err)
-	}
+	if !c.Database.IsMock() {
+		if err := os.MkdirAll(c.Storage.Path, 0755); err != nil {
+			log.Println("config.Config.Load: could not create storage directory:", err)
+		}
 
-	if err := os.MkdirAll(c.Storage.AttachmentsPath, 0755); err != nil {
-		log.Println("config.Config.Load: could not create attachments directory:", err)
+		if err := os.MkdirAll(c.Storage.AttachmentsPath, 0755); err != nil {
+			log.Println("config.Config.Load: could not create attachments directory:", err)
+		}
 	}
 
 	log.Printf("config.Config.Load: %d bridges and %d endpoints", len(c.Bridges), len(c.Endpoints))

@@ -107,8 +107,8 @@ func (e *Event) list(ctx context.Context, param *event.ListParam, filters ...q.M
 	}
 
 	if len(eventsM) == param.Cursor.Limit+1 {
-		param.Cursor.HasMore = true
-		param.Cursor.NextCursor = eventsM[param.Cursor.Limit-cursorOffset].ID
+		param.Cursor.SetHasMore(true)
+		param.Cursor.SetNextCursor(eventsM[param.Cursor.Limit-cursorOffset].ID)
 		eventsM = eventsM[:param.Cursor.Limit]
 	}
 

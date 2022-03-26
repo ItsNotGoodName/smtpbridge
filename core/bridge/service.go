@@ -10,18 +10,16 @@ import (
 )
 
 type BridgeService struct {
-	bridges            []Bridge
-	messageService     message.Service
-	endpointRepository endpoint.Repository
-	endpointService    endpoint.Service
+	bridges         []Bridge
+	messageService  message.Service
+	endpointService endpoint.Service
 }
 
-func NewBridgeService(bridges []Bridge, messageSerivce message.Service, endpointRepository endpoint.Repository, endpointService endpoint.Service) *BridgeService {
+func NewBridgeService(bridges []Bridge, messageSerivce message.Service, endpointService endpoint.Service) *BridgeService {
 	return &BridgeService{
-		bridges:            bridges,
-		messageService:     messageSerivce,
-		endpointRepository: endpointRepository,
-		endpointService:    endpointService,
+		bridges:         bridges,
+		messageService:  messageSerivce,
+		endpointService: endpointService,
 	}
 }
 

@@ -24,3 +24,11 @@ func New(ascending bool, limit int, cursor int64) Cursor {
 func NewOldest(limit int) Cursor {
 	return New(false, limit, 0)
 }
+
+func (c *Cursor) SetHasMore(hasMore bool) {
+	c.HasMore = hasMore
+}
+
+func (c *Cursor) SetNextCursor(nextCursor int64) {
+	c.NextCursor = nextCursor
+}

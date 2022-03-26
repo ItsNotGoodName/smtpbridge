@@ -66,6 +66,12 @@ func (js *JanitorService) Clean(ctx context.Context) error {
 func (j *JanitorService) Run(ctx context.Context, done chan<- struct{}) {
 	log.Println("janitor.JanitorService.Run: started")
 
+	if j.maxSize <= 0 {
+		log.Printf("janitor.JanitorService.Run: maxSize is %d, janitor is disabled", j.maxSize)
+		done <- struct{}{}
+		return
+	}
+
 	clean := func() {
 		if err := j.Clean(ctx); err != nil {
 			log.Printf("janitor.JanitorService.Run: %s", err)

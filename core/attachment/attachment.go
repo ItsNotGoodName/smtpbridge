@@ -15,7 +15,8 @@ const (
 )
 
 var (
-	ErrInvalid       = fmt.Errorf("invalid attachment")
+	ErrInvalid       = fmt.Errorf("attachment invalid")
+	ErrDataEmpty     = fmt.Errorf("attachment data is empty")
 	ErrDataNotLoaded = fmt.Errorf("attachment data not loaded")
 	ErrNotFound      = fmt.Errorf("attachment not found")
 )
@@ -87,7 +88,7 @@ func New(param *Param) (*Attachment, error) {
 // DataType returns the type of the attachment data.
 func DataType(data []byte) (Type, error) {
 	if len(data) == 0 {
-		return "", ErrDataNotLoaded
+		return "", ErrDataEmpty
 	}
 
 	contentType := http.DetectContentType(data)

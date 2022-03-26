@@ -33,32 +33,38 @@ func New(config *config.Config) Server {
 	background := []background.Background{}
 
 	// Init repositories
-	var (
-		attachmentRepository attachment.Repository
-		messageRepository    message.Repository
-		eventRepository      event.Repository
-	)
 	endpointRepository := endpoints.NewRepository()
-	dataRepository := filedb.NewData(config.Storage.AttachmentsPath)
-	for _, e := range config.Endpoints {
-		err := endpointRepository.Create(e.Name, e.Type, e.Config)
-		if err != nil {
-			log.Fatalln("server.New: could not create endpoint:", err)
-		}
-	}
-	if config.Database.IsBolt() {
+	var (
+		attachmentDataRepository attachment.DataRepository
+		attachmentRepository     attachment.Repository
+		messageRepository        message.Repository
+		eventRepository          event.Repository
+	)
+	if config.Database.IsMock() {
+		attachmentDataRepository = mockdb.NewData()
+		attachmentRepository = mockdb.NewAttachment()
+		messageRepository = mockdb.NewMessage()
+		eventRepository = mockdb.NewEvent()
+	} else if config.Database.IsBolt() {
+		attachmentDataRepository = filedb.NewData(config.Storage.AttachmentsPath)
 		db := boltdb.NewDatabase(config.Database.BoltPath)
-		att := boltdb.NewAttachment(&db, dataRepository)
-		msg := boltdb.NewMessage(&db, dataRepository)
+		att := boltdb.NewAttachment(&db, attachmentDataRepository)
+		msg := boltdb.NewMessage(&db, attachmentDataRepository)
 
 		background = append(background, db)
 		attachmentRepository = att
 		messageRepository = msg
 		eventRepository = boltdb.NewEvent(&db)
 	} else {
-		attachmentRepository = mockdb.NewAttachment()
-		messageRepository = mockdb.NewMessage()
-		eventRepository = mockdb.NewEvent()
+		log.Fatalln("server.New: unknown database type:", config.Database.Type)
+	}
+
+	// Create endpoints
+	for _, e := range config.Endpoints {
+		err := endpointRepository.Create(e.Name, e.Type, e.Config)
+		if err != nil {
+			log.Fatalln("server.New: could not create endpoint:", err)
+		}
 	}
 
 	// Create bridges
@@ -94,21 +100,21 @@ func New(config *config.Config) Server {
 	} else {
 		smtpAuthService = auth.NewAnonymousService()
 	}
-	if config.Storage.Size > 0 {
-		background = append(background, janitor.NewJanitorService(attachmentRepository, messageRepository, dataRepository, config.Storage.Size))
-	}
 	eventService := event.NewEventService(eventRepository)
 	endpointService := event.NewEndpointService(eventService, endpoint.NewEndpointService())
 	messageService := event.NewMessageService(eventService, message.NewMessageService(messageRepository))
 	attachmentService := attachment.NewAttachmentService(attachmentRepository)
-	bridgeService := bridge.NewBridgeService(bridges, messageService, endpointRepository, endpointService)
+	bridgeService := bridge.NewBridgeService(bridges, messageService, endpointService)
+	if !config.Database.IsMock() {
+		background = append(background, janitor.NewJanitorService(attachmentRepository, messageRepository, attachmentDataRepository, config.Storage.Size))
+	}
 
 	// Init app
 	app := app.New(
 		attachmentRepository,
 		attachmentService,
 		bridgeService,
-		dataRepository,
+		attachmentDataRepository,
 		endpointService,
 		eventRepository,
 		messageRepository,

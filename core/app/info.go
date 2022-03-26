@@ -17,7 +17,7 @@ func (a *App) Info(ctx context.Context) (*dto.InfoResponse, error) {
 		return nil, err
 	}
 
-	attachmentsSize, err := a.dataRepository.Size(ctx)
+	attachmentsSize, err := a.attachmentDataRepository.Size(ctx)
 	if err != nil {
 		return nil, err
 	}
