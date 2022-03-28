@@ -19,11 +19,12 @@ type Config struct {
 }
 
 type ConfigBridge struct {
-	Name          string                 `json:"name" mapstructure:"name"`
-	NoText        bool                   `json:"no_text" mapstructure:"no_text"`
-	NoAttachments bool                   `json:"no_attachments" mapstructure:"no_attachments"`
-	Endpoints     []ConfigBridgeEndpoint `json:"endpoints" mapstructure:"endpoints"`
-	Filters       []ConfigFilter         `json:"filters" mapstructure:"filters"`
+	Name           string                 `json:"name" mapstructure:"name"`
+	NoText         bool                   `json:"no_text" mapstructure:"no_text"`
+	NoAttachments  bool                   `json:"no_attachments" mapstructure:"no_attachments"`
+	MinAttachments int                    `json:"min_attachments" mapstructure:"min_attachments"`
+	Endpoints      []ConfigBridgeEndpoint `json:"endpoints" mapstructure:"endpoints"`
+	Filters        []ConfigFilter         `json:"filters" mapstructure:"filters"`
 }
 
 type ConfigBridgeEndpoint struct {

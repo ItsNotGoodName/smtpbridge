@@ -4,8 +4,8 @@ import (
 	"context"
 	"log"
 
-	"github.com/ItsNotGoodName/smtpbridge/core/attachment"
 	"github.com/ItsNotGoodName/smtpbridge/core/endpoint"
+	"github.com/ItsNotGoodName/smtpbridge/core/envelope"
 	"github.com/ItsNotGoodName/smtpbridge/core/message"
 )
 
@@ -23,10 +23,10 @@ func NewBridgeService(bridges []Bridge, messageSerivce message.Service, endpoint
 	}
 }
 
-func (bs *BridgeService) ListByMessage(msg *message.Message) []*Bridge {
+func (bs *BridgeService) ListByEnvelope(env envelope.Envelope) []*Bridge {
 	var bridges []*Bridge
 	for _, bridge := range bs.bridges {
-		if !bridge.Match(msg) {
+		if !bridge.Match(env) {
 			continue
 		}
 		bridges = append(bridges, &bridge)
@@ -35,11 +35,11 @@ func (bs *BridgeService) ListByMessage(msg *message.Message) []*Bridge {
 	return bridges
 }
 
-func (bs *BridgeService) HandleMessage(ctx context.Context, bridges []*Bridge, msg *message.Message, atts []attachment.Attachment) error {
-	defer bs.messageService.Processed(ctx, msg)
+func (bs *BridgeService) HandleEnvelope(ctx context.Context, bridges []*Bridge, env envelope.Envelope) error {
+	defer bs.messageService.Processed(ctx, env.Message)
 
-	emsg := endpoint.NewMessage(msg)
-	eatts, err := endpoint.NewAttachments(atts)
+	emsg := endpoint.NewMessage(env.Message)
+	eatts, err := endpoint.NewAttachments(env.Attachments)
 	if err != nil {
 		return err
 	}
@@ -57,12 +57,12 @@ func (bs *BridgeService) HandleMessage(ctx context.Context, bridges []*Bridge, m
 		resC := bs.endpointService.Send(ctx, req)
 		for res := range resC {
 			if res.Error != nil {
-				log.Println("bridge.BridgeService.HandleMessage:", res)
+				log.Println("bridge.BridgeService.HandleEnvelope:", res)
 			}
 			count++
 		}
 
-		log.Printf("bridge.BridgeService.MessageHandle: sent message %d  to %d endpoint(s)", emsg.ID, count)
+		log.Printf("bridge.BridgeService.MessageEnvelope: sent envelope %d to %d endpoint(s)", emsg.ID, count)
 	}
 
 	return nil

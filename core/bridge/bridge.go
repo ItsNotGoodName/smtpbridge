@@ -3,16 +3,16 @@ package bridge
 import (
 	"context"
 
-	"github.com/ItsNotGoodName/smtpbridge/core/attachment"
 	"github.com/ItsNotGoodName/smtpbridge/core/endpoint"
-	"github.com/ItsNotGoodName/smtpbridge/core/message"
+	"github.com/ItsNotGoodName/smtpbridge/core/envelope"
 )
 
 type (
 	Bridge struct {
-		Name      string     // Name is the name of the bridge.
-		Endpoints []Endpoint // Endpoints are the endpoint.
-		Filters   []Filter   // Filters are the filters.
+		Name           string     // Name is the name of the bridge.
+		Filters        []Filter   // Filters are the filters.
+		Endpoints      []Endpoint // Endpoints are the endpoint.
+		MinAttachments int        // MinAttachments is the minimum number of attachments required.
 	}
 
 	Endpoint struct {
@@ -22,18 +22,19 @@ type (
 	}
 
 	Service interface {
-		// ListByMessage returns bridges that the message belongs to.
-		ListByMessage(msg *message.Message) []*Bridge
-		// HandleMessage handles a message.
-		HandleMessage(ctx context.Context, bridges []*Bridge, msg *message.Message, atts []attachment.Attachment) error
+		// ListByEnvelope returns bridges that the envelope belongs to.
+		ListByEnvelope(env envelope.Envelope) []*Bridge
+		// HandleEnvelope handles an envelope.
+		HandleEnvelope(ctx context.Context, bridges []*Bridge, env envelope.Envelope) error
 	}
 )
 
-func New(name string, facades []Endpoint, filters []Filter) *Bridge {
+func New(name string, facades []Endpoint, filters []Filter, minAttachments int) *Bridge {
 	return &Bridge{
-		Name:      name,
-		Endpoints: facades,
-		Filters:   filters,
+		Name:           name,
+		Endpoints:      facades,
+		Filters:        filters,
+		MinAttachments: minAttachments,
 	}
 }
 
@@ -45,15 +46,19 @@ func NewEndpoint(facade *endpoint.Facade, noText, noAttachments bool) Endpoint {
 	}
 }
 
-func (b *Bridge) Match(msg *message.Message) bool {
-	if len(b.Filters) == 0 {
-		return true
-	}
-	for _, f := range b.Filters {
-		if f.Match(msg) {
+func (b *Bridge) Match(env envelope.Envelope) bool {
+	if len(env.Attachments) >= b.MinAttachments {
+		if len(b.Filters) == 0 {
 			return true
 		}
+
+		for _, f := range b.Filters {
+			if f.Match(env.Message) {
+				return true
+			}
+		}
 	}
+
 	return false
 }
 

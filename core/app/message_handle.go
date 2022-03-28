@@ -6,6 +6,7 @@ import (
 
 	"github.com/ItsNotGoodName/smtpbridge/core/attachment"
 	"github.com/ItsNotGoodName/smtpbridge/core/dto"
+	"github.com/ItsNotGoodName/smtpbridge/core/envelope"
 	"github.com/ItsNotGoodName/smtpbridge/core/message"
 )
 
@@ -35,5 +36,6 @@ func (a *App) MessageHandle(ctx context.Context, req *dto.MessageHandleRequest) 
 		atts = append(atts, *att)
 	}
 
-	return a.bridgeService.HandleMessage(ctx, a.bridgeService.ListByMessage(msg), msg, atts)
+	env := envelope.New(msg, atts)
+	return a.bridgeService.HandleEnvelope(ctx, a.bridgeService.ListByEnvelope(env), env)
 }

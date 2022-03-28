@@ -90,7 +90,7 @@ func New(config *config.Config) Server {
 			filters = append(filters, filter)
 		}
 
-		bridges = append(bridges, *bridge.New(b.Name, endpoints, filters))
+		bridges = append(bridges, *bridge.New(b.Name, endpoints, filters, b.MinAttachments))
 	}
 
 	// Init services

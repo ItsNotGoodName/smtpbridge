@@ -62,6 +62,7 @@ bridges: # Bridges modify and check if messages should be sent to endpoints
   - name: test bridge
     no_text: false # When this is true, text will not be sent to endpoints
     no_attachments: false # When this is true, attachments will not be sent to endpoints
+    min_attachments: 1 # Message must have at least this amount of attachments, Default 0
     filters:
       - to: foo@example.com # Filter based on to address
         to_regex: "foo" # To regex takes priority over to, must be surrounded by quotation marks
