@@ -2,7 +2,6 @@ package boltdb
 
 import (
 	"context"
-	"math"
 	"time"
 
 	"github.com/ItsNotGoodName/smtpbridge/core/entity"
@@ -85,31 +84,23 @@ func (e *Event) Get(ctx context.Context, id int64) (*event.Event, error) {
 }
 
 func (e *Event) list(ctx context.Context, param *event.ListParam, filters ...q.Matcher) error {
-	var query storm.Query
-	cursorOffset := 0
-	if param.Cursor.Ascending {
-		filters = append(filters, q.Gt("ID", param.Cursor.Cursor))
-		query = e.db.Select(filters...).OrderBy("ID")
-	} else {
-		if param.Cursor.Cursor == 0 {
-			param.Cursor.Cursor = math.MaxInt64
-		}
-		filters = append(filters, q.Lt("ID", param.Cursor.Cursor))
-		query = e.db.Select(filters...).OrderBy("ID").Reverse()
-		cursorOffset = 1
+	query := e.db.Select(filters...).OrderBy("ID")
+	if !param.Page.Ascending {
+		query = query.Reverse()
 	}
 
-	query.Limit(param.Cursor.Limit + 1)
+	count, err := query.Count(&eventModel{})
+	if err != nil {
+		return err
+	}
+	param.Page.SetCount(count)
+
+	query.Limit(param.Page.Limit)
+	query.Skip(param.Page.Offset())
 
 	var eventsM []eventModel
 	if err := query.Find(&eventsM); err != nil && err != storm.ErrNotFound {
 		return err
-	}
-
-	if len(eventsM) == param.Cursor.Limit+1 {
-		param.Cursor.SetHasMore(true)
-		param.Cursor.SetNextCursor(eventsM[param.Cursor.Limit-cursorOffset].ID)
-		eventsM = eventsM[:param.Cursor.Limit]
 	}
 
 	var events []event.Event

@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/ItsNotGoodName/smtpbridge/core/attachment"
-	"github.com/ItsNotGoodName/smtpbridge/core/cursor"
 	"github.com/ItsNotGoodName/smtpbridge/core/message"
+	"github.com/ItsNotGoodName/smtpbridge/core/paginate"
 )
 
 type JanitorService struct {
@@ -38,7 +38,7 @@ func (js *JanitorService) Clean(ctx context.Context) error {
 		}
 
 		listParam := message.ListParam{
-			Cursor: cursor.NewOldest(5),
+			Cursor: paginate.NewCursorOldest(5),
 		}
 		if err = js.messageRepository.List(ctx, &listParam); err != nil {
 			return err

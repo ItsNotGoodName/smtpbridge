@@ -48,16 +48,15 @@ type VersionResponse struct {
 }
 
 type EventListRequest struct {
-	EntityID  int64
-	Cursor    int64
 	Ascending bool
+	Page      int
 	Limit     int
+	EntityID  int64
 }
 
 type EventListResponse struct {
-	Events     []Event `json:"events"`
-	NextCursor int64   `json:"next_cursor"`
-	HasMore    bool    `json:"has_more"`
+	Events   []Event `json:"events"`
+	MaxPages int     `json:"max_pages"`
 }
 
 type MessageDeleteRequest struct {

@@ -71,14 +71,14 @@ func MessageEventsGet(a dto.App) Handler {
 	return func(rw http.ResponseWriter, r *http.Request) Response {
 		id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 		q := r.URL.Query()
-		cursor, _ := strconv.ParseInt(q.Get("cursor"), 10, 64)
+		page, _ := strconv.Atoi(q.Get("page"))
 		ascending := q.Get("ascending") == "true"
 		limit, _ := strconv.Atoi(q.Get("limit"))
 
 		code := http.StatusOK
 		res, err := a.MessageEventList(r.Context(), &dto.EventListRequest{
 			EntityID:  id,
-			Cursor:    cursor,
+			Page:      page,
 			Ascending: ascending,
 			Limit:     limit,
 		})

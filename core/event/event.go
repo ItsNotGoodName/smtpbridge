@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ItsNotGoodName/smtpbridge/core/cursor"
 	"github.com/ItsNotGoodName/smtpbridge/core/entity"
+	"github.com/ItsNotGoodName/smtpbridge/core/paginate"
 )
 
 var (
@@ -35,7 +35,7 @@ type (
 	}
 
 	ListParam struct {
-		Cursor cursor.Cursor
+		Page   paginate.Page
 		Events []Event
 	}
 

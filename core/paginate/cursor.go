@@ -1,4 +1,4 @@
-package cursor
+package paginate
 
 type Cursor struct {
 	Ascending  bool
@@ -8,7 +8,7 @@ type Cursor struct {
 	HasMore    bool
 }
 
-func New(ascending bool, limit int, cursor int64) Cursor {
+func NewCursor(ascending bool, limit int, cursor int64) Cursor {
 	if limit <= 0 || limit > 100 {
 		limit = 5
 	}
@@ -21,8 +21,8 @@ func New(ascending bool, limit int, cursor int64) Cursor {
 	}
 }
 
-func NewOldest(limit int) Cursor {
-	return New(false, limit, 0)
+func NewCursorOldest(limit int) Cursor {
+	return NewCursor(false, limit, 0)
 }
 
 func (c *Cursor) SetHasMore(hasMore bool) {

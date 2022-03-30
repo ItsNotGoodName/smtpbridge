@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ItsNotGoodName/smtpbridge/core/cursor"
+	"github.com/ItsNotGoodName/smtpbridge/core/paginate"
 )
 
 var (
@@ -31,7 +31,7 @@ type (
 	}
 
 	ListParam struct {
-		Cursor   cursor.Cursor
+		Cursor   paginate.Cursor
 		Messages []Message
 	}
 
