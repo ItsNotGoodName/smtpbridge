@@ -1,35 +1,73 @@
 <script lang="ts">
 import { defineComponent } from "vue"
-import api, { IResponse, IMessage, IMessages } from "../api"
+import api, { IMessage } from "../api"
 import MessageCard from "../components/MessageCard.vue"
 
 export default defineComponent({
   data() {
     return {
-      limit: 10,
       limits: [10, 20, 50, 100],
-      ascending: false,
-      cursor: 0,
       back_cursor: 0,
       next_cursor: 0,
       loading: false,
       messages: [] as IMessage[],
     };
   },
-  beforeMount() {
-    this.firstPage()
+  created() {
+    this.$watch(
+      () => this.$route.query,
+      () => {
+        if (this.$route.name === "Home") {
+          this.load();
+        }
+      },
+      { immediate: true }
+    )
+  },
+  computed: {
+    limit: {
+      get(): number {
+        let limit = parseInt(this.$route.query.limit as string);
+        return isNaN(limit) ? this.limits[0] : limit;
+      },
+      set(value) {
+        this.push({ limit: value })
+      },
+    },
+    cursor: {
+      get() {
+        let cursor = parseInt(this.$route.query.cursor as string);
+        return isNaN(cursor) ? 0 : cursor;
+      },
+      set(value) {
+        this.push({ cursor: value })
+      },
+    },
+    ascending: {
+      get() {
+        return (this.$route.query.ascending as string) == "true"
+      },
+      set(value) {
+        this.push({ ascending: value, cursor: 0 })
+      },
+    },
+    backPageDisabled(): boolean {
+      return this.back_cursor == this.cursor || this.back_cursor == 0
+    },
+    nextPageDisabled(): boolean {
+      return this.next_cursor == this.cursor || this.next_cursor == 9223372036854776000
+    },
   },
   methods: {
-    async load(cursor: number) {
+    async load() {
       if (this.loading) {
         return
       }
 
       this.loading = true;
       try {
-        let res = await api.getMessages({ cursor: cursor, ascending: this.ascending, limit: this.limit })
+        let res = await api.getMessages({ cursor: this.cursor, ascending: this.ascending, limit: this.limit })
         if (res.ok) {
-          this.cursor = cursor
           this.messages = res.data!.messages;
           this.back_cursor = res.data!.back_cursor;
           this.next_cursor = res.data!.next_cursor;
@@ -38,17 +76,17 @@ export default defineComponent({
         this.loading = false;
       }
     },
-    refreshPage() {
-      return this.load(this.cursor);
+    push(query: {}) {
+      return this.$router.push({ name: "Home", query: { ...this.$route.query, ...query, } })
     },
     firstPage() {
-      return this.load(0);
+      return this.push({ cursor: 0 })
     },
     backPage() {
-      return this.load(this.back_cursor);
+      return this.push({ cursor: this.back_cursor })
     },
     nextPage() {
-      return this.load(this.next_cursor);
+      return this.push({ cursor: this.next_cursor })
     },
   },
   components: { MessageCard }
@@ -59,7 +97,7 @@ export default defineComponent({
   <el-space fill style="width: 100%">
     <el-space>
       <span>Limit</span>
-      <el-select v-model="limit" placeholder="Limit" @change="refreshPage" :disabled="loading">
+      <el-select v-model="limit" placeholder="Limit" :disabled="loading">
         <el-option v-for="item in limits" :key="item" :label="item" :value="item" />
       </el-select>
       <el-switch
@@ -67,7 +105,6 @@ export default defineComponent({
         inactive-text="Newest"
         active-text="Oldest"
         :loading="loading"
-        @click="firstPage"
       />
     </el-space>
     <el-space fill wrap :fill-ratio="20">
@@ -76,19 +113,19 @@ export default defineComponent({
     <el-button-group>
       <el-button
         type="primary"
-        :disabled="cursor == back_cursor"
+        :disabled="backPageDisabled"
         @click="firstPage"
         :loading="loading"
       >First Page</el-button>
       <el-button
         type="primary"
-        :disabled="cursor == back_cursor"
+        :disabled="backPageDisabled"
         @click="backPage"
         :loading="loading"
       >Previous Page</el-button>
       <el-button
         type="primary"
-        :disabled="cursor == next_cursor"
+        :disabled="nextPageDisabled"
         @click="nextPage"
         :loading="loading"
       >Next Page</el-button>

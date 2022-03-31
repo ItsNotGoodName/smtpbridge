@@ -1,4 +1,3 @@
-
 const API_URL = import.meta.env.VITE_API_URL
   ? import.meta.env.VITE_API_URL
   : "";
@@ -9,7 +8,9 @@ export interface IResponse<T> {
   ok: boolean;
   status: number;
   data?: T;
-  error?: string;
+  error?: {
+    message: string;
+  };
 }
 
 export interface ICursor {
@@ -94,5 +95,5 @@ export default {
   },
   attachmentUrl(attachment: IAttachment): string {
     return API_URL + "/attachment/" + attachment.file
-  }
+  },
 };

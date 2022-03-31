@@ -4,6 +4,8 @@
 
 declare module 'vue' {
   export interface GlobalComponents {
+    AttachmentImage: typeof import('./src/components/AttachmentImage.vue')['default']
+    Date: typeof import('./src/components/Date.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElButtonGroup: typeof import('element-plus/es')['ElButtonGroup']
     ElCard: typeof import('element-plus/es')['ElCard']
@@ -27,6 +29,7 @@ declare module 'vue' {
     ElSwitch: typeof import('element-plus/es')['ElSwitch']
     ElTag: typeof import('element-plus/es')['ElTag']
     MessageCard: typeof import('./src/components/MessageCard.vue')['default']
+    MessageDate: typeof import('./src/components/MessageDate.vue')['default']
     Navbar: typeof import('./src/components/Navbar.vue')['default']
   }
 }

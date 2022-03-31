@@ -1,6 +1,8 @@
 <script lang="ts">
 import { defineComponent } from "vue";
-import api, { IMessage } from "../api"
+import { IMessage } from "../api"
+import MessageDate from "./MessageDate.vue"
+import AttachmentImage from "./AttachmentImage.vue";
 
 export default defineComponent({
   props: {
@@ -9,47 +11,54 @@ export default defineComponent({
       required: true,
     }
   },
-  computed: {
-    subject() {
-      return this.message.subject ? this.message.subject : "No Subject";
-    },
-    attachmentUrls() {
-      let urls = []
-      for (let attachment of this.message.attachments) {
-        urls.push(api.attachmentUrl(attachment))
-      }
-      return urls
+  methods: {
+    onClick() {
+      this.$router.push({
+        name: "Message",
+        params: {
+          id: this.message.id,
+        },
+      });
     }
   },
+  components: { MessageDate, AttachmentImage }
 })
 </script>
 
 <template>
-  <el-card :body-style="{ padding: '0px' }">
-    <el-carousel v-if="attachmentUrls.length > 0">
-      <el-carousel-item v-for="attachmentUrl, idx of attachmentUrls" :key="idx">
-        <el-image :src="attachmentUrl" />
-      </el-carousel-item>
-    </el-carousel>
-    <div style="padding: 14px">
-      <span>{{ subject }}</span>
-      <div class="bottom">
-        <time class="time">{{ message.created_at }}</time>
+  <el-card :body-style="{ padding: '0px' }" @click="onClick">
+    <div class="card">
+      <attachment-image
+        v-if="message.attachments.length"
+        :attachment="message.attachments[0]"
+        class="thumbnail"
+      />
+      <div class="body">
+        <span>{{ message.subject }}</span>
+        <div class="body-bottom">
+          <message-date :message="message" />
+          <el-tag v-if="message.attachments.length">{{ message.attachments.length }}</el-tag>
+        </div>
       </div>
     </div>
   </el-card>
 </template>
 
 <style scoped>
-.bottom {
+.card {
+  display: flex;
+  height: 5rem;
+}
+.thumbnail {
+  width: 20%;
+}
+.body {
+  padding: 14px;
+}
+.body-bottom {
   margin-top: 13px;
   line-height: 12px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-}
-.time {
-  font-size: 13px;
-  color: #999;
 }
 </style>
