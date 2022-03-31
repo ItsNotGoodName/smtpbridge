@@ -3,7 +3,6 @@ package boltdb
 import (
 	"context"
 	"log"
-	"math"
 	"time"
 
 	"github.com/ItsNotGoodName/smtpbridge/core/attachment"
@@ -120,29 +119,33 @@ func (m *Message) Count(ctx context.Context) (int, error) {
 }
 
 func (m *Message) List(ctx context.Context, param *message.ListParam) error {
-	var query storm.Query
-	cursorOffset := 0
+	var (
+		q1 storm.Query
+		q2 storm.Query
+	)
 	if param.Cursor.Ascending {
-		query = m.db.Select(q.Gt("ID", param.Cursor.Cursor)).OrderBy("ID")
+		q1 = m.db.Select(q.Gte("ID", param.Cursor.Cursor)).OrderBy("ID").Limit(param.Cursor.Limit + 1)
+		q2 = m.db.Select(q.Lt("ID", param.Cursor.Cursor)).OrderBy("ID").Limit(param.Cursor.Limit).Reverse()
 	} else {
-		if param.Cursor.Cursor == 0 {
-			param.Cursor.Cursor = math.MaxInt64
-		}
-		query = m.db.Select(q.Lt("ID", param.Cursor.Cursor)).OrderBy("ID").Reverse()
-		cursorOffset = 1
+		q1 = m.db.Select(q.Lte("ID", param.Cursor.Cursor)).OrderBy("ID").Limit(param.Cursor.Limit + 1).Reverse()
+		q2 = m.db.Select(q.Gt("ID", param.Cursor.Cursor)).OrderBy("ID").Limit(param.Cursor.Limit)
 	}
-
-	query.Limit(param.Cursor.Limit + 1)
 
 	var msgsM []messageModel
-	if err := query.Find(&msgsM); err != nil && err != storm.ErrNotFound {
+	if err := q1.Find(&msgsM); err != nil && err != storm.ErrNotFound {
 		return err
 	}
-
 	if len(msgsM) == param.Cursor.Limit+1 {
-		param.Cursor.SetHasMore(true)
-		param.Cursor.SetNextCursor(msgsM[param.Cursor.Limit-cursorOffset].ID)
+		param.Cursor.SetNextCursor(msgsM[param.Cursor.Limit].ID)
 		msgsM = msgsM[:param.Cursor.Limit]
+	}
+
+	var msgsMB []messageModel
+	if err := q2.Find(&msgsMB); err != nil && err != storm.ErrNotFound {
+		return err
+	}
+	if length := len(msgsMB); length > 0 {
+		param.Cursor.SetBackCursor(msgsMB[length-1].ID)
 	}
 
 	var msgs []message.Message

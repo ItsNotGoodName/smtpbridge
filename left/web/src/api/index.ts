@@ -13,7 +13,7 @@ export interface IResponse<T> {
 }
 
 export interface ICursor {
-  ascending?: Boolean
+  ascending?: boolean
   limit?: Number
   cursor?: Number
 }
@@ -57,7 +57,7 @@ export interface IEvent {
 }
 
 export interface IMessages {
-  has_more: boolean
+  back_cursor: number
   next_cursor: number
   messages: IMessage[]
 }

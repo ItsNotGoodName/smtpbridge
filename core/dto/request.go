@@ -22,15 +22,15 @@ type MessageGetRequest struct {
 }
 
 type MessageListRequest struct {
-	Cursor    int64
 	Ascending bool
+	Cursor    int64
 	Limit     int
 }
 
 type MessageListResponse struct {
 	Messages   []Message `json:"messages"`
+	BackCursor int64     `json:"back_cursor"`
 	NextCursor int64     `json:"next_cursor"`
-	HasMore    bool      `json:"has_more"`
 }
 
 type InfoResponse struct {

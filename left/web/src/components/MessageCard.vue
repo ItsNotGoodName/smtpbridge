@@ -10,11 +10,15 @@ export default defineComponent({
     }
   },
   computed: {
-    attachmentUrl() {
-      if (this.message.attachments.length == 0) {
-        return ""
+    subject() {
+      return this.message.subject ? this.message.subject : "No Subject";
+    },
+    attachmentUrls() {
+      let urls = []
+      for (let attachment of this.message.attachments) {
+        urls.push(api.attachmentUrl(attachment))
       }
-      return api.attachmentUrl(this.message.attachments[0])
+      return urls
     }
   },
 })
@@ -22,9 +26,13 @@ export default defineComponent({
 
 <template>
   <el-card :body-style="{ padding: '0px' }">
-    <el-image v-if="attachmentUrl" :src="attachmentUrl" />
+    <el-carousel v-if="attachmentUrls.length > 0">
+      <el-carousel-item v-for="attachmentUrl, idx of attachmentUrls" :key="idx">
+        <el-image :src="attachmentUrl" />
+      </el-carousel-item>
+    </el-carousel>
     <div style="padding: 14px">
-      <span>{{ message.subject }}</span>
+      <span>{{ subject }}</span>
       <div class="bottom">
         <time class="time">{{ message.created_at }}</time>
       </div>
@@ -32,6 +40,16 @@ export default defineComponent({
   </el-card>
 </template>
 
-<style lang="">
-  
+<style scoped>
+.bottom {
+  margin-top: 13px;
+  line-height: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.time {
+  font-size: 13px;
+  color: #999;
+}
 </style>

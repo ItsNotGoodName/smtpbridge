@@ -10,7 +10,7 @@ import (
 
 func (a *App) MessageList(ctx context.Context, req *dto.MessageListRequest) (*dto.MessageListResponse, error) {
 	listParam := message.ListParam{
-		Cursor: paginate.NewCursor(req.Ascending, req.Limit, req.Cursor),
+		Cursor: paginate.NewCursor(req.Cursor, req.Limit, req.Ascending),
 	}
 	err := a.messageRepository.List(ctx, &listParam)
 	if err != nil {
@@ -19,8 +19,8 @@ func (a *App) MessageList(ctx context.Context, req *dto.MessageListRequest) (*dt
 
 	res := dto.MessageListResponse{
 		Messages:   []dto.Message{},
+		BackCursor: listParam.Cursor.BackCursor,
 		NextCursor: listParam.Cursor.NextCursor,
-		HasMore:    listParam.Cursor.HasMore,
 	}
 	for _, msg := range listParam.Messages {
 		atts, err := a.attachmentRepository.ListByMessage(ctx, &msg)
