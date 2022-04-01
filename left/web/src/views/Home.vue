@@ -6,13 +6,14 @@ import MessageCard from "../components/MessageCard.vue"
 export default defineComponent({
   data() {
     return {
+      loading: false,
+      messages: [] as IMessage[],
+      error: null as string | null,
       limits: [10, 20, 50, 100],
       has_back: false,
       back_cursor: 0,
       next_cursor: 0,
       has_next: false,
-      loading: false,
-      messages: [] as IMessage[],
     };
   },
   created() {
@@ -69,7 +70,12 @@ export default defineComponent({
           this.back_cursor = res.data!.back_cursor;
           this.next_cursor = res.data!.next_cursor;
           this.has_next = res.data!.has_next;
+        } else {
+          this.error = res.error!.message;
         }
+      }
+      catch (error: any) {
+        this.error = error.message;
       } finally {
         this.loading = false;
       }
@@ -93,6 +99,7 @@ export default defineComponent({
 
 <template>
   <el-space fill>
+    <el-alert v-if="error" :title="error" type="error" effect="dark" :closable="false" />
     <el-space wrap>
       <el-space>
         <span>Limit</span>
@@ -100,7 +107,12 @@ export default defineComponent({
           <el-option v-for="item in limits" :key="item" :label="item" :value="item" />
         </el-select>
       </el-space>
-      <el-switch v-model="ascending" inactive-text="Newest" active-text="Oldest" :loading="loading" />
+      <el-switch
+        v-model="ascending"
+        inactive-text="Newest"
+        active-text="Oldest"
+        :loading="loading"
+      />
     </el-space>
     <el-space fill wrap :fill-ratio="20">
       <MessageCard :key="message.id" v-for="message of messages" :message="message" />
@@ -110,6 +122,7 @@ export default defineComponent({
       <el-button type="primary" :disabled="!has_back" @click="backPage" :loading="loading">Previous</el-button>
       <el-button type="primary" :disabled="!has_next" @click="nextPage" :loading="loading">Next</el-button>
     </el-button-group>
+    <el-backtop />
   </el-space>
 </template>
 
