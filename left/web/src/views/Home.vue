@@ -95,40 +95,22 @@ export default defineComponent({
 
 <template>
   <el-space fill>
-    <el-space>
-      <span>Limit</span>
-      <el-select v-model="limit" placeholder="Limit" :disabled="loading">
-        <el-option v-for="item in limits" :key="item" :label="item" :value="item" />
-      </el-select>
-      <el-switch
-        v-model="ascending"
-        inactive-text="Newest"
-        active-text="Oldest"
-        :loading="loading"
-      />
+    <el-space wrap>
+      <el-space>
+        <span>Limit</span>
+        <el-select v-model="limit" placeholder="Limit" :disabled="loading">
+          <el-option v-for="item in limits" :key="item" :label="item" :value="item" />
+        </el-select>
+      </el-space>
+      <el-switch v-model="ascending" inactive-text="Newest" active-text="Oldest" :loading="loading" />
     </el-space>
     <el-space fill wrap :fill-ratio="20">
       <MessageCard :key="message.id" v-for="message of messages" :message="message" />
     </el-space>
     <el-button-group>
-      <el-button
-        type="primary"
-        :disabled="backPageDisabled"
-        @click="firstPage"
-        :loading="loading"
-      >First Page</el-button>
-      <el-button
-        type="primary"
-        :disabled="backPageDisabled"
-        @click="backPage"
-        :loading="loading"
-      >Previous Page</el-button>
-      <el-button
-        type="primary"
-        :disabled="nextPageDisabled"
-        @click="nextPage"
-        :loading="loading"
-      >Next Page</el-button>
+      <el-button type="primary" :disabled="backPageDisabled" @click="firstPage" :loading="loading">First</el-button>
+      <el-button type="primary" :disabled="backPageDisabled" @click="backPage" :loading="loading">Previous</el-button>
+      <el-button type="primary" :disabled="nextPageDisabled" @click="nextPage" :loading="loading">Next</el-button>
     </el-button-group>
   </el-space>
 </template>
