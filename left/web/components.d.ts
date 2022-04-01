@@ -28,8 +28,10 @@ declare module 'vue' {
     ElSpace: typeof import('element-plus/es')['ElSpace']
     ElSwitch: typeof import('element-plus/es')['ElSwitch']
     ElTag: typeof import('element-plus/es')['ElTag']
+    Message: typeof import('./src/components/Message.vue')['default']
     MessageCard: typeof import('./src/components/MessageCard.vue')['default']
     MessageDate: typeof import('./src/components/MessageDate.vue')['default']
+    MessageFull: typeof import('./src/components/MessageFull.vue')['default']
     Navbar: typeof import('./src/components/Navbar.vue')['default']
   }
 }

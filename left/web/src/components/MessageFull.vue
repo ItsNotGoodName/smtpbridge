@@ -9,16 +9,11 @@ export default defineComponent({
       required: true,
     }
   },
-  computed: {
-    date() {
-      return new Date(this.message.created_at).toLocaleString();
-    },
-  }
 })
 </script>
 
 <template>
-  <time class="text-gray-400">{{ date }}</time>
+  <el-card :body-style="{ padding: '0px' }">{{ message }}</el-card>
 </template>
 
 <style scoped>

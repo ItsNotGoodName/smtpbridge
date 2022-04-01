@@ -93,7 +93,4 @@ export default {
   getEvents(cursor: ICursor): Promise<IResponse<IEvents>> {
     return jsonResponse(fetch(API_URL + "/api/events?" + new URLSearchParams(cursor as any)));
   },
-  attachmentUrl(attachment: IAttachment): string {
-    return API_URL + "/attachment/" + attachment.file
-  },
 };

@@ -2,7 +2,6 @@
 import { defineComponent } from "vue";
 import { IMessage } from "../api"
 import MessageDate from "./MessageDate.vue"
-import AttachmentImage from "./AttachmentImage.vue";
 
 export default defineComponent({
   props: {
@@ -11,54 +10,28 @@ export default defineComponent({
       required: true,
     }
   },
-  methods: {
-    onClick() {
-      this.$router.push({
-        name: "Message",
-        params: {
-          id: this.message.id,
-        },
-      });
-    }
-  },
-  components: { MessageDate, AttachmentImage }
+  components: { MessageDate }
 })
 </script>
 
 <template>
-  <el-card :body-style="{ padding: '0px' }" @click="onClick">
-    <div class="card">
-      <attachment-image
+  <el-card :body-style="{ padding: '0px' }">
+    <div class="flex h-20">
+      <el-image
         v-if="message.attachments.length"
-        :attachment="message.attachments[0]"
-        class="thumbnail"
+        class="aspect-square"
+        :src="message.attachments[0].file"
       />
-      <div class="body">
-        <span>{{ message.subject }}</span>
-        <div class="body-bottom">
+      <router-link class="flex-1 p-4" :to="{ name: 'Message', params: { id: message.id } }">
+        <div>{{ message.subject }}</div>
+        <el-space>
           <message-date :message="message" />
           <el-tag v-if="message.attachments.length">{{ message.attachments.length }}</el-tag>
-        </div>
-      </div>
+        </el-space>
+      </router-link>
     </div>
   </el-card>
 </template>
 
 <style scoped>
-.card {
-  display: flex;
-  height: 5rem;
-}
-.thumbnail {
-  width: 20%;
-}
-.body {
-  padding: 14px;
-}
-.body-bottom {
-  margin-top: 13px;
-  line-height: 12px;
-  display: flex;
-  align-items: center;
-}
 </style>

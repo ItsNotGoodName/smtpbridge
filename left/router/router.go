@@ -33,7 +33,7 @@ func New(app dto.App, rd api.Renderer, addr string) *Router {
 
 	hookMiddleware(r)
 
-	r.Get("/attachment/*", mwCacheControl(handleFS("/attachment/", app.AttachmentFS()), SecondsInYear))
+	r.Get("/attachment/*", mwCacheControl(handleFS(api.AttachmentURI, app.AttachmentFS()), SecondsInYear))
 
 	// API Routes
 	r.Route("/api", func(r chi.Router) {
