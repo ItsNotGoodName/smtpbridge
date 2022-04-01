@@ -58,9 +58,11 @@ export interface IEvent {
 }
 
 export interface IMessages {
+  messages: IMessage[]
+  has_back: boolean
   back_cursor: number
   next_cursor: number
-  messages: IMessage[]
+  has_next: boolean
 }
 
 export interface IEvents {

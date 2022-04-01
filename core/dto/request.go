@@ -29,8 +29,10 @@ type MessageListRequest struct {
 
 type MessageListResponse struct {
 	Messages   []Message `json:"messages"`
+	HasBack    bool      `json:"has_back"`
 	BackCursor int64     `json:"back_cursor"`
 	NextCursor int64     `json:"next_cursor"`
+	HasNext    bool      `json:"has_next"`
 }
 
 type InfoResponse struct {

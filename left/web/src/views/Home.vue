@@ -7,8 +7,10 @@ export default defineComponent({
   data() {
     return {
       limits: [10, 20, 50, 100],
+      has_back: false,
       back_cursor: 0,
       next_cursor: 0,
+      has_next: false,
       loading: false,
       messages: [] as IMessage[],
     };
@@ -51,12 +53,6 @@ export default defineComponent({
         this.push({ ascending: value, cursor: 0 })
       },
     },
-    backPageDisabled(): boolean {
-      return this.back_cursor == this.cursor || this.back_cursor == 0
-    },
-    nextPageDisabled(): boolean {
-      return this.next_cursor == this.cursor || this.next_cursor == 9223372036854776000
-    },
   },
   methods: {
     async load() {
@@ -69,8 +65,10 @@ export default defineComponent({
         let res = await api.getMessages({ cursor: this.cursor, ascending: this.ascending, limit: this.limit })
         if (res.ok) {
           this.messages = res.data!.messages;
+          this.has_back = res.data!.has_back;
           this.back_cursor = res.data!.back_cursor;
           this.next_cursor = res.data!.next_cursor;
+          this.has_next = res.data!.has_next;
         }
       } finally {
         this.loading = false;
@@ -108,9 +106,9 @@ export default defineComponent({
       <MessageCard :key="message.id" v-for="message of messages" :message="message" />
     </el-space>
     <el-button-group>
-      <el-button type="primary" :disabled="backPageDisabled" @click="firstPage" :loading="loading">First</el-button>
-      <el-button type="primary" :disabled="backPageDisabled" @click="backPage" :loading="loading">Previous</el-button>
-      <el-button type="primary" :disabled="nextPageDisabled" @click="nextPage" :loading="loading">Next</el-button>
+      <el-button type="primary" :disabled="!has_back" @click="firstPage" :loading="loading">First</el-button>
+      <el-button type="primary" :disabled="!has_back" @click="backPage" :loading="loading">Previous</el-button>
+      <el-button type="primary" :disabled="!has_next" @click="nextPage" :loading="loading">Next</el-button>
     </el-button-group>
   </el-space>
 </template>

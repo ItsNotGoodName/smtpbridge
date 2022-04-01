@@ -19,8 +19,10 @@ func (a *App) MessageList(ctx context.Context, req *dto.MessageListRequest) (*dt
 
 	res := dto.MessageListResponse{
 		Messages:   []dto.Message{},
+		HasBack:    listParam.Cursor.HasBack(),
 		BackCursor: listParam.Cursor.BackCursor,
 		NextCursor: listParam.Cursor.NextCursor,
+		HasNext:    listParam.Cursor.HasNext(),
 	}
 	for _, msg := range listParam.Messages {
 		atts, err := a.attachmentRepository.ListByMessage(ctx, &msg)

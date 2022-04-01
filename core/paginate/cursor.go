@@ -36,3 +36,11 @@ func (c *Cursor) SetNextCursor(nextCursor int64) {
 func (c *Cursor) SetBackCursor(backCursor int64) {
 	c.BackCursor = backCursor
 }
+
+func (c *Cursor) HasBack() bool {
+	return !(c.BackCursor == c.Cursor || c.BackCursor == 0)
+}
+
+func (c *Cursor) HasNext() bool {
+	return !(c.NextCursor == c.Cursor || c.NextCursor == math.MaxInt64)
+}
