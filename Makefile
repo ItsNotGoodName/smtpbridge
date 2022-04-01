@@ -5,6 +5,9 @@ all: npm build-frontend snapshot
 npm:
 	$(NPM_PREFIX) npm install
 
+npm-login:
+	$(NPM_PREFIX) bash
+
 dev-backend:
 	go run --tags dev . server
 
