@@ -94,7 +94,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <el-space fill style="width: 100%">
+  <el-space fill>
     <el-space>
       <span>Limit</span>
       <el-select v-model="limit" placeholder="Limit" :disabled="loading">
@@ -133,4 +133,4 @@ export default defineComponent({
   </el-space>
 </template>
 
-<style lang="scss" scoped></style>
+<style scoped></style>

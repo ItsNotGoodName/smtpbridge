@@ -7,7 +7,7 @@ export default defineComponent({
     return {
       loading: false,
       message: null as IMessage | null,
-      error: null as String | null,
+      error: null as string | null,
     };
   },
   created() {
@@ -37,6 +37,8 @@ export default defineComponent({
         } else {
           this.error = res.error!.message;
         }
+      } catch (error: any) {
+        this.error = error.message;
       } finally {
         this.loading = false;
       }
@@ -46,9 +48,9 @@ export default defineComponent({
 </script>
 
 <template>
-  <div v-if="loading">Loading...</div>
-  <div v-if="error">{{ error }}</div>
+  <el-alert v-if="loading" title="loading..." type="info" effect="dark" :closable="false" />
+  <el-alert v-if="error" :title="error" type="error" effect="dark" :closable="false" />
   <message-full v-if="message" :message="message" />
 </template>
 
-<style lang="scss" scoped></style>
+<style scoped></style>

@@ -1,3 +1,5 @@
+//go:build dev
+
 package api
 
 import (
@@ -10,6 +12,6 @@ const AttachmentURI = "/attachment/"
 
 func convertAttachments(r *http.Request, attachments []dto.Attachment) {
 	for i := range attachments {
-		attachments[i].File = AttachmentURI + attachments[i].File
+		attachments[i].File = "http://" + r.Host + AttachmentURI + attachments[i].File
 	}
 }

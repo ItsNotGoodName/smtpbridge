@@ -7,6 +7,5 @@
   </el-menu>
 </template>
 
-<style lang="">
-  
+<style scoped>
 </style>
