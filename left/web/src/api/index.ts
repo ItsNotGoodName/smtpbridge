@@ -19,6 +19,12 @@ export interface ICursor {
   cursor?: Number
 }
 
+export interface IPage {
+  page: number
+  limit: number
+  ascending: boolean
+}
+
 export interface IVersion {
   version: String
   commit: String
@@ -66,8 +72,7 @@ export interface IMessages {
 }
 
 export interface IEvents {
-  has_more: boolean
-  next_cursor: number
+  max_page: number
   events: IEvent[]
 }
 
@@ -86,13 +91,13 @@ export default {
   getMessage(id: Number): Promise<IResponse<IMessage>> {
     return jsonResponse(fetch(API_URL + "/api/message/" + id));
   },
-  getMessageEvents(id: Number, cursor: ICursor): Promise<IResponse<IEvents>> {
-    return jsonResponse(fetch(API_URL + "/api/message/" + id + "?" + new URLSearchParams(cursor as any)));
+  getMessageEvents(id: Number, page: IPage): Promise<IResponse<IEvents>> {
+    return jsonResponse(fetch(API_URL + "/api/message/" + id + "/events?" + new URLSearchParams(page as any)));
   },
   getMessages(cursor: ICursor): Promise<IResponse<IMessages>> {
     return jsonResponse(fetch(API_URL + "/api/messages?" + new URLSearchParams(cursor as any)));
   },
-  getEvents(cursor: ICursor): Promise<IResponse<IEvents>> {
-    return jsonResponse(fetch(API_URL + "/api/events?" + new URLSearchParams(cursor as any)));
+  getEvents(page: IPage): Promise<IResponse<IEvents>> {
+    return jsonResponse(fetch(API_URL + "/api/events?" + new URLSearchParams(page as any)));
   },
 };

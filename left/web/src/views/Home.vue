@@ -1,7 +1,6 @@
 <script lang="ts">
 import { defineComponent } from "vue"
 import api, { IMessage } from "../api"
-import MessageCard from "../components/MessageCard.vue"
 
 export default defineComponent({
   data() {
@@ -93,7 +92,6 @@ export default defineComponent({
       return this.push({ cursor: this.next_cursor })
     },
   },
-  components: { MessageCard }
 })
 </script>
 
@@ -122,7 +120,6 @@ export default defineComponent({
       <el-button type="primary" :disabled="!has_back" @click="backPage" :loading="loading">Previous</el-button>
       <el-button type="primary" :disabled="!has_next" @click="nextPage" :loading="loading">Next</el-button>
     </el-button-group>
-    <el-backtop />
   </el-space>
 </template>
 

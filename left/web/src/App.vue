@@ -12,6 +12,7 @@ import Navbar from "./components/Navbar.vue";
       <el-main>
         <router-view />
       </el-main>
+      <el-backtop />
     </el-container>
   </div>
 </template>

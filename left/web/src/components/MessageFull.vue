@@ -45,15 +45,19 @@ export default defineComponent({
         <div class="text-md font-bold">Body</div>
       </template>
       <el-scrollbar>
-        <code v-if="message.text"><pre class="m-0">{{ message.text }}</pre></code>
+        <code v-if="message.text">
+          <pre class="m-0">{{ message.text }}</pre>
+        </code>
       </el-scrollbar>
     </el-card>
-    <el-card :body-style="{ padding: '0px' }" v-for="attachment in message.attachments" :key="attachment.id">
+    <el-card
+      :body-style="{ padding: '0px' }"
+      v-for="attachment in message.attachments"
+      :key="attachment.id"
+    >
       <el-image :src="attachment.file" :preview-src-list="[attachment.file]" />
       <el-scrollbar>
-        <div class="p-2">
-          {{ attachment.name }}
-        </div>
+        <div class="p-2">{{ attachment.name }}</div>
       </el-scrollbar>
     </el-card>
   </el-space>

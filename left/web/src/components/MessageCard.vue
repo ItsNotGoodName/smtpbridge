@@ -1,7 +1,6 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { IMessage } from "../api"
-import MessageDate from "./MessageDate.vue"
 
 export default defineComponent({
   props: {
@@ -15,7 +14,6 @@ export default defineComponent({
       return this.message.attachments.map(a => a.file)
     }
   },
-  components: { MessageDate }
 })
 </script>
 
