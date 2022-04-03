@@ -20,7 +20,9 @@ func (a *App) eventList(ctx context.Context, req *dto.EventListRequest, exec fun
 
 	res := dto.EventListResponse{
 		Events:   make([]dto.Event, 0, len(listParam.Events)),
-		MaxPages: listParam.Page.MaxPages,
+		Page:     listParam.Page.Page,
+		MaxPage:  listParam.Page.MaxPage,
+		MaxCount: listParam.Page.MaxCount,
 	}
 	for _, ev := range listParam.Events {
 		res.Events = append(res.Events, *newEvent(&ev))

@@ -93,7 +93,7 @@ func (e *Event) list(ctx context.Context, param *event.ListParam, filters ...q.M
 	if err != nil {
 		return err
 	}
-	param.Page.SetCount(count)
+	param.Page.SetMaxCount(count)
 
 	query.Limit(param.Page.Limit)
 	query.Skip(param.Page.Offset())

@@ -4,6 +4,13 @@ const API_URL = import.meta.env.VITE_API_URL
 
 const jsonResponse = (req: Promise<Response>) => req.then((res) => res.json());
 
+const request = (url: string, method = "GET") => { return { url: url, method } };
+
+export interface IRequest<T> {
+  url: string;
+  method: string;
+}
+
 export interface IResponse<T> {
   ok: boolean;
   status: number;
@@ -15,8 +22,8 @@ export interface IResponse<T> {
 
 export interface ICursor {
   ascending?: boolean
-  limit?: Number
-  cursor?: Number
+  limit?: number
+  cursor?: number
 }
 
 export interface IPage {
@@ -26,17 +33,17 @@ export interface IPage {
 }
 
 export interface IVersion {
-  version: String
-  commit: String
-  date: String
-  built_by: String
+  version: string
+  commit: string
+  date: string
+  built_by: string
 }
 
 export interface IInfo {
-  events_count: Number
-  messages_count: Number
-  attachments_count: Number
-  attachments_size: Number
+  events_count: number
+  messages_count: number
+  attachments_count: number
+  attachments_size: number
 }
 
 export interface IMessage {
@@ -72,7 +79,9 @@ export interface IMessages {
 }
 
 export interface IEvents {
+  page: number,
   max_page: number
+  max_count: number
   events: IEvent[]
 }
 
@@ -88,10 +97,7 @@ export default {
       method: "DELETE"
     }));
   },
-  getMessage(id: Number): Promise<IResponse<IMessage>> {
-    return jsonResponse(fetch(API_URL + "/api/message/" + id));
-  },
-  getMessageEvents(id: Number, page: IPage): Promise<IResponse<IEvents>> {
+  getMessageEvents(id: number, page: IPage): Promise<IResponse<IEvents>> {
     return jsonResponse(fetch(API_URL + "/api/message/" + id + "/events?" + new URLSearchParams(page as any)));
   },
   getMessages(cursor: ICursor): Promise<IResponse<IMessages>> {
@@ -100,4 +106,10 @@ export default {
   getEvents(page: IPage): Promise<IResponse<IEvents>> {
     return jsonResponse(fetch(API_URL + "/api/events?" + new URLSearchParams(page as any)));
   },
+  messageGet: (id: number | string): IRequest<IMessage> => request(API_URL + "/api/message/" + id),
+  messageDelete: (id: number | string): IRequest<IMessage> => request(API_URL + "/api/message/" + id, "DELETE"),
+  messageEventsGet: (id: number | string, page: IPage): IRequest<IEvents> => request(API_URL + "/api/message/" + id + "/events?" + new URLSearchParams(page as any)),
+  infoGet: (): IRequest<IInfo> => request(API_URL + "/api/info"),
+  versionGet: (): IRequest<IVersion> => request(API_URL + "/api/version"),
+  eventsGet: (page: IPage): IRequest<IEvents> => request(API_URL + "/api/events?" + new URLSearchParams(page as any)),
 };

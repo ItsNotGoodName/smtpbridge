@@ -58,7 +58,9 @@ type EventListRequest struct {
 
 type EventListResponse struct {
 	Events   []Event `json:"events"`
-	MaxPages int     `json:"max_pages"`
+	Page     int     `json:"page"`
+	MaxPage  int     `json:"max_page"`
+	MaxCount int     `json:"max_count"`
 }
 
 type MessageDeleteRequest struct {

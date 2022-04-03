@@ -9,7 +9,8 @@ type Page struct {
 	Ascending bool
 	Limit     int
 	Page      int
-	MaxPages  int
+	MaxPage   int // MaxPage is the maximum number of pages.
+	MaxCount  int // MaxCount is the maximum number of items.
 }
 
 func NewPage(page, limit int, ascending bool) Page {
@@ -24,7 +25,7 @@ func NewPage(page, limit int, ascending bool) Page {
 		Ascending: ascending,
 		Limit:     limit,
 		Page:      page,
-		MaxPages:  1,
+		MaxPage:   1,
 	}
 }
 
@@ -32,6 +33,7 @@ func (p *Page) Offset() int {
 	return (p.Page - 1) * p.Limit
 }
 
-func (p *Page) SetCount(count int) {
-	p.MaxPages = int(math.Ceil(float64(count) / float64(p.Limit)))
+func (p *Page) SetMaxCount(count int) {
+	p.MaxCount = count
+	p.MaxPage = int(math.Ceil(float64(count) / float64(p.Limit)))
 }

@@ -1,81 +1,44 @@
-<script lang="ts">
-import { defineComponent } from "vue"
-import api, { IEvent, IMessage, IPage } from "../api"
+<script lang="ts" setup>
+import { ref, watch, computed } from "vue"
+import { useRoute, useRouter } from "vue-router";
+import api from "../api"
+import { useFetch } from "../fetch"
+import EventsTable from "../components/EventsTable.vue";
 
-export default defineComponent({
-  data() {
-    return {
-      messageLoading: false,
-      message: null as IMessage | null,
-      messageError: null as string | null,
-      eventsLoading: false,
-      events: [] as IEvent[],
-      eventsError: null as string | null,
-      eventMaxPage: 1,
-    };
-  },
-  created() {
-    this.$watch(() => this.$route.params, () => {
-      if (this.$route.name === "Message") {
-        this.loadMessage();
-        this.loadEvents();
-      }
-    }, { immediate: true });
-  },
-  computed: {
-    id(): number {
-      return this.$route.params.id as unknown as number;
-    },
-  },
-  methods: {
-    async loadMessage() {
-      if (this.messageLoading) {
-        return;
-      }
-      this.messageLoading = true;
-      try {
-        let res = await api.getMessage(this.id);
-        this.message = null;
-        this.messageError = null;
-        if (res.ok) {
-          this.message = res.data!;
-        }
-        else {
-          this.messageError = res.error!.message;
-        }
-      }
-      catch (error: any) {
-        this.messageError = error.message;
-      }
-      finally {
-        this.messageLoading = false;
-      }
-    },
-    async loadEvents() {
-      if (this.eventsLoading) {
-        return;
-      }
-      this.eventsLoading = true;
-      try {
-        let res = await api.getMessageEvents(this.id, {} as IPage);
-        this.events = [];
-        this.eventsError = null;
-        if (res.ok) {
-          this.events = res.data!.events;
-          this.eventMaxPage = res.data!.max_page;
-        }
-        else {
-          this.eventsError = res.error!.message;
-        }
-      }
-      catch (error: any) {
-        this.eventsError = error.message;
-      }
-      finally {
-        this.eventsLoading = false;
-      }
-    },
-  },
+const route = useRoute()
+
+const id = ref(0)
+const page = ref(1)
+const limit = ref(1)
+const ascending = ref(false)
+const maxPage = ref(1)
+
+const {
+  data: message,
+  error: messageError,
+  loading: messageLoading,
+  fetch: fetchMessage
+} = useFetch(computed(() => api.messageGet(id.value)), { skip: true })
+const {
+  data: events,
+  error: eventsError,
+  loading: eventsLoading,
+  fetch: fetchEvents
+} = useFetch(computed(() => api.messageEventsGet(id.value, { page: page.value, limit: limit.value, ascending: ascending.value })), { skip: true })
+
+watch(() => route.params, () => {
+  if (route.name === "Message") {
+    id.value = parseInt(route.params.id as string)
+    fetchMessage()
+    fetchEvents()
+  }
+}, { immediate: true })
+
+watch(() => events.value, () => {
+  if (events.value) {
+    page.value = events.value.page
+    maxPage.value = events.value.max_page
+  }
 })
 </script>
 
@@ -91,7 +54,26 @@ export default defineComponent({
     />
     <template v-if="message">
       <message-full :message="message" />
-      <events-table :loading="eventsLoading" :events="events" />
+      <el-alert
+        v-if="eventsError"
+        :title="eventsError"
+        type="error"
+        effect="dark"
+        :closable="false"
+      />
+      <el-card :body-style="{ padding: '0px' }">
+        <template #header>
+          <div class="text-md font-bold">Events</div>
+        </template>
+        <events-table :loading="eventsLoading" v-if="events" :events="events.events" />
+        <el-pagination
+          layout="prev, pager, next"
+          v-model:currentPage="page"
+          v-model:page-size="limit"
+          :page-count="maxPage"
+          @current-change="fetchEvents"
+        />
+      </el-card>
     </template>
   </el-space>
 </template>
