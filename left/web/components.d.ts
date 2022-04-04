@@ -26,7 +26,6 @@ declare module 'vue' {
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ElTag: typeof import('element-plus/es')['ElTag']
-    EventsCard: typeof import('./src/components/EventsCard.vue')['default']
     EventsTable: typeof import('./src/components/EventsTable.vue')['default']
     Loading: typeof import('element-plus/es')['ElLoadingDirective']
     MessageCard: typeof import('./src/components/MessageCard.vue')['default']

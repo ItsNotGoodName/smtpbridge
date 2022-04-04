@@ -35,25 +35,25 @@ func New(config *config.Config) Server {
 	// Init repositories
 	endpointRepository := endpoints.NewRepository()
 	var (
-		attachmentDataRepository attachment.DataRepository
-		attachmentRepository     attachment.Repository
-		messageRepository        message.Repository
-		eventRepository          event.Repository
+		attachmentRepository  attachment.Repository
+		attachmentDataService attachment.ServiceData
+		messageRepository     message.Repository
+		eventRepository       event.Repository
 	)
 	if config.Database.IsMock() {
-		attachmentDataRepository = mockdb.NewData()
+		attachmentDataService = attachment.NewDataService(mockdb.NewData(), config.Storage.AttachmentDataHost, config.Storage.AttachmentDataURI)
+
 		attachmentRepository = mockdb.NewAttachment()
 		messageRepository = mockdb.NewMessage()
 		eventRepository = mockdb.NewEvent()
 	} else if config.Database.IsBolt() {
-		attachmentDataRepository = filedb.NewData(config.Storage.AttachmentsPath)
-		db := boltdb.NewDatabase(config.Database.BoltPath)
-		att := boltdb.NewAttachment(&db, attachmentDataRepository)
-		msg := boltdb.NewMessage(&db, attachmentDataRepository)
+		attachmentDataService = attachment.NewDataService(filedb.NewData(config.Storage.AttachmentsPath), config.Storage.AttachmentDataHost, config.Storage.AttachmentDataURI)
 
+		db := boltdb.NewDatabase(config.Database.BoltPath)
 		background = append(background, db)
-		attachmentRepository = att
-		messageRepository = msg
+
+		attachmentRepository = boltdb.NewAttachment(&db, attachmentDataService)
+		messageRepository = boltdb.NewMessage(&db, attachmentDataService)
 		eventRepository = boltdb.NewEvent(&db)
 	} else {
 		log.Fatalln("server.New: unknown database type:", config.Database.Type)
@@ -106,15 +106,15 @@ func New(config *config.Config) Server {
 	attachmentService := attachment.NewAttachmentService(attachmentRepository)
 	bridgeService := bridge.NewBridgeService(bridges, messageService, endpointService)
 	if !config.Database.IsMock() {
-		background = append(background, janitor.NewJanitorService(attachmentRepository, messageRepository, attachmentDataRepository, config.Storage.Size))
+		background = append(background, janitor.NewJanitorService(attachmentRepository, messageRepository, attachmentDataService, config.Storage.Size))
 	}
 
 	// Init app
 	app := app.New(
+		attachmentDataService,
 		attachmentRepository,
 		attachmentService,
 		bridgeService,
-		attachmentDataRepository,
 		endpointService,
 		eventRepository,
 		messageRepository,

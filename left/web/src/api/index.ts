@@ -59,7 +59,7 @@ export interface IMessage {
 export interface IAttachment {
   id: number
   name: string
-  file: string
+  url: string
   type: string
 }
 

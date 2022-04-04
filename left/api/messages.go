@@ -23,10 +23,6 @@ func MessagesGet(a dto.App) Handler {
 		})
 		if err != nil {
 			code = http.StatusInternalServerError
-		} else {
-			for i := range res.Messages {
-				convertAttachments(r, res.Messages[i].Attachments)
-			}
 		}
 
 		return Response{
@@ -45,8 +41,6 @@ func MessageGet(a dto.App) Handler {
 		res, err := a.MessageGet(r.Context(), &dto.MessageGetRequest{ID: id})
 		if err != nil {
 			code = http.StatusInternalServerError
-		} else {
-			convertAttachments(r, res.Attachments)
 		}
 
 		return Response{

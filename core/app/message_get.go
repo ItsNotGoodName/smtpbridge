@@ -17,6 +17,6 @@ func (a *App) MessageGet(ctx context.Context, req *dto.MessageGetRequest) (*dto.
 		return nil, err
 	}
 
-	dtomsg := newMessage(msg, atts)
+	dtomsg := a.newMessage(msg, atts)
 	return &dtomsg, nil
 }

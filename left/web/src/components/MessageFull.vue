@@ -55,7 +55,7 @@ export default defineComponent({
       v-for="attachment in message.attachments"
       :key="attachment.id"
     >
-      <el-image :src="attachment.file" :preview-src-list="[attachment.file]" />
+      <el-image :src="attachment.url" :preview-src-list="[attachment.url]" />
       <el-scrollbar>
         <div class="p-2">{{ attachment.name }}</div>
       </el-scrollbar>

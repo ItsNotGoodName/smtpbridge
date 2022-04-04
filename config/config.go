@@ -53,6 +53,8 @@ type ConfigStorage struct {
 	Path                 string `json:"path" mapstructure:"path"`
 	AttachmentsDirectory string `json:"-" mapstructure:"-"`
 	AttachmentsPath      string `json:"-" mapstructure:"-"`
+	AttachmentDataURI    string `json:"-" mapstructure:"-"`
+	AttachmentDataHost   string `json:"-" mapstructure:"-"`
 }
 
 func (db ConfigDatabase) IsMock() bool {
@@ -97,6 +99,8 @@ func New() *Config {
 			Size:                 1024 * 1024 * 2048,
 			Path:                 path.Join(home, ".smtpbridge"),
 			AttachmentsDirectory: "attachments",
+			AttachmentDataURI:    "/attachment/",
+			AttachmentDataHost:   attachmentDataHost,
 		},
 		Database: ConfigDatabase{
 			BoltFile: "bolt.db",
@@ -124,11 +128,6 @@ func (c *Config) Load() {
 		log.Fatalln("config.Config.Load: could not load config:", err)
 	}
 
-	c.SMTP.Addr = c.SMTP.Host + ":" + strconv.FormatUint(uint64(c.SMTP.Port), 10)
-	c.HTTP.Addr = c.HTTP.Host + ":" + strconv.FormatUint(uint64(c.HTTP.Port), 10)
-	c.Storage.AttachmentsPath = path.Join(c.Storage.Path, c.Storage.AttachmentsDirectory)
-	c.Database.BoltPath = path.Join(c.Storage.Path, c.Database.BoltFile)
-
 	for _, bridge := range c.Bridges {
 		for j, endpoint := range bridge.Endpoints {
 			if endpoint.NoTextStr != "" {
@@ -152,7 +151,14 @@ func (c *Config) Load() {
 		}
 	}
 
+	c.SMTP.Addr = c.SMTP.Host + ":" + strconv.FormatUint(uint64(c.SMTP.Port), 10)
+	c.HTTP.Addr = c.HTTP.Host + ":" + strconv.FormatUint(uint64(c.HTTP.Port), 10)
+	c.Storage.AttachmentsPath = path.Join(c.Storage.Path, c.Storage.AttachmentsDirectory)
+	c.Database.BoltPath = path.Join(c.Storage.Path, c.Database.BoltFile)
+
 	if !c.Database.IsMock() {
+		c.Storage.AttachmentDataURI = c.Storage.AttachmentDataURI + c.Database.Type + "/"
+
 		if err := os.MkdirAll(c.Storage.Path, 0755); err != nil {
 			log.Println("config.Config.Load: could not create storage directory:", err)
 		}

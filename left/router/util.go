@@ -11,11 +11,11 @@ import (
 )
 
 const (
-	SecondsInYear = 31536000
-	SecondsInDay  = 86400
+	SecondsInDay = 86400
 )
 
-func mwCacheControl(next http.HandlerFunc, maxAge int) http.HandlerFunc {
+// mwCacheControl sets the Cache-Control header to the given value.
+func mwCacheControl(maxAge int, next http.HandlerFunc) http.HandlerFunc {
 	maxAgeString := fmt.Sprintf("max-age=%d", maxAge)
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		rw.Header().Set("Cache-Control", maxAgeString)

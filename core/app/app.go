@@ -11,22 +11,22 @@ import (
 )
 
 type App struct {
-	attachmentRepository     attachment.Repository
-	attachmentService        attachment.Service
-	bridgeService            bridge.Service
-	attachmentDataRepository attachment.DataRepository
-	endpointService          endpoint.Service
-	eventRepository          event.Repository
-	messageRepository        message.Repository
-	messageService           message.Service
-	smtpAuthService          auth.Service
+	attachmentDataService attachment.ServiceData
+	attachmentRepository  attachment.Repository
+	attachmentService     attachment.Service
+	bridgeService         bridge.Service
+	endpointService       endpoint.Service
+	eventRepository       event.Repository
+	messageRepository     message.Repository
+	messageService        message.Service
+	smtpAuthService       auth.Service
 }
 
 func New(
+	attachmentDataService attachment.ServiceData,
 	attachmentRepository attachment.Repository,
 	attachmentService attachment.Service,
 	bridgeService bridge.Service,
-	attachmentDataRepository attachment.DataRepository,
 	endpointService endpoint.Service,
 	eventRepository event.Repository,
 	messageRepository message.Repository,
@@ -34,10 +34,10 @@ func New(
 	smtpAuthService auth.Service,
 ) *App {
 	return &App{
+		attachmentDataService,
 		attachmentRepository,
 		attachmentService,
 		bridgeService,
-		attachmentDataRepository,
 		endpointService,
 		eventRepository,
 		messageRepository,
@@ -46,10 +46,10 @@ func New(
 	}
 }
 
-func newMessage(msg *message.Message, atts []attachment.Attachment) dto.Message {
+func (a *App) newMessage(msg *message.Message, atts []attachment.Attachment) dto.Message {
 	var attachments []dto.Attachment = make([]dto.Attachment, 0, len(atts))
 	for _, att := range atts {
-		attachments = append(attachments, newAttachment(&att))
+		attachments = append(attachments, a.newAttachment(&att))
 	}
 
 	var to []string
@@ -68,11 +68,11 @@ func newMessage(msg *message.Message, atts []attachment.Attachment) dto.Message 
 	}
 }
 
-func newAttachment(att *attachment.Attachment) dto.Attachment {
+func (a *App) newAttachment(att *attachment.Attachment) dto.Attachment {
 	return dto.Attachment{
 		ID:   att.ID,
 		Name: att.Name,
-		File: att.File(),
+		URL:  a.attachmentDataService.URL(att),
 		Type: string(att.Type),
 	}
 }

@@ -11,7 +11,7 @@ export default defineComponent({
   },
   computed: {
     srcList() {
-      return this.message.attachments.map(a => a.file)
+      return this.message.attachments.map(a => a.url)
     }
   },
 })
@@ -24,7 +24,7 @@ export default defineComponent({
         v-if="message.attachments.length"
         class="aspect-square"
         :preview-src-list="srcList"
-        :src="message.attachments[0].file"
+        :src="message.attachments[0].url"
         fit="fill"
       />
       <router-link

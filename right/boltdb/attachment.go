@@ -35,14 +35,14 @@ func convertAttachmentM(attM *attachmentModel) *attachment.Attachment {
 }
 
 type Attachment struct {
-	db             *storm.DB
-	dataRepository attachment.DataRepository
+	db          *storm.DB
+	dataService attachment.ServiceData
 }
 
-func NewAttachment(db *Database, dataRepository attachment.DataRepository) *Attachment {
+func NewAttachment(db *Database, dataService attachment.ServiceData) *Attachment {
 	return &Attachment{
-		db:             db.db,
-		dataRepository: dataRepository,
+		db:          db.db,
+		dataService: dataService,
 	}
 }
 
@@ -54,7 +54,7 @@ func (a *Attachment) Create(ctx context.Context, att *attachment.Attachment) err
 
 	att.ID = attD.ID
 
-	return a.dataRepository.Create(ctx, att)
+	return a.dataService.Create(ctx, att)
 }
 
 func (a *Attachment) Count(ctx context.Context) (int, error) {

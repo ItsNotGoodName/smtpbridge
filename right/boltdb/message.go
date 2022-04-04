@@ -47,14 +47,14 @@ func convertMessageD(msg *message.Message) *messageModel {
 }
 
 type Message struct {
-	db             *storm.DB
-	dataRepository attachment.DataRepository
+	db          *storm.DB
+	dataService attachment.ServiceData
 }
 
-func NewMessage(db *Database, dataRepository attachment.DataRepository) *Message {
+func NewMessage(db *Database, dataService attachment.ServiceData) *Message {
 	return &Message{
-		db:             db.db,
-		dataRepository: dataRepository,
+		db:          db.db,
+		dataService: dataService,
 	}
 }
 
@@ -201,7 +201,7 @@ func (m *Message) Delete(ctx context.Context, msg *message.Message) error {
 
 	// Delete attachment's data
 	for _, attM := range attsM {
-		if err := m.dataRepository.Delete(ctx, convertAttachmentM(&attM)); err != nil {
+		if err := m.dataService.Delete(ctx, convertAttachmentM(&attM)); err != nil {
 			log.Println("boltdb.Message.Delete: could not delete attachment file:", err)
 		}
 	}

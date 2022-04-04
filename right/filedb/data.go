@@ -2,6 +2,7 @@ package filedb
 
 import (
 	"context"
+	"fmt"
 	"io/fs"
 	"io/ioutil"
 	"os"
@@ -22,16 +23,8 @@ func NewData(dir string) *Data {
 	}
 }
 
-func (d *Data) Create(ctx context.Context, att *attachment.Attachment) error {
-	var (
-		data []byte
-		err  error
-	)
-	if data, err = att.GetData(); err != nil {
-		return err
-	}
-
-	return os.WriteFile(d.getPath(att), data, 0644)
+func (d *Data) Create(ctx context.Context, att *attachment.Attachment, data []byte) error {
+	return os.WriteFile(d.path(att), data, 0644)
 }
 
 func (d *Data) FS() fs.FS {
@@ -39,27 +32,12 @@ func (d *Data) FS() fs.FS {
 }
 
 func (d *Data) Delete(ctx context.Context, att *attachment.Attachment) error {
-	err := os.Remove(d.getPath(att))
+	err := os.Remove(d.path(att))
 	if err == os.ErrNotExist {
 		return attachment.ErrNotFound
 	}
+
 	return err
-}
-
-func (d *Data) Load(ctx context.Context, att *attachment.Attachment) error {
-	data, err := os.ReadFile(d.getPath(att))
-	if err != nil {
-		if err == os.ErrNotExist {
-			return attachment.ErrNotFound
-		}
-		return err
-	}
-
-	if err := att.SetData(data); err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func (d *Data) Size(ctx context.Context) (int64, error) {
@@ -82,7 +60,23 @@ func (d *Data) Size(ctx context.Context) (int64, error) {
 	return dirSize, nil
 }
 
-// getPath returns the path to the attachment file on the file system.
-func (d *Data) getPath(att *attachment.Attachment) string {
-	return path.Join(d.dir, att.File())
+func (d *Data) Get(ctx context.Context, att *attachment.Attachment) ([]byte, error) {
+	return ioutil.ReadFile(d.path(att))
+}
+
+func (d *Data) Remote() bool {
+	return false
+}
+
+func (d *Data) URL(att *attachment.Attachment) string {
+	return ""
+}
+
+func (d *Data) File(att *attachment.Attachment) string {
+	return fmt.Sprintf("%d.%s", att.ID, att.Type)
+}
+
+// path returns the path to the attachment file on the file system.
+func (d *Data) path(att *attachment.Attachment) string {
+	return path.Join(d.dir, d.File(att))
 }

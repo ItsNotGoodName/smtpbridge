@@ -33,7 +33,11 @@ func New(app dto.App, rd api.Renderer, addr string) *Router {
 
 	hookMiddleware(r)
 
-	r.Get("/attachment/*", mwCacheControl(handleFS(api.AttachmentURI, app.AttachmentFS()), SecondsInYear))
+	// Mount attachments file system if data is not stored remotely aceessible
+	if !app.AttachmentDataRemote() {
+		uri := app.AttachmentDataURI()
+		r.Get(uri+"*", mwCacheControl(SecondsInDay, handleFS(uri, app.AttachmentDataFS())))
+	}
 
 	// API Routes
 	r.Route("/api", func(r chi.Router) {

@@ -2,11 +2,14 @@ package dto
 
 import (
 	"context"
+	"fmt"
 	"io/fs"
 )
 
 type App interface {
-	AttachmentFS() fs.FS
+	AttachmentDataFS() fs.FS
+	AttachmentDataURI() string
+	AttachmentDataRemote() bool
 	EventList(ctx context.Context, req *EventListRequest) (*EventListResponse, error)
 	Info(ctx context.Context) (*InfoResponse, error)
 	MessageDelete(ctx context.Context, req *MessageDeleteRequest) error
@@ -17,3 +20,5 @@ type App interface {
 	SMTPLogin(ctx context.Context, req *SMTPLoginRequest) error
 	Version() *VersionResponse
 }
+
+var ErrNotImplemented = fmt.Errorf("not implemented")

@@ -7,32 +7,44 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/core/attachment"
 )
 
-type Data struct {}
+type Data struct{}
 
 func NewData() *Data {
 	return &Data{}
 }
 
-func (d *Data) Create(ctx context.Context, att *attachment.Attachment) error {
+func (Data) Remote() bool {
+	return true
+}
+
+func (Data) URL(*attachment.Attachment) string {
+	return ""
+}
+
+func (Data) File(*attachment.Attachment) string {
+	return ""
+}
+
+func (Data) Create(context.Context, *attachment.Attachment, []byte) error {
 	return nil
+}
+
+func (Data) Get(context.Context, *attachment.Attachment) ([]byte, error) {
+	return nil, attachment.ErrNotFound
 }
 
 func (d *Data) FS() fs.FS {
 	return d
 }
 
-func (d *Data) Open(name string) (fs.File, error) {
+func (Data) Open(name string) (fs.File, error) {
 	return nil, fs.ErrNotExist
 }
 
-func (d *Data) Delete(ctx context.Context, att *attachment.Attachment) error {
+func (Data) Delete(context.Context, *attachment.Attachment) error {
 	return nil
 }
 
-func (d *Data) Load(ctx context.Context, att *attachment.Attachment) error {
-	return attachment.ErrNotFound
-}
-
-func (d *Data) Size(ctx context.Context) (int64, error) {
+func (Data) Size(ctx context.Context) (int64, error) {
 	return 0, nil
 }

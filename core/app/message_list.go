@@ -30,7 +30,7 @@ func (a *App) MessageList(ctx context.Context, req *dto.MessageListRequest) (*dt
 			return nil, err
 		}
 
-		res.Messages = append(res.Messages, newMessage(&msg, atts))
+		res.Messages = append(res.Messages, a.newMessage(&msg, atts))
 	}
 
 	return &res, nil

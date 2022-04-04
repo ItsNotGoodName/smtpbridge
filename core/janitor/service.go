@@ -13,15 +13,15 @@ import (
 
 type JanitorService struct {
 	attachmentRepository attachment.Repository
-	dataRepository       attachment.DataRepository
+	dataService          attachment.ServiceData
 	messageRepository    message.Repository
 	maxSize              int64
 }
 
-func NewJanitorService(attachmentRepository attachment.Repository, messageRepository message.Repository, dataRepository attachment.DataRepository, maxSize int64) *JanitorService {
+func NewJanitorService(attachmentRepository attachment.Repository, messageRepository message.Repository, dataService attachment.ServiceData, maxSize int64) *JanitorService {
 	return &JanitorService{
 		attachmentRepository: attachmentRepository,
-		dataRepository:       dataRepository,
+		dataService:          dataService,
 		messageRepository:    messageRepository,
 		maxSize:              maxSize,
 	}
@@ -29,7 +29,7 @@ func NewJanitorService(attachmentRepository attachment.Repository, messageReposi
 
 func (js *JanitorService) Clean(ctx context.Context) error {
 	for {
-		size, err := js.dataRepository.Size(ctx)
+		size, err := js.dataService.Size(ctx)
 		if err != nil {
 			return err
 		}
