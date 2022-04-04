@@ -1,19 +1,17 @@
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
 import { IMessage } from "../api"
+import Date from "./Date.vue"
 
-export default defineComponent({
-  props: {
-    message: {
-      type: Object as () => IMessage,
-      required: true,
-    }
+defineProps({
+  message: {
+    type: Object as () => IMessage,
+    required: true,
   },
 })
 </script>
 
 <template>
-  <el-space fill class="w-full">
+  <el-space fill>
     <el-descriptions size="small" :title="'Message ' + message.id" :column="1" :border="true">
       <el-descriptions-item>
         <template #label>
@@ -37,7 +35,7 @@ export default defineComponent({
         <template #label>
           <div class="cell-item">Time</div>
         </template>
-        {{ new Date(message.created_at).toLocaleString() }}
+        <Date :date="message.created_at"></Date>
       </el-descriptions-item>
     </el-descriptions>
     <el-card>

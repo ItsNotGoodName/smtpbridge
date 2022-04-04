@@ -1,23 +1,25 @@
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
 import { IEvent } from "../api";
+import Date from "./Date.vue"
 
-export default defineComponent({
-  props: {
-    events: {
-      type: Array as () => IEvent[],
-      required: true,
-    },
-    loading: {
-      type: Boolean,
-    },
-  }
-})
+const { events, loading } = defineProps({
+  events: {
+    type: Object as () => IEvent[],
+    required: true,
+  },
+  loading: {
+    type: Boolean,
+  },
+});
 </script>
 
 <template>
   <el-table v-loading="loading" :data="events" class="w-full">
-    <el-table-column prop="created_at" label="Date" width="180" />
+    <el-table-column prop="created_at" label="Date" width="180">
+      <template #default="scope">
+        <Date :date="scope.row.created_at" />
+      </template>
+    </el-table-column>
     <el-table-column prop="name" label="Name" width="180" />
     <el-table-column prop="description" label="Description" />
   </el-table>

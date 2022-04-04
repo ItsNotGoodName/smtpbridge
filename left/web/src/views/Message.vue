@@ -1,17 +1,16 @@
 <script lang="ts" setup>
 import { ref, watch, computed } from "vue"
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import api from "../api"
 import { useFetch } from "../fetch"
-import EventsTable from "../components/EventsTable.vue";
 
 const route = useRoute()
 
 const id = ref(0)
-const page = ref(1)
-const limit = ref(1)
-const ascending = ref(false)
-const maxPage = ref(1)
+const eventPage = ref(1)
+const eventLimit = ref(10)
+const eventAscending = ref(false)
+const eventMaxPage = ref(1)
 
 const {
   data: message,
@@ -24,7 +23,7 @@ const {
   error: eventsError,
   loading: eventsLoading,
   fetch: fetchEvents
-} = useFetch(computed(() => api.messageEventsGet(id.value, { page: page.value, limit: limit.value, ascending: ascending.value })), { skip: true })
+} = useFetch(computed(() => api.messageEventsGet(id.value, { page: eventPage.value, limit: eventLimit.value, ascending: eventAscending.value })), { skip: true })
 
 watch(() => route.params, () => {
   if (route.name === "Message") {
@@ -36,8 +35,8 @@ watch(() => route.params, () => {
 
 watch(() => events.value, () => {
   if (events.value) {
-    page.value = events.value.page
-    maxPage.value = events.value.max_page
+    eventPage.value = events.value.page
+    eventMaxPage.value = events.value.max_page
   }
 })
 </script>
@@ -67,11 +66,12 @@ watch(() => events.value, () => {
         </template>
         <events-table :loading="eventsLoading" v-if="events" :events="events.events" />
         <el-pagination
-          layout="prev, pager, next"
-          v-model:currentPage="page"
-          v-model:page-size="limit"
-          :page-count="maxPage"
+          layout="sizes, prev, pager, next"
+          v-model:currentPage="eventPage"
+          v-model:page-size="eventLimit"
+          :page-count="eventMaxPage"
           @current-change="fetchEvents"
+          @size-change="fetchEvents"
         />
       </el-card>
     </template>

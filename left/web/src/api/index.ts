@@ -86,25 +86,8 @@ export interface IEvents {
 }
 
 export default {
-  getVersion(): Promise<IResponse<IVersion>> {
-    return jsonResponse(fetch(API_URL + "/api/version"));
-  },
-  getInfo(): Promise<IResponse<IInfo>> {
-    return jsonResponse(fetch(API_URL + "/api/info"));
-  },
-  deleteMessage(id: number): Promise<IResponse<undefined>> {
-    return jsonResponse(fetch(API_URL + "/api/message/" + id, {
-      method: "DELETE"
-    }));
-  },
-  getMessageEvents(id: number, page: IPage): Promise<IResponse<IEvents>> {
-    return jsonResponse(fetch(API_URL + "/api/message/" + id + "/events?" + new URLSearchParams(page as any)));
-  },
   getMessages(cursor: ICursor): Promise<IResponse<IMessages>> {
     return jsonResponse(fetch(API_URL + "/api/messages?" + new URLSearchParams(cursor as any)));
-  },
-  getEvents(page: IPage): Promise<IResponse<IEvents>> {
-    return jsonResponse(fetch(API_URL + "/api/events?" + new URLSearchParams(page as any)));
   },
   messageGet: (id: number | string): IRequest<IMessage> => request(API_URL + "/api/message/" + id),
   messageDelete: (id: number | string): IRequest<IMessage> => request(API_URL + "/api/message/" + id, "DELETE"),

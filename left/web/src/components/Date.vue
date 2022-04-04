@@ -1,24 +1,23 @@
 <script lang="ts">
 import { defineComponent } from "vue";
-import { IMessage } from "../api"
 
 export default defineComponent({
   props: {
-    message: {
-      type: Object as () => IMessage,
+    date: {
+      type: String,
       required: true,
     }
   },
   computed: {
-    date() {
-      return new Date(this.message.created_at).toLocaleString();
+    parsedDate() {
+      return new Date(this.date).toLocaleString();
     },
   }
 })
 </script>
 
 <template>
-  <time class="text-gray-400">{{ date }}</time>
+  <time>{{ parsedDate }}</time>
 </template>
 
 <style scoped>

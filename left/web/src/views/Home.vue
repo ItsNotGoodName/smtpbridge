@@ -8,7 +8,7 @@ export default defineComponent({
       loading: false,
       messages: [] as IMessage[],
       error: null as string | null,
-      limits: [10, 20, 50, 100],
+      limits: [10, 20, 30, 40, 50, 100],
       has_back: false,
       back_cursor: 0,
       next_cursor: 0,
@@ -113,7 +113,7 @@ export default defineComponent({
       />
     </el-space>
     <el-space fill wrap :fill-ratio="20">
-      <MessageCard :key="message.id" v-for="message of messages" :message="message" />
+      <message-card :key="message.id" v-for="message of messages" :message="message" />
     </el-space>
     <el-button-group>
       <el-button type="primary" :disabled="!has_back" @click="firstPage" :loading="loading">First</el-button>

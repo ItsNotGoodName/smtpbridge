@@ -1,19 +1,17 @@
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { computed } from "vue"
 import { IMessage } from "../api"
+import Date from "./Date.vue"
 
-export default defineComponent({
-  props: {
-    message: {
-      type: Object as () => IMessage,
-      required: true,
-    }
+const { message } = defineProps({
+  message: {
+    type: Object as () => IMessage,
+    required: true,
   },
-  computed: {
-    srcList() {
-      return this.message.attachments.map(a => a.url)
-    }
-  },
+})
+
+const srcList = computed(() => {
+  return message.attachments.map(a => a.url)
 })
 </script>
 
@@ -33,7 +31,7 @@ export default defineComponent({
       >
         <div>{{ message.subject }}</div>
         <el-space>
-          <message-date :message="message" />
+          <Date class="text-gray-400" :date="message.created_at" />
           <el-tag v-if="message.attachments.length">{{ message.attachments.length }}</el-tag>
         </el-space>
       </router-link>
