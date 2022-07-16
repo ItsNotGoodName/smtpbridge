@@ -1,22 +1,29 @@
 package router
 
 import (
+	"context"
 	"log"
+	"mime"
 	"net/http"
 	"time"
 
-	"github.com/ItsNotGoodName/smtpbridge/app"
-	"github.com/ItsNotGoodName/smtpbridge/config"
-	"github.com/ItsNotGoodName/smtpbridge/left"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-func New(a *app.App, w left.WebRepository) http.Handler {
+func init() {
+	mime.AddExtensionType(".js", "application/javascript")
+}
+
+type Router struct {
+	addr string
+	r    chi.Router
+}
+
+func New(addr string, h *Handler) *Router {
 	r := chi.NewRouter()
 
 	// A good base middleware stack
-	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
@@ -26,21 +33,22 @@ func New(a *app.App, w left.WebRepository) http.Handler {
 	// processing should be stopped.
 	r.Use(middleware.Timeout(60 * time.Second))
 
-	r.Get("/attachments/*", mwCacheControl(handleFS("/attachments/", a.AttachmentGetFS()), SecondsInYear))
-	r.Get("/assets/*", mwCacheControl(handleFS("/assets/", w.GetAssetFS()), SecondsInDay))
-	r.Get("/message/{uuid}", handleMessageGet(w, a))
-	r.Get("/message/{uuid}/send", handleMessageSendGet(a))
-	r.Get("/message/{uuid}/delete", handleMessageDeleteGet(a))
-	r.Get("/info", handleInfoGet(w, a))
-	r.Get("/", handleIndexGet(w, a))
+	r.Get("/", h.Index)
 
-	return r
+	return &Router{
+		addr: addr,
+		r:    r,
+	}
 }
 
-func Start(cfg *config.Config, r http.Handler) {
-	log.Println("router.Start: HTTP server listening on", cfg.HTTP.Addr)
-	err := http.ListenAndServe(cfg.HTTP.Addr, r)
-	if err != nil {
-		log.Fatalln("router.Start:", err)
+func (r *Router) Start() {
+	log.Println("router.Router.Start: HTTP server listening on", r.addr)
+	if err := http.ListenAndServe(r.addr, r.r); err != nil {
+		log.Fatalln("router.Router.Start:", err)
 	}
+}
+
+func (r *Router) Run(ctx context.Context, doneC chan<- struct{}) {
+	go r.Start()
+	doneC <- struct{}{}
 }

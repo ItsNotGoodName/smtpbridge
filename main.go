@@ -1,5 +1,5 @@
 /*
-Copyright © 2021 ItsNotGoodName
+Copyright © 2022 ItsNotGoodName
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,13 @@ THE SOFTWARE.
 package main
 
 import "github.com/ItsNotGoodName/smtpbridge/cmd"
+
+var (
+    version = "dev"
+    commit  = "none"
+    date    = "unknown"
+    builtBy = "unknown"
+)
 
 func main() {
 	cmd.Execute()

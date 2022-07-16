@@ -1,48 +1,56 @@
 package smtp
 
 import (
+	"context"
 	"io"
 	"log"
+	"net"
 
-	"github.com/ItsNotGoodName/smtpbridge/app"
+	"github.com/ItsNotGoodName/smtpbridge/core/auth"
+	"github.com/ItsNotGoodName/smtpbridge/core/envelope"
 	"github.com/emersion/go-smtp"
 	"github.com/jhillyerd/enmime"
 )
 
 // Backend implements SMTP server methods.
 type Backend struct {
-	app *app.App
+	envelopeService envelope.Service
+	authService     auth.Service
 }
 
 func (b Backend) AnonymousLogin(state *smtp.ConnectionState) (smtp.Session, error) {
-	if err := b.app.AuthLoginRequest(&app.AuthLoginRequest{}); err != nil {
-		log.Println("smtp.AnonymousLogin: login failure:", smtp.ErrAuthRequired)
+	if err := b.authService.Login("", ""); err != nil {
+		log.Println("smtp.AnonymousLogin: login failure:", err)
 		return nil, smtp.ErrAuthRequired
 	}
-	return newSession(b.app), nil
+	return newSession(b.envelopeService, state.RemoteAddr), nil
 }
 
 func (b Backend) Login(state *smtp.ConnectionState, username, password string) (smtp.Session, error) {
-	if err := b.app.AuthLoginRequest(&app.AuthLoginRequest{Username: username, Password: password}); err != nil {
+	if err := b.authService.Login(username, password); err != nil {
 		log.Println("smtp.Login: login failure:", err)
 		return nil, err
 	}
-	return newSession(b.app), nil
+	return newSession(b.envelopeService, state.RemoteAddr), nil
 }
 
-func NewBackend(app *app.App) Backend {
-	return Backend{app}
+func NewBackend(envelopeService envelope.Service, authService auth.Service) Backend {
+	return Backend{
+		envelopeService: envelopeService,
+		authService:     authService,
+	}
 }
 
 // A session is returned after EHLO.
 type session struct {
-	app  *app.App
-	from string
-	to   string
+	envelopeService envelope.Service
+	from            string
+	to              string
+	remoteAddr      net.Addr
 }
 
-func newSession(app *app.App) *session {
-	return &session{app: app}
+func newSession(envelopeService envelope.Service, remoteAddr net.Addr) *session {
+	return &session{envelopeService: envelopeService, remoteAddr: remoteAddr}
 }
 
 func (s *session) Mail(from string, opts smtp.MailOptions) error {
@@ -60,7 +68,7 @@ func (s *session) Rcpt(to string) error {
 func (s *session) Data(r io.Reader) error {
 	e, err := enmime.ReadEnvelope(r)
 	if err != nil {
-		log.Println("smtp.Data: could not read email:", err)
+		log.Printf("smtp.session.Data: remote %s: could not read envelope: %s", s.remoteAddr, err)
 		return err
 	}
 
@@ -72,36 +80,43 @@ func (s *session) Data(r io.Reader) error {
 	//	log.Println("ERROR:", e)
 	//}
 	//log.Println("FROM:", e.GetHeader("From"))
-	toMap := make(map[string]struct{})
-	if to, err := e.AddressList("To"); err == nil {
-		for _, t := range to {
-			toMap[t.Address] = struct{}{}
+	to := []string{s.to}
+	if addresses, err := e.AddressList("To"); err == nil {
+		for _, t := range addresses {
+			to = append(to, t.Address)
 			//log.Println("TO:", t.Address)
 		}
 	} else {
-		log.Println("smtp.Data: could not get To from email:", err)
+		log.Printf("smtp.session.Data: remote %s: could not get To from address list: %s", s.remoteAddr, err)
 	}
-	toMap[s.to] = struct{}{}
 
-	req := app.MessageHandleRequest{
-		Subject:               e.GetHeader("Subject"),
-		From:                  s.from,
-		To:                    toMap,
-		Text:                  e.Text,
-		IgnoreAttachmentError: true,
-	}
+	// Attachment requests
+	attsReq := []envelope.CreateAttachmentRequest{}
 	for _, a := range e.Attachments {
-		req.AddAttachment(a.FileName, a.Content)
+		attsReq = append(attsReq, envelope.CreateAttachmentRequest{
+			Name: a.FileName,
+			Data: a.Content,
+		})
 	}
 
-	// TODO: remove goroutine when endpoint service workers are implemented
-	go func() {
-		err := s.app.MessageHandle(&req)
-		if err != nil {
-			log.Println("smtp.Data: could not handle message:", err)
-		}
-	}()
+	// Envelope request
+	envReq := &envelope.CreateEnvelopeRequest{
+		From:       s.from,
+		To:         to,
+		Subject:    e.GetHeader("Subject"),
+		Text:       e.Text,
+		HTML:       e.HTML,
+		Attachment: attsReq,
+	}
 
+	// Create envelope
+	envID, err := s.envelopeService.CreateEnvelope(context.Background(), envReq)
+	if err != nil {
+		log.Printf("smtp.session.Data: remote %s: %s", s.remoteAddr, err)
+		return nil
+	}
+
+	log.Printf("smtp.session.Data: remote %s: id %d: envelope created", s.remoteAddr, envID)
 	return nil
 }
 

@@ -1,5 +1,5 @@
 /*
-Copyright © 2021 ItsNotGoodName
+Copyright © 2022 ItsNotGoodName
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,15 +22,8 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"github.com/ItsNotGoodName/smtpbridge/app"
 	"github.com/ItsNotGoodName/smtpbridge/config"
-	"github.com/ItsNotGoodName/smtpbridge/core"
-	"github.com/ItsNotGoodName/smtpbridge/left/router"
-	"github.com/ItsNotGoodName/smtpbridge/left/smtp"
-	"github.com/ItsNotGoodName/smtpbridge/left/web"
-	"github.com/ItsNotGoodName/smtpbridge/right/endpoint"
-	"github.com/ItsNotGoodName/smtpbridge/right/repository"
-	"github.com/ItsNotGoodName/smtpbridge/service"
+	"github.com/ItsNotGoodName/smtpbridge/server"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -40,72 +33,19 @@ var serverConfig *config.Config
 // serverCmd represents the server command
 var serverCmd = &cobra.Command{
 	Use:   "server",
-	Short: "Start SMTP server",
-	Long:  ``,
+	Short: "A brief description of your command",
+	Long: `A longer description that spans multiple lines and likely contains examples
+and usage of using your command. For example:
+
+Cobra is a CLI library for Go that empowers applications.
+This application is a tool to generate the needed files
+to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// Read config
+		// Load config
 		serverConfig.Load()
 
-		var (
-			background     []core.BackgroundPort
-			db             core.DatabasePort
-			attachmentREPO core.AttachmentRepositoryPort
-			messageREPO    core.MessageRepositoryPort
-		)
-
-		// Init database and repositories
-		if serverConfig.DB.IsBolt() {
-			d := repository.NewDatabase(serverConfig)
-			att := repository.NewAttachment(serverConfig, &d)
-			msg := repository.NewMessage(&d, att)
-
-			db, attachmentREPO, messageREPO = d, att, msg
-		} else {
-			db = repository.NewMock()
-			attachmentREPO = repository.NewAttachmentMock()
-			messageREPO = repository.NewMessageMock()
-		}
-
-		// Init endpoint repository
-		endpointREPO := endpoint.NewRepository(serverConfig)
-
-		// Init services
-		authSVC := service.NewAuth(serverConfig)
-		bridgeSVC := service.NewBridge(serverConfig, endpointREPO)
-		messageSVC := service.NewMessage(serverConfig, attachmentREPO, messageREPO)
-		endpointSVC := service.NewEndpoint(endpointREPO, messageSVC)
-		janitorSVC := service.NewJanitor(serverConfig, attachmentREPO, messageREPO)
-
-		// Add janitor to background
-		background = append(background, janitorSVC)
-
-		// Init app
-		app := app.New(
-			background,
-			db,
-			attachmentREPO,
-			messageREPO,
-			endpointREPO,
-			authSVC,
-			bridgeSVC,
-			endpointSVC,
-			messageSVC,
-		)
-
-		// Init and start http server
-		if serverConfig.HTTP.Enable {
-			web := web.New()
-			httpServer := router.New(app, web)
-			go router.Start(serverConfig, httpServer)
-		}
-
-		// Init and start smtp server
-		smtpBackend := smtp.NewBackend(app)
-		smtpServer := smtp.New(serverConfig, smtpBackend)
-		go smtpServer.Start()
-
-		// Start app
-		app.Run()
+		// Start server
+		server.Start(serverConfig)
 	},
 }
 
@@ -113,18 +53,6 @@ func init() {
 	rootCmd.AddCommand(serverCmd)
 
 	serverConfig = config.New()
-
-	serverCmd.Flags().String("smtp-host", serverConfig.SMTP.Host, "smtp host address to listen on")
-	viper.BindPFlag("smtp.host", serverCmd.Flags().Lookup("smtp-host"))
-
-	serverCmd.Flags().Uint16("smtp-port", serverConfig.SMTP.Port, "smtp port to listen on")
-	viper.BindPFlag("smtp.port", serverCmd.Flags().Lookup("smtp-port"))
-
-	serverCmd.Flags().Int("smtp-size", serverConfig.SMTP.Size, "max size of email in bytes")
-	viper.BindPFlag("smtp.size", serverCmd.Flags().Lookup("smtp-size"))
-
-	viper.SetDefault("database.db", serverConfig.DB.DB)
-	viper.SetDefault("database.attachments", serverConfig.DB.Attachments)
 
 	serverCmd.Flags().Bool("http", serverConfig.HTTP.Enable, "enable http server")
 	viper.BindPFlag("http.enable", serverCmd.Flags().Lookup("http"))
@@ -134,6 +62,12 @@ func init() {
 
 	serverCmd.Flags().Uint16("http-port", serverConfig.HTTP.Port, "http port to listen on")
 	viper.BindPFlag("http.port", serverCmd.Flags().Lookup("http-port"))
+
+	serverCmd.Flags().String("smtp-host", serverConfig.SMTP.Host, "smtp host address to listen on")
+	viper.BindPFlag("smtp.host", serverCmd.Flags().Lookup("smtp-host"))
+
+	serverCmd.Flags().Uint16("smtp-port", serverConfig.SMTP.Port, "smtp port to listen on")
+	viper.BindPFlag("smtp.port", serverCmd.Flags().Lookup("smtp-port"))
 
 	// Here you will define your flags and configuration settings.
 
