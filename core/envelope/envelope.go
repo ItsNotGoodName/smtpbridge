@@ -28,18 +28,16 @@ type (
 
 	Service interface {
 		ListEnvelope(ctx context.Context, page *paginate.Page) ([]Envelope, error)
+		GetEnvelope(ctx context.Context, msgID int64) (*Envelope, error)
 		CreateEnvelope(ctx context.Context, req *CreateEnvelopeRequest) (int64, error)
 		DeleteEnvelope(ctx context.Context, msgID int64) error
 	}
 
 	Store interface {
 		ListEnvelope(ctx context.Context, offset, limit int, ascending bool) ([]Envelope, int, error)
-		CreateMessage(ctx context.Context, msg *Message) error
-		DeleteMessage(ctx context.Context, msgID int64) error
-		GetMessage(ctx context.Context, id int64) (*Message, error)
-		CreateAttachment(ctx context.Context, att *Attachment) error
-		GetAttachment(ctx context.Context, id int64) (*Attachment, error)
-		GetAttachmentsByMessageID(ctx context.Context, msgID int64) ([]Attachment, error)
+		CreateEnvelope(ctx context.Context, msg *Message, atts []Attachment) error
+		GetEnvelope(ctx context.Context, msgID int64) (*Envelope, error)
+		GetAndDeleteEnvelope(ctx context.Context, msgID int64) (*Envelope, error)
 	}
 
 	DataStore interface {
@@ -73,18 +71,21 @@ func (es *EnvelopeService) ListEnvelope(ctx context.Context, page *paginate.Page
 }
 
 func (es *EnvelopeService) CreateEnvelope(ctx context.Context, req *CreateEnvelopeRequest) (int64, error) {
+	// Create message and attachments
 	msg := NewMessage(req.From, req.To, req.Subject, req.Text, req.HTML)
-	if err := es.store.CreateMessage(ctx, msg); err != nil {
-		return 0, err
+	atts := make([]Attachment, 0, len(req.Attachment))
+	for _, attReq := range req.Attachment {
+		atts = append(atts, *NewAttachment(msg.ID, attReq.Name, attReq.Data))
 	}
 
-	for _, attReq := range req.Attachment {
-		att := NewAttachment(msg.ID, attReq.Name, attReq.Data)
-		if err := es.store.CreateAttachment(ctx, att); err != nil {
-			return 0, err
-		}
+	// Save envelope
+	if err := es.store.CreateEnvelope(ctx, msg, atts); err != nil {
+		return 0, nil
+	}
 
-		if err := es.dataStore.CreateData(ctx, att, attReq.Data); err != nil {
+	// Save attachments' data
+	for i, att := range atts {
+		if err := es.dataStore.CreateData(ctx, &att, req.Attachment[i].Data); err != nil {
 			return 0, err
 		}
 	}
@@ -92,17 +93,19 @@ func (es *EnvelopeService) CreateEnvelope(ctx context.Context, req *CreateEnvelo
 	return msg.ID, nil
 }
 
+func (es *EnvelopeService) GetEnvelope(ctx context.Context, msgID int64) (*Envelope, error) {
+	return es.store.GetEnvelope(ctx, msgID)
+}
+
 func (es *EnvelopeService) DeleteEnvelope(ctx context.Context, msgID int64) error {
-	atts, err := es.store.GetAttachmentsByMessageID(ctx, msgID)
+	// Delete envelope
+	env, err := es.store.GetAndDeleteEnvelope(ctx, msgID)
 	if err != nil {
 		return err
 	}
 
-	if err := es.store.DeleteMessage(ctx, msgID); err != nil {
-		return err
-	}
-
-	for _, att := range atts {
+	// Delete attachments' data
+	for _, att := range env.Attachments {
 		if err := es.dataStore.DeleteData(ctx, &att); err != nil {
 			return err
 		}

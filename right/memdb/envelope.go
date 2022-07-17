@@ -31,6 +31,7 @@ func NewEnvelope(dataStore envelope.DataStore) *Envelope {
 }
 
 func (e *Envelope) ListEnvelope(ctx context.Context, offset, limit int, ascending bool) ([]envelope.Envelope, int, error) {
+	// Get envelopes
 	e.mu.Lock()
 	length := len(e.messages)
 	allEnvs := make([]envelope.Envelope, 0, length)
@@ -42,6 +43,7 @@ func (e *Envelope) ListEnvelope(ctx context.Context, offset, limit int, ascendin
 	}
 	e.mu.Unlock()
 
+	// Sort envelopes
 	if ascending {
 		sort.Slice(allEnvs, func(i, j int) bool {
 			return allEnvs[i].Message.ID < allEnvs[j].Message.ID
@@ -52,6 +54,7 @@ func (e *Envelope) ListEnvelope(ctx context.Context, offset, limit int, ascendin
 		})
 	}
 
+	// Slice envelopes
 	envs := []envelope.Envelope{}
 	end := offset + limit
 	for i := offset; i < length && i < end; i++ {
@@ -61,103 +64,82 @@ func (e *Envelope) ListEnvelope(ctx context.Context, offset, limit int, ascendin
 	return envs, length, nil
 }
 
-func (e *Envelope) CreateMessage(ctx context.Context, msg *envelope.Message) error {
+func (e *Envelope) CreateEnvelope(ctx context.Context, msg *envelope.Message, atts []envelope.Attachment) error {
+	// Create IDs
 	msg.ID = atomic.AddInt64(&e.lastMessageID, 1)
+	for i := range atts {
+		atts[i].ID = atomic.AddInt64(&e.lastAttachmentID, 1)
+	}
 
+	// Create envelope
 	e.mu.Lock()
 	e.messages[msg.ID] = *msg
+	copy(e.attachments[msg.ID], atts)
 	count := len(e.messages)
+	e.mu.Unlock()
+
+	// Delete oldest envelope if full
 	if count > maxMessages {
-		e.mu.Unlock()
-		e.cleanUpMessage(ctx, msg.ID-maxMessages)
-	} else {
-		e.mu.Unlock()
+		e.DeleteEnvelopeAndData(ctx, msg.ID-maxMessages)
 	}
 
 	return nil
 }
 
-func (e *Envelope) cleanUpMessage(ctx context.Context, msgID int64) error {
+func (e *Envelope) DeleteEnvelopeAndData(ctx context.Context, msgID int64) error {
+	// Delete envelope
 	e.mu.Lock()
 	atts := e.attachments[msgID]
-	e.deleteMessage(msgID)
+	e.deleteEnvelope(msgID)
+	e.mu.Unlock()
 
+	// Delete attachment data for envelopes
 	for _, att := range atts {
 		if err := e.dataStore.DeleteData(ctx, &att); err != nil {
-			e.mu.Unlock()
 			return err
 		}
 	}
-	e.mu.Unlock()
 
 	return nil
 }
 
-func (e *Envelope) deleteMessage(msgID int64) {
-	delete(e.messages, msgID)
-	delete(e.attachments, msgID)
-}
-
-func (e *Envelope) DeleteMessage(ctx context.Context, msgID int64) error {
+func (e *Envelope) GetEnvelope(ctx context.Context, msgID int64) (*envelope.Envelope, error) {
 	e.mu.Lock()
-	e.deleteMessage(msgID)
+	env, err := e.getEnvelope(msgID)
 	e.mu.Unlock()
 
-	return nil
+	return env, err
 }
 
-func (e *Envelope) GetMessage(ctx context.Context, id int64) (*envelope.Message, error) {
+func (e *Envelope) GetAndDeleteEnvelope(ctx context.Context, msgID int64) (*envelope.Envelope, error) {
 	e.mu.Lock()
-	msg, ok := e.messages[id]
+	env, err := e.getEnvelope(msgID)
+	if err != nil {
+		e.mu.Unlock()
+		return nil, err
+	}
+
+	e.deleteEnvelope(msgID)
 	e.mu.Unlock()
 
+	return env, nil
+}
+
+func (e *Envelope) getEnvelope(msgID int64) (*envelope.Envelope, error) {
+	msg, ok := e.messages[msgID]
 	if !ok {
 		return nil, core.ErrMessageNotFound
 	}
 
-	return &msg, nil
-}
-
-func (e *Envelope) CreateAttachment(ctx context.Context, att *envelope.Attachment) error {
-	att.ID = atomic.AddInt64(&e.lastAttachmentID, 1)
-
-	e.mu.Lock()
-	atts, ok := e.attachments[att.MessageID]
-	if ok {
-		atts = append(atts, *att)
-	} else {
-		atts = []envelope.Attachment{}
-	}
-	e.attachments[att.MessageID] = atts
-	e.mu.Unlock()
-
-	return nil
-}
-
-func (e *Envelope) GetAttachment(ctx context.Context, id int64) (*envelope.Attachment, error) {
-	e.mu.Lock()
-	for _, atts := range e.attachments {
-		for _, att := range atts {
-			if att.ID == id {
-				e.mu.Unlock()
-				return &att, nil
-			}
-
-		}
-	}
-	e.mu.Unlock()
-
-	return nil, core.ErrAttachmentNotFound
-}
-
-func (e *Envelope) GetAttachmentsByMessageID(ctx context.Context, msgID int64) ([]envelope.Attachment, error) {
-	e.mu.Lock()
 	atts, ok := e.attachments[msgID]
 	if !ok {
-		e.mu.Unlock()
 		return nil, core.ErrMessageNotFound
 	}
-	e.mu.Unlock()
 
-	return atts, nil
+	return &envelope.Envelope{Message: msg, Attachments: atts}, nil
+}
+
+func (e *Envelope) deleteEnvelope(msgID int64) {
+	delete(e.messages, msgID)
+	delete(e.attachments, msgID)
 }
