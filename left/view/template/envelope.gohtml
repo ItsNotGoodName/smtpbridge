@@ -1,0 +1,48 @@
+{{ template "layout/default" . }}
+{{ define "content" }}
+<table class="table">
+  <tbody>
+    <tr>
+      <td><b>Subject</b></td>
+      <td>{{ formatSubject .Envelope.Message.Subject }}</td>
+    </tr>
+    <tr>
+      <td><b>Date</b></td>
+      <td>{{ formatDate .Envelope.Message.CreatedAt }}</td>
+    </tr>
+    <tr>
+      <td><b>From</b></td>
+      <td>{{ .Envelope.Message.From }}</td>
+    </tr>
+    {{ range .Envelope.Message.To }}
+    <tr>
+      <td><b>To</b></td>
+      <td>{{ . }}</td>
+    </tr>
+    {{ end }}
+    <tr>
+      <td><b>Attachments</b></td>
+      <td>{{ len .Envelope.Attachments }}</td>
+    </tr>
+  </tbody>
+</table>
+<div class="tabs is-boxed">
+  <ul>
+    <li {{ if or (eq .Tab "text" ) (eq .Tab "" ) }} class="is-active" {{ end }}>
+      <a href="?tab=text">
+        <span>Text</span>
+      </a>
+    </li>
+    <li {{ if eq .Tab "html" }} class="is-active" {{ end }}>
+      <a href="?tab=html">
+        <span>HTML</span>
+      </a>
+    </li>
+  </ul>
+</div>
+{{ if or (eq .Tab "text") (eq .Tab "") }}
+<pre>{{ .Envelope.Message.Text }}</pre>
+{{ else if eq .Tab "html" }}
+{{ .Envelope.Message.HTML }}
+{{ end }}
+{{ end }}

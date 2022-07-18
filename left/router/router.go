@@ -35,6 +35,7 @@ func New(addr string, c *controller.Controller) *Router {
 	r.Use(middleware.Timeout(60 * time.Second))
 
 	r.Get("/", c.Index)
+	r.Get("/envelope/{id}", c.Envelope)
 
 	return &Router{
 		addr: addr,
