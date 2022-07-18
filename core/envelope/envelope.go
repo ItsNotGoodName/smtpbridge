@@ -3,6 +3,7 @@ package envelope
 import (
 	"context"
 
+	"github.com/ItsNotGoodName/smtpbridge/core"
 	"github.com/ItsNotGoodName/smtpbridge/core/paginate"
 )
 
@@ -35,7 +36,7 @@ type (
 
 	Store interface {
 		ListEnvelope(ctx context.Context, offset, limit int, ascending bool) ([]Envelope, int, error)
-		CreateEnvelope(ctx context.Context, msg *Message, atts []Attachment) error
+		CreateEnvelope(ctx context.Context, msg *Message, atts []Attachment) (int64, error)
 		GetEnvelope(ctx context.Context, msgID int64) (*Envelope, error)
 		GetAndDeleteEnvelope(ctx context.Context, msgID int64) (*Envelope, error)
 	}
@@ -79,7 +80,8 @@ func (es *EnvelopeService) CreateEnvelope(ctx context.Context, req *CreateEnvelo
 	}
 
 	// Save envelope
-	if err := es.store.CreateEnvelope(ctx, msg, atts); err != nil {
+	msgID, err := es.store.CreateEnvelope(ctx, msg, atts)
+	if err != nil {
 		return 0, nil
 	}
 
@@ -90,7 +92,7 @@ func (es *EnvelopeService) CreateEnvelope(ctx context.Context, req *CreateEnvelo
 		}
 	}
 
-	return msg.ID, nil
+	return msgID, nil
 }
 
 func (es *EnvelopeService) GetEnvelope(ctx context.Context, msgID int64) (*Envelope, error) {
@@ -106,7 +108,7 @@ func (es *EnvelopeService) DeleteEnvelope(ctx context.Context, msgID int64) erro
 
 	// Delete attachments' data
 	for _, att := range env.Attachments {
-		if err := es.dataStore.DeleteData(ctx, &att); err != nil {
+		if err := es.dataStore.DeleteData(ctx, &att); err != nil && err != core.ErrDataNotFound {
 			return err
 		}
 	}

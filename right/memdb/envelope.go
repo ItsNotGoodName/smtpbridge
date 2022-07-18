@@ -10,21 +10,17 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/core/envelope"
 )
 
-const maxMessages = 30
-
 type Envelope struct {
 	lastMessageID    int64
 	lastAttachmentID int64
-	dataStore        envelope.DataStore
 
 	mu          sync.Mutex
 	messages    map[int64]envelope.Message
 	attachments map[int64][]envelope.Attachment
 }
 
-func NewEnvelope(dataStore envelope.DataStore) *Envelope {
+func NewEnvelope() *Envelope {
 	return &Envelope{
-		dataStore:   dataStore,
 		messages:    make(map[int64]envelope.Message),
 		attachments: map[int64][]envelope.Attachment{},
 	}
@@ -64,43 +60,24 @@ func (e *Envelope) ListEnvelope(ctx context.Context, offset, limit int, ascendin
 	return envs, length, nil
 }
 
-func (e *Envelope) CreateEnvelope(ctx context.Context, msg *envelope.Message, atts []envelope.Attachment) error {
+func (e *Envelope) CreateEnvelope(ctx context.Context, msg *envelope.Message, atts []envelope.Attachment) (int64, error) {
 	// Create IDs
 	msg.ID = atomic.AddInt64(&e.lastMessageID, 1)
 	for i := range atts {
 		atts[i].ID = atomic.AddInt64(&e.lastAttachmentID, 1)
 	}
 
-	// Create envelope
 	e.mu.Lock()
+	// Create envelope
 	e.messages[msg.ID] = *msg
 	copy(e.attachments[msg.ID], atts)
-	count := len(e.messages)
-	e.mu.Unlock()
-
 	// Delete oldest envelope if full
-	if count > maxMessages {
-		e.DeleteEnvelopeAndData(ctx, msg.ID-maxMessages)
+	if len(e.messages) > maxMessages {
+		e.deleteEnvelope(msg.ID - maxMessages)
 	}
-
-	return nil
-}
-
-func (e *Envelope) DeleteEnvelopeAndData(ctx context.Context, msgID int64) error {
-	// Delete envelope
-	e.mu.Lock()
-	atts := e.attachments[msgID]
-	e.deleteEnvelope(msgID)
 	e.mu.Unlock()
 
-	// Delete attachment data for envelopes
-	for _, att := range atts {
-		if err := e.dataStore.DeleteData(ctx, &att); err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return msg.ID, nil
 }
 
 func (e *Envelope) GetEnvelope(ctx context.Context, msgID int64) (*envelope.Envelope, error) {
@@ -131,12 +108,7 @@ func (e *Envelope) getEnvelope(msgID int64) (*envelope.Envelope, error) {
 		return nil, core.ErrMessageNotFound
 	}
 
-	atts, ok := e.attachments[msgID]
-	if !ok {
-		return nil, core.ErrMessageNotFound
-	}
-
-	return &envelope.Envelope{Message: msg, Attachments: atts}, nil
+	return &envelope.Envelope{Message: msg, Attachments: e.attachments[msgID]}, nil
 }
 
 func (e *Envelope) deleteEnvelope(msgID int64) {

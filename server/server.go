@@ -5,6 +5,7 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/core/auth"
 	"github.com/ItsNotGoodName/smtpbridge/core/background"
 	"github.com/ItsNotGoodName/smtpbridge/core/envelope"
+	"github.com/ItsNotGoodName/smtpbridge/core/event"
 	"github.com/ItsNotGoodName/smtpbridge/left/router"
 	"github.com/ItsNotGoodName/smtpbridge/left/smtp"
 	"github.com/ItsNotGoodName/smtpbridge/pkg/interrupt"
@@ -24,10 +25,11 @@ func Start(config *config.Config) {
 
 	// Create stores
 	dataStore := memdb.NewData()
-	envelopeStore := memdb.NewEnvelope(dataStore)
+	envelopeStore := memdb.NewEnvelope()
 
 	// Create services
-	envelopeService := envelope.NewEnvelopeService(envelopeStore, dataStore)
+	pub := event.NewPub()
+	envelopeService := event.NewEnvelopeService(envelope.NewEnvelopeService(envelopeStore, dataStore), pub)
 	smtpAuthService := smtpAuthService(config)
 
 	// Create SMTP server
