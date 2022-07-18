@@ -4,24 +4,19 @@ import "time"
 
 type (
 	Message struct {
-		ID        int64
-		To        map[string]struct{}
-		From      string
-		Subject   string
-		Text      string
-		HTML      string
-		CreatedAt time.Time
+		ID        int64     `json:"id"`
+		To        []string  `json:"to"`
+		From      string    `json:"from"`
+		Subject   string    `json:"subject"`
+		Text      string    `json:"text"`
+		HTML      string    `json:"html"`
+		CreatedAt time.Time `json:"created_at"`
 	}
 )
 
 func NewMessage(From string, To []string, subject, text, html string) *Message {
-	ToMap := make(map[string]struct{})
-	for _, to := range To {
-		ToMap[to] = struct{}{}
-	}
-
 	return &Message{
-		To:        ToMap,
+		To:        To,
 		From:      From,
 		Subject:   subject,
 		Text:      text,

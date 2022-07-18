@@ -9,8 +9,8 @@ import (
 
 type (
 	Envelope struct {
-		Message     Message
-		Attachments []Attachment
+		Message     Message      `json:"message"`
+		Attachments []Attachment `json:"attachments"`
 	}
 
 	CreateEnvelopeRequest struct {

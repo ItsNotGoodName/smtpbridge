@@ -70,7 +70,7 @@ func (e *Envelope) CreateEnvelope(ctx context.Context, msg *envelope.Message, at
 	e.mu.Lock()
 	// Create envelope
 	e.messages[msg.ID] = *msg
-	copy(e.attachments[msg.ID], atts)
+	e.attachments[msg.ID] = atts
 	// Delete oldest envelope if full
 	if len(e.messages) > maxMessages {
 		e.deleteEnvelope(msg.ID - maxMessages)

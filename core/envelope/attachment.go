@@ -12,10 +12,10 @@ const (
 
 type (
 	Attachment struct {
-		ID        int64
-		MessageID int64
-		Name      string
-		Type      DataType
+		ID        int64    `json:"id"`
+		MessageID int64    `json:"message_id"`
+		Name      string   `json:"name"`
+		Type      DataType `json:"type"`
 	}
 
 	DataType string
