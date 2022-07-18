@@ -9,13 +9,13 @@ import (
 )
 
 func parseTemplate(name string, templateFS fs.FS) *template.Template {
-	return template.Must(template.New(name).Funcs(helperMap).ParseFS(templateFS, name, "**/*.gohtml"))
+	return template.Must(template.New(name).Funcs(helperMap).ParseFS(templateFS, name, "**/*.html"))
 }
 
 const (
-	ErrorPage    string = "error.gohtml"
-	IndexPage    string = "index.gohtml"
-	EnvelopePage string = "envelope.gohtml"
+	ErrorPage    string = "error.html"
+	IndexPage    string = "index.html"
+	EnvelopePage string = "envelope.html"
 )
 
 type IndexData struct {
