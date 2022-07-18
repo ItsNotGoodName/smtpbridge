@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/ItsNotGoodName/smtpbridge/left/controller"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -20,7 +21,7 @@ type Router struct {
 	r    chi.Router
 }
 
-func New(addr string, h *Handler) *Router {
+func New(addr string, c *controller.Controller) *Router {
 	r := chi.NewRouter()
 
 	// A good base middleware stack
@@ -33,7 +34,7 @@ func New(addr string, h *Handler) *Router {
 	// processing should be stopped.
 	r.Use(middleware.Timeout(60 * time.Second))
 
-	r.Get("/", h.Index)
+	r.Get("/", c.Index)
 
 	return &Router{
 		addr: addr,

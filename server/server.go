@@ -6,6 +6,7 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/core/background"
 	"github.com/ItsNotGoodName/smtpbridge/core/envelope"
 	"github.com/ItsNotGoodName/smtpbridge/core/event"
+	"github.com/ItsNotGoodName/smtpbridge/left/controller"
 	"github.com/ItsNotGoodName/smtpbridge/left/router"
 	"github.com/ItsNotGoodName/smtpbridge/left/smtp"
 	"github.com/ItsNotGoodName/smtpbridge/pkg/interrupt"
@@ -37,7 +38,7 @@ func Start(config *config.Config) {
 
 	// Create HTTP server
 	if config.HTTP.Enable {
-		backgrounds = append(backgrounds, router.New(config.HTTP.Addr, router.NewHandler(envelopeService)))
+		backgrounds = append(backgrounds, router.New(config.HTTP.Addr, controller.New(envelopeService)))
 	}
 
 	// Start server

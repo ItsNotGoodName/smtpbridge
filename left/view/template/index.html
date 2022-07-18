@@ -1,0 +1,36 @@
+{{ template "layout/default" . }}
+{{ define "content" }}
+<table class="table">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Subject</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{ range .Envelopes }}
+    <tr>
+      <td>
+        {{ .Message.ID }}
+      </td>
+      <td>
+        <a href="/envelope/{{ .Message.ID }}">
+          {{ formatSubject .Message.Subject }}
+        </a>
+      </td>
+      <td>{{ formatDate .Message.CreatedAt }}</td>
+    </tr>
+    {{ end }}
+</table>
+<nav class="pagination" role="navigation" aria-label="pagination">
+  <ul class="pagination-list">
+    <li>
+      <a class="pagination-link is-current" aria-label="Page {{ .Page.Page }}" aria-current="page">
+        {{ .Page.Page }}
+      </a>
+    </li>
+  </ul>
+</nav>
+</tbody>
+{{ end }}
