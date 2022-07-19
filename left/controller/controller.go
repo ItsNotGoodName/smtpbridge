@@ -1,9 +1,11 @@
 package controller
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
+	"github.com/ItsNotGoodName/smtpbridge/core"
 	"github.com/ItsNotGoodName/smtpbridge/core/envelope"
 	"github.com/ItsNotGoodName/smtpbridge/core/paginate"
 	"github.com/ItsNotGoodName/smtpbridge/left/view"
@@ -42,7 +44,11 @@ func (c *Controller) EnvelopeGet(rw http.ResponseWriter, r *http.Request) {
 
 	env, err := c.envelopeService.GetEnvelope(r.Context(), id)
 	if err != nil {
-		view.RenderError(rw, http.StatusInternalServerError, err)
+		code := http.StatusInternalServerError
+		if errors.Is(err, core.ErrMessageNotFound) {
+			code = http.StatusNotFound
+		}
+		view.RenderError(rw, code, err)
 		return
 	}
 

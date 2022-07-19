@@ -1,5 +1,8 @@
 {{ template "layout/default" . }}
 {{ define "content" }}
+<a class="button" href="{{ toggleAscendingLink .Page }}">
+  {{ if .Page.Ascending }}Ascending{{ else }}Descending{{ end }}
+</a>
 <table class="table">
   <thead>
     <tr>

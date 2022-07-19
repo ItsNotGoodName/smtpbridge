@@ -15,4 +15,7 @@ var helperMap template.FuncMap = template.FuncMap{
 	"pageLink": func(page paginate.Page, newPage int) string {
 		return fmt.Sprintf("?page=%d&ascending=%v&limit=%d", newPage, page.Ascending, page.Limit)
 	},
+	"toggleAscendingLink": func(page paginate.Page) string {
+		return fmt.Sprintf("?page=%d&ascending=%v&limit=%d", page.Page, !page.Ascending, page.Limit)
+	},
 }
