@@ -12,25 +12,17 @@
     {{ range .Envelopes }}
     <tr>
       <td>
-        {{ .Message.ID }}
+        <a href="/envelope/{{ .Message.ID }}">
+          {{ .Message.ID }}
+        </a>
       </td>
       <td>
-        <a href="/envelope/{{ .Message.ID }}">
-          {{ formatSubject .Message.Subject }}
-        </a>
+        {{ .Message.Subject }}
       </td>
       <td>{{ formatDate .Message.CreatedAt }}</td>
     </tr>
     {{ end }}
 </table>
-<nav class="pagination" role="navigation" aria-label="pagination">
-  <ul class="pagination-list">
-    <li>
-      <a class="pagination-link is-current" aria-label="Page {{ .Page.Page }}" aria-current="page">
-        {{ .Page.Page }}
-      </a>
-    </li>
-  </ul>
-</nav>
+{{ template "shim/pagination" . }}
 </tbody>
 {{ end }}

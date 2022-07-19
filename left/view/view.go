@@ -4,7 +4,7 @@ import (
 	"net/http"
 )
 
-func Render(rw http.ResponseWriter, code int, data interface{}, page string) {
+func Render(rw http.ResponseWriter, code int, page string, data interface{}) {
 	rw.WriteHeader(code)
 	getTemplate(page).Execute(rw, data)
 }

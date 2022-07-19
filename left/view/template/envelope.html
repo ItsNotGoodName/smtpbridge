@@ -3,8 +3,12 @@
 <table class="table">
   <tbody>
     <tr>
+      <td><b>ID</b></td>
+      <td>{{ .Envelope.Message.ID }}</td>
+    </tr>
+    <tr>
       <td><b>Subject</b></td>
-      <td>{{ formatSubject .Envelope.Message.Subject }}</td>
+      <td>{{ .Envelope.Message.Subject }}</td>
     </tr>
     <tr>
       <td><b>Date</b></td>
@@ -14,10 +18,10 @@
       <td><b>From</b></td>
       <td>{{ .Envelope.Message.From }}</td>
     </tr>
-    {{ range .Envelope.Message.To }}
+    {{ range $to, $ := .Envelope.Message.To }}
     <tr>
       <td><b>To</b></td>
-      <td>{{ . }}</td>
+      <td>{{ $to }}</td>
     </tr>
     {{ end }}
     <tr>

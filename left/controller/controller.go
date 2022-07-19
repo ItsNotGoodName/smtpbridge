@@ -20,7 +20,7 @@ func New(envelopeService envelope.Service) *Controller {
 	}
 }
 
-func (c *Controller) Index(rw http.ResponseWriter, r *http.Request) {
+func (c *Controller) IndexGet(rw http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	pageQ, _ := strconv.Atoi(q.Get("page"))
 	limitQ, _ := strconv.Atoi(q.Get("limit"))
@@ -33,10 +33,10 @@ func (c *Controller) Index(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	view.Render(rw, http.StatusOK, view.IndexData{Envelopes: envs, Page: page}, view.IndexPage)
+	view.Render(rw, http.StatusOK, view.IndexPage, view.IndexData{Envelopes: envs, Page: page})
 }
 
-func (c *Controller) Envelope(rw http.ResponseWriter, r *http.Request) {
+func (c *Controller) EnvelopeGet(rw http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	tab := r.URL.Query().Get("tab")
 
@@ -46,5 +46,5 @@ func (c *Controller) Envelope(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	view.Render(rw, http.StatusOK, view.EnvelopeData{Envelope: env, Tab: tab}, view.EnvelopePage)
+	view.Render(rw, http.StatusOK, view.EnvelopePage, view.EnvelopeData{Envelope: env, Tab: tab})
 }

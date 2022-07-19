@@ -1,0 +1,52 @@
+{{ define "shim/pagination" }}
+<nav class="pagination" role="navigation" aria-label="pagination">
+  {{ if .Page.Prev }}
+  <a class="pagination-previous" href="{{ pageLink .Page .Page.Prev }}">Previous</a>
+  {{ end }}
+  {{ if .Page.Next }}
+  <a class="pagination-next" href="{{ pageLink .Page .Page.Next }}">Next</a>
+  {{ end }}
+  <ul class="pagination-list">
+    {{ if and (ne .Page.Min .Page.Page) (ne .Page.Min .Page.Prev) }}
+    <li>
+      <a class="pagination-link" aria-label="Goto page {{ .Page.Min }}" href="{{ pageLink .Page .Page.Min }}">
+        {{ .Page.Min }}
+      </a>
+    </li>
+    <li>
+      <span class="pagination-ellipsis">&hellip;</span>
+    </li>
+    {{ end }}
+    {{ if .Page.Prev }}
+    <li>
+      <a class="pagination-link" aria-label="Goto page {{ .Page.Prev }}" href="{{ pageLink .Page .Page.Prev }}">
+        {{ .Page.Prev }}
+      </a>
+    </li>
+    {{ end }}
+    <li>
+      <a class="pagination-link is-current" aria-label="Page {{ .Page.Page }}" aria-current="page"
+        href="{{ pageLink .Page .Page.Page }}">
+        {{ .Page.Page }}
+      </a>
+    </li>
+    {{ if .Page.Next }}
+    <li>
+      <a class="pagination-link" aria-label="Goto page {{ .Page.Next }}" href="{{ pageLink .Page .Page.Next }}">
+        {{ .Page.Next }}
+      </a>
+    </li>
+    {{ end }}
+    {{ if and (ne .Page.Max .Page.Page) (ne .Page.Max .Page.Next) }}
+    <li>
+      <span class="pagination-ellipsis">&hellip;</span>
+    </li>
+    <li>
+      <a class="pagination-link" aria-label="Goto page {{ .Page.Max }}" href="{{ pageLink .Page .Page.Max }}">
+        {{ .Page.Max }}
+      </a>
+    </li>
+    {{ end }}
+  </ul>
+</nav>
+{{ end }}

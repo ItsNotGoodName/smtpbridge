@@ -34,8 +34,8 @@ func New(addr string, c *controller.Controller) *Router {
 	// processing should be stopped.
 	r.Use(middleware.Timeout(60 * time.Second))
 
-	r.Get("/", c.Index)
-	r.Get("/envelope/{id}", c.Envelope)
+	r.Get("/", c.IndexGet)
+	r.Get("/envelope/{id}", c.EnvelopeGet)
 
 	return &Router{
 		addr: addr,

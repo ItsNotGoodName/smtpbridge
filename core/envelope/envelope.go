@@ -66,7 +66,7 @@ func (es *EnvelopeService) ListEnvelope(ctx context.Context, page *paginate.Page
 		return nil, err
 	}
 
-	page.SetMaxCount(count)
+	page.SetCount(count)
 
 	return envs, nil
 }
