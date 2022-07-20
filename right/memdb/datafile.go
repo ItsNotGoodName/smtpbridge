@@ -23,6 +23,9 @@ func newDataFile(dataBlock dataBlock) *dataFile {
 func (df *dataFile) Read(data []byte) (int, error) { return df.reader.Read(data) }
 func (df *dataFile) Close() error                  { return nil }
 func (df *dataFile) Stat() (fs.FileInfo, error)    { return df, nil }
+func (df *dataFile) Seek(offset int64, whence int) (int64, error) {
+	return df.reader.Seek(offset, whence)
+}
 
 // fs.FileInfo
 
