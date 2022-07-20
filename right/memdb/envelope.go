@@ -85,18 +85,23 @@ func (e *Envelope) GetEnvelope(ctx context.Context, msgID int64) (*envelope.Enve
 	return env, err
 }
 
-func (e *Envelope) GetAndDeleteEnvelope(ctx context.Context, msgID int64) (*envelope.Envelope, error) {
+func (e *Envelope) DeleteEnvelope(ctx context.Context, msgID int64, fn func(env *envelope.Envelope) error) error {
 	e.mu.Lock()
 	env, err := e.getEnvelope(msgID)
 	if err != nil {
 		e.mu.Unlock()
-		return nil, err
+		return err
+	}
+
+	if err := fn(env); err != nil {
+		e.mu.Unlock()
+		return err
 	}
 
 	e.deleteEnvelope(msgID)
 	e.mu.Unlock()
 
-	return env, nil
+	return nil
 }
 
 func (e *Envelope) getEnvelope(msgID int64) (*envelope.Envelope, error) {

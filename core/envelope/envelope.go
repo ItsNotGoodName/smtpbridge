@@ -39,7 +39,7 @@ type (
 		ListEnvelope(ctx context.Context, offset, limit int, ascending bool) ([]Envelope, int, error)
 		CreateEnvelope(ctx context.Context, msg *Message, atts []Attachment) (int64, error)
 		GetEnvelope(ctx context.Context, msgID int64) (*Envelope, error)
-		GetAndDeleteEnvelope(ctx context.Context, msgID int64) (*Envelope, error)
+		DeleteEnvelope(ctx context.Context, msgID int64, fn func(env *Envelope) error) error
 	}
 
 	DataStore interface {
@@ -105,18 +105,13 @@ func (es *EnvelopeService) GetEnvelope(ctx context.Context, msgID int64) (*Envel
 }
 
 func (es *EnvelopeService) DeleteEnvelope(ctx context.Context, msgID int64) error {
-	// Delete envelope
-	env, err := es.store.GetAndDeleteEnvelope(ctx, msgID)
-	if err != nil {
-		return err
-	}
-
-	// Delete attachments' data
-	for _, att := range env.Attachments {
-		if err := es.dataStore.DeleteData(ctx, &att); err != nil && err != core.ErrDataNotFound {
-			return err
+	return es.store.DeleteEnvelope(ctx, msgID, func(env *Envelope) error {
+		// Delete attachments' data
+		for _, att := range env.Attachments {
+			if err := es.dataStore.DeleteData(ctx, &att); err != nil && err != core.ErrDataNotFound {
+				return err
+			}
 		}
-	}
-
-	return nil
+		return nil
+	})
 }
