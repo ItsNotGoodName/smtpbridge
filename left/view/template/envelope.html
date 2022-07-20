@@ -1,5 +1,10 @@
 {{ template "layout/default" . }}
 {{ define "content" }}
+<div class="buttons">
+  <a class="button is-danger" href="/envelope/{{ .Envelope.Message.ID }}?action=delete">
+    Delete
+  </a>
+</div>
 <table class="table">
   <tbody>
     <tr>

@@ -22,7 +22,7 @@ func New(envelopeService envelope.Service) *Controller {
 	}
 }
 
-func (c *Controller) IndexGet(rw http.ResponseWriter, r *http.Request) {
+func (c *Controller) IndexGet(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	pageQ, _ := strconv.Atoi(q.Get("page"))
 	limitQ, _ := strconv.Atoi(q.Get("limit"))
@@ -31,14 +31,14 @@ func (c *Controller) IndexGet(rw http.ResponseWriter, r *http.Request) {
 	page := paginate.NewPage(pageQ, limitQ, ascendingQ)
 	envs, err := c.envelopeService.ListEnvelope(r.Context(), &page)
 	if err != nil {
-		view.RenderError(rw, http.StatusInternalServerError, err)
+		view.RenderError(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	view.Render(rw, http.StatusOK, view.IndexPage, view.IndexData{Envelopes: envs, Page: page})
+	view.Render(w, http.StatusOK, view.IndexPage, view.IndexData{Envelopes: envs, Page: page})
 }
 
-func (c *Controller) EnvelopeGet(rw http.ResponseWriter, r *http.Request) {
+func (c *Controller) EnvelopeGet(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	tab := r.URL.Query().Get("tab")
 
@@ -48,9 +48,25 @@ func (c *Controller) EnvelopeGet(rw http.ResponseWriter, r *http.Request) {
 		if errors.Is(err, core.ErrMessageNotFound) {
 			code = http.StatusNotFound
 		}
-		view.RenderError(rw, code, err)
+		view.RenderError(w, code, err)
 		return
 	}
 
-	view.Render(rw, http.StatusOK, view.EnvelopePage, view.EnvelopeData{Envelope: env, Tab: tab})
+	view.Render(w, http.StatusOK, view.EnvelopePage, view.EnvelopeData{Envelope: env, Tab: tab})
+}
+
+func (c *Controller) EnvelopeDelete(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+
+	err := c.envelopeService.DeleteEnvelope(r.Context(), id)
+	if err != nil {
+		code := http.StatusInternalServerError
+		if errors.Is(err, core.ErrMessageNotFound) {
+			code = http.StatusNotFound
+		}
+		http.Error(w, err.Error(), code)
+		return
+	}
+
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 }
