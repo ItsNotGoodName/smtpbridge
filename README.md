@@ -1,6 +1,6 @@
 # smtpbridge
 
-SMTP server that bridges email to messaging services.
+SMTP server that bridges email to other messaging services.
 
 Do not expose this to the Internet, this is only intended to be used on a local network.
 
