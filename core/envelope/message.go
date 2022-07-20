@@ -4,14 +4,14 @@ import "time"
 
 type (
 	Message struct {
-		ID        int64               `json:"id"`
-		To        map[string]struct{} `json:"to"`
-		From      string              `json:"from"`
-		Subject   string              `json:"subject"`
-		Text      string              `json:"text"`
-		HTML      string              `json:"html"`
-		Date      string              `json:"date"`
-		CreatedAt time.Time           `json:"created_at"`
+		ID        int64
+		To        map[string]struct{}
+		From      string
+		Subject   string
+		Text      string
+		HTML      string
+		Date      string
+		CreatedAt time.Time
 	}
 )
 

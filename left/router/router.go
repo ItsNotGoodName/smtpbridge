@@ -36,7 +36,7 @@ func New(addr string, c *controller.Controller, dataFS fs.FS) *Router {
 	// processing should be stopped.
 	r.Use(middleware.Timeout(60 * time.Second))
 
-	r.Get("/asset/*", handlePrefixFS("/asset/", web.AssetFS()))
+	r.Get("/css/*", handlePrefixFS("/css/", web.CSSFS()))
 
 	r.Get("/", c.IndexGet)
 	r.Route("/envelope/{id}", func(r chi.Router) {
