@@ -31,7 +31,7 @@ func (c *Controller) IndexGet(w http.ResponseWriter, r *http.Request) {
 	page := paginate.NewPage(pageQ, limitQ, ascendingQ)
 	envs, err := c.envelopeService.ListEnvelope(r.Context(), &page)
 	if err != nil {
-		view.RenderError(w, http.StatusInternalServerError, err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -48,7 +48,7 @@ func (c *Controller) EnvelopeGet(w http.ResponseWriter, r *http.Request) {
 		if errors.Is(err, core.ErrMessageNotFound) {
 			code = http.StatusNotFound
 		}
-		view.RenderError(w, code, err)
+		http.Error(w, err.Error(), code)
 		return
 	}
 
@@ -64,7 +64,7 @@ func (c *Controller) EnvelopeHTMLGet(w http.ResponseWriter, r *http.Request) {
 		if errors.Is(err, core.ErrMessageNotFound) {
 			code = http.StatusNotFound
 		}
-		view.RenderError(w, code, err)
+		http.Error(w, err.Error(), code)
 		return
 	}
 
