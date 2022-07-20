@@ -107,6 +107,7 @@ func (s *session) Data(r io.Reader) error {
 		Text:       e.Text,
 		HTML:       e.HTML,
 		Attachment: attsReq,
+		Date:       e.GetHeader("Date"),
 	}
 
 	// Create envelope

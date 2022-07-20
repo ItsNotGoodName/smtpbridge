@@ -55,6 +55,22 @@ func (c *Controller) EnvelopeGet(w http.ResponseWriter, r *http.Request) {
 	view.Render(w, http.StatusOK, view.EnvelopePage, view.EnvelopeData{Envelope: env, Tab: tab})
 }
 
+func (c *Controller) EnvelopeHTMLGet(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+
+	env, err := c.envelopeService.GetEnvelope(r.Context(), id)
+	if err != nil {
+		code := http.StatusInternalServerError
+		if errors.Is(err, core.ErrMessageNotFound) {
+			code = http.StatusNotFound
+		}
+		view.RenderError(w, code, err)
+		return
+	}
+
+	w.Write([]byte(env.Message.HTML))
+}
+
 func (c *Controller) EnvelopeDelete(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 

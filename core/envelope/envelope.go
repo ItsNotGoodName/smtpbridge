@@ -15,6 +15,7 @@ type (
 	}
 
 	CreateEnvelopeRequest struct {
+		Date       string
 		From       string
 		To         []string
 		Subject    string
@@ -78,7 +79,7 @@ func (es *EnvelopeService) ListEnvelope(ctx context.Context, page *paginate.Page
 
 func (es *EnvelopeService) CreateEnvelope(ctx context.Context, req *CreateEnvelopeRequest) (int64, error) {
 	// Create message and attachments
-	msg := NewMessage(req.From, req.To, req.Subject, req.Text, req.HTML)
+	msg := NewMessage(req.From, req.To, req.Subject, req.Text, req.HTML, req.Date)
 	atts := make([]Attachment, 0, len(req.Attachment))
 	for _, attReq := range req.Attachment {
 		atts = append(atts, *NewAttachment(msg.ID, attReq.Name, attReq.Data))

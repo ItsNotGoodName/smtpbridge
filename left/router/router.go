@@ -42,6 +42,7 @@ func New(addr string, c *controller.Controller, dataFS fs.FS) *Router {
 	r.Route("/envelope/{id}", func(r chi.Router) {
 		r.Get("/", mwMultiplexAction(c.EnvelopeGet, nil, c.EnvelopeDelete))
 		r.Delete("/", c.EnvelopeDelete)
+		r.Get("/html", c.EnvelopeHTMLGet)
 	})
 	r.Get("/data/*", handlePrefixFS("/data/", dataFS))
 

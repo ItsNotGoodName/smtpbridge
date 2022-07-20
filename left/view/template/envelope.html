@@ -17,8 +17,12 @@
       <td>{{ .Envelope.Message.Subject }}</td>
     </tr>
     <tr>
-      <td><b>Date</b></td>
+      <td><b>Received</b></td>
       <td>{{ formatDate .Envelope.Message.CreatedAt }}</td>
+    </tr>
+    <tr>
+      <td><b>Date</b></td>
+      <td>{{ .Envelope.Message.Date }}</td>
     </tr>
     <tr>
       <td><b>From</b></td>
@@ -30,10 +34,16 @@
       <td>{{ $to }}</td>
     </tr>
     {{ end }}
+    {{ range $att := .Envelope.Attachments }}
     <tr>
-      <td><b>Attachments</b></td>
-      <td>{{ len .Envelope.Attachments }}</td>
+      <td><b>Attachment</b></td>
+      <td>
+        <a href="{{ dataLink $att }}">
+          {{ $att.Name }}
+        </a>
+      </td>
     </tr>
+    {{ end }}
   </tbody>
 </table>
 <div class="tabs is-boxed">
@@ -44,8 +54,8 @@
       </a>
     </li>
     {{ if .Envelope.Message.HTML }}
-    <li {{ if eq .Tab "html" }} class="is-active" {{ end }}>
-      <a href="?tab=html">
+    <li>
+      <a href="{{ envelopeLink .Envelope }}/html">
         <span>HTML</span>
       </a>
     </li>
@@ -53,7 +63,8 @@
     {{ if $hasAttachments }}
     <li {{ if eq .Tab "attachments" }} class="is-active" {{ end }}>
       <a href="?tab=attachments">
-        <span>Attachments</span>
+        <span class="mr-2">Attachments</span>
+        <span class="tag is-info">{{ len .Envelope.Attachments }}</span>
       </a>
     </li>
     {{ end }}
@@ -61,19 +72,19 @@
 </div>
 {{ if or (eq .Tab "text") (eq .Tab "") }}
 <pre>{{ .Envelope.Message.Text }}</pre>
-{{ else if and (eq .Tab "html") .Envelope.Message.HTML }}
-{{ .Envelope.Message.HTML }}
 {{ else if and (eq .Tab "attachments" ) $hasAttachments }}
 {{ range $att := .Envelope.Attachments }}
-{{ if $att.IsImage }}
-<figure class="image">
-  <img src="{{ dataLink $att }}" alt="{{ $att.Name }}">
-</figure>
-{{ else }}
-<a href="{{ dataLink $att }}">
-  {{ $att.Name }}
-</a>
-{{ end }}
+<div class="block">
+  {{ if $att.IsImage }}
+  <figure class="image">
+    <img src="{{ dataLink $att }}" alt="{{ $att.Name }}">
+  </figure>
+  {{ else }}
+  <a href="{{ dataLink $att }}">
+    {{ $att.Name }}
+  </a>
+  {{ end }}
+</div>
 {{ end }}
 {{ end }}
 {{ end }}
