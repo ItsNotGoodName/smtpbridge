@@ -33,9 +33,6 @@ func Start(config *config.Config) {
 	envelopeService := event.NewEnvelopeService(envelope.NewEnvelopeService(envelopeStore, dataStore), pub)
 	smtpAuthService := smtpAuthService(config)
 
-	// Create SMTP server
-	backgrounds = append(backgrounds, smtp.New(smtp.NewBackend(envelopeService, smtpAuthService), config.SMTP.Addr, config.SMTP.Size))
-
 	// Create HTTP server
 	if config.HTTP.Enable {
 		dataFS, err := dataStore.DataFS()
@@ -43,7 +40,12 @@ func Start(config *config.Config) {
 			panic(err)
 		}
 
-		backgrounds = append(backgrounds, router.New(config.HTTP.Addr, controller.New(envelopeService), dataFS))
+		backgrounds = append(backgrounds, router.New(config.HTTP.Addr(), controller.New(envelopeService), dataFS))
+	}
+
+	// Create SMTP server
+	if config.SMTP.Enable {
+		backgrounds = append(backgrounds, smtp.New(smtp.NewBackend(envelopeService, smtpAuthService), config.SMTP.Addr(), config.SMTP.Size))
 	}
 
 	// Start server

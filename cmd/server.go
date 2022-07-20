@@ -63,6 +63,9 @@ func init() {
 	serverCmd.Flags().Uint16("http-port", serverConfig.HTTP.Port, "http port to listen on")
 	viper.BindPFlag("http.port", serverCmd.Flags().Lookup("http-port"))
 
+	serverCmd.Flags().Bool("smtp", serverConfig.SMTP.Enable, "enable smtp server")
+	viper.BindPFlag("smtp.enable", serverCmd.Flags().Lookup("smtp"))
+
 	serverCmd.Flags().String("smtp-host", serverConfig.SMTP.Host, "smtp host address to listen on")
 	viper.BindPFlag("smtp.host", serverCmd.Flags().Lookup("smtp-host"))
 

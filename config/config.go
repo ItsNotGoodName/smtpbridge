@@ -9,20 +9,39 @@ import (
 
 type Config struct {
 	Database ConfigDatabase `json:"database" mapstructure:"database"`
-	SMTP     ConfigSMTP     `json:"smtp" mapstructure:"smtp"`
+	Storage  ConfigStorage  `json:"storage" mapstructure:"storage"`
 	HTTP     ConfigHTTP     `json:"http" mapstructure:"http"`
+	SMTP     ConfigSMTP     `json:"smtp" mapstructure:"smtp"`
 }
 
 type ConfigDatabase struct {
 	Type string `json:"type" mapstructure:"type"`
 }
 
-func (db ConfigDatabase) IsMemDB() bool {
-	return db.Type == ""
+func (cd ConfigDatabase) IsMemDB() bool {
+	return cd.Type == "" || cd.Type == "memory"
+}
+
+type ConfigStorage struct {
+	Type string `json:"type" mapstructure:"type"`
+}
+
+func (cs ConfigStorage) IsMemDB() bool {
+	return cs.Type == "" || cs.Type == "memory"
+}
+
+type ConfigHTTP struct {
+	Enable bool   `json:"enable" mapstructure:"enable"`
+	Host   string `json:"host" mapstructure:"host"`
+	Port   uint16 `json:"port" mapstructure:"port"`
+}
+
+func (ch ConfigHTTP) Addr() string {
+	return ch.Host + ":" + strconv.FormatUint(uint64(ch.Port), 10)
 }
 
 type ConfigSMTP struct {
-	Addr     string `json:"-" mapstructure:"-"`
+	Enable   bool   `json:"enable" mapstructure:"enable"`
 	Host     string `json:"host" mapstructure:"host"`
 	Port     uint16 `json:"port" mapstructure:"port"`
 	Size     int    `json:"size" mapstructure:"size"`
@@ -31,22 +50,19 @@ type ConfigSMTP struct {
 	Password string `json:"password" mapstructure:"password"`
 }
 
-type ConfigHTTP struct {
-	Enable bool   `json:"enable" mapstructure:"enable"`
-	Addr   string `json:"-" mapstructure:"-"`
-	Host   string `json:"host" mapstructure:"host"`
-	Port   uint16 `json:"port" mapstructure:"port"`
+func (cs ConfigSMTP) Addr() string {
+	return cs.Host + ":" + strconv.FormatUint(uint64(cs.Port), 10)
 }
 
 func New() *Config {
 	return &Config{
 		Database: ConfigDatabase{},
+		HTTP: ConfigHTTP{
+			Port: 8080,
+		},
 		SMTP: ConfigSMTP{
 			Size: 1024 * 1024 * 25,
 			Port: 1025,
-		},
-		HTTP: ConfigHTTP{
-			Port: 8080,
 		},
 	}
 }
@@ -61,7 +77,4 @@ func (c *Config) Load() {
 	if err := viper.Unmarshal(c); err != nil {
 		log.Fatalln("config.Config.Load: could not load config:", err)
 	}
-
-	c.SMTP.Addr = c.SMTP.Host + ":" + strconv.FormatUint(uint64(c.SMTP.Port), 10)
-	c.HTTP.Addr = c.HTTP.Host + ":" + strconv.FormatUint(uint64(c.HTTP.Port), 10)
 }

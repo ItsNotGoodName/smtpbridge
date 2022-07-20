@@ -30,7 +30,7 @@ type SMTP struct {
 	s *smtp.Server
 }
 
-func New(b Backend, addr string, size int) SMTP {
+func New(b Backend, addr string, maxMessageBytes int) SMTP {
 	s := smtp.NewServer(b)
 
 	enableMechLogin(s, b)
@@ -39,7 +39,7 @@ func New(b Backend, addr string, size int) SMTP {
 	s.Domain = "localhost"
 	s.ReadTimeout = 10 * time.Second
 	s.WriteTimeout = 10 * time.Second
-	s.MaxMessageBytes = size
+	s.MaxMessageBytes = maxMessageBytes
 	s.MaxRecipients = 50
 	s.AllowInsecureAuth = true
 
