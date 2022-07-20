@@ -25,11 +25,16 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/ItsNotGoodName/smtpbridge/config"
+	"github.com/ItsNotGoodName/smtpbridge/server"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-var cfgFile string
+var (
+	cfgFile      string
+	serverConfig *config.Config
+)
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -38,7 +43,13 @@ var rootCmd = &cobra.Command{
 	Long:  ``,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+	Run: func(cmd *cobra.Command, args []string) {
+		// Load config
+		serverConfig.Load()
+
+		// Start server
+		server.Start(serverConfig)
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -58,6 +69,26 @@ func init() {
 	// will be global for your application.
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.smtpbridge.yaml)")
+
+	serverConfig = config.New()
+
+	rootCmd.Flags().Bool("http", serverConfig.HTTP.Enable, "enable http server")
+	viper.BindPFlag("http.enable", rootCmd.Flags().Lookup("http"))
+
+	rootCmd.Flags().String("http-host", serverConfig.HTTP.Host, "http host address to listen on")
+	viper.BindPFlag("http.host", rootCmd.Flags().Lookup("http-host"))
+
+	rootCmd.Flags().Uint16("http-port", serverConfig.HTTP.Port, "http port to listen on")
+	viper.BindPFlag("http.port", rootCmd.Flags().Lookup("http-port"))
+
+	rootCmd.Flags().Bool("smtp", serverConfig.SMTP.Enable, "enable smtp server")
+	viper.BindPFlag("smtp.enable", rootCmd.Flags().Lookup("smtp"))
+
+	rootCmd.Flags().String("smtp-host", serverConfig.SMTP.Host, "smtp host address to listen on")
+	viper.BindPFlag("smtp.host", rootCmd.Flags().Lookup("smtp-host"))
+
+	rootCmd.Flags().Uint16("smtp-port", serverConfig.SMTP.Port, "smtp port to listen on")
+	viper.BindPFlag("smtp.port", rootCmd.Flags().Lookup("smtp-port"))
 }
 
 // initConfig reads in config file and ENV variables if set.

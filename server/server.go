@@ -1,6 +1,8 @@
 package server
 
 import (
+	"log"
+
 	"github.com/ItsNotGoodName/smtpbridge/config"
 	"github.com/ItsNotGoodName/smtpbridge/core/auth"
 	"github.com/ItsNotGoodName/smtpbridge/core/background"
@@ -22,6 +24,9 @@ func smtpAuthService(config *config.Config) auth.Service {
 }
 
 func Start(config *config.Config) {
+	log.Println("server.Start: starting server")
+
+	// Background daemons
 	backgrounds := []background.Background{}
 
 	// Create stores
@@ -48,6 +53,8 @@ func Start(config *config.Config) {
 		backgrounds = append(backgrounds, smtp.New(smtp.NewBackend(envelopeService, smtpAuthService), config.SMTP.Addr(), config.SMTP.Size))
 	}
 
-	// Start server
+	// Start background daemons
 	background.Run(interrupt.Context(), backgrounds)
+
+	log.Println("server.Start: stopped server")
 }
