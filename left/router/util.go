@@ -35,8 +35,8 @@ func mwCacheControl(next http.HandlerFunc, maxAge int) http.HandlerFunc {
 	})
 }
 
-func handleFS(prefix string, dirFS fs.FS) http.HandlerFunc {
-	h := http.StripPrefix(prefix, http.FileServer(http.FS(dirFS)))
+func handlePrefixFS(prefix string, fs fs.FS) http.HandlerFunc {
+	h := http.StripPrefix(prefix, http.FileServer(http.FS(fs)))
 	return func(rw http.ResponseWriter, r *http.Request) {
 		h.ServeHTTP(rw, r)
 	}

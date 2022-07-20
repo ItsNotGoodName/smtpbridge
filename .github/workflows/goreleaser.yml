@@ -21,6 +21,7 @@ jobs:
         with:
           node-version: "16"
       - run: npm install --prefix left/web
+      - run: npm run css-build --prefix left/web
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
