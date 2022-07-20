@@ -38,7 +38,12 @@ func Start(config *config.Config) {
 
 	// Create HTTP server
 	if config.HTTP.Enable {
-		backgrounds = append(backgrounds, router.New(config.HTTP.Addr, controller.New(envelopeService)))
+		dataFS, err := dataStore.DataFS()
+		if err != nil {
+			panic(err)
+		}
+
+		backgrounds = append(backgrounds, router.New(config.HTTP.Addr, controller.New(envelopeService), dataFS))
 	}
 
 	// Start server

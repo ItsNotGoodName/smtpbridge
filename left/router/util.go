@@ -1,8 +1,12 @@
 package router
 
-import "net/http"
+import (
+	"fmt"
+	"io/fs"
+	"net/http"
+)
 
-func multiplexAction(get, post, delete http.HandlerFunc) http.HandlerFunc {
+func mwMultiplexAction(get, post, delete http.HandlerFunc) http.HandlerFunc {
 	if get == nil {
 		get = func(w http.ResponseWriter, r *http.Request) {}
 	} else if post == nil {
@@ -20,5 +24,20 @@ func multiplexAction(get, post, delete http.HandlerFunc) http.HandlerFunc {
 		} else {
 			get(w, r)
 		}
+	}
+}
+
+func mwCacheControl(next http.HandlerFunc, maxAge int) http.HandlerFunc {
+	maxAgeString := fmt.Sprintf("max-age=%d", maxAge)
+	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		rw.Header().Set("Cache-Control", maxAgeString)
+		next(rw, r)
+	})
+}
+
+func handleFS(prefix string, dirFS fs.FS) http.HandlerFunc {
+	h := http.StripPrefix(prefix, http.FileServer(http.FS(dirFS)))
+	return func(rw http.ResponseWriter, r *http.Request) {
+		h.ServeHTTP(rw, r)
 	}
 }

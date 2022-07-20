@@ -2,6 +2,7 @@ package envelope
 
 import (
 	"context"
+	"io/fs"
 
 	"github.com/ItsNotGoodName/smtpbridge/core"
 	"github.com/ItsNotGoodName/smtpbridge/core/paginate"
@@ -45,6 +46,10 @@ type (
 		CreateData(ctx context.Context, att *Attachment, data []byte) error
 		GetData(ctx context.Context, att *Attachment) ([]byte, error)
 		DeleteData(ctx context.Context, att *Attachment) error
+	}
+
+	LocalDataStore interface {
+		DataFS() (fs.FS, error)
 	}
 )
 

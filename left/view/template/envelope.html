@@ -1,7 +1,8 @@
 {{ template "layout/default" . }}
 {{ define "content" }}
+{{ $hasAttachments := ne (len .Envelope.Attachments) 0 }}
 <div class="buttons">
-  <a class="button is-danger" href="/envelope/{{ .Envelope.Message.ID }}?action=delete">
+  <a class="button is-danger" href="?action=delete">
     Delete
   </a>
 </div>
@@ -42,16 +43,37 @@
         <span>Text</span>
       </a>
     </li>
+    {{ if .Envelope.Message.HTML }}
     <li {{ if eq .Tab "html" }} class="is-active" {{ end }}>
       <a href="?tab=html">
         <span>HTML</span>
       </a>
     </li>
+    {{ end }}
+    {{ if $hasAttachments }}
+    <li {{ if eq .Tab "attachments" }} class="is-active" {{ end }}>
+      <a href="?tab=attachments">
+        <span>Attachments</span>
+      </a>
+    </li>
+    {{ end }}
   </ul>
 </div>
 {{ if or (eq .Tab "text") (eq .Tab "") }}
 <pre>{{ .Envelope.Message.Text }}</pre>
-{{ else if eq .Tab "html" }}
+{{ else if and (eq .Tab "html") .Envelope.Message.HTML }}
 {{ .Envelope.Message.HTML }}
+{{ else if and (eq .Tab "attachments" ) $hasAttachments }}
+{{ range $att := .Envelope.Attachments }}
+{{ if $att.IsImage }}
+<figure class="image">
+  <img src="{{ dataLink $att }}" alt="{{ $att.Name }}">
+</figure>
+{{ else }}
+<a href="{{ dataLink $att }}">
+  {{ $att.Name }}
+</a>
+{{ end }}
+{{ end }}
 {{ end }}
 {{ end }}

@@ -2,6 +2,7 @@ package router
 
 import (
 	"context"
+	"io/fs"
 	"log"
 	"mime"
 	"net/http"
@@ -21,7 +22,7 @@ type Router struct {
 	r    chi.Router
 }
 
-func New(addr string, c *controller.Controller) *Router {
+func New(addr string, c *controller.Controller, dataFS fs.FS) *Router {
 	r := chi.NewRouter()
 
 	// A good base middleware stack
@@ -36,9 +37,10 @@ func New(addr string, c *controller.Controller) *Router {
 
 	r.Get("/", c.IndexGet)
 	r.Route("/envelope/{id}", func(r chi.Router) {
-		r.Get("/", multiplexAction(c.EnvelopeGet, nil, c.EnvelopeDelete))
+		r.Get("/", mwMultiplexAction(c.EnvelopeGet, nil, c.EnvelopeDelete))
 		r.Delete("/", c.EnvelopeDelete)
 	})
+	r.Get("/data/*", handleFS("/data/", dataFS))
 
 	return &Router{
 		addr: addr,
