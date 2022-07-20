@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/ItsNotGoodName/smtpbridge/left/controller"
-	"github.com/ItsNotGoodName/smtpbridge/left/web"
+	"github.com/ItsNotGoodName/smtpbridge/left/static"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -36,7 +36,7 @@ func New(addr string, c *controller.Controller, dataFS fs.FS) *Router {
 	// processing should be stopped.
 	r.Use(middleware.Timeout(60 * time.Second))
 
-	r.Get("/css/*", handlePrefixFS("/css/", web.CSSFS()))
+	r.Get("/css/*", handlePrefixFS("/css/", static.CSSFS()))
 
 	r.Get("/", c.IndexGet)
 	r.Route("/envelope/{id}", func(r chi.Router) {

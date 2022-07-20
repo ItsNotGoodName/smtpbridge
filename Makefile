@@ -1,4 +1,4 @@
-NPM_PREFIX := podman run --rm -it -v "$(shell pwd)/left/web:/work" -w /work docker.io/library/node:16
+NPM_PREFIX := podman run --rm -it -v "$(shell pwd)/left/static:/work" -w /work docker.io/library/node:16
 
 all: npm snapshot
 
