@@ -10,6 +10,8 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/core/envelope"
 )
 
+const maxMessagesCount = 100
+
 type Envelope struct {
 	lastMessageID    int64
 	lastAttachmentID int64
@@ -29,10 +31,10 @@ func NewEnvelope() *Envelope {
 func (e *Envelope) ListEnvelope(ctx context.Context, offset, limit int, ascending bool) ([]envelope.Envelope, int, error) {
 	// Get envelopes
 	e.mu.Lock()
-	length := len(e.messages)
-	allEnvs := make([]envelope.Envelope, 0, length)
+	count := len(e.messages)
+	all := make([]envelope.Envelope, 0, count)
 	for _, msg := range e.messages {
-		allEnvs = append(allEnvs, envelope.Envelope{
+		all = append(all, envelope.Envelope{
 			Message:     msg,
 			Attachments: e.attachments[msg.ID],
 		})
@@ -41,23 +43,23 @@ func (e *Envelope) ListEnvelope(ctx context.Context, offset, limit int, ascendin
 
 	// Sort envelopes
 	if ascending {
-		sort.Slice(allEnvs, func(i, j int) bool {
-			return allEnvs[i].Message.ID < allEnvs[j].Message.ID
+		sort.Slice(all, func(i, j int) bool {
+			return all[i].Message.ID < all[j].Message.ID
 		})
 	} else {
-		sort.Slice(allEnvs, func(i, j int) bool {
-			return allEnvs[i].Message.ID > allEnvs[j].Message.ID
+		sort.Slice(all, func(i, j int) bool {
+			return all[i].Message.ID > all[j].Message.ID
 		})
 	}
 
 	// Slice envelopes
 	envs := []envelope.Envelope{}
 	end := offset + limit
-	for i := offset; i < length && i < end; i++ {
-		envs = append(envs, allEnvs[i])
+	for i := offset; i < count && i < end; i++ {
+		envs = append(envs, all[i])
 	}
 
-	return envs, length, nil
+	return envs, count, nil
 }
 
 func (e *Envelope) CreateEnvelope(ctx context.Context, msg *envelope.Message, atts []envelope.Attachment) (int64, error) {
@@ -71,7 +73,7 @@ func (e *Envelope) CreateEnvelope(ctx context.Context, msg *envelope.Message, at
 	// Create envelope
 	e.messages[msg.ID] = *msg
 	e.attachments[msg.ID] = atts
-	e.deleteEnvelope(msg.ID - maxMessages)
+	e.deleteEnvelope(msg.ID - maxMessagesCount)
 	e.mu.Unlock()
 
 	return msg.ID, nil
@@ -83,6 +85,15 @@ func (e *Envelope) GetEnvelope(ctx context.Context, msgID int64) (*envelope.Enve
 	e.mu.Unlock()
 
 	return env, err
+}
+
+func (e *Envelope) getEnvelope(msgID int64) (*envelope.Envelope, error) {
+	msg, ok := e.messages[msgID]
+	if !ok {
+		return nil, core.ErrMessageNotFound
+	}
+
+	return &envelope.Envelope{Message: msg, Attachments: e.attachments[msgID]}, nil
 }
 
 func (e *Envelope) DeleteEnvelope(ctx context.Context, msgID int64, fn func(env *envelope.Envelope) error) error {
@@ -102,15 +113,6 @@ func (e *Envelope) DeleteEnvelope(ctx context.Context, msgID int64, fn func(env 
 	e.mu.Unlock()
 
 	return nil
-}
-
-func (e *Envelope) getEnvelope(msgID int64) (*envelope.Envelope, error) {
-	msg, ok := e.messages[msgID]
-	if !ok {
-		return nil, core.ErrMessageNotFound
-	}
-
-	return &envelope.Envelope{Message: msg, Attachments: e.attachments[msgID]}, nil
 }
 
 func (e *Envelope) deleteEnvelope(msgID int64) {

@@ -30,7 +30,7 @@ func (df *dataFile) Seek(offset int64, whence int) (int64, error) {
 // fs.FileInfo
 
 func (df *dataFile) Name() string       { return df.dataBlock.fileName } // base name of the file
-func (df *dataFile) Size() int64        { return df.dataBlock.length }   // length in bytes for regular files; system-dependent for others
+func (df *dataFile) Size() int64        { return df.dataBlock.size }     // length in bytes for regular files; system-dependent for others
 func (df *dataFile) Mode() fs.FileMode  { return 0777 }                  // file mode bits
 func (df *dataFile) ModTime() time.Time { return df.dataBlock.modtime }  // modification time
 func (df *dataFile) IsDir() bool        { return false }                 // abbreviation for Mode().IsDir()
