@@ -95,3 +95,17 @@ func TestEnvelopeListCount(t *testing.T) {
 	assert.Equal(t, envs[0].Message.From, "11")
 	assert.Equal(t, envs[1].Message.From, "10")
 }
+
+func TestEnvelopeLimitCount(t *testing.T) {
+	store := NewEnvelope(10)
+	ctx := context.Background()
+
+	msg, att := envelope.NewMessage("", []string{}, "", "", "", ""), []envelope.Attachment{}
+	for i := 0; i < 12; i++ {
+		store.CreateEnvelope(ctx, msg, att)
+	}
+
+	count, err := store.CountEnvelope(ctx)
+	assert.Nil(t, err)
+	assert.Equal(t, count, 10)
+}
