@@ -31,9 +31,10 @@ func (cs ConfigStorage) IsMemDB() bool {
 }
 
 type ConfigHTTP struct {
-	Enable bool   `json:"enable" mapstructure:"enable"`
-	Host   string `json:"host" mapstructure:"host"`
-	Port   uint16 `json:"port" mapstructure:"port"`
+	Enable  bool   `json:"enable" mapstructure:"enable"`
+	Disable bool   `json:"disable" mapstructure:"disable"`
+	Host    string `json:"host" mapstructure:"host"`
+	Port    uint16 `json:"port" mapstructure:"port"`
 }
 
 func (ch ConfigHTTP) Addr() string {
@@ -42,6 +43,7 @@ func (ch ConfigHTTP) Addr() string {
 
 type ConfigSMTP struct {
 	Enable   bool   `json:"enable" mapstructure:"enable"`
+	Disable  bool   `json:"disable" mapstructure:"disable"`
 	Host     string `json:"host" mapstructure:"host"`
 	Port     uint16 `json:"port" mapstructure:"port"`
 	Size     int    `json:"size" mapstructure:"size"`
@@ -58,11 +60,13 @@ func New() *Config {
 	return &Config{
 		Database: ConfigDatabase{},
 		HTTP: ConfigHTTP{
-			Port: 8080,
+			Enable: true,
+			Port:   8080,
 		},
 		SMTP: ConfigSMTP{
-			Size: 1024 * 1024 * 25,
-			Port: 1025,
+			Enable: true,
+			Size:   1024 * 1024 * 25,
+			Port:   1025,
 		},
 	}
 }
@@ -76,5 +80,13 @@ func (c *Config) Load() {
 
 	if err := viper.Unmarshal(c); err != nil {
 		log.Fatalln("config.Config.Load: could not load config:", err)
+	}
+
+	if c.HTTP.Disable {
+		c.HTTP.Enable = false
+	}
+
+	if c.SMTP.Disable {
+		c.SMTP.Enable = false
 	}
 }

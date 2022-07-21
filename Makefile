@@ -15,7 +15,7 @@ npm-build:
 	$(NPM_PREFIX) npm run css-build
 
 dev:
-	go run --tags dev . --http --smtp
+	go run --tags dev .
 
 snapshot: npm-build
 	goreleaser release --snapshot --rm-dist

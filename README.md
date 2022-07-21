@@ -6,7 +6,7 @@ Do not expose this to the Internet, this is only intended to be used on a local 
 
 ## Use Cases
 
-- Receive pictures/videos from IP cameras
+- Receive pictures from IP cameras
 - Receive system messages from Linux servers
 
 ## Configuration
@@ -38,7 +38,7 @@ smtp: # SMTP server
 ## Usage
 
 ```
-smtpbridge server --http --smtp
+smtpbridge
 ```
 
 ## Todo
