@@ -28,6 +28,14 @@ func NewEnvelope() *Envelope {
 	}
 }
 
+func (e *Envelope) CountEnvelope(ctx context.Context) (int, error) {
+	e.mu.Lock()
+	count := len(e.messages)
+	e.mu.Unlock()
+
+	return count, nil
+}
+
 func (e *Envelope) ListEnvelope(ctx context.Context, offset, limit int, ascending bool) ([]envelope.Envelope, int, error) {
 	// Get envelopes
 	e.mu.Lock()
@@ -67,6 +75,7 @@ func (e *Envelope) CreateEnvelope(ctx context.Context, msg *envelope.Message, at
 	msg.ID = atomic.AddInt64(&e.lastMessageID, 1)
 	for i := range atts {
 		atts[i].ID = atomic.AddInt64(&e.lastAttachmentID, 1)
+		atts[i].MessageID = msg.ID
 	}
 
 	e.mu.Lock()

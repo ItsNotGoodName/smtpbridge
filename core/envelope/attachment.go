@@ -16,11 +16,10 @@ type (
 	}
 )
 
-func NewAttachment(messageID int64, name string, data []byte) *Attachment {
+func NewAttachment(name string, data []byte) *Attachment {
 	return &Attachment{
-		MessageID: messageID,
-		Name:      name,
-		Mime:      http.DetectContentType(data),
+		Name: name,
+		Mime: http.DetectContentType(data),
 	}
 }
 

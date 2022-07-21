@@ -39,6 +39,7 @@ type (
 	Store interface {
 		ListEnvelope(ctx context.Context, offset, limit int, ascending bool) ([]Envelope, int, error)
 		CreateEnvelope(ctx context.Context, msg *Message, atts []Attachment) (int64, error)
+		CountEnvelope(ctx context.Context) (int, error)
 		GetEnvelope(ctx context.Context, msgID int64) (*Envelope, error)
 		DeleteEnvelope(ctx context.Context, msgID int64, fn func(env *Envelope) error) error
 	}
@@ -82,7 +83,7 @@ func (es *EnvelopeService) CreateEnvelope(ctx context.Context, req *CreateEnvelo
 	msg := NewMessage(req.From, req.To, req.Subject, req.Text, req.HTML, req.Date)
 	atts := make([]Attachment, 0, len(req.Attachment))
 	for _, attReq := range req.Attachment {
-		atts = append(atts, *NewAttachment(msg.ID, attReq.Name, attReq.Data))
+		atts = append(atts, *NewAttachment(attReq.Name, attReq.Data))
 	}
 
 	// Save envelope
