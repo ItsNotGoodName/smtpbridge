@@ -3,26 +3,32 @@
 <a class="button" href="{{ toggleAscendingLink .Page }}">
   {{ if .Page.Ascending }}Ascending{{ else }}Descending{{ end }}
 </a>
-<table class="table">
+<table class="table is-hoverable is-striped is-fullwidth">
   <thead>
     <tr>
       <th>ID</th>
       <th>Subject</th>
+      <th>From</th>
       <th>Received</th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
     {{ range .Envelopes }}
+    {{ $href := envelopeLink . }}
     <tr>
       <td>
-        <a href="{{ envelopeLink . }}">
-          {{ .Message.ID }}
-        </a>
+        <a href="{{ $href }}">{{ .Message.ID }}</a>
       </td>
       <td>
-        {{ .Message.Subject }}
+        <a href="{{ $href }}">{{ .Message.Subject }}</a>
       </td>
-      <td>{{ formatDate .Message.CreatedAt }}</td>
+      <td>
+        <a href="{{ $href }}">{{ .Message.From }}</a>
+      </td>
+      <td>
+        <a href="{{ $href }}">{{ formatDate .Message.CreatedAt }}</a>
+      </td>
     </tr>
     {{ end }}
 </table>
