@@ -46,10 +46,10 @@
     {{ end }}
   </tbody>
 </table>
-<div class="tabs is-boxed">
+<div class="tabs is-boxed" id="tab">
   <ul>
     <li {{ if or (eq .Tab "text" ) (eq .Tab "" ) }} class="is-active" {{ end }}>
-      <a href="?tab=text">
+      <a href="?tab=text#tab">
         <span>Text</span>
       </a>
     </li>
@@ -62,7 +62,7 @@
     {{ end }}
     {{ if $hasAttachments }}
     <li {{ if eq .Tab "attachments" }} class="is-active" {{ end }}>
-      <a href="?tab=attachments">
+      <a href="?tab=attachments#tab">
         <span class="mr-2">Attachments</span>
         <span class="tag is-info">{{ len .Envelope.Attachments }}</span>
       </a>

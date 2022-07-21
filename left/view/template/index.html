@@ -1,37 +1,37 @@
 {{ template "layout/default" . }}
 {{ define "content" }}
-<a class="button" href="{{ toggleAscendingLink .Page }}">
-  {{ if .Page.Ascending }}Ascending{{ else }}Descending{{ end }}
-</a>
-<table class="table is-hoverable is-striped is-fullwidth">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Subject</th>
-      <th>From</th>
-      <th>Received</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    {{ range .Envelopes }}
-    {{ $href := envelopeLink . }}
-    <tr>
-      <td>
-        <a href="{{ $href }}">{{ .Message.ID }}</a>
-      </td>
-      <td>
-        <a href="{{ $href }}">{{ .Message.Subject }}</a>
-      </td>
-      <td>
-        <a href="{{ $href }}">{{ .Message.From }}</a>
-      </td>
-      <td>
-        <a href="{{ $href }}">{{ formatDate .Message.CreatedAt }}</a>
-      </td>
-    </tr>
-    {{ end }}
-</table>
+{{ template "shim/sort" .Page }}
+<div class="table-container">
+  <table class="table is-hoverable is-striped is-fullwidth">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Subject</th>
+        <th>From</th>
+        <th>Received</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ range .Envelopes }}
+      {{ $href := envelopeLink . }}
+      <tr>
+        <td>
+          <a href="{{ $href }}">{{ .Message.ID }}</a>
+        </td>
+        <td>
+          <a href="{{ $href }}">{{ .Message.Subject }}</a>
+        </td>
+        <td>
+          <a href="{{ $href }}">{{ .Message.From }}</a>
+        </td>
+        <td>
+          <a href="{{ $href }}">{{ formatDate .Message.CreatedAt }}</a>
+        </td>
+      </tr>
+      {{ end }}
+  </table>
+</div>
 {{ template "shim/pagination" . }}
 </tbody>
 {{ end }}

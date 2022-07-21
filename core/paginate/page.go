@@ -17,7 +17,7 @@ type Page struct {
 
 func NewPage(page, limit int, ascending bool) Page {
 	if limit <= 0 || limit > 100 {
-		limit = 5
+		limit = 10
 	}
 	prev := page - 1
 	if page < 1 {
