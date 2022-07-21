@@ -10,9 +10,8 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/core/envelope"
 )
 
-const maxMessagesCount = 100
-
 type Envelope struct {
+	limit            int64
 	lastMessageID    int64
 	lastAttachmentID int64
 
@@ -21,8 +20,9 @@ type Envelope struct {
 	attachments map[int64][]envelope.Attachment
 }
 
-func NewEnvelope() *Envelope {
+func NewEnvelope(limit int64) *Envelope {
 	return &Envelope{
+		limit:       limit,
 		messages:    make(map[int64]envelope.Message),
 		attachments: map[int64][]envelope.Attachment{},
 	}
@@ -82,7 +82,7 @@ func (e *Envelope) CreateEnvelope(ctx context.Context, msg *envelope.Message, at
 	// Create envelope
 	e.messages[msg.ID] = *msg
 	e.attachments[msg.ID] = atts
-	e.deleteEnvelope(msg.ID - maxMessagesCount)
+	e.deleteEnvelope(msg.ID - e.limit)
 	e.mu.Unlock()
 
 	return msg.ID, nil

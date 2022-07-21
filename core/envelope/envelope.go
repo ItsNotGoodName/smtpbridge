@@ -51,7 +51,7 @@ type (
 	}
 
 	LocalDataStore interface {
-		DataFS() (fs.FS, error)
+		DataFS() fs.FS
 	}
 )
 

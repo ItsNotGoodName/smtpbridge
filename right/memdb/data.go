@@ -10,11 +10,6 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/core/envelope"
 )
 
-const (
-	maxDataCount    = 30
-	maxDataPoolSize = 1024 * 1024 * 100 // 100 MiB
-)
-
 type dataBlock struct {
 	data     []byte
 	size     int64
@@ -23,16 +18,18 @@ type dataBlock struct {
 }
 
 type Data struct {
-	mu   sync.Mutex
-	pool map[int64]dataBlock
-	size int64
-	idCh chan int64
+	mu       sync.Mutex
+	pool     map[int64]dataBlock
+	poolSize int64
+	size     int64
+	idChan   chan int64
 }
 
-func NewData() *Data {
+func NewData(limit int64, size int64) *Data {
 	return &Data{
-		idCh: make(chan int64, maxDataCount),
-		pool: make(map[int64]dataBlock),
+		idChan: make(chan int64, limit),
+		size:   size,
+		pool:   make(map[int64]dataBlock),
 	}
 }
 
@@ -47,21 +44,21 @@ func (d *Data) CreateData(ctx context.Context, att *envelope.Attachment, data []
 	// Create data
 	size := int64(len(data))
 	d.pool[att.ID] = dataBlock{data: data, size: size, fileName: att.FileName(), modtime: time.Now()}
-	d.size += size
+	d.poolSize += size
 	// Queue id
 	select {
-	case d.idCh <- att.ID:
+	case d.idChan <- att.ID:
 	default:
-		id := <-d.idCh
+		id := <-d.idChan
 		d.deleteData(id)
-		d.idCh <- att.ID
+		d.idChan <- att.ID
 	}
 
 	// Clean up pool if full
-	if d.size > maxDataPoolSize {
-		for id := range d.idCh {
+	if d.poolSize > d.size {
+		for id := range d.idChan {
 			d.deleteData(id)
-			if d.size <= maxDataPoolSize {
+			if d.poolSize <= d.size {
 				break
 			}
 		}
@@ -97,13 +94,13 @@ func (d *Data) deleteData(id int64) error {
 	}
 
 	delete(d.pool, id)
-	d.size -= data.size
+	d.poolSize -= data.size
 
 	return nil
 }
 
-func (d *Data) DataFS() (fs.FS, error) {
-	return d, nil
+func (d *Data) DataFS() fs.FS {
+	return d
 }
 
 func (d *Data) Open(name string) (fs.File, error) {

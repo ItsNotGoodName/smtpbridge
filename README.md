@@ -16,9 +16,14 @@ Configuration file is located at `~/.smtpbridge.yml`.
 ```yaml
 database: # Database
   type: memory # (memory)
+  memory:
+    limit: 100 # Max number of envelopes
 
-storage: # Storage for attachments
+storage: # Storage for attachment data
   type: memory # (memory)
+  memory:
+    limit: 30 # Max number of attachment data
+    size: 104857600 # Max memory allocation, 100 MiB
 
 http: # HTTP server
   enable: true
@@ -29,7 +34,7 @@ smtp: # SMTP server
   enable: true
   host: ""
   port: 1025
-  size: 26214400 # Max message size in bytes (25 MiB)
+  size: 26214400 # Max message size in bytes, 25 MiB
   auth: false
   username: ""
   password: ""
@@ -41,4 +46,4 @@ smtp: # SMTP server
 smtpbridge
 ```
 
-## Todo
+## To Do

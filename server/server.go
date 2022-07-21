@@ -29,9 +29,14 @@ func Start(config *config.Config) {
 	// Background daemons
 	backgrounds := []background.Background{}
 
+	// Only memdb database and storage is supported
+	if !(config.Database.IsMemDB() && config.Storage.IsMemDB()) {
+		log.Fatalf("server.Start: invalid database or storage: '%s' '%s'", config.Database.Type, config.Storage.Type)
+	}
+
 	// Create stores
-	dataStore := memdb.NewData()
-	envelopeStore := memdb.NewEnvelope()
+	dataStore := memdb.NewData(config.Storage.Memory.Limit, config.Storage.Memory.Size)
+	envelopeStore := memdb.NewEnvelope(config.Database.Memory.Limit)
 
 	// Create services
 	pub := event.NewPub()
@@ -40,12 +45,7 @@ func Start(config *config.Config) {
 
 	// Create HTTP server
 	if config.HTTP.Enable {
-		dataFS, err := dataStore.DataFS()
-		if err != nil {
-			panic(err)
-		}
-
-		backgrounds = append(backgrounds, router.New(config.HTTP.Addr(), controller.New(envelopeService), dataFS))
+		backgrounds = append(backgrounds, router.New(config.HTTP.Addr(), controller.New(envelopeService), dataStore.DataFS()))
 	}
 
 	// Create SMTP server

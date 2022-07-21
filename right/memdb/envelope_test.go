@@ -11,8 +11,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const envelopeLimit int64 = 100
+
 func TestEnvelopeCreateDelete(t *testing.T) {
-	store := NewEnvelope()
+	store := NewEnvelope(envelopeLimit)
 	ctx := context.Background()
 	msg, att := envelope.NewMessage("", []string{}, "", "", "", ""), []envelope.Attachment{*envelope.NewAttachment("", []byte{})}
 
@@ -43,7 +45,7 @@ func TestEnvelopeCreateDelete(t *testing.T) {
 }
 
 func TestEnvelopeCreateNoAttachments(t *testing.T) {
-	store := NewEnvelope()
+	store := NewEnvelope(envelopeLimit)
 	ctx := context.Background()
 	msg, att := envelope.NewMessage("", []string{}, "", "", "", ""), []envelope.Attachment{}
 
@@ -60,7 +62,7 @@ func TestEnvelopeCreateNoAttachments(t *testing.T) {
 }
 
 func TestEnvelopeListCount(t *testing.T) {
-	store := NewEnvelope()
+	store := NewEnvelope(envelopeLimit)
 	ctx := context.Background()
 
 	for i := 0; i < 12; i++ {
