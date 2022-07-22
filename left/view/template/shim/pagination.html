@@ -7,7 +7,7 @@
   <a class="pagination-next" href="{{ pageQuery . .Next }}">Next</a>
   {{ end }}
   <ul class="pagination-list">
-    {{ if and (ne .Min .Page) (ne .Min .Prev) }}
+    {{ if and (lt .Min .Page) (ne .Min .Prev) }}
     <li>
       <a class="pagination-link" aria-label="Goto page {{ .Min }}" href="{{ pageQuery . .Min }}">
         {{ .Min }}
@@ -37,7 +37,7 @@
       </a>
     </li>
     {{ end }}
-    {{ if and (ne .Max .Page) (ne .Max .Next) }}
+    {{ if and (gt .Max .Page) (ne .Max .Next) }}
     <li>
       <span class="pagination-ellipsis">&hellip;</span>
     </li>
