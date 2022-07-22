@@ -36,6 +36,51 @@ func (e *Envelope) CountEnvelope(ctx context.Context) (int, error) {
 	return count, nil
 }
 
+func (e *Envelope) CountAttachment(ctx context.Context) (int, error) {
+	e.mu.Lock()
+	count := 0
+	for _, atts := range e.attachments {
+		count += len(atts)
+	}
+	e.mu.Unlock()
+
+	return count, nil
+}
+
+func (e *Envelope) ListAttachment(ctx context.Context, offset, limit int, ascending bool) ([]envelope.Attachment, int, error) {
+	// Get attachments
+	e.mu.Lock()
+	count := 0
+	all := []envelope.Attachment{}
+	for _, atts := range e.attachments {
+		for _, att := range atts {
+			all = append(all, att)
+			count++
+		}
+	}
+	e.mu.Unlock()
+
+	// Sort attachments
+	if ascending {
+		sort.Slice(all, func(i, j int) bool {
+			return all[i].ID < all[j].ID
+		})
+	} else {
+		sort.Slice(all, func(i, j int) bool {
+			return all[i].ID > all[j].ID
+		})
+	}
+
+	// Slice attachments
+	atts := []envelope.Attachment{}
+	end := offset + limit
+	for i := offset; i < count && i < end; i++ {
+		atts = append(atts, all[i])
+	}
+
+	return atts, count, nil
+}
+
 func (e *Envelope) ListEnvelope(ctx context.Context, offset, limit int, ascending bool) ([]envelope.Envelope, int, error) {
 	// Get envelopes
 	e.mu.Lock()

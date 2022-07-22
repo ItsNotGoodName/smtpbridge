@@ -30,6 +30,7 @@ type (
 	}
 
 	Service interface {
+		ListAttachment(ctx context.Context, page *paginate.Page) ([]Attachment, error)
 		ListEnvelope(ctx context.Context, page *paginate.Page) ([]Envelope, error)
 		GetEnvelope(ctx context.Context, msgID int64) (*Envelope, error)
 		CreateEnvelope(ctx context.Context, req *CreateEnvelopeRequest) (int64, error)
@@ -37,6 +38,8 @@ type (
 	}
 
 	Store interface {
+		CountAttachment(ctx context.Context) (int, error)
+		ListAttachment(ctx context.Context, offset, limit int, ascending bool) ([]Attachment, int, error)
 		ListEnvelope(ctx context.Context, offset, limit int, ascending bool) ([]Envelope, int, error)
 		CreateEnvelope(ctx context.Context, msg *Message, atts []Attachment) (int64, error)
 		CountEnvelope(ctx context.Context) (int, error)
@@ -65,6 +68,17 @@ func NewEnvelopeService(store Store, dataStore DataStore) *EnvelopeService {
 		store:     store,
 		dataStore: dataStore,
 	}
+}
+
+func (es *EnvelopeService) ListAttachment(ctx context.Context, page *paginate.Page) ([]Attachment, error) {
+	atts, count, err := es.store.ListAttachment(ctx, page.Offset(), page.Limit, page.Ascending)
+	if err != nil {
+		return nil, err
+	}
+
+	page.SetCount(count)
+
+	return atts, nil
 }
 
 func (es *EnvelopeService) ListEnvelope(ctx context.Context, page *paginate.Page) ([]Envelope, error) {

@@ -14,7 +14,7 @@
     </thead>
     <tbody>
       {{ range .Envelopes }}
-      {{ $href := envelopeLink . }}
+      {{ $href := envelopeIDLink .Message.ID }}
       <tr>
         <td>
           <a href="{{ $href }}">{{ .Message.ID }}</a>
@@ -32,6 +32,6 @@
       {{ end }}
   </table>
 </div>
-{{ template "shim/pagination" . }}
+{{ template "shim/pagination" .Page }}
 </tbody>
 {{ end }}

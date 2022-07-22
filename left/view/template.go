@@ -9,9 +9,9 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/core/paginate"
 )
 
-func Render(rw http.ResponseWriter, code int, page string, data interface{}) {
-	rw.WriteHeader(code)
-	getTemplate(page).Execute(rw, data)
+func Render(w http.ResponseWriter, code int, page string, data interface{}) {
+	w.WriteHeader(code)
+	getTemplate(page).Execute(w, data)
 }
 
 func parseTemplate(name string, templateFS fs.FS) *template.Template {
@@ -19,8 +19,9 @@ func parseTemplate(name string, templateFS fs.FS) *template.Template {
 }
 
 const (
-	IndexPage    string = "index.html"
-	EnvelopePage string = "envelope.html"
+	IndexPage       string = "index.html"
+	EnvelopePage    string = "envelope.html"
+	AttachmentsPage string = "attachments.html"
 )
 
 type IndexData struct {
@@ -31,4 +32,9 @@ type IndexData struct {
 type EnvelopeData struct {
 	Envelope *envelope.Envelope
 	Tab      string
+}
+
+type AttachmentsData struct {
+	Attachments []envelope.Attachment
+	Page        paginate.Page
 }

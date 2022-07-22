@@ -19,6 +19,10 @@ func NewEnvelopeService(envelopeService envelope.Service, pub *Pub) *EnvelopeSer
 	}
 }
 
+func (e *EnvelopeService) ListAttachment(ctx context.Context, page *paginate.Page) ([]envelope.Attachment, error) {
+	return e.envelopeService.ListAttachment(ctx, page)
+}
+
 func (e *EnvelopeService) ListEnvelope(ctx context.Context, page *paginate.Page) ([]envelope.Envelope, error) {
 	return e.envelopeService.ListEnvelope(ctx, page)
 }

@@ -22,10 +22,10 @@ var helperMap template.FuncMap = template.FuncMap{
 	"pageLimitLink": func(page paginate.Page, limit int) string {
 		return fmt.Sprintf("?page=%d&ascending=%v&limit=%d", ((page.Page-1)*page.Limit)/limit+1, page.Ascending, limit)
 	},
-	"dataLink": func(att *envelope.Attachment) string {
+	"attachmentDataLink": func(att *envelope.Attachment) string {
 		return fmt.Sprintf("/data/%s", att.FileName())
 	},
-	"envelopeLink": func(env *envelope.Envelope) string {
-		return fmt.Sprintf("/envelope/%d", env.Message.ID)
+	"envelopeIDLink": func(id int64) string {
+		return fmt.Sprintf("/envelopes/%d", id)
 	},
 }

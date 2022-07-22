@@ -37,14 +37,15 @@ func New(addr string, c *controller.Controller, dataFS fs.FS) *Router {
 	r.Use(middleware.Timeout(60 * time.Second))
 
 	r.Get("/css/*", handlePrefixFS("/css/", static.CSSFS()))
+	r.Get("/data/*", handlePrefixFS("/data/", dataFS))
 
 	r.Get("/", c.IndexGet)
-	r.Route("/envelope/{id}", func(r chi.Router) {
+	r.Route("/envelopes/{id}", func(r chi.Router) {
 		r.Get("/", mwMultiplexAction(c.EnvelopeGet, nil, c.EnvelopeDelete))
 		r.Delete("/", c.EnvelopeDelete)
 		r.Get("/html", c.EnvelopeHTMLGet)
 	})
-	r.Get("/data/*", handlePrefixFS("/data/", dataFS))
+	r.Get("/attachments", c.AttachmentList)
 
 	return &Router{
 		addr: addr,

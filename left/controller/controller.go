@@ -3,13 +3,10 @@ package controller
 import (
 	"errors"
 	"net/http"
-	"strconv"
 
 	"github.com/ItsNotGoodName/smtpbridge/core"
 	"github.com/ItsNotGoodName/smtpbridge/core/envelope"
-	"github.com/ItsNotGoodName/smtpbridge/core/paginate"
 	"github.com/ItsNotGoodName/smtpbridge/left/view"
-	"github.com/go-chi/chi/v5"
 )
 
 type Controller struct {
@@ -23,12 +20,7 @@ func New(envelopeService envelope.Service) *Controller {
 }
 
 func (c *Controller) IndexGet(w http.ResponseWriter, r *http.Request) {
-	q := r.URL.Query()
-	pageQ, _ := strconv.Atoi(q.Get("page"))
-	limitQ, _ := strconv.Atoi(q.Get("limit"))
-	ascendingQ, _ := strconv.ParseBool(q.Get("ascending"))
-
-	page := paginate.NewPage(pageQ, limitQ, ascendingQ)
+	page := parsePage(r)
 	envs, err := c.envelopeService.ListEnvelope(r.Context(), &page)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -39,10 +31,7 @@ func (c *Controller) IndexGet(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *Controller) EnvelopeGet(w http.ResponseWriter, r *http.Request) {
-	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
-	tab := r.URL.Query().Get("tab")
-
-	env, err := c.envelopeService.GetEnvelope(r.Context(), id)
+	env, err := c.envelopeService.GetEnvelope(r.Context(), parseID(r))
 	if err != nil {
 		code := http.StatusInternalServerError
 		if errors.Is(err, core.ErrMessageNotFound) {
@@ -52,13 +41,11 @@ func (c *Controller) EnvelopeGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	view.Render(w, http.StatusOK, view.EnvelopePage, view.EnvelopeData{Envelope: env, Tab: tab})
+	view.Render(w, http.StatusOK, view.EnvelopePage, view.EnvelopeData{Envelope: env, Tab: r.URL.Query().Get("tab")})
 }
 
 func (c *Controller) EnvelopeHTMLGet(w http.ResponseWriter, r *http.Request) {
-	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
-
-	env, err := c.envelopeService.GetEnvelope(r.Context(), id)
+	env, err := c.envelopeService.GetEnvelope(r.Context(), parseID(r))
 	if err != nil {
 		code := http.StatusInternalServerError
 		if errors.Is(err, core.ErrMessageNotFound) {
@@ -72,9 +59,7 @@ func (c *Controller) EnvelopeHTMLGet(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *Controller) EnvelopeDelete(w http.ResponseWriter, r *http.Request) {
-	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
-
-	err := c.envelopeService.DeleteEnvelope(r.Context(), id)
+	err := c.envelopeService.DeleteEnvelope(r.Context(), parseID(r))
 	if err != nil {
 		code := http.StatusInternalServerError
 		if errors.Is(err, core.ErrMessageNotFound) {
@@ -85,4 +70,15 @@ func (c *Controller) EnvelopeDelete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+}
+
+func (c *Controller) AttachmentList(w http.ResponseWriter, r *http.Request) {
+	page := parsePage(r)
+	atts, err := c.envelopeService.ListAttachment(r.Context(), &page)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	view.Render(w, http.StatusOK, view.AttachmentsPage, view.AttachmentsData{Attachments: atts, Page: page})
 }

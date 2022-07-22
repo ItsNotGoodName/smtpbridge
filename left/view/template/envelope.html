@@ -38,7 +38,7 @@
     <tr>
       <td><b>Attachment</b></td>
       <td>
-        <a href="{{ dataLink $att }}">
+        <a href="{{ attachmentDataLink $att }}">
           {{ $att.Name }}
         </a>
       </td>
@@ -55,7 +55,7 @@
     </li>
     {{ if .Envelope.Message.HTML }}
     <li>
-      <a href="{{ envelopeLink .Envelope }}/html">
+      <a href="{{ envelopeIDLink .Envelope.Message.ID }}/html">
         <span>HTML</span>
       </a>
     </li>
@@ -77,10 +77,10 @@
 <div class="block">
   {{ if $att.IsImage }}
   <figure class="image">
-    <img src="{{ dataLink $att }}" alt="{{ $att.Name }}">
+    <img src="{{ attachmentDataLink $att }}" alt="{{ $att.Name }}">
   </figure>
   {{ else }}
-  <a href="{{ dataLink $att }}">
+  <a href="{{ attachmentDataLink $att }}">
     {{ $att.Name }}
   </a>
   {{ end }}

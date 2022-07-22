@@ -1,49 +1,49 @@
 {{ define "shim/pagination" }}
 <nav class="pagination" role="navigation" aria-label="pagination">
-  {{ if .Page.Prev }}
-  <a class="pagination-previous" href="{{ pageLink .Page .Page.Prev }}">Previous</a>
+  {{ if .Prev }}
+  <a class="pagination-previous" href="{{ pageLink . .Prev }}">Previous</a>
   {{ end }}
-  {{ if .Page.Next }}
-  <a class="pagination-next" href="{{ pageLink .Page .Page.Next }}">Next</a>
+  {{ if .Next }}
+  <a class="pagination-next" href="{{ pageLink . .Next }}">Next</a>
   {{ end }}
   <ul class="pagination-list">
-    {{ if and (ne .Page.Min .Page.Page) (ne .Page.Min .Page.Prev) }}
+    {{ if and (ne .Min .Page) (ne .Min .Prev) }}
     <li>
-      <a class="pagination-link" aria-label="Goto page {{ .Page.Min }}" href="{{ pageLink .Page .Page.Min }}">
-        {{ .Page.Min }}
+      <a class="pagination-link" aria-label="Goto page {{ .Min }}" href="{{ pageLink . .Min }}">
+        {{ .Min }}
       </a>
     </li>
     <li>
       <span class="pagination-ellipsis">&hellip;</span>
     </li>
     {{ end }}
-    {{ if .Page.Prev }}
+    {{ if .Prev }}
     <li>
-      <a class="pagination-link" aria-label="Goto page {{ .Page.Prev }}" href="{{ pageLink .Page .Page.Prev }}">
-        {{ .Page.Prev }}
+      <a class="pagination-link" aria-label="Goto page {{ .Prev }}" href="{{ pageLink . .Prev }}">
+        {{ .Prev }}
       </a>
     </li>
     {{ end }}
     <li>
-      <a class="pagination-link is-current" aria-label="Page {{ .Page.Page }}" aria-current="page"
-        href="{{ pageLink .Page .Page.Page }}">
-        {{ .Page.Page }}
+      <a class="pagination-link is-current" aria-label="Page {{ .Page }}" aria-current="page"
+        href="{{ pageLink . .Page }}">
+        {{ .Page }}
       </a>
     </li>
-    {{ if .Page.Next }}
+    {{ if .Next }}
     <li>
-      <a class="pagination-link" aria-label="Goto page {{ .Page.Next }}" href="{{ pageLink .Page .Page.Next }}">
-        {{ .Page.Next }}
+      <a class="pagination-link" aria-label="Goto page {{ .Next }}" href="{{ pageLink . .Next }}">
+        {{ .Next }}
       </a>
     </li>
     {{ end }}
-    {{ if and (ne .Page.Max .Page.Page) (ne .Page.Max .Page.Next) }}
+    {{ if and (ne .Max .Page) (ne .Max .Next) }}
     <li>
       <span class="pagination-ellipsis">&hellip;</span>
     </li>
     <li>
-      <a class="pagination-link" aria-label="Goto page {{ .Page.Max }}" href="{{ pageLink .Page .Page.Max }}">
-        {{ .Page.Max }}
+      <a class="pagination-link" aria-label="Goto page {{ .Max }}" href="{{ pageLink . .Max }}">
+        {{ .Max }}
       </a>
     </li>
     {{ end }}

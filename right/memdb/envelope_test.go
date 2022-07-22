@@ -23,12 +23,11 @@ func TestEnvelopeCreateDelete(t *testing.T) {
 
 	env, err := store.GetEnvelope(ctx, id)
 	assert.Nil(t, err)
-
-	assert.Equal(t, store.lastAttachmentID, int64(1))
-	assert.Equal(t, store.lastMessageID, int64(1))
 	assert.Equal(t, env.Message.ID, int64(1))
 	assert.Equal(t, env.Attachments[0].ID, int64(1))
 	assert.Equal(t, env.Attachments[0].MessageID, int64(1))
+	assert.Equal(t, store.lastAttachmentID, int64(1))
+	assert.Equal(t, store.lastMessageID, int64(1))
 
 	deleteErr := fmt.Errorf("delete error")
 	err = store.DeleteEnvelope(ctx, id, func(env *envelope.Envelope) error { return deleteErr })
@@ -108,4 +107,32 @@ func TestEnvelopeLimitCount(t *testing.T) {
 	count, err := store.CountEnvelope(ctx)
 	assert.Nil(t, err)
 	assert.Equal(t, count, 10)
+}
+
+func TestAttachmentListCount(t *testing.T) {
+	store := NewEnvelope(envelopeLimit)
+	ctx := context.Background()
+
+	for i := 0; i < 12; i++ {
+		msg, att := envelope.NewMessage(strconv.Itoa(i), []string{}, "", "", "", ""), []envelope.Attachment{*envelope.NewAttachment(strconv.Itoa(i), []byte{})}
+		store.CreateEnvelope(ctx, msg, att)
+	}
+
+	atts, count, err := store.ListAttachment(ctx, 0, 10, true)
+	assert.Nil(t, err)
+	assert.Equal(t, count, 12)
+	assert.Len(t, atts, 10)
+	assert.Equal(t, atts[0].Name, "0")
+	assert.Equal(t, atts[9].Name, "9")
+
+	count, err = store.CountAttachment(ctx)
+	assert.Nil(t, err)
+	assert.Equal(t, count, 12)
+
+	atts, count, err = store.ListAttachment(ctx, 10, 2, false)
+	assert.Nil(t, err)
+	assert.Equal(t, count, 12)
+	assert.Len(t, atts, 2)
+	assert.Equal(t, atts[0].Name, "1")
+	assert.Equal(t, atts[1].Name, "0")
 }
