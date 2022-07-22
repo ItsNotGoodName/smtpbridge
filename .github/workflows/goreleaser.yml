@@ -20,8 +20,8 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: "16"
-      - run: npm install --prefix left/static
-      - run: npm run css-build --prefix left/static
+      - run: npm install --prefix left/assets
+      - run: npm run css-build --prefix left/assets
       - name: Set up Go
         uses: actions/setup-go@v2
         with:

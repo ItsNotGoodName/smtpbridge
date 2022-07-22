@@ -1,11 +1,7 @@
 {{ template "layout/default" . }}
 {{ define "content" }}
 {{ $hasAttachments := ne (len .Envelope.Attachments) 0 }}
-<div class="buttons">
-  <a class="button is-danger" href="?action=delete">
-    Delete
-  </a>
-</div>
+<h1 class="title">Envelope</h1>
 <table class="table">
   <tbody>
     <tr>
@@ -36,6 +32,11 @@
     {{ end }}
   </tbody>
 </table>
+<div class="buttons">
+  <a class="button is-danger" href="?action=delete">
+    Delete
+  </a>
+</div>
 <div class="tabs is-boxed" id="tab">
   <ul>
     <li {{ if or (eq .Tab "text" ) (eq .Tab "" ) }} class="is-active" {{ end }}>
@@ -75,11 +76,11 @@
         </figure>
       </div>
       {{ end }}
-      <footer class="card-footer">
-        <a href="{{ $href }}" class="card-footer-item is-clipped">
-          {{ $att.Name }}
-        </a>
-      </footer>
+      <div class="card-content">
+        <div class="is-clipped">
+          <a href="{{ $href }}">{{ $att.Name }}</a>
+        </div>
+      </div>
     </div>
   </div>
 </div>

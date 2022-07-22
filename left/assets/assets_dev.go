@@ -1,6 +1,6 @@
 //go:build dev
 
-package static
+package assets
 
 import (
 	"io/fs"
@@ -9,7 +9,7 @@ import (
 	"runtime"
 )
 
-var dist fs.FS
+var distFS fs.FS
 
 func init() {
 	_, filename, _, ok := runtime.Caller(0)
@@ -18,13 +18,9 @@ func init() {
 	}
 	packageDir := path.Dir(filename)
 
-	dist = os.DirFS(path.Join(packageDir, "dist"))
+	distFS = os.DirFS(path.Join(packageDir, "dist"))
 }
 
-func CSSFS() fs.FS {
-	f, err := fs.Sub(dist, "css")
-	if err != nil {
-		panic(err)
-	}
-	return f
+func FS() fs.FS {
+	return distFS
 }

@@ -1,4 +1,4 @@
-NPM_PREFIX := podman run --rm -it -v "$(shell pwd)/left/static:/work" -w /work docker.io/library/node:16
+NPM_PREFIX := podman run --rm -it -v "$(shell pwd)/left/assets:/work" -w /work docker.io/library/node:16
 
 all: npm snapshot
 
@@ -9,10 +9,10 @@ npm-login:
 	$(NPM_PREFIX) bash
 
 npm-dev:
-	$(NPM_PREFIX) npm run css-watch
+	$(NPM_PREFIX) npm run dev
 
 npm-build:
-	$(NPM_PREFIX) npm run css-build
+	$(NPM_PREFIX) npm run build
 
 dev:
 	go run --tags dev .

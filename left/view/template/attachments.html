@@ -14,14 +14,19 @@
         </figure>
       </div>
       {{ end }}
-      <footer class="card-footer">
-        <div class="card-footer-item is-clipped">
-          <a href="{{ $href }}" class="is-clipped">
-            {{ $att.Name }}
-          </a>
+      <div class="card-content is-flex is-flex-wrap-wrap">
+        <div class="is-flex-grow-1 is-clipped">
+          <a href="{{ $href }}">{{ $att.Name }}</a>
         </div>
-        <a href='{{ envelopeLinkID $att.MessageID }}{{ tabQuery "attachments" }}' class="card-footer-item">Envelope</a>
-      </footer>
+        <a href='{{ envelopeLinkID $att.MessageID }}{{ tabQuery "attachments" }}'>
+          <span class="icon-text">
+            <span class="icon">
+              <i class="fas fa-envelope"></i>
+            </span>
+            <span>Envelope</span>
+          </span>
+        </a>
+      </div>
     </div>
   </div>
   {{ end }}

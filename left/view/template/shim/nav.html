@@ -2,7 +2,12 @@
 <nav class="navbar" role="navigation" aria-label="main navigation">
   <div class="navbar-brand">
     <a href="/" class="navbar-item">
-      <strong>Home</strong>
+      <span class="icon-text">
+        <span class="icon">
+          <i class="fas fa-home"></i>
+        </span>
+        <span><strong>Home</strong></span>
+      </span>
     </a>
 
     <a role="button" class="navbar-burger" data-target="navMenu" aria-label="menu" aria-expanded="false">
@@ -15,41 +20,33 @@
   <div class="navbar-menu" id="navMenu">
     <div class="navbar-start">
       <a href="/" class="navbar-item">
-        Envelopes
+        <span class="icon-text">
+          <span class="icon">
+            <i class="fas fa-envelope"></i>
+          </span>
+          <span>Envelopes</span>
+        </span>
       </a>
       <a href="/attachments" class="navbar-item">
-        Attachments
+        <span class="icon-text">
+          <span class="icon">
+            <i class="fas fa-paperclip"></i>
+          </span>
+          <span>Attachments</span>
+        </span>
       </a>
     </div>
 
     <div class="navbar-end">
       <a class="navbar-item" href="https://github.com/ItsNotGoodName/smtpbridge">
-        Source Code
+        <span class="icon-text">
+          <span class="icon">
+            <i class="fas fa-code-branch"></i>
+          </span>
+          <span>Source Code</span>
+        </span>
       </a>
     </div>
   </div>
 </nav>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-
-    // Get all "navbar-burger" elements
-    const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
-
-    // Add a click event on each of them
-    $navbarBurgers.forEach(el => {
-      el.addEventListener('click', () => {
-
-        // Get the target from the "data-target" attribute
-        const target = el.dataset.target;
-        const $target = document.getElementById(target);
-
-        // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
-        el.classList.toggle('is-active');
-        $target.classList.toggle('is-active');
-
-      });
-    });
-
-  });
-</script>
 {{ end }}

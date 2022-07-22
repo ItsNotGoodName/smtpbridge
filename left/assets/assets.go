@@ -1,6 +1,6 @@
 //go:build !dev
 
-package static
+package assets
 
 import (
 	"embed"
@@ -8,10 +8,10 @@ import (
 )
 
 //go:embed dist
-var dist embed.FS
+var assetFS embed.FS
 
-func CSSFS() fs.FS {
-	f, err := fs.Sub(dist, "dist/css")
+func FS() fs.FS {
+	f, err := fs.Sub(assetFS, "dist")
 	if err != nil {
 		panic(err)
 	}
