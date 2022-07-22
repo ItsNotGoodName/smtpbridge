@@ -14,7 +14,7 @@
     </thead>
     <tbody>
       {{ range .Envelopes }}
-      {{ $href := envelopeIDLink .Message.ID }}
+      {{ $href := envelopeLink . }}
       <tr>
         <td>
           <a href="{{ $href }}">{{ .Message.ID }}</a>

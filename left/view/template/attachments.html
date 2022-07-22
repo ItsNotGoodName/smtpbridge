@@ -7,7 +7,7 @@
     {{ if $att.IsImage }}
     <div class="card-image">
       <figure class="image is-16by9">
-        <img src="{{ attachmentDataLink $att }}" alt="{{ $att.Name }}">
+        <img src="{{ dataLinkAttachment $att }}" alt="{{ $att.Name }}">
       </figure>
     </div>
     {{ end }}
@@ -19,7 +19,7 @@
       </div>
     </div>
     <footer class="card-footer">
-      <a href="{{ envelopeIDLink $att.MessageID }}?tab=attachments" class="card-footer-item">Envelope</a>
+      <a href="{{ envelopeLinkID $att.MessageID }}?tab=attachments" class="card-footer-item">Envelope</a>
     </footer>
   </div>
   {{ end }}
