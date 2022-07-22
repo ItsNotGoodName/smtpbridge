@@ -1,15 +1,15 @@
 {{ define "shim/pagination" }}
-<nav class="pagination" role="navigation" aria-label="pagination">
+<nav class="pagination block" role="navigation" aria-label="pagination">
   {{ if .Prev }}
-  <a class="pagination-previous" href="{{ pageLink . .Prev }}">Previous</a>
+  <a class="pagination-previous" href="{{ pageQuery . .Prev }}">Previous</a>
   {{ end }}
   {{ if .Next }}
-  <a class="pagination-next" href="{{ pageLink . .Next }}">Next</a>
+  <a class="pagination-next" href="{{ pageQuery . .Next }}">Next</a>
   {{ end }}
   <ul class="pagination-list">
     {{ if and (ne .Min .Page) (ne .Min .Prev) }}
     <li>
-      <a class="pagination-link" aria-label="Goto page {{ .Min }}" href="{{ pageLink . .Min }}">
+      <a class="pagination-link" aria-label="Goto page {{ .Min }}" href="{{ pageQuery . .Min }}">
         {{ .Min }}
       </a>
     </li>
@@ -19,20 +19,20 @@
     {{ end }}
     {{ if .Prev }}
     <li>
-      <a class="pagination-link" aria-label="Goto page {{ .Prev }}" href="{{ pageLink . .Prev }}">
+      <a class="pagination-link" aria-label="Goto page {{ .Prev }}" href="{{ pageQuery . .Prev }}">
         {{ .Prev }}
       </a>
     </li>
     {{ end }}
     <li>
       <a class="pagination-link is-current" aria-label="Page {{ .Page }}" aria-current="page"
-        href="{{ pageLink . .Page }}">
+        href="{{ pageQuery . .Page }}">
         {{ .Page }}
       </a>
     </li>
     {{ if .Next }}
     <li>
-      <a class="pagination-link" aria-label="Goto page {{ .Next }}" href="{{ pageLink . .Next }}">
+      <a class="pagination-link" aria-label="Goto page {{ .Next }}" href="{{ pageQuery . .Next }}">
         {{ .Next }}
       </a>
     </li>
@@ -42,7 +42,7 @@
       <span class="pagination-ellipsis">&hellip;</span>
     </li>
     <li>
-      <a class="pagination-link" aria-label="Goto page {{ .Max }}" href="{{ pageLink . .Max }}">
+      <a class="pagination-link" aria-label="Goto page {{ .Max }}" href="{{ pageQuery . .Max }}">
         {{ .Max }}
       </a>
     </li>

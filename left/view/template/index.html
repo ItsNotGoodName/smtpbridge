@@ -1,15 +1,15 @@
 {{ template "layout/default" . }}
 {{ define "content" }}
-{{ template "shim/sort" .Page }}
+<h1 class="title">Envelopes</h1>
+{{ template "shim/filter" .Page }}
 <div class="table-container">
   <table class="table is-hoverable is-striped is-fullwidth">
     <thead>
       <tr>
         <th>ID</th>
-        <th>Subject</th>
         <th>From</th>
+        <th>Subject</th>
         <th>Received</th>
-        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -20,13 +20,13 @@
           <a href="{{ $href }}">{{ .Message.ID }}</a>
         </td>
         <td>
-          <a href="{{ $href }}">{{ .Message.Subject }}</a>
-        </td>
-        <td>
           <a href="{{ $href }}">{{ .Message.From }}</a>
         </td>
         <td>
-          <a href="{{ $href }}">{{ formatDate .Message.CreatedAt }}</a>
+          <a href="{{ $href }}">{{ .Message.Subject }}</a>
+        </td>
+        <td>
+          <a href="{{ $href }}">{{ dateFormat .Message.CreatedAt }}</a>
         </td>
       </tr>
       {{ end }}

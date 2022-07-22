@@ -1,26 +1,28 @@
 {{ template "layout/default" . }}
 {{ define "content" }}
-{{ template "shim/sort" .Page }}
-<div class="is-flex is-flex-wrap-wrap is-justify-content-center">
+<h1 class="title">Attachments</h1>
+{{ template "shim/filter" .Page }}
+<div class="columns is-multiline">
   {{ range $att := .Attachments }}
-  <div class="card m-2">
-    {{ if $att.IsImage }}
-    <div class="card-image">
-      <figure class="image is-16by9">
-        <img src="{{ dataLinkAttachment $att }}" alt="{{ $att.Name }}">
-      </figure>
-    </div>
-    {{ end }}
-    <div class="card-content">
-      <div class="media">
-        <div class="media-content">
-          <p class="title is-4">{{ $att.Name}}</p>
-        </div>
+  <div class="column is-4">
+    <div class="card">
+      {{ $href := dataLinkAttachment $att }}
+      {{ if $att.IsImage }}
+      <div class="card-image">
+        <figure class="image is-16by9">
+          <img src="{{ $href }}" alt="{{ $att.Name }}">
+        </figure>
       </div>
+      {{ end }}
+      <footer class="card-footer">
+        <div class="card-footer-item is-clipped">
+          <a href="{{ $href }}" class="is-clipped">
+            {{ $att.Name }}
+          </a>
+        </div>
+        <a href='{{ envelopeLinkID $att.MessageID }}{{ tabQuery "attachments" }}' class="card-footer-item">Envelope</a>
+      </footer>
     </div>
-    <footer class="card-footer">
-      <a href="{{ envelopeLinkID $att.MessageID }}?tab=attachments" class="card-footer-item">Envelope</a>
-    </footer>
   </div>
   {{ end }}
 </div>

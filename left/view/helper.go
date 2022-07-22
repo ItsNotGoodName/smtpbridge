@@ -10,17 +10,20 @@ import (
 )
 
 var helperMap template.FuncMap = template.FuncMap{
-	"formatDate": func(date time.Time) string {
+	"dateFormat": func(date time.Time) string {
 		return date.Format("Jan _2 2006 15:04:05")
 	},
-	"pageLink": func(page paginate.Page, newPage int) string {
+	"pageQuery": func(page paginate.Page, newPage int) string {
 		return fmt.Sprintf("?page=%d&ascending=%v&limit=%d", newPage, page.Ascending, page.Limit)
 	},
-	"pageLinkToggleAscending": func(page paginate.Page) string {
+	"pageQueryToggleAscending": func(page paginate.Page) string {
 		return fmt.Sprintf("?page=%d&ascending=%v&limit=%d", page.Page, !page.Ascending, page.Limit)
 	},
-	"pageLinkLimit": func(page paginate.Page, limit int) string {
+	"pageQueryLimit": func(page paginate.Page, limit int) string {
 		return fmt.Sprintf("?page=%d&ascending=%v&limit=%d", ((page.Page-1)*page.Limit)/limit+1, page.Ascending, limit)
+	},
+	"tabQuery": func(tab string) string {
+		return fmt.Sprintf("?tab=%s#tab", tab)
 	},
 	"dataLinkAttachment": func(att *envelope.Attachment) string {
 		return fmt.Sprintf("/data/%s", att.FileName())
@@ -30,5 +33,8 @@ var helperMap template.FuncMap = template.FuncMap{
 	},
 	"envelopeLinkID": func(id int64) string {
 		return fmt.Sprintf("/envelopes/%d", id)
+	},
+	"envelopeHTMLLink": func(env *envelope.Envelope) string {
+		return fmt.Sprintf("/envelopes/%d/html", env.Message.ID)
 	},
 }

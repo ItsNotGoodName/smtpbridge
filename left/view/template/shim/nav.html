@@ -1,20 +1,55 @@
 {{ define "shim/nav" }}
 <nav class="navbar" role="navigation" aria-label="main navigation">
   <div class="navbar-brand">
-    <div class="navbar-item mr-auto">
-      <div class="buttons">
-        <a href="/" class="button is-primary">
-          <strong>Envelopes</strong>
-        </a>
-        <a href="/attachments" class="button">
-          <strong>Attachments</strong>
-        </a>
-      </div>
-    </div>
-    <a class="navbar-item is-light" href="https://github.com/ItsNotGoodName/smtpbridge">
-      Source Code
+    <a href="/" class="navbar-item">
+      <strong>Home</strong>
+    </a>
+
+    <a role="button" class="navbar-burger" data-target="navMenu" aria-label="menu" aria-expanded="false">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
     </a>
   </div>
+
+  <div class="navbar-menu" id="navMenu">
+    <div class="navbar-start">
+      <a href="/" class="navbar-item">
+        Envelopes
+      </a>
+      <a href="/attachments" class="navbar-item">
+        Attachments
+      </a>
+    </div>
+
+    <div class="navbar-end">
+      <a class="navbar-item" href="https://github.com/ItsNotGoodName/smtpbridge">
+        Source Code
+      </a>
+    </div>
   </div>
 </nav>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+
+    // Get all "navbar-burger" elements
+    const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+
+    // Add a click event on each of them
+    $navbarBurgers.forEach(el => {
+      el.addEventListener('click', () => {
+
+        // Get the target from the "data-target" attribute
+        const target = el.dataset.target;
+        const $target = document.getElementById(target);
+
+        // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+        el.classList.toggle('is-active');
+        $target.classList.toggle('is-active');
+
+      });
+    });
+
+  });
+</script>
 {{ end }}

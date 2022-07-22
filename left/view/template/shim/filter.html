@@ -1,0 +1,30 @@
+{{ define "shim/filter" }}
+<div class="block">
+  <a class="button" href="{{ pageQueryToggleAscending . }}">
+    {{ if .Ascending }}Ascending{{ else }}Descending{{ end }}
+  </a>
+  <div class="dropdown is-hoverable">
+    <div class="dropdown-trigger">
+      <button class="button" aria-haspopup="true" aria-controls="filter-dropdown-menu">
+        <span>{{ .Limit }}</span>
+      </button>
+    </div>
+    <div class="dropdown-menu" id="filter-dropdown-menu" role="menu">
+      <div class="dropdown-content">
+        <a href="{{ pageQueryLimit . 10 }}" class="dropdown-item">
+          10
+        </a>
+        <a href="{{ pageQueryLimit . 25 }}" class="dropdown-item">
+          25
+        </a>
+        <a href="{{ pageQueryLimit . 50 }}" class="dropdown-item">
+          50
+        </a>
+        <a href="{{ pageQueryLimit . 100 }}" class="dropdown-item">
+          100
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{{ end }}

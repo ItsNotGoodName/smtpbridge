@@ -18,7 +18,7 @@
     </tr>
     <tr>
       <td><b>Received</b></td>
-      <td>{{ formatDate .Envelope.Message.CreatedAt }}</td>
+      <td>{{ dateFormat .Envelope.Message.CreatedAt }}</td>
     </tr>
     <tr>
       <td><b>Date</b></td>
@@ -34,35 +34,25 @@
       <td>{{ $to }}</td>
     </tr>
     {{ end }}
-    {{ range $att := .Envelope.Attachments }}
-    <tr>
-      <td><b>Attachment</b></td>
-      <td>
-        <a href="{{ dataLinkAttachment $att }}">
-          {{ $att.Name }}
-        </a>
-      </td>
-    </tr>
-    {{ end }}
   </tbody>
 </table>
 <div class="tabs is-boxed" id="tab">
   <ul>
     <li {{ if or (eq .Tab "text" ) (eq .Tab "" ) }} class="is-active" {{ end }}>
-      <a href="?tab=text#tab">
+      <a href='{{ tabQuery "text" }}'>
         <span>Text</span>
       </a>
     </li>
     {{ if .Envelope.Message.HTML }}
     <li>
-      <a href="{{ envelopeLink .Envelope }}/html">
+      <a href="{{ envelopeHTMLLink .Envelope }}">
         <span>HTML</span>
       </a>
     </li>
     {{ end }}
     {{ if $hasAttachments }}
     <li {{ if eq .Tab "attachments" }} class="is-active" {{ end }}>
-      <a href="?tab=attachments#tab">
+      <a href='{{ tabQuery "attachments" }}'>
         <span class="mr-2">Attachments</span>
         <span class="tag is-info">{{ len .Envelope.Attachments }}</span>
       </a>
@@ -74,16 +64,24 @@
 <pre>{{ .Envelope.Message.Text }}</pre>
 {{ else if and (eq .Tab "attachments" ) $hasAttachments }}
 {{ range $att := .Envelope.Attachments }}
-<div class="block">
-  {{ if $att.IsImage }}
-  <figure class="image">
-    <img src="{{ dataLinkAttachment $att }}" alt="{{ $att.Name }}">
-  </figure>
-  {{ else }}
-  <a href="{{ dataLinkAttachment $att }}">
-    {{ $att.Name }}
-  </a>
-  {{ end }}
+<div class="columns is-multiline">
+  {{ $href := dataLinkAttachment $att }}
+  <div class="column is-4">
+    <div class="card">
+      {{ if $att.IsImage }}
+      <div class="card-image">
+        <figure class="image is-16by9">
+          <img src="{{ $href }}" alt="{{ $att.Name }}">
+        </figure>
+      </div>
+      {{ end }}
+      <footer class="card-footer">
+        <a href="{{ $href }}" class="card-footer-item is-clipped">
+          {{ $att.Name }}
+        </a>
+      </footer>
+    </div>
+  </div>
 </div>
 {{ end }}
 {{ end }}
