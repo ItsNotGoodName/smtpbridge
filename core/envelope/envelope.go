@@ -3,6 +3,7 @@ package envelope
 import (
 	"context"
 	"io/fs"
+	"time"
 
 	"github.com/ItsNotGoodName/smtpbridge/core"
 	"github.com/ItsNotGoodName/smtpbridge/core/paginate"
@@ -15,10 +16,10 @@ type (
 	}
 
 	CreateEnvelopeRequest struct {
-		Date       string
+		Date       time.Time
+		Subject    string
 		From       string
 		To         []string
-		Subject    string
 		Text       string
 		HTML       string
 		Attachment []CreateAttachmentRequest

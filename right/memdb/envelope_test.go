@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/ItsNotGoodName/smtpbridge/core"
 	"github.com/ItsNotGoodName/smtpbridge/core/envelope"
@@ -16,7 +17,7 @@ const envelopeLimit int64 = 100
 func TestEnvelopeCreateDelete(t *testing.T) {
 	store := NewEnvelope(envelopeLimit)
 	ctx := context.Background()
-	msg, att := envelope.NewMessage("", []string{}, "", "", "", ""), []envelope.Attachment{*envelope.NewAttachment("", []byte{})}
+	msg, att := envelope.NewMessage("", []string{}, "", "", "", time.Now()), []envelope.Attachment{*envelope.NewAttachment("", []byte{})}
 
 	id, err := store.CreateEnvelope(ctx, msg, att)
 	assert.Nil(t, err)
@@ -46,7 +47,7 @@ func TestEnvelopeCreateDelete(t *testing.T) {
 func TestEnvelopeCreateNoAttachments(t *testing.T) {
 	store := NewEnvelope(envelopeLimit)
 	ctx := context.Background()
-	msg, att := envelope.NewMessage("", []string{}, "", "", "", ""), []envelope.Attachment{}
+	msg, att := envelope.NewMessage("", []string{}, "", "", "", time.Now()), []envelope.Attachment{}
 
 	id, err := store.CreateEnvelope(ctx, msg, att)
 	assert.Nil(t, err)
@@ -65,7 +66,7 @@ func TestEnvelopeListCount(t *testing.T) {
 	ctx := context.Background()
 
 	for i := 0; i < 12; i++ {
-		msg, att := envelope.NewMessage(strconv.Itoa(i), []string{}, "", "", "", ""), []envelope.Attachment{*envelope.NewAttachment(strconv.Itoa(i), []byte{})}
+		msg, att := envelope.NewMessage(strconv.Itoa(i), []string{}, "", "", "", time.Now()), []envelope.Attachment{*envelope.NewAttachment(strconv.Itoa(i), []byte{})}
 		store.CreateEnvelope(ctx, msg, att)
 	}
 
@@ -99,7 +100,7 @@ func TestEnvelopeLimitCount(t *testing.T) {
 	store := NewEnvelope(10)
 	ctx := context.Background()
 
-	msg, att := envelope.NewMessage("", []string{}, "", "", "", ""), []envelope.Attachment{}
+	msg, att := envelope.NewMessage("", []string{}, "", "", "", time.Now()), []envelope.Attachment{}
 	for i := 0; i < 12; i++ {
 		store.CreateEnvelope(ctx, msg, att)
 	}
@@ -114,7 +115,7 @@ func TestAttachmentListCount(t *testing.T) {
 	ctx := context.Background()
 
 	for i := 0; i < 12; i++ {
-		msg, att := envelope.NewMessage(strconv.Itoa(i), []string{}, "", "", "", ""), []envelope.Attachment{*envelope.NewAttachment(strconv.Itoa(i), []byte{})}
+		msg, att := envelope.NewMessage(strconv.Itoa(i), []string{}, "", "", "", time.Now()), []envelope.Attachment{*envelope.NewAttachment(strconv.Itoa(i), []byte{})}
 		store.CreateEnvelope(ctx, msg, att)
 	}
 

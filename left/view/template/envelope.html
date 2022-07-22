@@ -13,16 +13,16 @@
       <td>{{ .Envelope.Message.ID }}</td>
     </tr>
     <tr>
-      <td><b>Subject</b></td>
-      <td>{{ .Envelope.Message.Subject }}</td>
-    </tr>
-    <tr>
-      <td><b>Received</b></td>
+      <td><b>Received Date</b></td>
       <td>{{ dateFormat .Envelope.Message.CreatedAt }}</td>
     </tr>
     <tr>
       <td><b>Date</b></td>
-      <td>{{ .Envelope.Message.Date }}</td>
+      <td>{{ dateFormat .Envelope.Message.Date }}</td>
+    </tr>
+    <tr>
+      <td><b>Subject</b></td>
+      <td>{{ .Envelope.Message.Subject }}</td>
     </tr>
     <tr>
       <td><b>From</b></td>

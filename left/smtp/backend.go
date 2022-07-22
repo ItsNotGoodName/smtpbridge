@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"net/mail"
 
 	"github.com/ItsNotGoodName/smtpbridge/core/auth"
 	"github.com/ItsNotGoodName/smtpbridge/core/envelope"
@@ -100,6 +101,11 @@ func (s *session) Data(r io.Reader) error {
 	}
 
 	// Envelope request
+	date, err := e.Date()
+	if err != nil && err != mail.ErrHeaderNotPresent {
+		log.Printf("smtp.session.Data: remote %s: could not parse date: %s: %s", s.remoteAddr, e.GetHeader("Date"), err)
+	}
+
 	envReq := &envelope.CreateEnvelopeRequest{
 		From:       s.from,
 		To:         to,
@@ -107,7 +113,7 @@ func (s *session) Data(r io.Reader) error {
 		Text:       e.Text,
 		HTML:       e.HTML,
 		Attachment: attsReq,
-		Date:       e.GetHeader("Date"),
+		Date:       date,
 	}
 
 	// Create envelope
