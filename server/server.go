@@ -6,6 +6,7 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/config"
 	"github.com/ItsNotGoodName/smtpbridge/core/auth"
 	"github.com/ItsNotGoodName/smtpbridge/core/background"
+	"github.com/ItsNotGoodName/smtpbridge/core/bridge"
 	"github.com/ItsNotGoodName/smtpbridge/core/endpoint"
 	"github.com/ItsNotGoodName/smtpbridge/core/envelope"
 	"github.com/ItsNotGoodName/smtpbridge/core/event"
@@ -44,6 +45,8 @@ func Start(config *config.Config) {
 	envelopeService := event.NewEnvelopeService(envelope.NewEnvelopeService(envelopeStore, dataStore), pub)
 	smtpAuthService := smtpAuthService(config)
 	endpointService := endpoint.NewEndpointService(memdb.NewEndpoint())
+	bridgeService := bridge.NewBridgeService(pub, envelopeService, endpointService)
+	backgrounds = append(backgrounds, bridgeService)
 
 	// Create endpoints from config
 	for _, end := range config.Endpoints {

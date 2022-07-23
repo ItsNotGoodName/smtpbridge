@@ -1,6 +1,9 @@
 package event
 
-import "sync"
+import (
+	"log"
+	"sync"
+)
 
 type Pub struct {
 	subsMu sync.Mutex
@@ -22,7 +25,11 @@ func (ps *Pub) Publish(ev Event) {
 	}
 
 	for _, ch := range chs {
-		ch <- ev
+		select {
+		case ch <- ev:
+		default:
+			log.Println("event.Pub.Publish: could not publish event")
+		}
 	}
 	ps.subsMu.Unlock()
 }
