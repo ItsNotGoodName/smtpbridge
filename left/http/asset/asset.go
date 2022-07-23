@@ -1,6 +1,6 @@
 //go:build !dev
 
-package assets
+package asset
 
 import (
 	"embed"
@@ -15,5 +15,6 @@ func FS() fs.FS {
 	if err != nil {
 		panic(err)
 	}
+
 	return f
 }

@@ -19,6 +19,13 @@ type Backend struct {
 	authService     auth.Service
 }
 
+func NewBackend(envelopeService envelope.Service, authService auth.Service) Backend {
+	return Backend{
+		envelopeService: envelopeService,
+		authService:     authService,
+	}
+}
+
 func (b Backend) AnonymousLogin(state *smtp.ConnectionState) (smtp.Session, error) {
 	if err := b.authService.Login("", ""); err != nil {
 		log.Println("smtp.AnonymousLogin: login failure:", err)
@@ -33,13 +40,6 @@ func (b Backend) Login(state *smtp.ConnectionState, username, password string) (
 		return nil, err
 	}
 	return newSession(b.envelopeService, state.RemoteAddr), nil
-}
-
-func NewBackend(envelopeService envelope.Service, authService auth.Service) Backend {
-	return Backend{
-		envelopeService: envelopeService,
-		authService:     authService,
-	}
 }
 
 // A session is returned after EHLO.
@@ -91,6 +91,11 @@ func (s *session) Data(r io.Reader) error {
 		log.Printf("smtp.session.Data: remote %s: could not get To from address list: %s", s.remoteAddr, err)
 	}
 
+	date, err := e.Date()
+	if err != nil && err != mail.ErrHeaderNotPresent {
+		log.Printf("smtp.session.Data: remote %s: could not parse date: %s: %s", s.remoteAddr, e.GetHeader("Date"), err)
+	}
+
 	// Attachment requests
 	attsReq := []envelope.CreateAttachmentRequest{}
 	for _, a := range e.Attachments {
@@ -101,11 +106,6 @@ func (s *session) Data(r io.Reader) error {
 	}
 
 	// Envelope request
-	date, err := e.Date()
-	if err != nil && err != mail.ErrHeaderNotPresent {
-		log.Printf("smtp.session.Data: remote %s: could not parse date: %s: %s", s.remoteAddr, e.GetHeader("Date"), err)
-	}
-
 	envReq := &envelope.CreateEnvelopeRequest{
 		From:       s.from,
 		To:         to,

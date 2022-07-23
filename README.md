@@ -43,13 +43,13 @@ endpoints: # Endpoints for envelopes
   - name: console endpoint
     type: console
   - name: telegram endpoint
-    template: |
-      {{ .Message.Subject }}
-      {{ .Message.Text }}
     type: telegram
     config:
       token: 2222222222222222222222
       chat_id: 111111111111111111111
+    template: |
+      {{ .Message.Subject }}
+      {{ .Message.Text }}
 ```
 
 ## Usage

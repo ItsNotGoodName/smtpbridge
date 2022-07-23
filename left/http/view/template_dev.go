@@ -17,9 +17,8 @@ func init() {
 	if !ok {
 		panic("no caller information")
 	}
-	packageDir := path.Dir(filename)
 
-	templateFS = os.DirFS(path.Join(packageDir, "template"))
+	templateFS = os.DirFS(path.Join(path.Dir(filename), "template"))
 }
 
 func getTemplate(name string) *template.Template {

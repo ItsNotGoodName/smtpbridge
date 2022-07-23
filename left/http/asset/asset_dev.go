@@ -1,6 +1,6 @@
 //go:build dev
 
-package assets
+package asset
 
 import (
 	"io/fs"
@@ -16,9 +16,8 @@ func init() {
 	if !ok {
 		panic("no caller information")
 	}
-	packageDir := path.Dir(filename)
 
-	distFS = os.DirFS(path.Join(packageDir, "dist"))
+	distFS = os.DirFS(path.Join(path.Dir(filename), "dist"))
 }
 
 func FS() fs.FS {

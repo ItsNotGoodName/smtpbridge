@@ -10,8 +10,7 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/core/endpoint"
 	"github.com/ItsNotGoodName/smtpbridge/core/envelope"
 	"github.com/ItsNotGoodName/smtpbridge/core/event"
-	"github.com/ItsNotGoodName/smtpbridge/left/controller"
-	"github.com/ItsNotGoodName/smtpbridge/left/router"
+	"github.com/ItsNotGoodName/smtpbridge/left/http"
 	"github.com/ItsNotGoodName/smtpbridge/left/smtp"
 	"github.com/ItsNotGoodName/smtpbridge/pkg/interrupt"
 	"github.com/ItsNotGoodName/smtpbridge/right/memdb"
@@ -62,14 +61,21 @@ func Start(config *config.Config) {
 
 	// Create HTTP server
 	if config.HTTP.Enable {
-		controller := controller.New(envelopeService, endpointService)
-		router := router.New(config.HTTP.Addr(), controller, dataStore.DataFS())
-		backgrounds = append(backgrounds, router)
+		backgrounds = append(backgrounds, http.New(
+			config.HTTP.Addr(),
+			dataStore.DataFS(),
+			envelopeService,
+			endpointService,
+		))
 	}
 
 	// Create SMTP server
 	if config.SMTP.Enable {
-		backgrounds = append(backgrounds, smtp.New(smtp.NewBackend(envelopeService, smtpAuthService), config.SMTP.Addr(), config.SMTP.Size))
+		backgrounds = append(backgrounds, smtp.New(
+			smtp.NewBackend(envelopeService, smtpAuthService),
+			config.SMTP.Addr(),
+			config.SMTP.Size,
+		))
 	}
 
 	// Start background daemons
