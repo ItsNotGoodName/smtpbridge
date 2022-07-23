@@ -47,7 +47,12 @@ func Start(config *config.Config) {
 
 	// Create endpoints from config
 	for _, end := range config.Endpoints {
-		if err := endpointService.CreateEndpoint(end.Name, end.Type, end.Config); err != nil {
+		if err := endpointService.CreateEndpoint(endpoint.CreateEndpointRequest{
+			Name:     end.Name,
+			Template: end.Template,
+			Type:     end.Type,
+			Config:   end.Config,
+		}); err != nil {
 			log.Fatalf("server.Start: endpoint: %s: %s", end.Name, err)
 		}
 	}

@@ -32,13 +32,18 @@ func NewEndpointService(store Store) *EndpointService {
 	}
 }
 
-func (es *EndpointService) CreateEndpoint(name string, endpointType string, config Config) error {
-	sender, err := newSender(endpointType, config)
+func (es *EndpointService) CreateEndpoint(req CreateEndpointRequest) error {
+	sender, err := newSender(req.Type, req.Config)
 	if err != nil {
 		return err
 	}
 
-	return es.store.CreateEndpoint(NewEndpoint(name, endpointType, sender))
+	end, err := NewEndpoint(req.Name, req.Type, req.Template, sender)
+	if err != nil {
+		return err
+	}
+
+	return es.store.CreateEndpoint(end)
 }
 
 func (es *EndpointService) GetEndpoint(name string) (Endpoint, error) {

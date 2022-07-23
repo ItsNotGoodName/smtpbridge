@@ -91,20 +91,7 @@ func (c *Controller) EndpointList(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *Controller) EnvelopeSendPost(w http.ResponseWriter, r *http.Request) {
-	// Get envelope
-	id := parseID(r)
-	ctx := r.Context()
-	env, err := c.envelopeService.GetEnvelope(ctx, id)
-	if err != nil {
-		code := http.StatusInternalServerError
-		if errors.Is(err, core.ErrMessageNotFound) {
-			code = http.StatusNotFound
-		}
-		http.Error(w, err.Error(), code)
-		return
-	}
-
-	// Get endpoint name
+	// Parse form
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -125,7 +112,20 @@ func (c *Controller) EnvelopeSendPost(w http.ResponseWriter, r *http.Request) {
 		noText = (noTextStr[0] == "on")
 	}
 	if noText && noAttachments {
-		http.Error(w, "cannot enable check both no attachments and no text", http.StatusBadRequest)
+		http.Error(w, "cannot enable both no attachments and no text", http.StatusBadRequest)
+		return
+	}
+
+	// Get envelope
+	id := parseID(r)
+	ctx := r.Context()
+	env, err := c.envelopeService.GetEnvelope(ctx, id)
+	if err != nil {
+		code := http.StatusInternalServerError
+		if errors.Is(err, core.ErrMessageNotFound) {
+			code = http.StatusNotFound
+		}
+		http.Error(w, err.Error(), code)
 		return
 	}
 
@@ -140,7 +140,17 @@ func (c *Controller) EnvelopeSendPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Convert atachments from envelope
+	// Convert envelope message to text
+	text := ""
+	if !noText {
+		text, err = end.Text(env)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+
+	// Convert envelope attachments to endpoint attachments
 	atts := []endpoint.Attachment{}
 	if !noAttachments {
 		for _, att := range env.Attachments {
@@ -149,15 +159,13 @@ func (c *Controller) EnvelopeSendPost(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			atts = append(atts, endpoint.Attachment{Name: att.Name, Data: data})
+
+			atts = append(atts, endpoint.NewAttachment(&att, data))
 		}
 	}
 
 	// Send to endpoint
-	if noText {
-		env.Message.Text = ""
-	}
-	if err := end.Sender.Send(ctx, env.Message.Text, atts); err != nil {
+	if err := end.Sender.Send(ctx, text, atts); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
