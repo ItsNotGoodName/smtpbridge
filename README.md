@@ -50,6 +50,12 @@ endpoints: # Endpoints for envelopes
     template: |
       {{ .Message.Subject }}
       {{ .Message.Text }}
+
+bridges:
+  - from: test@example.com
+    endpoints:
+      - telegram endpoint
+      - console endpoint
 ```
 
 ## Usage

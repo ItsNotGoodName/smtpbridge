@@ -133,7 +133,10 @@ func EnvelopeSendPost(envelopeService envelope.Service, endpointService endpoint
 		if !noAttachments {
 			for _, att := range env.Attachments {
 				data, err := envelopeService.GetData(ctx, &att)
-				if err != nil && err != core.ErrDataNotFound {
+				if err != nil {
+					if errors.Is(err, core.ErrDataNotFound) {
+						continue
+					}
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 					return
 				}

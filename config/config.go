@@ -12,6 +12,7 @@ type Config struct {
 	HTTP      HTTP       `json:"http" mapstructure:"http"`
 	SMTP      SMTP       `json:"smtp" mapstructure:"smtp"`
 	Endpoints []Endpoint `json:"endpoints" mapstructure:"endpoints"`
+	Bridges   []Bridge   `json:"bridges" mapstructure:"bridges"`
 }
 
 func New() *Config {

@@ -32,7 +32,7 @@ func Start(config *config.Config) {
 
 	// Only memdb database and storage is supported
 	if !(config.Database.IsMemDB() && config.Storage.IsMemDB()) {
-		log.Fatalf("server.Start: invalid database or storage: %s: %s", config.Database.Type, config.Storage.Type)
+		log.Fatalf("server.Start: invalid database or storage: '%s' or '%s'", config.Database.Type, config.Storage.Type)
 	}
 
 	// Create stores
@@ -55,7 +55,21 @@ func Start(config *config.Config) {
 			Type:     end.Type,
 			Config:   end.Config,
 		}); err != nil {
-			log.Fatalf("server.Start: endpoint: %s: %s", end.Name, err)
+			log.Fatalf("server.Start: endpoint '%s': %s", end.Name, err)
+		}
+	}
+
+	// Create bridges from config
+	for _, brid := range config.Bridges {
+		if err := bridgeService.CreateBridge(&bridge.CreateBridgeRequest{
+			Name:      brid.Name,
+			From:      brid.From,
+			To:        brid.To,
+			FromRegex: brid.FromRegex,
+			ToRegex:   brid.ToRegex,
+			Endpoints: brid.Endpoints,
+		}); err != nil {
+			log.Fatalf("server.Start: bridge '%s': %s", brid.Name, err)
 		}
 	}
 
