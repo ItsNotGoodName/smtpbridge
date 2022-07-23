@@ -37,4 +37,7 @@ var helperMap template.FuncMap = template.FuncMap{
 	"envelopeHTMLLink": func(env *envelope.Envelope) string {
 		return fmt.Sprintf("/envelopes/%d/html", env.Message.ID)
 	},
+	"envelopeSendLink": func(env *envelope.Envelope) string {
+		return fmt.Sprintf("/envelopes/%d/send", env.Message.ID)
+	},
 }

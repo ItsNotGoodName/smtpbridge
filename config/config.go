@@ -7,10 +7,11 @@ import (
 )
 
 type Config struct {
-	Database Database `json:"database" mapstructure:"database"`
-	Storage  Storage  `json:"storage" mapstructure:"storage"`
-	HTTP     HTTP     `json:"http" mapstructure:"http"`
-	SMTP     SMTP     `json:"smtp" mapstructure:"smtp"`
+	Database  Database   `json:"database" mapstructure:"database"`
+	Storage   Storage    `json:"storage" mapstructure:"storage"`
+	HTTP      HTTP       `json:"http" mapstructure:"http"`
+	SMTP      SMTP       `json:"smtp" mapstructure:"smtp"`
+	Endpoints []Endpoint `json:"endpoints" mapstructure:"endpoints"`
 }
 
 func New() *Config {

@@ -38,6 +38,15 @@ smtp: # SMTP server
   auth: false
   username: ""
   password: ""
+
+endpoints: # Endpoints for envelopes
+  - name: telegram endpoint
+    type: telegram
+    config:
+      token: 2222222222222222222222
+      chat_id: 111111111111111111111
+  - name: console endpoint
+    type: console
 ```
 
 ## Usage

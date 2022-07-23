@@ -37,15 +37,23 @@ func New(addr string, c *controller.Controller, dataFS fs.FS) *Router {
 	r.Use(middleware.Timeout(60 * time.Second))
 
 	r.Get("/assets/*", handlePrefixFS("/assets/", assets.FS()))
+
 	r.Get("/data/*", handlePrefixFS("/data/", dataFS))
 
 	r.Get("/", c.IndexGet)
+
 	r.Route("/envelopes/{id}", func(r chi.Router) {
 		r.Get("/", mwMultiplexAction(c.EnvelopeGet, nil, c.EnvelopeDelete))
 		r.Delete("/", c.EnvelopeDelete)
 		r.Get("/html", c.EnvelopeHTMLGet)
+		r.Post("/send", c.EnvelopeSendPost)
 	})
+
 	r.Get("/attachments", c.AttachmentList)
+
+	r.Route("/endpoints", func(r chi.Router) {
+		r.Get("/", c.EndpointList)
+	})
 
 	return &Router{
 		addr: addr,

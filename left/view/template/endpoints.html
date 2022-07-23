@@ -1,0 +1,26 @@
+{{ template "layout/default" . }}
+{{ define "content" }}
+<h1 class="title">Endpoints</h1>
+<div class="table-container">
+  <table class="table is-hoverable is-striped is-fullwidth">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ range .Endpoints }}
+      <tr>
+        <td>
+          {{ .Name }}
+        </td>
+        <td>
+          {{ .Type }}
+        </td>
+      </tr>
+      {{ end }}
+  </table>
+</div>
+</tbody>
+{{ end }}

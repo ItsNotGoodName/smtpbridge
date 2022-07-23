@@ -6,6 +6,7 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/config"
 	"github.com/ItsNotGoodName/smtpbridge/core/auth"
 	"github.com/ItsNotGoodName/smtpbridge/core/background"
+	"github.com/ItsNotGoodName/smtpbridge/core/endpoint"
 	"github.com/ItsNotGoodName/smtpbridge/core/envelope"
 	"github.com/ItsNotGoodName/smtpbridge/core/event"
 	"github.com/ItsNotGoodName/smtpbridge/left/controller"
@@ -31,7 +32,7 @@ func Start(config *config.Config) {
 
 	// Only memdb database and storage is supported
 	if !(config.Database.IsMemDB() && config.Storage.IsMemDB()) {
-		log.Fatalf("server.Start: invalid database or storage: '%s' '%s'", config.Database.Type, config.Storage.Type)
+		log.Fatalf("server.Start: invalid database or storage: %s: %s", config.Database.Type, config.Storage.Type)
 	}
 
 	// Create stores
@@ -42,10 +43,20 @@ func Start(config *config.Config) {
 	pub := event.NewPub()
 	envelopeService := event.NewEnvelopeService(envelope.NewEnvelopeService(envelopeStore, dataStore), pub)
 	smtpAuthService := smtpAuthService(config)
+	endpointService := endpoint.NewEndpointService(memdb.NewEndpoint())
+
+	// Create endpoints from config
+	for _, end := range config.Endpoints {
+		if err := endpointService.CreateEndpoint(end.Name, end.Type, end.Config); err != nil {
+			log.Fatalf("server.Start: endpoint: %s: %s", end.Name, err)
+		}
+	}
 
 	// Create HTTP server
 	if config.HTTP.Enable {
-		backgrounds = append(backgrounds, router.New(config.HTTP.Addr(), controller.New(envelopeService), dataStore.DataFS()))
+		controller := controller.New(envelopeService, endpointService)
+		router := router.New(config.HTTP.Addr(), controller, dataStore.DataFS())
+		backgrounds = append(backgrounds, router)
 	}
 
 	// Create SMTP server

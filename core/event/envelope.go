@@ -50,3 +50,7 @@ func (e *EnvelopeService) CreateEnvelope(ctx context.Context, req *envelope.Crea
 func (e *EnvelopeService) DeleteEnvelope(ctx context.Context, msgID int64) error {
 	return e.envelopeService.DeleteEnvelope(ctx, msgID)
 }
+
+func (e *EnvelopeService) GetData(ctx context.Context, att *envelope.Attachment) ([]byte, error) {
+	return e.envelopeService.GetData(ctx, att)
+}

@@ -2,40 +2,77 @@
 {{ define "content" }}
 {{ $hasAttachments := ne (len .Envelope.Attachments) 0 }}
 <h1 class="title">Envelope</h1>
-<table class="table">
-  <tbody>
-    <tr>
-      <td><b>ID</b></td>
-      <td>{{ .Envelope.Message.ID }}</td>
-    </tr>
-    <tr>
-      <td><b>Received Date</b></td>
-      <td>{{ dateFormat .Envelope.Message.CreatedAt }}</td>
-    </tr>
-    <tr>
-      <td><b>Date</b></td>
-      <td>{{ dateFormat .Envelope.Message.Date }}</td>
-    </tr>
-    <tr>
-      <td><b>Subject</b></td>
-      <td>{{ .Envelope.Message.Subject }}</td>
-    </tr>
-    <tr>
-      <td><b>From</b></td>
-      <td>{{ .Envelope.Message.From }}</td>
-    </tr>
-    {{ range $to, $ := .Envelope.Message.To }}
-    <tr>
-      <td><b>To</b></td>
-      <td>{{ $to }}</td>
-    </tr>
-    {{ end }}
-  </tbody>
-</table>
-<div class="buttons">
-  <a class="button is-danger" href="?action=delete">
-    Delete
-  </a>
+<div class="columns">
+  <div class="column">
+    <table class="table">
+      <tbody>
+        <tr>
+          <td><b>ID</b></td>
+          <td>{{ .Envelope.Message.ID }}</td>
+        </tr>
+        <tr>
+          <td><b>Received Date</b></td>
+          <td>{{ dateFormat .Envelope.Message.CreatedAt }}</td>
+        </tr>
+        <tr>
+          <td><b>Date</b></td>
+          <td>{{ dateFormat .Envelope.Message.Date }}</td>
+        </tr>
+        <tr>
+          <td><b>Subject</b></td>
+          <td>{{ .Envelope.Message.Subject }}</td>
+        </tr>
+        <tr>
+          <td><b>From</b></td>
+          <td>{{ .Envelope.Message.From }}</td>
+        </tr>
+        {{ range $to, $ := .Envelope.Message.To }}
+        <tr>
+          <td><b>To</b></td>
+          <td>{{ $to }}</td>
+        </tr>
+        {{ end }}
+      </tbody>
+    </table>
+    <div class="buttons">
+      <a class="button is-danger" href="?action=delete">
+        Delete
+      </a>
+    </div>
+  </div>
+  <div class="column">
+    <form action="{{ envelopeSendLink .Envelope }}" method="POST" id="endpointForm">
+      <div class="field">
+        <label class="label">Endpoint</label>
+        <div class="control">
+          <div class="select">
+            <select name="endpoint" form="endpointForm">
+              {{ range $end := .Endpoints }}
+              <option>{{ $end.Name }}</option>
+              {{ end }}
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label class="checkbox">
+          <input type="checkbox" name="no attachments">
+          No Attachments
+        </label>
+      </div>
+      <div class="field">
+        <label class="checkbox">
+          <input type="checkbox" name="no text">
+          No Text
+        </label>
+      </div>
+      <div class="field">
+        <div class="control">
+          <button class="button is-link">Send</button>
+        </div>
+      </div>
+    </form>
+  </div>
 </div>
 <div class="tabs is-boxed" id="tab">
   <ul>

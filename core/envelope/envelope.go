@@ -36,6 +36,7 @@ type (
 		GetEnvelope(ctx context.Context, msgID int64) (*Envelope, error)
 		CreateEnvelope(ctx context.Context, req *CreateEnvelopeRequest) (int64, error)
 		DeleteEnvelope(ctx context.Context, msgID int64) error
+		GetData(ctx context.Context, att *Attachment) ([]byte, error)
 	}
 
 	Store interface {
@@ -115,6 +116,10 @@ func (es *EnvelopeService) CreateEnvelope(ctx context.Context, req *CreateEnvelo
 	}
 
 	return msgID, nil
+}
+
+func (es *EnvelopeService) GetData(ctx context.Context, att *Attachment) ([]byte, error) {
+	return es.dataStore.GetData(ctx, att)
 }
 
 func (es *EnvelopeService) GetEnvelope(ctx context.Context, msgID int64) (*Envelope, error) {

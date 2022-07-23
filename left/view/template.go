@@ -5,6 +5,7 @@ import (
 	"io/fs"
 	"net/http"
 
+	"github.com/ItsNotGoodName/smtpbridge/core/endpoint"
 	"github.com/ItsNotGoodName/smtpbridge/core/envelope"
 	"github.com/ItsNotGoodName/smtpbridge/core/paginate"
 )
@@ -22,6 +23,7 @@ const (
 	IndexPage       string = "index.html"
 	EnvelopePage    string = "envelope.html"
 	AttachmentsPage string = "attachments.html"
+	EndpointsPage   string = "endpoints.html"
 )
 
 type IndexData struct {
@@ -30,11 +32,16 @@ type IndexData struct {
 }
 
 type EnvelopeData struct {
-	Envelope *envelope.Envelope
-	Tab      string
+	Envelope  *envelope.Envelope
+	Tab       string
+	Endpoints []endpoint.Endpoint
 }
 
 type AttachmentsData struct {
 	Attachments []envelope.Attachment
 	Page        paginate.Page
+}
+
+type EndpointsData struct {
+	Endpoints []endpoint.Endpoint
 }
