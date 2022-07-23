@@ -7,6 +7,7 @@
       <tr>
         <th>Name</th>
         <th>Type</th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -17,6 +18,11 @@
         </td>
         <td>
           {{ .Type }}
+        </td>
+        <td>
+          <form action="{{ endpointTestLinkQuery . }}" method="post">
+            <button class="button is-primary">Test</button>
+          </form>
         </td>
       </tr>
       {{ end }}

@@ -90,36 +90,40 @@ func (c *Controller) EndpointList(w http.ResponseWriter, r *http.Request) {
 	view.Render(w, http.StatusOK, view.EndpointsPage, view.EndpointsData{Endpoints: c.endpointService.ListEndpoint()})
 }
 
+func (c *Controller) EndpointTestPost(w http.ResponseWriter, r *http.Request) {
+	endpointName := r.URL.Query().Get("endpoint")
+	end, err := c.endpointService.GetEndpoint(endpointName)
+	if err != nil {
+		code := http.StatusInternalServerError
+		if errors.Is(err, core.ErrEndpointNotFound) {
+			code = http.StatusNotFound
+		}
+		http.Error(w, err.Error(), code)
+		return
+	}
+
+	if err := end.Sender.Send(r.Context(), "SMTPBridge test message", []endpoint.Attachment{}); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
 func (c *Controller) EnvelopeSendPost(w http.ResponseWriter, r *http.Request) {
 	// Parse form
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	endpointName, ok := r.PostForm["endpoint"]
-	if !ok || len(endpointName) != 1 {
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		return
-	}
-	noAttachments := false
-	noAttachmentsStr, ok := r.PostForm["no attachments"]
-	if ok && len(endpointName) == 1 {
-		noAttachments = (noAttachmentsStr[0] == "on")
-	}
-	noText := false
-	noTextStr, ok := r.PostForm["no text"]
-	if ok && len(endpointName) == 1 {
-		noText = (noTextStr[0] == "on")
-	}
-	if noText && noAttachments {
-		http.Error(w, "cannot enable both no attachments and no text", http.StatusBadRequest)
-		return
-	}
+	endpointName := r.PostFormValue("endpoint")
+	filter := r.PostFormValue("filter")
+	noText := filter == "no text"
+	noAttachments := filter == "no attachments"
 
 	// Get envelope
-	id := parseID(r)
 	ctx := r.Context()
-	env, err := c.envelopeService.GetEnvelope(ctx, id)
+	env, err := c.envelopeService.GetEnvelope(ctx, parseID(r))
 	if err != nil {
 		code := http.StatusInternalServerError
 		if errors.Is(err, core.ErrMessageNotFound) {
@@ -130,7 +134,7 @@ func (c *Controller) EnvelopeSendPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get endpoint
-	end, err := c.endpointService.GetEndpoint(endpointName[0])
+	end, err := c.endpointService.GetEndpoint(endpointName)
 	if err != nil {
 		code := http.StatusInternalServerError
 		if errors.Is(err, core.ErrEndpointNotFound) {

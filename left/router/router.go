@@ -53,6 +53,7 @@ func New(addr string, c *controller.Controller, dataFS fs.FS) *Router {
 
 	r.Route("/endpoints", func(r chi.Router) {
 		r.Get("/", c.EndpointList)
+		r.Post("/test", c.EndpointTestPost)
 	})
 
 	return &Router{

@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"time"
 
+	"github.com/ItsNotGoodName/smtpbridge/core/endpoint"
 	"github.com/ItsNotGoodName/smtpbridge/core/envelope"
 	"github.com/ItsNotGoodName/smtpbridge/core/paginate"
 )
@@ -39,5 +40,8 @@ var helperMap template.FuncMap = template.FuncMap{
 	},
 	"envelopeSendLink": func(env *envelope.Envelope) string {
 		return fmt.Sprintf("/envelopes/%d/send", env.Message.ID)
+	},
+	"endpointTestLinkQuery": func(end *endpoint.Endpoint) string {
+		return fmt.Sprintf("/endpoints/test?endpoint=%s", end.Name)
 	},
 }
