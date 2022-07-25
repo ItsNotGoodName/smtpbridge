@@ -72,7 +72,7 @@ func init() {
 
 	serverConfig = config.New()
 
-	rootCmd.Flags().Bool("http-disable", false, "disable http server")
+	rootCmd.Flags().Bool("http-disable", serverConfig.HTTP.Disable, "disable http server")
 	viper.BindPFlag("http.disable", rootCmd.Flags().Lookup("http-disable"))
 
 	rootCmd.Flags().String("http-host", serverConfig.HTTP.Host, "http host address to listen on")
@@ -81,7 +81,7 @@ func init() {
 	rootCmd.Flags().Uint16("http-port", serverConfig.HTTP.Port, "http port to listen on")
 	viper.BindPFlag("http.port", rootCmd.Flags().Lookup("http-port"))
 
-	rootCmd.Flags().Bool("smtp-disable", false, "enable smtp server")
+	rootCmd.Flags().Bool("smtp-disable", serverConfig.SMTP.Disable, "disable smtp server")
 	viper.BindPFlag("smtp.disable", rootCmd.Flags().Lookup("smtp-disable"))
 
 	rootCmd.Flags().String("smtp-host", serverConfig.SMTP.Host, "smtp host address to listen on")

@@ -74,7 +74,7 @@ func Start(config *config.Config) {
 	}
 
 	// Create HTTP server
-	if config.HTTP.Enable {
+	if !config.HTTP.Disable {
 		backgrounds = append(backgrounds, http.New(
 			config.HTTP.Addr(),
 			dataStore.DataFS(),
@@ -84,7 +84,7 @@ func Start(config *config.Config) {
 	}
 
 	// Create SMTP server
-	if config.SMTP.Enable {
+	if !config.SMTP.Disable {
 		backgrounds = append(backgrounds, smtp.New(
 			smtp.NewBackend(envelopeService, smtpAuthService),
 			config.SMTP.Addr(),

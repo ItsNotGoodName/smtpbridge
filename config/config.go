@@ -29,13 +29,11 @@ func New() *Config {
 			},
 		},
 		HTTP: HTTP{
-			Enable: true,
-			Port:   8080,
+			Port: 8080,
 		},
 		SMTP: SMTP{
-			Enable: true,
-			Size:   1024 * 1024 * 25, // 25 MiB
-			Port:   1025,
+			Size: 1024 * 1024 * 25, // 25 MiB
+			Port: 1025,
 		},
 	}
 }
@@ -49,14 +47,6 @@ func (c *Config) Load() {
 
 	if err := viper.Unmarshal(c); err != nil {
 		log.Fatalln("config.Config.Load: could not load config:", err)
-	}
-
-	if c.HTTP.Disable {
-		c.HTTP.Enable = false
-	}
-
-	if c.SMTP.Disable {
-		c.SMTP.Enable = false
 	}
 
 	for i := range c.Endpoints {

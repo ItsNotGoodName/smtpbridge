@@ -3,7 +3,6 @@ package config
 import "strconv"
 
 type SMTP struct {
-	Enable   bool   `json:"enable" mapstructure:"enable"`
 	Disable  bool   `json:"disable" mapstructure:"disable"`
 	Host     string `json:"host" mapstructure:"host"`
 	Port     uint16 `json:"port" mapstructure:"port"`
