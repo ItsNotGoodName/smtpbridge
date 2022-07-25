@@ -26,8 +26,8 @@ type (
 	CreateEndpointRequest struct {
 		Name     string
 		Type     string
-		Template string
 		Config   Config
+		Template string
 	}
 
 	Sender interface {
@@ -51,11 +51,6 @@ type (
 )
 
 func NewEndpoint(name string, endpointType string, templateStr string, sender Sender) (Endpoint, error) {
-	if templateStr == "" {
-		templateStr = `{{ .Message.Subject }}
-{{ .Message.Text }}`
-	}
-
 	tmpl, err := template.New(name).Parse(templateStr)
 	if err != nil {
 		return Endpoint{}, err

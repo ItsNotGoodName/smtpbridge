@@ -58,4 +58,12 @@ func (c *Config) Load() {
 	if c.SMTP.Disable {
 		c.SMTP.Enable = false
 	}
+
+	for i := range c.Endpoints {
+		if c.Endpoints[i].TextTemplate == "" && !c.Endpoints[i].TextDisable {
+			c.Endpoints[i].TextTemplate = `FROM: {{ .Message.From }}
+SUBJECT: {{ .Message.Subject }}
+{{ .Message.Text }}`
+		}
+	}
 }

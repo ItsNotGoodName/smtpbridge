@@ -46,7 +46,7 @@ func (bs *BridgeService) CreateBridge(req *CreateBridgeRequest) error {
 		}
 	}
 
-	filter, err := NewFilter(req.To, req.From, req.ToRegex, req.FromRegex)
+	filter, err := NewFilter(req.To, req.From, req.ToRegex, req.FromRegex, req.MatchTemplate)
 	if err != nil {
 		return err
 	}
@@ -77,7 +77,7 @@ func (bs *BridgeService) send(ctx context.Context, env *envelope.Envelope) error
 
 	for _, brid := range bs.ListBridge() {
 		// Match bridge
-		if !brid.Filter.Match(&env.Message) {
+		if !brid.Filter.Match(env) {
 			continue
 		}
 

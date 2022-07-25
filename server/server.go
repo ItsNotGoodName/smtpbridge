@@ -51,25 +51,25 @@ func Start(config *config.Config) {
 	for _, end := range config.Endpoints {
 		if err := endpointService.CreateEndpoint(endpoint.CreateEndpointRequest{
 			Name:     end.Name,
-			Template: end.Template,
 			Type:     end.Type,
 			Config:   end.Config,
+			Template: end.TextTemplate,
 		}); err != nil {
 			log.Fatalf("server.Start: endpoint '%s': %s", end.Name, err)
 		}
 	}
 
 	// Create bridges from config
-	for _, brid := range config.Bridges {
+	for i, brid := range config.Bridges {
 		if err := bridgeService.CreateBridge(&bridge.CreateBridgeRequest{
-			Name:      brid.Name,
-			From:      brid.From,
-			To:        brid.To,
-			FromRegex: brid.FromRegex,
-			ToRegex:   brid.ToRegex,
-			Endpoints: brid.Endpoints,
+			From:          brid.From,
+			To:            brid.To,
+			FromRegex:     brid.FromRegex,
+			ToRegex:       brid.ToRegex,
+			Endpoints:     brid.Endpoints,
+			MatchTemplate: brid.MatchTemplate,
 		}); err != nil {
-			log.Fatalf("server.Start: bridge '%s': %s", brid.Name, err)
+			log.Fatalf("server.Start: bridge '%d': %s", i, err)
 		}
 	}
 

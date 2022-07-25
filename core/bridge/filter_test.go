@@ -14,14 +14,16 @@ func TestFilter(t *testing.T) {
 	}
 
 	newFilter := func(to, from, toRegex, fromRegex string) Filter {
-		filter, err := NewFilter(from, to, fromRegex, toRegex)
+		filter, err := NewFilter(from, to, fromRegex, toRegex, "")
 		assert.Nil(t, err)
 		return filter
 	}
 
-	msg := envelope.Message{
-		From: "foo",
-		To:   map[string]struct{}{"bar": {}},
+	msg := envelope.Envelope{
+		Message: envelope.Message{
+			From: "foo",
+			To:   map[string]struct{}{"bar": {}},
+		},
 	}
 
 	tests := []FilterTest{

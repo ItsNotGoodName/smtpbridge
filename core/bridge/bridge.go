@@ -7,12 +7,13 @@ type (
 	}
 
 	CreateBridgeRequest struct {
-		Name      string
-		From      string
-		FromRegex string
-		To        string
-		ToRegex   string
-		Endpoints []string
+		Name          string
+		From          string
+		FromRegex     string
+		To            string
+		ToRegex       string
+		MatchTemplate string
+		Endpoints     []string
 	}
 
 	Service interface {

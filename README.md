@@ -26,36 +26,56 @@ storage: # Storage for attachment data
     size: 104857600 # Max memory allocation, 100 MiB
 
 http: # HTTP server
-  enable: true
+  enable: true # (true, false)
   host: ""
   port: 8080
 
 smtp: # SMTP server
-  enable: true
+  enable: true # (true, false)
   host: ""
   port: 1025
   size: 26214400 # Max message size in bytes, 25 MiB
-  auth: false
+  auth: false # (true, false)
   username: ""
   password: ""
 
 endpoints: # Endpoints for envelopes
+  - name: example endpoint
+    type: console
+    text_disable: false
+    text_template: |
+      FROM: {{ .Message.From }}
+      SUBJECT: {{ .Message.Subject }}
+      {{ .Message.Text }}
+  # Console
   - name: console endpoint
     type: console
+  # Telegram
   - name: telegram endpoint
     type: telegram
     config:
       token: 2222222222222222222222
       chat_id: 111111111111111111111
-    template: |
-      {{ .Message.Subject }}
-      {{ .Message.Text }}
 
-bridges:
-  - from: test@example.com
+bridges: # Bridges to endpoints, if this is empty then envelopes will always be sent to all endpoints
+  # Send to 'console endpoint'
+  - endpoints:
+      - console endpoint
+  # Send to all endpoints if the envelope is from 'example@example.com'
+  - from: example@example.com
+  # Send to 'console endpoint' if the envelope is from 'example@example.com' and is to 'test@example.com'
+  - from: example@example.com
+    to: test@example.com
+    endpoints:
+      - console endpoint
+  # Send to 'console endpoint' if the envelope to matches regex "@example\.com$"
+  - to_regex: "@example\.com$"
+    endpoints:
+      - console endpoint
+  # Send to 'telegram endpoint' if the envelope has more than 4 attachments
+  - match_template: "{{ gt (len .Attachments) 4 }}"
     endpoints:
       - telegram endpoint
-      - console endpoint
 ```
 
 ## Usage
