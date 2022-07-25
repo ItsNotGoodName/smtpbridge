@@ -28,7 +28,7 @@ func (ps *Pub) Publish(ev Event) {
 		select {
 		case ch <- ev:
 		default:
-			log.Println("event.Pub.Publish: could not publish event")
+			log.Printf("event.Pub.Publish: could not publish event: %s", ev.Topic)
 		}
 	}
 	ps.subsMu.Unlock()

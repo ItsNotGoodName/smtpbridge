@@ -2,12 +2,10 @@ package bridge
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"sync"
 
-	"github.com/ItsNotGoodName/smtpbridge/core"
 	"github.com/ItsNotGoodName/smtpbridge/core/endpoint"
 	"github.com/ItsNotGoodName/smtpbridge/core/envelope"
 	"github.com/ItsNotGoodName/smtpbridge/core/event"
@@ -61,59 +59,61 @@ func (bs *BridgeService) CreateBridge(req *CreateBridgeRequest) error {
 }
 
 func (bs *BridgeService) send(ctx context.Context, env *envelope.Envelope) error {
-	// Convert envelope attachments to endpoint attachments
-	atts := []endpoint.Attachment{}
-	for _, att := range env.Attachments {
-		data, err := bs.envelopeService.GetData(ctx, &att)
-		if err != nil {
-			if errors.Is(err, core.ErrDataNotFound) {
-				log.Println("bridge.BridgeService.send:", err)
-				continue
-			}
-			return err
-		}
-
-		atts = append(atts, endpoint.NewAttachment(&att, data))
+	atts, err := endpoint.ConvertAttachments(ctx, bs.envelopeService, env)
+	if err != nil {
+		return err
 	}
 
-	for _, brid := range bs.ListBridge() {
-		// Match bridge
-		if !brid.Filter.Match(env) {
-			continue
-		}
+	// Concurrent endpoint send
+	var wg sync.WaitGroup
+	send := func(end endpoint.Endpoint) {
+		wg.Add(1)
+		go func() {
+			text, err := end.Text(env)
+			if err != nil {
+				log.Println("bridge.BridgeService.send:", err)
+			} else {
+				end.Send(ctx, text, atts)
+			}
 
-		// Send to all endpoints
-		if len(brid.Endpoints) == 0 {
-			for _, end := range bs.endpointService.ListEndpoint() {
-				text, err := end.Text(env)
+			wg.Done()
+		}()
+	}
+
+	bridges := bs.ListBridge()
+
+	// Send to all endpoints there are no bridges
+	if len(bridges) == 0 {
+		for _, end := range bs.endpointService.ListEndpoint() {
+			send(end)
+		}
+	} else { // Send to bridge's endpoints
+		endNameMemo := make(map[string]struct{})
+
+		for _, brid := range bridges {
+			if len(brid.Endpoints) == 0 || !brid.Filter.Match(env) {
+				continue
+			}
+
+			for _, endName := range brid.Endpoints {
+				// Do not send to a duplicate endpoint
+				if _, ok := endNameMemo[endName]; ok {
+					continue
+				}
+				endNameMemo[endName] = struct{}{}
+
+				end, err := bs.endpointService.GetEndpoint(endName)
 				if err != nil {
 					log.Println("bridge.BridgeService.send:", err)
 					continue
 				}
 
-				end.Sender.Send(ctx, text, atts)
+				send(end)
 			}
-
-			return nil
-		}
-
-		// Send to endpoints
-		for _, endpoitName := range brid.Endpoints {
-			end, err := bs.endpointService.GetEndpoint(endpoitName)
-			if err != nil {
-				log.Println("bridge.BridgeService.Run:", err)
-				continue
-			}
-
-			text, err := end.Text(env)
-			if err != nil {
-				log.Println("bridge.BridgeService.Run:", err)
-				continue
-			}
-
-			end.Sender.Send(ctx, text, atts)
 		}
 	}
+
+	wg.Wait()
 
 	return nil
 }

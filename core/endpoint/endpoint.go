@@ -1,12 +1,9 @@
 package endpoint
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"text/template"
-
-	"github.com/ItsNotGoodName/smtpbridge/core/envelope"
 )
 
 type (
@@ -19,7 +16,7 @@ type (
 	Endpoint struct {
 		Name     string
 		Type     string
-		Sender   Sender
+		sender   Sender
 		template *template.Template
 	}
 
@@ -59,30 +56,21 @@ func NewEndpoint(name string, endpointType string, templateStr string, sender Se
 	return Endpoint{
 		Name:     name,
 		Type:     endpointType,
-		Sender:   sender,
+		sender:   sender,
 		template: tmpl,
 	}, nil
 }
 
-func (e Endpoint) Text(env *envelope.Envelope) (string, error) {
-	var buffer bytes.Buffer
-	if err := e.template.Execute(&buffer, env); err != nil {
-		return "", err
-	}
-
-	return buffer.String(), nil
+func (e Endpoint) Send(ctx context.Context, text string, atts []Attachment) error {
+	return e.sender.Send(ctx, text, atts)
 }
 
 func (e Endpoint) SendText(ctx context.Context, text string) error {
-	return e.Sender.Send(ctx, text, []Attachment{})
+	return e.sender.Send(ctx, text, []Attachment{})
 }
 
-func NewAttachment(att *envelope.Attachment, data []byte) Attachment {
-	return Attachment{
-		Name:    att.Name,
-		Data:    data,
-		IsImage: att.IsImage(),
-	}
+func (e Endpoint) SendAtachments(ctx context.Context, atts []Attachment) error {
+	return e.sender.Send(ctx, "", atts)
 }
 
 func (c Config) Require(keys []string) error {

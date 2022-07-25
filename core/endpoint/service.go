@@ -2,6 +2,10 @@ package endpoint
 
 import "github.com/ItsNotGoodName/smtpbridge/core"
 
+type EndpointService struct {
+	store Store
+}
+
 const (
 	TypeConsole  string = "console"
 	TypeTelegram string = "telegram"
@@ -22,10 +26,6 @@ func newSender(endpointType string, config Config) (Sender, error) {
 	}
 
 	return nil, core.ErrEndpointTypeInvalid
-}
-
-type EndpointService struct {
-	store Store
 }
 
 func NewEndpointService(store Store) *EndpointService {
