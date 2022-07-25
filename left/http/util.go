@@ -8,11 +8,17 @@ import (
 
 func mwMultiplexAction(get, post, delete http.HandlerFunc) http.HandlerFunc {
 	if get == nil {
-		get = func(w http.ResponseWriter, r *http.Request) {}
+		get = func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+		}
 	} else if post == nil {
-		post = func(w http.ResponseWriter, r *http.Request) {}
+		post = func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+		}
 	} else if delete == nil {
-		delete = func(w http.ResponseWriter, r *http.Request) {}
+		delete = func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+		}
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
