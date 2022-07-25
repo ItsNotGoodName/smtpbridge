@@ -15,7 +15,7 @@ npm-build:
 	$(NPM_PREFIX) npm run build
 
 dev:
-	go run --tags dev .
+	go run --tags dev . --watch
 
 snapshot: npm-build
 	goreleaser release --snapshot --rm-dist

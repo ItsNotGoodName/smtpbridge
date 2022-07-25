@@ -3,6 +3,7 @@ package smtp
 import (
 	"context"
 	"log"
+	"net"
 	"time"
 
 	"github.com/emersion/go-sasl"
@@ -46,14 +47,32 @@ func New(b Backend, addr string, maxMessageBytes int) SMTP {
 	return SMTP{s}
 }
 
-func (s SMTP) Start() {
+func (s SMTP) Start() net.Listener {
 	log.Println("smtp.SMTP.Start: SMTP server listening on", s.s.Addr)
-	if err := s.s.ListenAndServe(); err != nil {
+
+	network := "tcp"
+	if s.s.LMTP {
+		network = "unix"
+	}
+
+	addr := s.s.Addr
+	if !s.s.LMTP && addr == "" {
+		addr = ":smtp"
+	}
+
+	l, err := net.Listen(network, addr)
+	if err != nil {
 		log.Fatalln("smtp.SMTP.Start:", err)
 	}
+
+	go s.s.Serve(l)
+
+	return l
 }
 
-func (s SMTP) Run(ctx context.Context, done chan<- struct{}) {
-	go s.Start()
-	done <- struct{}{}
+func (s SMTP) Run(ctx context.Context, doneC chan<- struct{}) {
+	l := s.Start()      // Start SMTP server
+	<-ctx.Done()        // Wait for context
+	l.Close()           // Shutdown SMTP server
+	doneC <- struct{}{} // Done
 }

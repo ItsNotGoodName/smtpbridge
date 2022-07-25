@@ -126,7 +126,6 @@ func (bs *BridgeService) Run(ctx context.Context, doneC chan<- struct{}) {
 	for {
 		select {
 		case <-ctx.Done():
-			log.Println("bridge.BridgeService.Run: stopped")
 			doneC <- struct{}{}
 			return
 		case event := <-eventChan:

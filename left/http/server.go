@@ -64,14 +64,26 @@ func New(addr string, dataFS fs.FS, envelopeService envelope.Service, endpointSe
 	}
 }
 
-func (s *Server) Start() {
-	log.Println("router.Router.Start: HTTP server listening on", s.addr)
-	if err := http.ListenAndServe(s.addr, s.r); err != nil {
-		log.Fatalln("router.Router.Start:", err)
-	}
+func (s *Server) Start() (*http.Server, <-chan struct{}) {
+	ch := make(chan struct{})
+	server := &http.Server{Addr: s.addr, Handler: s.r}
+
+	go func() {
+		defer close(ch)
+		log.Println("http.Server.Start: HTTP server listening on", s.addr)
+
+		if err := server.ListenAndServe(); err != http.ErrServerClosed {
+			log.Fatalln("http.Server.Start:", err)
+		}
+	}()
+
+	return server, ch
 }
 
 func (s *Server) Run(ctx context.Context, doneC chan<- struct{}) {
-	go s.Start()
-	doneC <- struct{}{}
+	srv, ch := s.Start()               // Start HTTP server
+	<-ctx.Done()                       // Wait for context
+	srv.Shutdown(context.Background()) // Shutdown HTTP server
+	<-ch                               // Wait for HTTP server shutodwn
+	doneC <- struct{}{}                // Done
 }

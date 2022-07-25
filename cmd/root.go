@@ -22,10 +22,14 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"context"
+	"log"
 	"os"
 
 	"github.com/ItsNotGoodName/smtpbridge/config"
+	"github.com/ItsNotGoodName/smtpbridge/pkg/interrupt"
 	"github.com/ItsNotGoodName/smtpbridge/server"
+	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -33,6 +37,7 @@ import (
 var (
 	cfgFile      string
 	serverConfig *config.Config
+	watch        *bool
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -43,11 +48,41 @@ var rootCmd = &cobra.Command{
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
-		// Load config
-		serverConfig.Load()
+		log.Println("cmd.rootCmd.Run: using config file:", viper.ConfigFileUsed())
 
-		// Start server
-		server.Start(serverConfig)
+		restartCh := make(chan struct{})
+		if *watch {
+			viper.OnConfigChange(func(in fsnotify.Event) {
+				log.Println("cmd.rootCmd.Run: config file changed, restarting")
+				restartCh <- struct{}{}
+			})
+			viper.WatchConfig()
+		}
+
+		osCtx := interrupt.Context()
+
+		// Start
+		serverConfig.Load()
+		ctx, cancel := context.WithCancel(osCtx)
+		serverCh := server.Start(ctx, serverConfig)
+
+		// Signals
+		for {
+			select {
+			case <-restartCh:
+				// Restart
+				cancel()
+				<-serverCh
+				serverConfig = config.New()
+				serverConfig.Load()
+				ctx, cancel = context.WithCancel(osCtx)
+				serverCh = server.Start(ctx, serverConfig)
+			case <-serverCh:
+				// Shutdown
+				cancel()
+				return
+			}
+		}
 	},
 }
 
@@ -70,6 +105,8 @@ func init() {
 	// will be global for your application.
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.smtpbridge.yaml)")
+
+	watch = rootCmd.Flags().Bool("watch", false, "restart when config file changes")
 
 	rootCmd.Flags().Bool("http-disable", serverConfig.HTTP.Disable, "disable http server")
 	viper.BindPFlag("http.disable", rootCmd.Flags().Lookup("http-disable"))
@@ -107,4 +144,7 @@ func initConfig() {
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
+
+	// If a config file is found, read it in.
+	viper.ReadInConfig()
 }

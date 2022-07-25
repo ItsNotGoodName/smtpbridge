@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"log"
 
 	"github.com/ItsNotGoodName/smtpbridge/config"
@@ -12,7 +13,6 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/core/event"
 	"github.com/ItsNotGoodName/smtpbridge/left/http"
 	"github.com/ItsNotGoodName/smtpbridge/left/smtp"
-	"github.com/ItsNotGoodName/smtpbridge/pkg/interrupt"
 	"github.com/ItsNotGoodName/smtpbridge/right/memdb"
 )
 
@@ -24,9 +24,7 @@ func smtpAuthService(config *config.Config) auth.Service {
 	}
 }
 
-func Start(config *config.Config) {
-	log.Println("server.Start: starting server")
-
+func Start(ctx context.Context, config *config.Config) <-chan struct{} {
 	// Background daemons
 	backgrounds := []background.Background{}
 
@@ -93,7 +91,5 @@ func Start(config *config.Config) {
 	}
 
 	// Start background daemons
-	background.Run(interrupt.Context(), backgrounds)
-
-	log.Println("server.Start: stopped server")
+	return background.Run(ctx, backgrounds)
 }
