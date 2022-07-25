@@ -105,25 +105,9 @@
 {{ if or (eq .Tab "text") (eq .Tab "") }}
 <pre>{{ .Envelope.Message.Text }}</pre>
 {{ else if and (eq .Tab "attachments" ) $hasAttachments }}
-{{ range $att := .Envelope.Attachments }}
+{{ range .Envelope.Attachments }}
 <div class="columns is-multiline">
-  {{ $href := dataLinkAttachment $att }}
-  <div class="column is-4">
-    <div class="card">
-      {{ if $att.IsImage }}
-      <div class="card-image">
-        <figure class="image is-16by9">
-          <img src="{{ $href }}" alt="{{ $att.Name }}">
-        </figure>
-      </div>
-      {{ end }}
-      <div class="card-content">
-        <div class="is-clipped">
-          <a href="{{ $href }}">{{ $att.Name }}</a>
-        </div>
-      </div>
-    </div>
-  </div>
+  {{ template "shim/attachment-card" . }}
 </div>
 {{ end }}
 {{ end }}

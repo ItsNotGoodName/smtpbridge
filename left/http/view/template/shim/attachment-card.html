@@ -1,0 +1,27 @@
+{{ define "shim/attachment-card" }}
+<div class="column is-4">
+  <div class="card">
+    {{ $href := dataLinkAttachment . }}
+    {{ if .IsImage }}
+    <div class="card-image">
+      <figure class="image is-16by9">
+        <img src="{{ $href }}" alt="{{ .Name }}">
+      </figure>
+    </div>
+    {{ end }}
+    <div class="card-content is-flex is-flex-wrap-wrap">
+      <div class="is-flex-grow-1 is-clipped">
+        <a href="{{ $href }}">{{ .Name }}</a>
+      </div>
+      <a href='{{ envelopeLinkID .MessageID }}{{ tabQuery "attachments" }}'>
+        <span class="icon-text">
+          <span class="icon">
+            <i class="fas fa-envelope"></i>
+          </span>
+          <span>Envelope</span>
+        </span>
+      </a>
+    </div>
+  </div>
+</div>
+{{ end }}

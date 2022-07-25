@@ -132,6 +132,10 @@ func EnvelopeSendPost(envelopeService envelope.Service, endpointService endpoint
 		atts := []endpoint.Attachment{}
 		if !noAttachmentsFormValue {
 			atts, err = endpoint.ConvertAttachments(ctx, envelopeService, env)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
 		}
 
 		// Send to endpoint
