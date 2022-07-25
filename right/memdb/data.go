@@ -22,48 +22,50 @@ type Data struct {
 	pool     map[int64]dataBlock
 	poolSize int64
 	size     int64
-	idChan   chan int64
+	oldestID int64
 }
 
-func NewData(limit int64, size int64) *Data {
+func NewData(size int64) *Data {
 	return &Data{
-		idChan: make(chan int64, limit),
-		size:   size,
-		pool:   make(map[int64]dataBlock),
+		size: size,
+		pool: make(map[int64]dataBlock),
 	}
 }
 
 func (d *Data) CreateData(ctx context.Context, att *envelope.Attachment, data []byte) error {
 	d.mu.Lock()
+	defer d.mu.Unlock()
+
 	// Don't create data if it already exists
 	if _, ok := d.pool[att.ID]; ok {
-		d.mu.Unlock()
 		return core.ErrDataExists
 	}
 
-	// Create data
 	size := int64(len(data))
+
+	// Don't store data if bigger than size
+	if size > d.size {
+		return core.ErrDataTooBig
+	}
+
+	// Create data
 	d.pool[att.ID] = dataBlock{data: data, size: size, fileName: att.FileName(), modtime: time.Now()}
 	d.poolSize += size
-	// Queue id
-	select {
-	case d.idChan <- att.ID:
-	default:
-		id := <-d.idChan
-		d.deleteData(id)
-		d.idChan <- att.ID
-	}
 
 	// Clean up pool if full
 	if d.poolSize > d.size {
-		for id := range d.idChan {
-			d.deleteData(id)
+		for {
+			if att.ID <= d.oldestID {
+				panic("pool is out of sync")
+			}
+
+			d.deleteData(d.oldestID)
+			d.oldestID += 1
 			if d.poolSize <= d.size {
 				break
 			}
 		}
 	}
-	d.mu.Unlock()
 
 	return nil
 }

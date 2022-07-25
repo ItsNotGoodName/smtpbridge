@@ -6,8 +6,7 @@ type Storage struct {
 }
 
 type StorageMemory struct {
-	Limit int64 `json:"limit" mapstructure:"limit"`
-	Size  int64 `json:"size" mapstructure:"size"`
+	Size int64 `json:"size" mapstructure:"size"`
 }
 
 func (s Storage) IsMemDB() bool {

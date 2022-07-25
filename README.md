@@ -22,7 +22,6 @@ database: # Database
 storage: # Storage for attachment data
   type: memory # (memory)
   memory:
-    limit: 30 # Max number of attachment data
     size: 104857600 # Max memory allocation, 100 MiB
 
 http: # HTTP server

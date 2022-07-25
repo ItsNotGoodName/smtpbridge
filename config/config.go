@@ -24,8 +24,7 @@ func New() *Config {
 		},
 		Storage: Storage{
 			Memory: StorageMemory{
-				Limit: 30,
-				Size:  1024 * 1024 * 100, // 100 MiB
+				Size: 1024 * 1024 * 100, // 100 MiB
 			},
 		},
 		HTTP: HTTP{

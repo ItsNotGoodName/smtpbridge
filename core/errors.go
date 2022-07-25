@@ -3,11 +3,12 @@ package core
 import "fmt"
 
 var (
-	ErrMessageNotFound     = fmt.Errorf("message not found")
-	ErrDataNotFound        = fmt.Errorf("data not found")
-	ErrDataExists          = fmt.Errorf("data exists")
 	ErrAuthInvalid         = fmt.Errorf("auth invalid")
-	ErrEndpointTypeInvalid = fmt.Errorf("endpoint type invalid")
-	ErrEndpointNotFound    = fmt.Errorf("endpoint not found")
+	ErrDataExists          = fmt.Errorf("data exists")
+	ErrDataNotFound        = fmt.Errorf("data not found")
+	ErrDataTooBig          = fmt.Errorf("data too big")
 	ErrEndpointNameExists  = fmt.Errorf("endpoint name exists")
+	ErrEndpointNotFound    = fmt.Errorf("endpoint not found")
+	ErrEndpointTypeInvalid = fmt.Errorf("endpoint type invalid")
+	ErrMessageNotFound     = fmt.Errorf("message not found")
 )

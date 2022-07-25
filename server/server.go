@@ -36,7 +36,7 @@ func Start(config *config.Config) {
 	}
 
 	// Create stores
-	dataStore := memdb.NewData(config.Storage.Memory.Limit, config.Storage.Memory.Size)
+	dataStore := memdb.NewData(config.Storage.Memory.Size)
 	envelopeStore := memdb.NewEnvelope(config.Database.Memory.Limit)
 
 	// Create services
