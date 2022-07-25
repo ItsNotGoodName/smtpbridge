@@ -43,6 +43,8 @@ func (c *Config) Load() {
 		if _, ok := err.(viper.ConfigParseError); ok {
 			log.Fatalln("config.Config.Load:", err)
 		}
+	} else {
+		log.Println("config.Config.Load: using config file:", viper.ConfigFileUsed())
 	}
 
 	if err := viper.Unmarshal(c); err != nil {

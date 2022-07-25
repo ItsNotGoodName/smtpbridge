@@ -1,4 +1,4 @@
-# smtpbridge
+# SMTPBridge
 
 SMTP server that bridges email to other messaging services.
 

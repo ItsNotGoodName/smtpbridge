@@ -52,6 +52,7 @@ func (bs *BridgeService) CreateBridge(req *CreateBridgeRequest) error {
 	}
 
 	bridge := NewBridge(filter, req.Endpoints)
+
 	bs.bridgesMu.Lock()
 	bs.bridges = append(bs.bridges, bridge)
 	bs.bridgesMu.Unlock()

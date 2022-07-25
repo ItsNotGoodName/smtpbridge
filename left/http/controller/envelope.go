@@ -90,10 +90,10 @@ func EnvelopeSendPost(envelopeService envelope.Service, endpointService endpoint
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		endpointName := r.PostFormValue("endpoint")
-		filter := r.PostFormValue("filter")
-		noText := filter == "no text"
-		noAttachments := filter == "no attachments"
+		endpointFormValue := r.PostFormValue("endpoint")
+		filterFormValue := r.PostFormValue("filter")
+		noTextFormValue := filterFormValue == "no text"
+		noAttachmentsFormValue := filterFormValue == "no attachments"
 
 		// Get envelope
 		ctx := r.Context()
@@ -108,7 +108,7 @@ func EnvelopeSendPost(envelopeService envelope.Service, endpointService endpoint
 		}
 
 		// Get endpoint
-		end, err := endpointService.GetEndpoint(endpointName)
+		end, err := endpointService.GetEndpoint(endpointFormValue)
 		if err != nil {
 			code := http.StatusInternalServerError
 			if errors.Is(err, core.ErrEndpointNotFound) {
@@ -120,7 +120,7 @@ func EnvelopeSendPost(envelopeService envelope.Service, endpointService endpoint
 
 		// Convert envelope message to text
 		text := ""
-		if !noText {
+		if !noTextFormValue {
 			text, err = end.Text(env)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -130,7 +130,7 @@ func EnvelopeSendPost(envelopeService envelope.Service, endpointService endpoint
 
 		// Convert envelope attachments to endpoint attachments
 		atts := []endpoint.Attachment{}
-		if !noAttachments {
+		if !noAttachmentsFormValue {
 			for _, att := range env.Attachments {
 				data, err := envelopeService.GetData(ctx, &att)
 				if err != nil {

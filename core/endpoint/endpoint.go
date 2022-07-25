@@ -64,6 +64,19 @@ func NewEndpoint(name string, endpointType string, templateStr string, sender Se
 	}, nil
 }
 
+func (e Endpoint) Text(env *envelope.Envelope) (string, error) {
+	var buffer bytes.Buffer
+	if err := e.template.Execute(&buffer, env); err != nil {
+		return "", err
+	}
+
+	return buffer.String(), nil
+}
+
+func (e Endpoint) SendText(ctx context.Context, text string) error {
+	return e.Sender.Send(ctx, text, []Attachment{})
+}
+
 func NewAttachment(att *envelope.Attachment, data []byte) Attachment {
 	return Attachment{
 		Name:    att.Name,
@@ -80,15 +93,6 @@ func (c Config) Require(keys []string) error {
 	}
 
 	return nil
-}
-
-func (e Endpoint) Text(env *envelope.Envelope) (string, error) {
-	var buffer bytes.Buffer
-	if err := e.template.Execute(&buffer, env); err != nil {
-		return "", err
-	}
-
-	return buffer.String(), nil
 }
 
 func FilterImages(atts []Attachment) []Attachment {

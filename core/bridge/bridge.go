@@ -7,7 +7,6 @@ type (
 	}
 
 	CreateBridgeRequest struct {
-		Name          string
 		From          string
 		FromRegex     string
 		To            string

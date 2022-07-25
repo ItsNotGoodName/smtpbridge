@@ -8,10 +8,12 @@ const (
 )
 
 func newSender(endpointType string, config Config) (Sender, error) {
+	// Console
 	if endpointType == TypeConsole {
 		return &Console{}, nil
 	}
 
+	// Telegram
 	if endpointType == TypeTelegram {
 		if err := config.Require([]string{"token", "chat_id"}); err != nil {
 			return nil, err
