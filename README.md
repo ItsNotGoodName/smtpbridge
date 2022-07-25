@@ -34,7 +34,6 @@ smtp: # SMTP server
   host: ""
   port: 1025
   size: 26214400 # Max message size in bytes, 25 MiB
-  auth: false # (true, false)
   username: ""
   password: ""
 

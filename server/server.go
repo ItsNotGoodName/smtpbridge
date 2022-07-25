@@ -17,7 +17,7 @@ import (
 )
 
 func smtpAuthService(config *config.Config) auth.Service {
-	if config.SMTP.Auth {
+	if config.SMTP.Auth() {
 		return auth.NewAccountService(config.SMTP.Username, config.SMTP.Password)
 	} else {
 		return auth.NewAnonymousService()
