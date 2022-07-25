@@ -44,6 +44,7 @@ func New(addr string, dataFS fs.FS, envelopeService envelope.Service, endpointSe
 
 	r.Get("/", c.IndexGet(envelopeService))
 
+	r.Get("/envelopes", c.EnvelopeList(envelopeService))
 	r.Route("/envelopes/{id}", func(r chi.Router) {
 		r.Get("/", mwMultiplexAction(c.EnvelopeGet(envelopeService, endpointService), nil, c.EnvelopeDelete(envelopeService)))
 		r.Delete("/", c.EnvelopeDelete(envelopeService))

@@ -1,37 +1,73 @@
 {{ template "layout/default" . }}
 {{ define "content" }}
-<h1 class="title">Envelopes</h1>
-{{ template "shim/filter" .Page }}
-<div class="table-container">
-  <table class="table is-hoverable is-striped is-fullwidth">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>From</th>
-        <th>Subject</th>
-        <th>Received Date</th>
-      </tr>
-    </thead>
-    <tbody>
+<div class="columns">
+  <div class="column">
+    <nav class="panel">
+      <p class="panel-heading">
+        Recent Envelopes
+      </p>
       {{ range .Envelopes }}
-      {{ $href := envelopeLink . }}
-      <tr>
-        <td>
-          <a href="{{ $href }}">{{ .Message.ID }}</a>
-        </td>
-        <td>
-          <a href="{{ $href }}">{{ .Message.From }}</a>
-        </td>
-        <td>
-          <a href="{{ $href }}">{{ .Message.Subject }}</a>
-        </td>
-        <td>
-          <a href="{{ $href }}">{{ dateFormat .Message.CreatedAt }}</a>
-        </td>
-      </tr>
+      <a class="panel-block is-active" href="{{ envelopeLink . }}">
+        <span class="panel-icon">
+          <i class="fas fa-envelope" aria-hidden="true"></i>
+        </span>
+        <span class="mr-auto  is-clipped">
+          {{ .Message.Subject }}
+        </span>
+        {{ dateFormat .Message.CreatedAt }}
+      </a>
       {{ end }}
-  </table>
+    </nav>
+  </div>
+  <div class="column">
+    <div class="box">
+      <h1 class="title has-text-centered">Database</h1>
+      <nav class="level">
+        <div class="level-item has-text-centered">
+          <div>
+            <p class="heading">Envelopes Count</p>
+            <p class="title">{{ .EnvelopesCount }}</p>
+          </div>
+        </div>
+        <div class="level-item has-text-centered">
+          <div>
+            <p class="heading">Attachments Count</p>
+            <p class="title">{{ .AttachmentsCount }}</p>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <div class="box">
+      <h1 class="title has-text-centered">Version</h1>
+      <nav class="level">
+        <div class="level-item has-text-centered">
+          <div>
+            <p class="heading">Version</p>
+            <p class="title">{{ .Version.Version }}</p>
+          </div>
+        </div>
+        <div class="level-item has-text-centered">
+          <div>
+            <p class="heading">Commit</p>
+            <p class="title">{{ .Version.Commit }}</p>
+          </div>
+        </div>
+      </nav>
+      <nav class="level">
+        <div class="level-item has-text-centered">
+          <div>
+            <p class="heading">Date</p>
+            <p class="title">{{ .Version.Date }}</p>
+          </div>
+        </div>
+        <div class="level-item has-text-centered">
+          <div>
+            <p class="heading">Built By</p>
+            <p class="title">{{ .Version.BuiltBy }}</p>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </div>
 </div>
-{{ template "shim/pagination" .Page }}
-</tbody>
 {{ end }}

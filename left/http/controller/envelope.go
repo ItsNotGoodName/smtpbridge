@@ -10,7 +10,7 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/left/http/view"
 )
 
-func IndexGet(envelopeService envelope.Service) http.HandlerFunc {
+func EnvelopeList(envelopeService envelope.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		page := parsePage(r)
 		envs, err := envelopeService.ListEnvelope(r.Context(), &page)
@@ -19,7 +19,7 @@ func IndexGet(envelopeService envelope.Service) http.HandlerFunc {
 			return
 		}
 
-		view.Render(w, http.StatusOK, view.IndexPage, view.IndexData{Envelopes: envs, Page: page})
+		view.Render(w, http.StatusOK, view.EnvelopesPage, view.EnvelopesData{Envelopes: envs, Page: page})
 	}
 }
 
