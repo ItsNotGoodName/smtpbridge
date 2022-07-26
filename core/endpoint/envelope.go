@@ -27,14 +27,10 @@ func NewAttachment(att *envelope.Attachment, data []byte) Attachment {
 	}
 }
 
-func ConvertAttachment(ctx context.Context, es envelope.Service, att envelope.Attachment) (Attachment, error) {
+func convertAttachment(ctx context.Context, es envelope.Service, att envelope.Attachment) (Attachment, error) {
 	data, err := es.GetData(ctx, &att)
 	if err != nil {
-		if errors.Is(err, core.ErrDataNotFound) {
-			log.Println("endpoint.ConvertAttachment:", err)
-		} else {
-			return Attachment{}, err
-		}
+		return Attachment{}, err
 	}
 
 	return NewAttachment(&att, data), nil
@@ -43,8 +39,13 @@ func ConvertAttachment(ctx context.Context, es envelope.Service, att envelope.At
 func ConvertAttachments(ctx context.Context, es envelope.Service, env *envelope.Envelope) ([]Attachment, error) {
 	atts := []Attachment{}
 	for _, att := range env.Attachments {
-		newAtt, err := ConvertAttachment(ctx, es, att)
+		newAtt, err := convertAttachment(ctx, es, att)
 		if err != nil {
+			if errors.Is(err, core.ErrDataNotFound) {
+				log.Printf("endpoint.ConvertAttachments: name '%s': fileName '%s': %s", att.Name, att.FileName(), err)
+				continue
+			}
+
 			return nil, err
 		}
 
