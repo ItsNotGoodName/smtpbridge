@@ -4,7 +4,9 @@
 {{ template "shim/page-filter" .Page }}
 <div class="columns is-multiline">
   {{ range .Attachments }}
-  {{ template "shim/attachment-card" . }}
+  <div class="column is-4">
+    {{ template "shim/attachment-card" . }}
+  </div>
   {{ end }}
 </div>
 {{ template "shim/page-pagination" .Page }}

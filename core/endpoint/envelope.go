@@ -10,9 +10,28 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/core/envelope"
 )
 
+func (e Endpoint) Send(ctx context.Context, env *envelope.Envelope, atts []Attachment) error {
+	// Text
+	var text string
+	if !e.TextDisable {
+		var err error
+		text, err = e.Text(env)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Attachments
+	if e.AttachmentsDisable {
+		atts = []Attachment{}
+	}
+
+	return e.SendRaw(ctx, text, atts)
+}
+
 func (e Endpoint) Text(env *envelope.Envelope) (string, error) {
 	var buffer bytes.Buffer
-	if err := e.template.Execute(&buffer, env); err != nil {
+	if err := e.textTemplate.Execute(&buffer, env); err != nil {
 		return "", err
 	}
 

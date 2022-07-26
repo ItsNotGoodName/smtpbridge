@@ -68,12 +68,13 @@ smtp: # SMTP server
 
 endpoints: # Endpoints for envelopes
   - name: example endpoint
-    type: console
     text_disable: false
     text_template: |
       FROM: {{ .Message.From }}
       SUBJECT: {{ .Message.Subject }}
       {{ .Message.Text }}
+    attachments_disable: false
+    type: console
   # Console
   - name: console endpoint
     type: console

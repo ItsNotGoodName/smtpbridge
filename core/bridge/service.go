@@ -75,13 +75,8 @@ func (bs *BridgeService) send(ctx context.Context, env *envelope.Envelope) error
 	send := func(end endpoint.Endpoint) {
 		wg.Add(1)
 		go func() {
-			text, err := end.Text(env)
-			if err != nil {
-				log.Printf("bridge.BridgeService.send: envelope %d: %s", env.Message.ID, err)
-			} else {
-				if err := end.Send(ctx, text, atts); err != nil {
-					log.Printf("bridge.BridgeService.send: envelope %d: name '%s': type '%s': %s", env.Message.ID, end.Name, end.Type, err)
-				}
+			if err := end.Send(ctx, env, atts); err != nil {
+				log.Printf("bridge.BridgeService.send: envelope %d: name '%s': type '%s': %s", env.Message.ID, end.Name, end.Type, err)
 			}
 
 			wg.Done()

@@ -68,7 +68,7 @@ func (c *Config) Load() {
 
 	// Set default template for endpoint text
 	for i := range c.Endpoints {
-		if c.Endpoints[i].TextTemplate == "" && !c.Endpoints[i].TextDisable {
+		if c.Endpoints[i].TextTemplate == "" {
 			c.Endpoints[i].TextTemplate = `FROM: {{ .Message.From }}
 SUBJECT: {{ .Message.Subject }}
 {{ .Message.Text }}`

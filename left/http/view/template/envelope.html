@@ -2,77 +2,70 @@
 {{ define "content" }}
 {{ $hasAttachments := ne (len .Envelope.Attachments) 0 }}
 <h1 class="title">Envelope</h1>
+<div class="table-container">
+  <table class="table">
+    <tbody>
+      <tr>
+        <td><b>ID</b></td>
+        <td>{{ .Envelope.Message.ID }}</td>
+      </tr>
+      <tr>
+        <td><b>Received Date</b></td>
+        <td>{{ timeFormat .Envelope.Message.CreatedAt }}</td>
+      </tr>
+      <tr>
+        <td><b>Date</b></td>
+        <td>{{ timeFormat .Envelope.Message.Date }}</td>
+      </tr>
+      <tr>
+        <td><b>Subject</b></td>
+        <td>{{ .Envelope.Message.Subject }}</td>
+      </tr>
+      <tr>
+        <td><b>From</b></td>
+        <td>{{ .Envelope.Message.From }}</td>
+      </tr>
+      {{ range $to, $ := .Envelope.Message.To }}
+      <tr>
+        <td><b>To</b></td>
+        <td>{{ $to }}</td>
+      </tr>
+      {{ end }}
+    </tbody>
+  </table>
+</div>
+
 <div class="columns">
   <div class="column">
-    <table class="table">
-      <tbody>
-        <tr>
-          <td><b>ID</b></td>
-          <td>{{ .Envelope.Message.ID }}</td>
-        </tr>
-        <tr>
-          <td><b>Received Date</b></td>
-          <td>{{ timeFormat .Envelope.Message.CreatedAt }}</td>
-        </tr>
-        <tr>
-          <td><b>Date</b></td>
-          <td>{{ timeFormat .Envelope.Message.Date }}</td>
-        </tr>
-        <tr>
-          <td><b>Subject</b></td>
-          <td>{{ .Envelope.Message.Subject }}</td>
-        </tr>
-        <tr>
-          <td><b>From</b></td>
-          <td>{{ .Envelope.Message.From }}</td>
-        </tr>
-        {{ range $to, $ := .Envelope.Message.To }}
-        <tr>
-          <td><b>To</b></td>
-          <td>{{ $to }}</td>
-        </tr>
-        {{ end }}
-      </tbody>
-    </table>
-    <div class="buttons">
-      <a class="button is-danger" href="?action=delete">
-        Delete
-      </a>
-    </div>
+    <a class="button is-danger" href="?action=delete">
+      Delete
+    </a>
   </div>
   <div class="column">
     <form action="{{ envelopeSendLink .Envelope }}" method="POST" id="endpointForm">
-      <div class="field">
-        <label class="label">Endpoint</label>
-        <div class="control">
-          <div class="select">
-            <select name="endpoint" form="endpointForm">
-              {{ range $end := .Endpoints }}
-              <option>{{ $end.Name }}</option>
-              {{ end }}
-            </select>
+      <div class="field is-horizontal">
+        <div class="field-label is-normal">
+          <label class="label">Endpoint</label>
+        </div>
+        <div class="field-body">
+          <div class="field is-narrow">
+            <div class="control">
+              <div class="select is-fullwidth">
+                <select name="endpoint" form="endpointForm">
+                  {{ range .Endpoints }}
+                  <option>
+                    <span>{{ .Name }}</span>
+                  </option>
+                  {{ end }}
+                </select>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-      <div class="field">
-        <div class="control">
-          <label class="radio">
-            <input type="radio" name="filter" checked>
-            Default
-          </label>
-          <label class="radio">
-            <input type="radio" name="filter" value="no text">
-            No text
-          </label>
-          <label class="radio">
-            <input type="radio" name="filter" value="no attachments">
-            No attachments
-          </label>
-        </div>
-      </div>
-      <div class="field">
-        <div class="control">
-          <button class="button is-link">Send</button>
+          <div class="field is-narrow">
+            <div class="control">
+              <button class="button is-link">Send</button>
+            </div>
+          </div>
         </div>
       </div>
     </form>
@@ -105,10 +98,12 @@
 {{ if or (eq .Tab "text") (eq .Tab "") }}
 <pre>{{ .Envelope.Message.Text }}</pre>
 {{ else if and (eq .Tab "attachments" ) $hasAttachments }}
-{{ range .Envelope.Attachments }}
 <div class="columns is-multiline">
-  {{ template "shim/attachment-card" . }}
+  {{ range .Envelope.Attachments }}
+  <div class="column is-4">
+    {{ template "shim/attachment-card" . }}
+  </div>
+  {{ end }}
 </div>
-{{ end }}
 {{ end }}
 {{ end }}

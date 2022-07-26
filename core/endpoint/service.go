@@ -40,7 +40,7 @@ func (es *EndpointService) CreateEndpoint(req CreateEndpointRequest) error {
 		return err
 	}
 
-	end, err := NewEndpoint(req.Name, req.Type, req.Template, sender)
+	end, err := NewEndpoint(req.Name, req.Type, req.TextDisable, req.TextTemplate, req.AttachmentsDisable, sender)
 	if err != nil {
 		return err
 	}

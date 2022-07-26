@@ -61,10 +61,12 @@ func Start(ctx context.Context, config *config.Config) <-chan struct{} {
 	// Create endpoints from config
 	for _, end := range config.Endpoints {
 		if err := endpointService.CreateEndpoint(endpoint.CreateEndpointRequest{
-			Name:     end.Name,
-			Type:     end.Type,
-			Config:   end.Config,
-			Template: end.TextTemplate,
+			Name:               end.Name,
+			Type:               end.Type,
+			Config:             end.Config,
+			TextDisable:        end.TextDisable,
+			TextTemplate:       end.TextTemplate,
+			AttachmentsDisable: end.AttachmentsDisable,
 		}); err != nil {
 			log.Fatalf("server.Start: endpoint '%s': %s", end.Name, err)
 		}

@@ -14,21 +14,25 @@ type (
 	}
 
 	Endpoint struct {
-		Name     string
-		Type     string
-		sender   Sender
-		template *template.Template
+		Name               string
+		Type               string
+		TextDisable        bool
+		textTemplate       *template.Template
+		AttachmentsDisable bool
+		sender             Sender
 	}
 
 	CreateEndpointRequest struct {
-		Name     string
-		Type     string
-		Config   Config
-		Template string
+		Name               string
+		Type               string
+		Config             Config
+		TextDisable        bool
+		TextTemplate       string
+		AttachmentsDisable bool
 	}
 
 	Sender interface {
-		// Send text and attachments to endpoint. Text can be empty and atts can be length 0.
+		// Send text and attachments to endpoint. Text can be empty and atts can be length 0 but not both.
 		Send(ctx context.Context, text string, atts []Attachment) error
 	}
 
@@ -47,30 +51,29 @@ type (
 	Config map[string]string
 )
 
-func NewEndpoint(name string, endpointType string, templateStr string, sender Sender) (Endpoint, error) {
-	tmpl, err := template.New(name).Parse(templateStr)
+func NewEndpoint(name string, endpointType string, textDisable bool, textTemplateStr string, attachmentsDisable bool, sender Sender) (Endpoint, error) {
+	textTemplate, err := template.New(name).Parse(textTemplateStr)
 	if err != nil {
 		return Endpoint{}, err
 	}
 
 	return Endpoint{
-		Name:     name,
-		Type:     endpointType,
-		sender:   sender,
-		template: tmpl,
+		Name:               name,
+		Type:               endpointType,
+		sender:             sender,
+		TextDisable:        textDisable,
+		textTemplate:       textTemplate,
+		AttachmentsDisable: attachmentsDisable,
 	}, nil
 }
 
-func (e Endpoint) Send(ctx context.Context, text string, atts []Attachment) error {
+func (e Endpoint) SendRaw(ctx context.Context, text string, atts []Attachment) error {
+	// Don't send there is nothing to send
+	if text == "" && len(atts) == 0 {
+		return nil
+	}
+
 	return e.sender.Send(ctx, text, atts)
-}
-
-func (e Endpoint) SendText(ctx context.Context, text string) error {
-	return e.sender.Send(ctx, text, []Attachment{})
-}
-
-func (e Endpoint) SendAtachments(ctx context.Context, atts []Attachment) error {
-	return e.sender.Send(ctx, "", atts)
 }
 
 func (c Config) Require(keys []string) error {
@@ -83,7 +86,7 @@ func (c Config) Require(keys []string) error {
 	return nil
 }
 
-func FilterImages(atts []Attachment) []Attachment {
+func OnlyImages(atts []Attachment) []Attachment {
 	imgAtts := []Attachment{}
 	for _, a := range atts {
 		if a.IsImage {

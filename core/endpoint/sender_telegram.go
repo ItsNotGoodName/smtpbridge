@@ -31,7 +31,7 @@ type telegramResponse struct {
 }
 
 func (t *Telegram) Send(ctx context.Context, text string, atts []Attachment) error {
-	atts = FilterImages(atts)
+	atts = OnlyImages(atts)
 
 	// Send with 0 attachments
 	if len(atts) == 0 {

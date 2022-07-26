@@ -28,7 +28,7 @@ func EndpointTestPost(endpointService endpoint.Service) http.HandlerFunc {
 			return
 		}
 
-		if err := end.SendText(r.Context(), end.Name+" test"); err != nil {
+		if err := end.SendRaw(r.Context(), end.Name+" test", []endpoint.Attachment{}); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
