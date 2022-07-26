@@ -44,7 +44,7 @@ func (bs *BridgeService) CreateBridge(req *CreateBridgeRequest) error {
 		}
 	}
 
-	filter, err := NewFilter(req.To, req.From, req.ToRegex, req.FromRegex, req.MatchTemplate)
+	filter, err := NewFilter(req.From, req.To, req.From, req.ToRegex, req.MatchTemplate)
 	if err != nil {
 		return err
 	}
