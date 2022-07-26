@@ -10,11 +10,12 @@
   <script src="/assets/js/bundle.js"></script>
 </head>
 
-<body class="container">
+<body class="has-navbar-fixed-top">
   {{ template "shim/nav" . }}
-  <div class="column">
+  <div class="container column" style="min-height: 100vh;">
     {{ template "content" . }}
   </div>
+  {{ template "shim/footer" . }}
 </body>
 
 </html>

@@ -76,6 +76,10 @@ func (e Endpoint) SendRaw(ctx context.Context, text string, atts []Attachment) e
 	return e.sender.Send(ctx, text, atts)
 }
 
+func (e Endpoint) TextTemplate() string {
+	return e.textTemplate.Root.String()
+}
+
 func (c Config) Require(keys []string) error {
 	for _, key := range keys {
 		if _, ok := c[key]; !ok {

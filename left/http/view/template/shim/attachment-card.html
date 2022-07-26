@@ -8,18 +8,22 @@
     </figure>
   </div>
   {{ end }}
-  <div class="card-content is-flex is-flex-wrap-wrap">
-    <div class="is-flex-grow-1 is-clipped">
-      <a href="{{ $href }}">{{ .Name }}</a>
+  <div class="card-content">
+    <div class="columns is-mobile">
+      <div class="column is-clipped">
+        <a href="{{ $href }}">{{ .Name }}</a>
+      </div>
+      <div class="column is-narrow">
+        <a href='{{ envelopeLinkID .MessageID }}{{ tabQuery "attachments" }}'>
+          <span class="icon-text">
+            <span class="icon">
+              <i class="fas fa-envelope"></i>
+            </span>
+            <span>Envelope</span>
+          </span>
+        </a>
+      </div>
     </div>
-    <a href='{{ envelopeLinkID .MessageID }}{{ tabQuery "attachments" }}'>
-      <span class="icon-text">
-        <span class="icon">
-          <i class="fas fa-envelope"></i>
-        </span>
-        <span>Envelope</span>
-      </span>
-    </a>
   </div>
 </div>
 {{ end }}
