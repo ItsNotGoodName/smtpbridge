@@ -1,17 +1,44 @@
 # SMTPBridge
 
-SMTP server that bridges email to other messaging services.
+Bridge emails to other messaging services.
 
-Do not expose this to the Internet, this is only intended to be used on a local network.
+**Do not expose this to the Internet, this is only intended to be used on a local network.**
 
 ## Use Cases
 
-- Receive pictures from IP cameras
-- Receive system messages from Linux servers
+- Pictures from IP cameras
+- System messages from servers
+
+## Usage
+
+```
+smtpbridge
+```
 
 ## Configuration
 
 Configuration file is located at `~/.smtpbridge.yml`.
+
+### Starter Configuration
+
+This config prints emails received via SMTP to console.
+The SMTP server listens on port `1025` and the HTTP server listens on port `8080`.
+This saves emails to `~/.smtpbridge` directory.
+The `database` and `storage` keys can be removed to run this entirely in memory.
+
+```yaml
+database:
+  type: bolt
+
+storage:
+  type: directory
+
+endpoints:
+  - name: hello world
+    type: console
+```
+
+### Full Configuration
 
 ```yaml
 directory: ~/.smtpbridge # Default persistence directory
@@ -21,7 +48,7 @@ database: # Database
   memory:
     limit: 100 # Max number of envelopes
 
-storage: # Storage for attachment data
+storage: # Storage for attachment's data
   type: memory # (memory, directory)
   memory:
     size: 104857600 # Max memory allocation, 100 MiB
@@ -78,10 +105,6 @@ bridges: # Bridges to endpoints, if this is empty then envelopes will always be 
       - telegram endpoint
 ```
 
-## Usage
-
-```
-smtpbridge
-```
-
 ## To Do
+
+- Read mail files

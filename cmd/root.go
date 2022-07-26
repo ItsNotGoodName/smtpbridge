@@ -43,7 +43,7 @@ var (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "smtpbridge",
-	Short: "SMTP server that bridges email to other messaging services.",
+	Short: "Bridge emails to other messaging services.",
 	Long:  ``,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
