@@ -24,7 +24,7 @@ func NewData(dir string) *Data {
 	}
 }
 
-func (d *Data) CreateData(ctx context.Context, att *envelope.Attachment, data []byte) error {
+func (d *Data) ForceCreateData(ctx context.Context, att *envelope.Attachment, data []byte) error {
 	return os.WriteFile(d.path(att), data, 0644)
 }
 
@@ -37,7 +37,7 @@ func (d *Data) DeleteData(ctx context.Context, att *envelope.Attachment) error {
 	return checkDataError(os.Remove(d.path(att)))
 }
 
-func (d *Data) DataSize(ctx context.Context) (int64, error) {
+func (d *Data) GetDataSize(ctx context.Context) (int64, error) {
 	if err := os.Chdir(d.dir); err != nil {
 		return 0, err
 	}

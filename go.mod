@@ -3,6 +3,7 @@ module github.com/ItsNotGoodName/smtpbridge
 go 1.17
 
 require (
+	github.com/dustin/go-humanize v1.0.0
 	github.com/emersion/go-sasl v0.0.0-20211008083017-0b9dcfb154ac
 	github.com/emersion/go-smtp v0.15.0
 	github.com/fsnotify/fsnotify v1.5.4

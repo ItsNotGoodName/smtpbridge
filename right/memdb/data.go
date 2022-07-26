@@ -32,13 +32,15 @@ func NewData(size int64) *Data {
 	}
 }
 
-func (d *Data) CreateData(ctx context.Context, att *envelope.Attachment, data []byte) error {
+func (d *Data) ForceCreateData(ctx context.Context, att *envelope.Attachment, data []byte) error {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 
-	// Don't create data if it already exists
+	// Delete existing data if it exists
 	if _, ok := d.pool[att.ID]; ok {
-		return core.ErrDataExists
+		if err := d.deleteData(att.ID); err != nil {
+			return err
+		}
 	}
 
 	size := int64(len(data))
@@ -80,6 +82,14 @@ func (d *Data) GetData(ctx context.Context, att *envelope.Attachment) ([]byte, e
 	d.mu.Unlock()
 
 	return block.data, nil
+}
+
+func (d *Data) GetDataSize(ctx context.Context) (int64, error) {
+	d.mu.Lock()
+	size := d.poolSize
+	d.mu.Unlock()
+
+	return size, nil
 }
 
 func (d *Data) DeleteData(ctx context.Context, att *envelope.Attachment) error {

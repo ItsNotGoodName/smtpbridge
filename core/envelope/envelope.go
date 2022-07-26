@@ -37,6 +37,7 @@ type (
 		CreateEnvelope(ctx context.Context, req *CreateEnvelopeRequest) (int64, error)
 		DeleteEnvelope(ctx context.Context, msgID int64) error
 		GetData(ctx context.Context, att *Attachment) ([]byte, error)
+		GetDataSize(ctx context.Context) (int64, error)
 	}
 
 	Store interface {
@@ -50,9 +51,10 @@ type (
 	}
 
 	DataStore interface {
-		CreateData(ctx context.Context, att *Attachment, data []byte) error
+		ForceCreateData(ctx context.Context, att *Attachment, data []byte) error
 		GetData(ctx context.Context, att *Attachment) ([]byte, error)
 		DeleteData(ctx context.Context, att *Attachment) error
+		GetDataSize(ctx context.Context) (int64, error)
 	}
 
 	LocalDataStore interface {
@@ -110,7 +112,7 @@ func (es *EnvelopeService) CreateEnvelope(ctx context.Context, req *CreateEnvelo
 
 	// Save attachments' data
 	for i, att := range atts {
-		if err := es.dataStore.CreateData(ctx, &att, req.Attachment[i].Data); err != nil {
+		if err := es.dataStore.ForceCreateData(ctx, &att, req.Attachment[i].Data); err != nil {
 			return 0, err
 		}
 	}
@@ -120,6 +122,10 @@ func (es *EnvelopeService) CreateEnvelope(ctx context.Context, req *CreateEnvelo
 
 func (es *EnvelopeService) GetData(ctx context.Context, att *Attachment) ([]byte, error) {
 	return es.dataStore.GetData(ctx, att)
+}
+
+func (es *EnvelopeService) GetDataSize(ctx context.Context) (int64, error) {
+	return es.dataStore.GetDataSize(ctx)
 }
 
 func (es *EnvelopeService) GetEnvelope(ctx context.Context, msgID int64) (*Envelope, error) {

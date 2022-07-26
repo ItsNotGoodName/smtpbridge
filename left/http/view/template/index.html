@@ -14,7 +14,7 @@
         <span class="mr-auto  is-clipped">
           {{ .Message.Subject }}
         </span>
-        {{ dateFormat .Message.CreatedAt }}
+        {{ timeHumanize .Message.CreatedAt }}
       </a>
       {{ end }}
     </nav>
@@ -33,6 +33,12 @@
           <div>
             <p class="heading">Attachments Count</p>
             <p class="title">{{ .AttachmentsCount }}</p>
+          </div>
+        </div>
+        <div class="level-item has-text-centered">
+          <div>
+            <p class="heading">Attachments Size</p>
+            <p class="title">{{ bytesHumanize .AttachmentsSize }}</p>
           </div>
         </div>
       </nav>

@@ -26,7 +26,7 @@
           <a href="{{ $href }}">{{ .Message.Subject }}</a>
         </td>
         <td>
-          <a href="{{ $href }}">{{ dateFormat .Message.CreatedAt }}</a>
+          <a href="{{ $href }}">{{ timeFormat .Message.CreatedAt }}</a>
         </td>
       </tr>
       {{ end }}

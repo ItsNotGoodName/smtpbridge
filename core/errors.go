@@ -4,7 +4,6 @@ import "fmt"
 
 var (
 	ErrAuthInvalid         = fmt.Errorf("auth invalid")
-	ErrDataExists          = fmt.Errorf("data exists")
 	ErrDataNotFound        = fmt.Errorf("data not found")
 	ErrDataTooBig          = fmt.Errorf("data too big")
 	ErrEndpointNameExists  = fmt.Errorf("endpoint name exists")

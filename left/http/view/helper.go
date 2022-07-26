@@ -8,10 +8,11 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/core/endpoint"
 	"github.com/ItsNotGoodName/smtpbridge/core/envelope"
 	"github.com/ItsNotGoodName/smtpbridge/core/paginate"
+	"github.com/dustin/go-humanize"
 )
 
 var helperMap template.FuncMap = template.FuncMap{
-	"dateFormat": func(date time.Time) string {
+	"timeFormat": func(date time.Time) string {
 		return date.Format("Jan _2 2006 15:04:05")
 	},
 	"pageQuery": func(page paginate.Page, newPage int) string {
@@ -52,5 +53,11 @@ var helperMap template.FuncMap = template.FuncMap{
 			return "fas fa-terminal"
 		}
 		return "fas fa-circle-question"
+	},
+	"timeHumanize": func(date time.Time) string {
+		return humanize.Time(date)
+	},
+	"bytesHumanize": func(bytes int64) string {
+		return humanize.Bytes(uint64(bytes))
 	},
 }

@@ -31,6 +31,7 @@ const (
 type IndexData struct {
 	EnvelopesCount   int
 	AttachmentsCount int
+	AttachmentsSize  int64
 	Envelopes        []envelope.Envelope
 	Version          version.Version
 }

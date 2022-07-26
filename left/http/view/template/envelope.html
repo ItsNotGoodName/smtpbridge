@@ -12,11 +12,11 @@
         </tr>
         <tr>
           <td><b>Received Date</b></td>
-          <td>{{ dateFormat .Envelope.Message.CreatedAt }}</td>
+          <td>{{ timeFormat .Envelope.Message.CreatedAt }}</td>
         </tr>
         <tr>
           <td><b>Date</b></td>
-          <td>{{ dateFormat .Envelope.Message.Date }}</td>
+          <td>{{ timeFormat .Envelope.Message.Date }}</td>
         </tr>
         <tr>
           <td><b>Subject</b></td>
