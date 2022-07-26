@@ -72,16 +72,39 @@ func Start(ctx context.Context, config *config.Config) <-chan struct{} {
 
 	// Create bridges from config
 	for i, brid := range config.Bridges {
+		// Filters request
+		var filtersReq []bridge.CreateFilterRequest
+		filtersLength := len(brid.Filters)
+		if filtersLength > 0 {
+			filtersReq = make([]bridge.CreateFilterRequest, 0, filtersLength)
+			for _, filter := range brid.Filters {
+				filtersReq = append(filtersReq, bridge.CreateFilterRequest{
+					From:          filter.From,
+					To:            filter.To,
+					FromRegex:     filter.FromRegex,
+					ToRegex:       filter.ToRegex,
+					MatchTemplate: filter.MatchTemplate,
+				})
+			}
+		} else {
+			filtersReq = []bridge.CreateFilterRequest{{
+				From:          brid.From,
+				To:            brid.To,
+				FromRegex:     brid.FromRegex,
+				ToRegex:       brid.ToRegex,
+				MatchTemplate: brid.MatchTemplate,
+			}}
+		}
+
+		// Create bridge
 		if err := bridgeService.CreateBridge(&bridge.CreateBridgeRequest{
-			From:          brid.From,
-			To:            brid.To,
-			FromRegex:     brid.FromRegex,
-			ToRegex:       brid.ToRegex,
-			Endpoints:     brid.Endpoints,
-			MatchTemplate: brid.MatchTemplate,
+			Endpoints: brid.Endpoints,
+			Filters:   filtersReq,
 		}); err != nil {
 			log.Fatalf("server.Start: bridge '%d': %s", i, err)
 		}
+
+		log.Printf("server.Start: bridge %d created with %d filters and %d endpoints", i, len(filtersReq), len(brid.Endpoints))
 	}
 
 	// Create HTTP server

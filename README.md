@@ -86,23 +86,23 @@ endpoints: # Endpoints for envelopes
 
 bridges: # Bridges to endpoints, if this is empty then envelopes will always be sent to all endpoints
   # Send to 'console endpoint'
-  - endpoints:
-      - console endpoint
-  # Send to all endpoints if the envelope is from 'example@example.com'
-  - from: example@example.com
-  # Send to 'console endpoint' if the envelope is from 'example@example.com' and is to 'test@example.com'
-  - from: example@example.com
-    to: test@example.com
-    endpoints:
-      - console endpoint
+  - endpoints: console endpoint
+  # Send to 'console endpoint' if the envelope is from 'foo@example.com' and is to 'bar@example.com'
+  - from: foo@example.com
+    to: bar@example.com
+    endpoints: console endpoint
+  # Send to all endpoints if the envelope is from 'foo@example.com' or 'baz@example.com'
+  - filters:
+      - from: foo@example.com
+      - from: baz@example.com
   # Send to 'console endpoint' if the envelope to matches regex "@example\.com$"
   - to_regex: '@example\.com$'
-    endpoints:
-      - console endpoint
-  # Send to 'telegram endpoint' if the envelope has more than 4 attachments
+    endpoints: console endpoint
+  # Send to 'telegram endpoint' and 'console endpoint' if the envelope has more than 4 attachments
   - match_template: "{{ gt (len .Attachments) 4 }}"
     endpoints:
       - telegram endpoint
+      - console endpoint
 ```
 
 ## To Do

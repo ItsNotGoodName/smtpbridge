@@ -15,8 +15,9 @@ type BridgeService struct {
 	eventPub        *event.Pub
 	envelopeService envelope.Service
 	endpointService endpoint.Service
-	bridgesMu       sync.Mutex
-	bridges         []Bridge
+
+	bridgesMu sync.Mutex
+	bridges   []Bridge
 }
 
 func NewBridgeService(pub *event.Pub, envelopeService envelope.Service, endpointService endpoint.Service) *BridgeService {
@@ -44,12 +45,17 @@ func (bs *BridgeService) CreateBridge(req *CreateBridgeRequest) error {
 		}
 	}
 
-	filter, err := NewFilter(req.From, req.To, req.From, req.ToRegex, req.MatchTemplate)
-	if err != nil {
-		return err
+	filters := make([]Filter, 0, len(req.Filters))
+	for _, filterReq := range req.Filters {
+		filter, err := NewFilter(filterReq.From, filterReq.To, filterReq.From, filterReq.ToRegex, filterReq.MatchTemplate)
+		if err != nil {
+			return err
+		}
+
+		filters = append(filters, filter)
 	}
 
-	bridge := NewBridge(filter, req.Endpoints)
+	bridge := NewBridge(filters, req.Endpoints)
 
 	bs.bridgesMu.Lock()
 	bs.bridges = append(bs.bridges, bridge)
@@ -71,10 +77,10 @@ func (bs *BridgeService) send(ctx context.Context, env *envelope.Envelope) error
 		go func() {
 			text, err := end.Text(env)
 			if err != nil {
-				log.Println("bridge.BridgeService.send:", err)
+				log.Printf("bridge.BridgeService.send: envelope %d: %s", env.Message.ID, err)
 			} else {
 				if err := end.Send(ctx, text, atts); err != nil {
-					log.Printf("bridge.BridgeService.send: name '%s': type '%s': %s", end.Name, end.Type, err)
+					log.Printf("bridge.BridgeService.send: envelope %d: name '%s': type '%s': %s", env.Message.ID, end.Name, end.Type, err)
 				}
 			}
 
@@ -92,21 +98,31 @@ func (bs *BridgeService) send(ctx context.Context, env *envelope.Envelope) error
 	} else { // Send to bridge's endpoints
 		endNameMemo := make(map[string]struct{})
 
-		for _, brid := range bridges {
-			if len(brid.Endpoints) == 0 || !brid.Filter.Match(env) {
+		for bridgeIndex, brid := range bridges {
+			// Skip if empty
+			if len(brid.Endpoints) == 0 {
 				continue
 			}
+
+			// Skip if no match
+			filterIndex, match := brid.Match(env)
+			if !match {
+				continue
+			}
+
+			log.Printf("bridge.BridgeService.send: envelope %d: bridge '%d': filter '%d': match", env.Message.ID, bridgeIndex, filterIndex)
 
 			for _, endName := range brid.Endpoints {
 				// Do not send to a duplicate endpoint
 				if _, ok := endNameMemo[endName]; ok {
+					log.Printf("bridge.BridgeService.send: envelope %d: bridge '%d': filter '%d': duplicate: skipping", env.Message.ID, bridgeIndex, filterIndex)
 					continue
 				}
 				endNameMemo[endName] = struct{}{}
 
 				end, err := bs.endpointService.GetEndpoint(endName)
 				if err != nil {
-					log.Println("bridge.BridgeService.send:", err)
+					log.Printf("bridge.BridgeService.send: envelope %d: bridge '%d': filter '%d': %s", env.Message.ID, bridgeIndex, filterIndex, err)
 					continue
 				}
 
@@ -131,8 +147,14 @@ func (bs *BridgeService) Run(ctx context.Context, doneC chan<- struct{}) {
 			doneC <- struct{}{}
 			return
 		case event := <-eventChan:
-			if err := bs.send(ctx, event.Data.(*envelope.Envelope)); err != nil {
-				log.Println("bridge.BridgeService.Run:", err)
+			env, ok := event.Data.(*envelope.Envelope)
+			if !ok {
+				log.Println("bridge.BridgeService.Run: could not cast envelope")
+				continue
+			}
+
+			if err := bs.send(ctx, env); err != nil {
+				log.Printf("bridge.BridgeService.Run: envelope %d: %s", env.Message.ID, err)
 			}
 		}
 	}
