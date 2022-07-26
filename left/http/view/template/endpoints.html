@@ -17,7 +17,12 @@
           {{ .Name }}
         </td>
         <td>
-          {{ .Type }}
+          <span class="icon-text">
+            <span class="icon">
+              <i class="{{ endpointIcon . }}"></i>
+            </span>
+            <span>{{ .Type }}</span>
+          </span>
         </td>
         <td>
           <form action="{{ endpointTestLinkQuery . }}" method="post">

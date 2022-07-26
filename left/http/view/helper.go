@@ -44,4 +44,13 @@ var helperMap template.FuncMap = template.FuncMap{
 	"endpointTestLinkQuery": func(end *endpoint.Endpoint) string {
 		return fmt.Sprintf("/endpoints/test?endpoint=%s", end.Name)
 	},
+	"endpointIcon": func(end *endpoint.Endpoint) string {
+		if end.Type == endpoint.TypeTelegram {
+			return "fab fa-telegram fa-lg"
+		}
+		if end.Type == endpoint.TypeConsole {
+			return "fas fa-terminal"
+		}
+		return "fas fa-circle-question"
+	},
 }
