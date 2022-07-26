@@ -2,11 +2,14 @@ package config
 
 import (
 	"log"
+	"os"
+	"path"
 
 	"github.com/spf13/viper"
 )
 
 type Config struct {
+	Directory string     `json:"directory" mapstructure:"directory"`
 	Database  Database   `json:"database" mapstructure:"database"`
 	Storage   Storage    `json:"storage" mapstructure:"storage"`
 	HTTP      HTTP       `json:"http" mapstructure:"http"`
@@ -16,13 +19,22 @@ type Config struct {
 }
 
 func New() *Config {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatalln("config.New: could not get user's home dir:", err)
+	}
+	directory := path.Join(home, ".smtpbridge")
+
 	return &Config{
+		Directory: directory,
 		Database: Database{
+			Type: "memory",
 			Memory: DatabaseMemory{
 				Limit: 100,
 			},
 		},
 		Storage: Storage{
+			Type: "memory",
 			Memory: StorageMemory{
 				Size: 1024 * 1024 * 100, // 100 MiB
 			},
@@ -48,11 +60,29 @@ func (c *Config) Load() {
 		log.Fatalln("config.Config.Load: could not load config:", err)
 	}
 
+	// Set default template for endpoint text
 	for i := range c.Endpoints {
 		if c.Endpoints[i].TextTemplate == "" && !c.Endpoints[i].TextDisable {
 			c.Endpoints[i].TextTemplate = `FROM: {{ .Message.From }}
 SUBJECT: {{ .Message.Subject }}
 {{ .Message.Text }}`
+		}
+	}
+
+	// Join paths
+	c.Storage.Directory.Path = path.Join(c.Directory, "data")
+
+	// Create directories if they are needed
+	if c.Storage.IsDirectory() {
+		paths := []string{
+			c.Directory,
+			c.Storage.Directory.Path,
+		}
+
+		for _, path := range paths {
+			if err := os.MkdirAll(path, 0755); err != nil {
+				log.Printf("config.Config.Load: could not create directory: %s: %s", path, err)
+			}
 		}
 	}
 }

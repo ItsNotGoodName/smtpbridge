@@ -10,5 +10,5 @@ type DatabaseMemory struct {
 }
 
 func (d Database) IsMemDB() bool {
-	return d.Type == "" || d.Type == "memory"
+	return d.Type == "memory"
 }

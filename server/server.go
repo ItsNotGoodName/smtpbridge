@@ -13,6 +13,7 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/core/event"
 	"github.com/ItsNotGoodName/smtpbridge/left/http"
 	"github.com/ItsNotGoodName/smtpbridge/left/smtp"
+	"github.com/ItsNotGoodName/smtpbridge/right/filedb"
 	"github.com/ItsNotGoodName/smtpbridge/right/memdb"
 )
 
@@ -28,13 +29,15 @@ func Start(ctx context.Context, config *config.Config) <-chan struct{} {
 	// Background daemons
 	backgrounds := []background.Background{}
 
-	// Only memdb database and storage is supported
-	if !(config.Database.IsMemDB() && config.Storage.IsMemDB()) {
-		log.Fatalf("server.Start: invalid database or storage: '%s' or '%s'", config.Database.Type, config.Storage.Type)
-	}
-
 	// Create stores
-	dataStore := memdb.NewData(config.Storage.Memory.Size)
+	var dataStore envelope.DataStore
+	if config.Storage.IsMemory() {
+		dataStore = memdb.NewData(config.Storage.Memory.Size)
+	} else if config.Storage.IsDirectory() {
+		dataStore = filedb.NewData(config.Storage.Directory.Path)
+	} else {
+		log.Fatalln("server.Start: storage invalid:", config.Storage.Type)
+	}
 	envelopeStore := memdb.NewEnvelope(config.Database.Memory.Limit)
 
 	// Create services
@@ -75,7 +78,7 @@ func Start(ctx context.Context, config *config.Config) <-chan struct{} {
 	if !config.HTTP.Disable {
 		backgrounds = append(backgrounds, http.New(
 			config.HTTP.Addr(),
-			dataStore.DataFS(),
+			dataStore.(envelope.LocalDataStore).DataFS(),
 			envelopeService,
 			endpointService,
 		))

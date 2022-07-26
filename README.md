@@ -14,13 +14,15 @@ Do not expose this to the Internet, this is only intended to be used on a local 
 Configuration file is located at `~/.smtpbridge.yml`.
 
 ```yaml
+directory: ~/.smtpbridge # Default persistence directory
+
 database: # Database
   type: memory # (memory)
   memory:
     limit: 100 # Max number of envelopes
 
 storage: # Storage for attachment data
-  type: memory # (memory)
+  type: memory # (memory, directory)
   memory:
     size: 104857600 # Max memory allocation, 100 MiB
 
