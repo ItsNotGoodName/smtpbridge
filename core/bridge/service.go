@@ -73,7 +73,9 @@ func (bs *BridgeService) send(ctx context.Context, env *envelope.Envelope) error
 			if err != nil {
 				log.Println("bridge.BridgeService.send:", err)
 			} else {
-				end.Send(ctx, text, atts)
+				if err := end.Send(ctx, text, atts); err != nil {
+					log.Printf("bridge.BridgeService.send: name '%s': type '%s': %s", end.Name, end.Type, err)
+				}
 			}
 
 			wg.Done()
