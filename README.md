@@ -1,6 +1,6 @@
 # SMTPBridge
 
-Bridge emails to other messaging services.
+Bridge email to other messaging services.
 
 **Do not expose this to the Internet, this is only intended to be used on a local network.**
 
@@ -44,14 +44,14 @@ endpoints:
 directory: ~/.smtpbridge # Default persistence directory
 
 database: # Database
-  type: memory # (memory)
+  type: memory # (memory, bolt)
   memory:
     limit: 100 # Max number of envelopes
 
 storage: # Storage for attachment's data
   type: memory # (memory, directory)
   memory:
-    size: 104857600 # Max memory allocation, 100 MiB
+    size: 104857600 # Max memory allocation in bytes, 100 MiB
 
 http: # HTTP server
   enable: true # (true, false)
@@ -96,7 +96,7 @@ bridges: # Bridges to endpoints, if this is empty then envelopes will always be 
     endpoints:
       - console endpoint
   # Send to 'console endpoint' if the envelope to matches regex "@example\.com$"
-  - to_regex: "@example\.com$"
+  - to_regex: '@example\.com$'
     endpoints:
       - console endpoint
   # Send to 'telegram endpoint' if the envelope has more than 4 attachments
@@ -108,3 +108,4 @@ bridges: # Bridges to endpoints, if this is empty then envelopes will always be 
 ## To Do
 
 - Read mail files
+- Windows installer
