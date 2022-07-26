@@ -13,6 +13,7 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/core/event"
 	"github.com/ItsNotGoodName/smtpbridge/left/http"
 	"github.com/ItsNotGoodName/smtpbridge/left/smtp"
+	"github.com/ItsNotGoodName/smtpbridge/right/boltdb"
 	"github.com/ItsNotGoodName/smtpbridge/right/filedb"
 	"github.com/ItsNotGoodName/smtpbridge/right/memdb"
 )
@@ -38,7 +39,16 @@ func Start(ctx context.Context, config *config.Config) <-chan struct{} {
 	} else {
 		log.Fatalln("server.Start: storage invalid:", config.Storage.Type)
 	}
-	envelopeStore := memdb.NewEnvelope(config.Database.Memory.Limit)
+	var envelopeStore envelope.Store
+	if config.Database.IsMemory() {
+		envelopeStore = memdb.NewEnvelope(config.Database.Memory.Limit)
+	} else if config.Database.IsBolt() {
+		boltdb := boltdb.NewDatabase(config.Database.Bolt.File)
+		backgrounds = append(backgrounds, boltdb)
+		envelopeStore = boltdb
+	} else {
+		log.Fatalln("server.Start: database invalid:", config.Database.Type)
+	}
 
 	// Create services
 	pub := event.NewPub()

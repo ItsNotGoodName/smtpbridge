@@ -3,6 +3,7 @@ module github.com/ItsNotGoodName/smtpbridge
 go 1.17
 
 require (
+	github.com/asdine/storm/v3 v3.2.1
 	github.com/dustin/go-humanize v1.0.0
 	github.com/emersion/go-sasl v0.0.0-20211008083017-0b9dcfb154ac
 	github.com/emersion/go-smtp v0.15.0
@@ -18,6 +19,7 @@ require (
 	github.com/cention-sany/utf7 v0.0.0-20170124080048-26cad61bd60a // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gogs/chardet v0.0.0-20211120154057-b7413eaefb8f // indirect
+	github.com/golang/snappy v0.0.4 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/jaytaylor/html2text v0.0.0-20211105163654-bc68cce691ba // indirect
@@ -36,6 +38,7 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/subosito/gotenv v1.4.0 // indirect
+	go.etcd.io/bbolt v1.3.4 // indirect
 	golang.org/x/net v0.0.0-20220708220712-1185a9018129 // indirect
 	golang.org/x/sys v0.0.0-20220721230656-c6bc011c0c49 // indirect
 	golang.org/x/text v0.3.7 // indirect

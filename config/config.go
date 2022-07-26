@@ -49,6 +49,12 @@ func New() *Config {
 	}
 }
 
+func mustCreatePath(path string) {
+	if err := os.MkdirAll(path, 0755); err != nil {
+		log.Printf("config.Config.Load: could not create directory: %s: %s", path, err)
+	}
+}
+
 func (c *Config) Load() {
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigParseError); ok {
@@ -69,20 +75,15 @@ SUBJECT: {{ .Message.Subject }}
 		}
 	}
 
-	// Join paths
+	// Directory
 	c.Storage.Directory.Path = path.Join(c.Directory, "data")
-
-	// Create directories if they are needed
 	if c.Storage.IsDirectory() {
-		paths := []string{
-			c.Directory,
-			c.Storage.Directory.Path,
-		}
+		mustCreatePath(c.Storage.Directory.Path)
+	}
 
-		for _, path := range paths {
-			if err := os.MkdirAll(path, 0755); err != nil {
-				log.Printf("config.Config.Load: could not create directory: %s: %s", path, err)
-			}
-		}
+	// Bolt
+	c.Database.Bolt.File = path.Join(c.Directory, "bolt.db")
+	if c.Database.IsBolt() {
+		mustCreatePath(c.Directory)
 	}
 }
