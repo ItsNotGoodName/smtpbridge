@@ -34,12 +34,6 @@ var (
 )
 
 func main() {
-	vs.Current = vs.Version{
-		Version: version,
-		Commit:  commit,
-		Date:    date,
-		BuiltBy: builtBy,
-	}
-
+	vs.SetCurrentVersion(version, commit, date, builtBy)
 	cmd.Execute()
 }

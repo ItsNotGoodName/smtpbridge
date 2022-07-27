@@ -8,3 +8,12 @@ type Version struct {
 }
 
 var Current Version
+
+func SetCurrentVersion(version, commit, date, builtBy string) {
+	Current = Version{
+		Version: version,
+		Commit:  commit,
+		Date:    date,
+		BuiltBy: builtBy,
+	}
+}
