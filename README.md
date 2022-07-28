@@ -15,51 +15,58 @@ Bridge email to other messaging services.
 smtpbridge
 ```
 
-## Configuration
+Run with database and storage in memory.
 
-Configuration file is located at `~/.smtpbridge.yml`.
+```
+smtpbridge --memory
+```
 
-### Starter Configuration
+Restart when config file changes.
+
+```
+smtpbridge --watch
+```
+
+## Config
+
+Config file is located at `~/.smtpbridge.yml`.
+
+### Starter Config
 
 This config prints emails received via SMTP to console.
 The SMTP server listens on port `1025` and the HTTP server listens on port `8080`.
 This saves emails to `~/.smtpbridge` directory.
-The `database` and `storage` keys can be removed to run this entirely in memory.
 
 ```yaml
-database:
-  type: bolt
-
-storage:
-  type: directory
-
 endpoints:
   - name: hello world
     type: console
 ```
 
-### Full Configuration
+### Full Config
 
 ```yaml
+memory: false # Run with database and storage in memory
+
 directory: ~/.smtpbridge # Default persistence directory
 
 database: # Database
-  type: memory # (memory, bolt)
+  type: bolt # (bolt, memory)
   memory:
     limit: 100 # Max number of envelopes
 
-storage: # Storage for attachment's data
-  type: memory # (memory, directory)
+storage: # Storage
+  type: file # (file, memory)
   memory:
     size: 104857600 # Max memory allocation in bytes, 100 MiB
 
 http: # HTTP server
-  enable: true # (true, false)
+  disable: true # (false, true)
   host: ""
   port: 8080
 
 smtp: # SMTP server
-  enable: true # (true, false)
+  disable: false # (false, true)
   host: ""
   port: 1025
   size: 26214400 # Max message size in bytes, 25 MiB
@@ -106,7 +113,13 @@ bridges: # Bridges to endpoints, if this is empty then envelopes will always be 
       - console endpoint
 ```
 
+### Template
+
+Each template has access to the [`Envelope`](./core/envelope/envelope.go) struct.
+See [`text/template`](https://pkg.go.dev/text/template) on how to template.
+
 ## To Do
 
 - Read mail files
+- Save raw emails
 - Windows installer

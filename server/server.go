@@ -34,8 +34,8 @@ func Start(ctx context.Context, config *config.Config) <-chan struct{} {
 	var dataStore envelope.DataStore
 	if config.Storage.IsMemory() {
 		dataStore = memdb.NewData(config.Storage.Memory.Size)
-	} else if config.Storage.IsDirectory() {
-		dataStore = filedb.NewData(config.Storage.Directory.Path)
+	} else if config.Storage.IsFile() {
+		dataStore = filedb.NewData(config.Storage.File.Path)
 	} else {
 		log.Fatalln("server.Start: storage invalid:", config.Storage.Type)
 	}
@@ -70,6 +70,8 @@ func Start(ctx context.Context, config *config.Config) <-chan struct{} {
 		}); err != nil {
 			log.Fatalf("server.Start: endpoint '%s': %s", end.Name, err)
 		}
+
+		log.Printf("server.Start: created endpoint '%s'", end.Name)
 	}
 
 	// Create bridges from config

@@ -108,6 +108,12 @@ func init() {
 
 	watch = rootCmd.Flags().Bool("watch", false, "restart when config file changes")
 
+	rootCmd.Flags().Bool("memory", serverConfig.Memory, "run with database and storage in memory")
+	viper.BindPFlag("memory", rootCmd.Flags().Lookup("memory"))
+
+	rootCmd.Flags().String("directory", serverConfig.Directory, "persistence directory")
+	viper.BindPFlag("directory", rootCmd.Flags().Lookup("directory"))
+
 	rootCmd.Flags().Bool("http-disable", serverConfig.HTTP.Disable, "disable http server")
 	viper.BindPFlag("http.disable", rootCmd.Flags().Lookup("http-disable"))
 

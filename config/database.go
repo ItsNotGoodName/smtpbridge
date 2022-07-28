@@ -1,10 +1,17 @@
 package config
 
 type Database struct {
-	Type   string         `json:"type" mapstructure:"type"`
+	Type   DatabaseType   `json:"type" mapstructure:"type"`
 	Memory DatabaseMemory `json:"memory" mapstructure:"memory"`
 	Bolt   DatabaseBolt   `json:"bolt" mapstructure:"bolt"`
 }
+
+type DatabaseType string
+
+const (
+	DatabaseTypeBolt   = "bolt"
+	DatabaseTypeMemory = "memory"
+)
 
 type DatabaseMemory struct {
 	Limit int64 `json:"limit" mapstructure:"limit"`
@@ -15,9 +22,9 @@ type DatabaseBolt struct {
 }
 
 func (d Database) IsMemory() bool {
-	return d.Type == "memory"
+	return d.Type == DatabaseTypeMemory
 }
 
 func (d Database) IsBolt() bool {
-	return d.Type == "bolt"
+	return d.Type == DatabaseTypeBolt
 }

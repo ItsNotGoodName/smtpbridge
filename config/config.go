@@ -9,6 +9,7 @@ import (
 )
 
 type Config struct {
+	Memory    bool       `json:"memory" mapstructure:"memory"`
 	Directory string     `json:"directory" mapstructure:"directory"`
 	Database  Database   `json:"database" mapstructure:"database"`
 	Storage   Storage    `json:"storage" mapstructure:"storage"`
@@ -28,13 +29,13 @@ func New() *Config {
 	return &Config{
 		Directory: directory,
 		Database: Database{
-			Type: "memory",
+			Type: DatabaseTypeBolt,
 			Memory: DatabaseMemory{
 				Limit: 100,
 			},
 		},
 		Storage: Storage{
-			Type: "memory",
+			Type: StorageTypeFile,
 			Memory: StorageMemory{
 				Size: 1024 * 1024 * 100, // 100 MiB
 			},
@@ -75,10 +76,16 @@ SUBJECT: {{ .Message.Subject }}
 		}
 	}
 
-	// Directory
-	c.Storage.Directory.Path = path.Join(c.Directory, "data")
-	if c.Storage.IsDirectory() {
-		mustCreatePath(c.Storage.Directory.Path)
+	// Override database and storage
+	if c.Memory {
+		c.Database.Type = DatabaseTypeMemory
+		c.Storage.Type = StorageTypeMemory
+	}
+
+	// File
+	c.Storage.File.Path = path.Join(c.Directory, "attachments")
+	if c.Storage.IsFile() {
+		mustCreatePath(c.Storage.File.Path)
 	}
 
 	// Bolt
