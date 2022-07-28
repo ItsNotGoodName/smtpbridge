@@ -113,7 +113,7 @@ func Start(ctx context.Context, config *config.Config) <-chan struct{} {
 	if !config.HTTP.Disable {
 		backgrounds = append(backgrounds, http.New(
 			config.HTTP.Addr(),
-			dataStore.(envelope.LocalDataStore).DataFS(),
+			dataStore.(envelope.LocalDataStore),
 			envelopeService,
 			endpointService,
 		))

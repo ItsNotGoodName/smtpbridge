@@ -1,6 +1,6 @@
 //go:build dev
 
-package asset
+package static
 
 import (
 	"io/fs"
@@ -10,6 +10,7 @@ import (
 )
 
 var distFS fs.FS
+var publicFS fs.FS
 
 func init() {
 	_, filename, _, ok := runtime.Caller(0)
@@ -18,8 +19,13 @@ func init() {
 	}
 
 	distFS = os.DirFS(path.Join(path.Dir(filename), "dist"))
+	publicFS = os.DirFS(path.Join(path.Dir(filename), "public"))
+}
+
+func AssetFS() fs.FS {
+	return distFS
 }
 
 func FS() fs.FS {
-	return distFS
+	return publicFS
 }

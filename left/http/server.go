@@ -2,7 +2,6 @@ package http
 
 import (
 	"context"
-	"io/fs"
 	"log"
 	"mime"
 	"net/http"
@@ -10,8 +9,8 @@ import (
 
 	"github.com/ItsNotGoodName/smtpbridge/core/endpoint"
 	"github.com/ItsNotGoodName/smtpbridge/core/envelope"
-	"github.com/ItsNotGoodName/smtpbridge/left/http/asset"
 	c "github.com/ItsNotGoodName/smtpbridge/left/http/controller"
+	"github.com/ItsNotGoodName/smtpbridge/left/http/static"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -25,7 +24,7 @@ type Server struct {
 	r    chi.Router
 }
 
-func New(addr string, dataFS fs.FS, envelopeService envelope.Service, endpointService endpoint.Service) *Server {
+func New(addr string, localDataStore envelope.LocalDataStore, envelopeService envelope.Service, endpointService endpoint.Service) *Server {
 	r := chi.NewRouter()
 
 	// A good base middleware stack
@@ -38,9 +37,11 @@ func New(addr string, dataFS fs.FS, envelopeService envelope.Service, endpointSe
 	// processing should be stopped.
 	r.Use(middleware.Timeout(60 * time.Second))
 
-	r.Get("/assets/*", handlePrefixFS("/assets/", asset.FS()))
+	mountFS(r, static.FS())
 
-	r.Get("/data/*", handlePrefixFS("/data/", dataFS))
+	r.Get("/assets/*", handlePrefixFS("/assets/", static.AssetFS()))
+
+	r.Get("/data/*", handlePrefixFS("/data/", localDataStore.DataFS()))
 
 	r.Get("/", c.IndexGet(envelopeService))
 
@@ -86,6 +87,6 @@ func (s *Server) Run(ctx context.Context, doneC chan<- struct{}) {
 	srv, ch := s.Start()               // Start HTTP server
 	<-ctx.Done()                       // Wait for context
 	srv.Shutdown(context.Background()) // Shutdown HTTP server
-	<-ch                               // Wait for HTTP server shutodwn
+	<-ch                               // Wait for HTTP server shutdown
 	doneC <- struct{}{}                // Done
 }

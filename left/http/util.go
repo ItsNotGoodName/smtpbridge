@@ -3,7 +3,10 @@ package http
 import (
 	"fmt"
 	"io/fs"
+	"log"
 	"net/http"
+
+	"github.com/go-chi/chi/v5"
 )
 
 func mwMultiplexAction(get, post, delete http.HandlerFunc) http.HandlerFunc {
@@ -45,5 +48,23 @@ func handlePrefixFS(prefix string, fs fs.FS) http.HandlerFunc {
 	h := http.StripPrefix(prefix, http.FileServer(http.FS(fs)))
 	return func(rw http.ResponseWriter, r *http.Request) {
 		h.ServeHTTP(rw, r)
+	}
+}
+
+func mountFS(r chi.Router, f fs.FS) {
+	httpFS := http.FS(f)
+	fsHandler := http.StripPrefix("/", http.FileServer(httpFS))
+
+	if files, err := fs.ReadDir(f, "."); err == nil {
+		for _, f := range files {
+			name := f.Name()
+			if f.IsDir() {
+				r.Get("/"+name+"/*", fsHandler.ServeHTTP)
+			} else {
+				r.Get("/"+name, fsHandler.ServeHTTP)
+			}
+		}
+	} else if err != fs.ErrNotExist {
+		log.Fatalln("http.mountFS:", err)
 	}
 }
