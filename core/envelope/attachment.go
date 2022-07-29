@@ -3,6 +3,7 @@ package envelope
 import (
 	"mime"
 	"net/http"
+	"path/filepath"
 	"strconv"
 	"strings"
 )
@@ -13,13 +14,31 @@ type (
 		MessageID int64
 		Name      string
 		Mime      string
+		Extension string
 	}
 )
 
 func NewAttachment(name string, data []byte) *Attachment {
+	mimeT := http.DetectContentType(data)
+
+	extension := ""
+	extensions, err := mime.ExtensionsByType(mimeT)
+	if err == nil && extensions != nil {
+		extension = extensions[0]
+		// Use extension from name if it is valid
+		unknownExt := filepath.Ext(name)
+		for _, ext := range extensions {
+			if ext == unknownExt {
+				extension = ext
+				break
+			}
+		}
+	}
+
 	return &Attachment{
-		Name: name,
-		Mime: http.DetectContentType(data),
+		Name:      name,
+		Mime:      mimeT,
+		Extension: extension,
 	}
 }
 
@@ -28,13 +47,7 @@ func (a *Attachment) IsImage() bool {
 }
 
 func (a *Attachment) FileName() string {
-	extension := ""
-	extensions, err := mime.ExtensionsByType(a.Mime)
-	if err == nil && extensions != nil {
-		extension = extensions[0]
-	}
-
-	return strconv.FormatInt(a.ID, 10) + extension
+	return strconv.FormatInt(a.ID, 10) + a.Extension
 }
 
 func AttachmentIDFromFileName(fileName string) (int64, error) {

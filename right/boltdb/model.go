@@ -48,6 +48,7 @@ type attachmentModel struct {
 	MessageID int64  `json:"message_id" storm:"index"`
 	Name      string `json:"name"`
 	Mime      string `json:"mime"`
+	Extension string `json:"extension"`
 }
 
 func attachmentMC(attM *attachmentModel) *envelope.Attachment {
@@ -56,6 +57,7 @@ func attachmentMC(attM *attachmentModel) *envelope.Attachment {
 		MessageID: attM.MessageID,
 		Name:      attM.Name,
 		Mime:      attM.Mime,
+		Extension: attM.Extension,
 	}
 }
 
@@ -65,5 +67,6 @@ func attachmentCM(att *envelope.Attachment) *attachmentModel {
 		MessageID: att.MessageID,
 		Name:      att.Name,
 		Mime:      att.Mime,
+		Extension: att.Extension,
 	}
 }
