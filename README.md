@@ -1,5 +1,11 @@
 # SMTPBridge
 
+[![GitHub](https://img.shields.io/github/license/itsnotgoodname/smtpbridge)](./LICENSE)
+[![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/itsnotgoodname/smtpbridge)](https://github.com/ItsNotGoodName/smtpbridge/tags)
+[![GitHub last commit](https://img.shields.io/github/last-commit/itsnotgoodname/smtpbridge)](https://github.com/ItsNotGoodName/smtpbridge)
+[![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/itsnotgoodname/smtpbridge)](./go.mod)
+[![Go Report Card](https://goreportcard.com/badge/github.com/ItsNotGoodName/smtpbridge)](https://goreportcard.com/report/github.com/ItsNotGoodName/smtpbridge)
+
 Bridge email to other messaging services.
 
 **Do not expose this to the Internet, this is only intended to be used on a local network.**
@@ -46,26 +52,26 @@ endpoints:
 ### Full Config
 
 ```yaml
-memory: false # Run with database and storage in memory
-
-directory: ~/.smtpbridge # Default persistence directory
-
-database: # Database
+# Database
+database:
   type: bolt # (bolt, memory)
   memory:
     limit: 100 # Max number of envelopes
 
-storage: # Storage
+# Storage
+storage:
   type: file # (file, memory)
   memory:
     size: 104857600 # Max memory allocation in bytes, 100 MiB
 
-http: # HTTP server
-  disable: true # (false, true)
+# HTTP server
+http:
+  disable: false # (false, true)
   host: ""
   port: 8080
 
-smtp: # SMTP server
+# SMTP server
+smtp:
   disable: false # (false, true)
   host: ""
   port: 1025
@@ -73,7 +79,8 @@ smtp: # SMTP server
   username: ""
   password: ""
 
-endpoints: # Endpoints for envelopes
+# Endpoints for envelopes
+endpoints:
   - name: example endpoint
     text_disable: false
     text_template: |
@@ -92,7 +99,8 @@ endpoints: # Endpoints for envelopes
       token: 2222222222222222222222
       chat_id: 111111111111111111111
 
-bridges: # Bridges to endpoints, if this is empty then envelopes will always be sent to all endpoints
+# Bridges to endpoints, if this is empty then envelopes will always be sent to all endpoints
+bridges:
   # Send to 'console endpoint'
   - endpoints: console endpoint
   # Send to 'console endpoint' if the envelope is from 'foo@example.com' and is to 'bar@example.com'
@@ -120,6 +128,9 @@ See [`text/template`](https://pkg.go.dev/text/template) on how to template.
 
 ## To Do
 
+- Limit database and storage size
+- HTTP auth
 - Read mail files
 - Save raw emails
+- REST API
 - Windows installer
