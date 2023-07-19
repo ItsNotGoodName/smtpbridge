@@ -1,0 +1,71 @@
+{{template "p/header" .}}
+
+<main class="container">
+  <h2>Endpoints</h2>
+  {{range $val := .Endpoints}}
+  <article id="endpoint_{{$val.ID}}">
+    <h3>{{$val.Name}}</h3>
+    <table>
+      <tbody>
+        <tr>
+          <th>
+            <em data-tooltip="Endpoint was created internally and cannot be modified.">
+              Internal
+            </em>
+          </th>
+          <td>
+            <input disabled {{if $val.Internal}}checked{{end}} type="checkbox" role="switch" />
+          </td>
+        </tr>
+        <tr>
+          <th>Kind</th>
+          <td>{{$val.Kind}}</td>
+        </tr>
+        <tr>
+          <th>
+            <em data-tooltip="Do not send attachments to endpoint.">
+              Attachment Disable
+            </em>
+          </th>
+          <td>
+            <input {{if $val.Internal}}disabled{{end}} {{if $val.AttachmentDisable}}checked{{end}} type="checkbox"
+              role="switch" />
+          </td>
+        </tr>
+        <tr>
+          <th>
+            <em data-tooltip="Do not send text to endpoint.">
+              Text Disable
+            </em>
+          </th>
+          <td>
+            <input {{if $val.Internal}}disabled{{end}} {{if $val.TextDisable}}checked{{end}} type="checkbox"
+              role="switch" />
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <label for="body_template">
+      Body Template
+      <textarea id="body_template" rows="4" {{if $val.Internal}}readonly{{end}}>{{$val.BodyTemplate}}</textarea>
+    </label>
+
+    {{if $val.Config}}
+    <h4>Config</h4>
+    <form>
+      {{ range $key, $value := $val.Config }}
+      <label for="config_{{$key}}">
+        {{$key}}
+        <textarea {{if $val.Internal}}readonly{{end}} {{if $value}}placeholder="**********" {{end}}
+          id="config_{{$key}}"></textarea>
+      </label>
+      {{ end }}
+    </form>
+    {{ end }}
+
+  </article>
+  {{end}}
+</main>
+
+{{template "p/footer" .}}

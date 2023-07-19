@@ -1,0 +1,16 @@
+<table hx-trigger="every 5s" hx-get="/p/recent-envelopes-table" hx-swap="outerHTML">
+  <tbody>
+    {{range $val := .Messages}}
+    <tr>
+      <td>
+        <a href="/envelopes/{{$val.ID}}">{{if $val.Subject}}{{$val.Subject}}{{else}}No Subject{{end}}
+        </a>
+      </td>
+
+      <td>
+        <a href="/envelopes/{{$val.ID}}">{{timeHumanize $val.Date}}</a>
+      </td>
+    </tr>
+    {{end}}
+  </tbody>
+</table>

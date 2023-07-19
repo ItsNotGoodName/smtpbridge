@@ -1,21 +1,24 @@
-NPM_PREFIX := podman run --rm -it -v "$(shell pwd)/left/http/static:/work" -w /work docker.io/library/node:16
-
 all: npm snapshot
 
 npm:
-	$(NPM_PREFIX) npm install
+	cd web && pnpm install
 
-npm-login:
-	$(NPM_PREFIX) bash
-
-npm-dev:
-	$(NPM_PREFIX) npm run dev
-
-npm-build:
-	$(NPM_PREFIX) npm run build
+snapshot:
+	goreleaser release --snapshot --clean
 
 dev:
-	go run --tags dev . --watch --memory
+	air
 
-snapshot: npm-build
-	goreleaser release --snapshot --rm-dist
+dev-web:
+	cd web && pnpm run dev
+
+clean:
+	rm -rf smtpbridge_data
+
+dep: dep-air dep-sqlc
+
+dep-air:
+	go install github.com/cosmtrek/air@latest
+
+dep-sqlc:
+	go install github.com/kyleconroy/sqlc/cmd/sqlc@latest

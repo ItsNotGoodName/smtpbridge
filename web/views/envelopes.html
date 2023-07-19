@@ -1,0 +1,137 @@
+{{template "p/header" .}}
+
+<main class="container">
+  <section>
+    <hgroup>
+      <h2>Envelopes</h2>
+      <h2>
+        Seen {{.MessagesPageResult.Seen}} of {{.MessagesPageResult.TotalItems}}
+        and showing {{.MessagesPageResult.PerPage}}
+      </h2>
+    </hgroup>
+
+    <nav>
+      <ul></ul>
+      <ul>
+        <li>
+          <a href='/envelopes?{{query .Queries "page" .MessagesPageResult.Previous }}' role="button" {{if not
+            .MessagesPageResult.HasPrevious}} disabled {{end}}>
+            Previous
+          </a>
+        </li>
+        <li>
+          <a href="#" role="button" class="outline">{{.MessagesPageResult.Page}} /
+            {{.MessagesPageResult.TotalPages}}</a>
+        </li>
+        <li>
+          <a href='/envelopes?{{query .Queries "page" .MessagesPageResult.Next }}' role="button" {{if not
+            .MessagesPageResult.HasNext}} disabled {{end}}>
+            Next
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <details>
+      <summary>Advanced</summary>
+
+      <hr />
+
+      <form>
+        <fieldset>
+          <label for="perPage">
+            Per page
+            <select id="perPage" name="perPage">
+              <option value="5" {{if eq .MessagesPageResult.PerPage 5}} selected {{end}}>
+                5
+              </option>
+              <option value="10" {{if eq .MessagesPageResult.PerPage 10}} selected {{end}}>
+                10
+              </option>
+              <option value="25" {{if eq .MessagesPageResult.PerPage 25}} selected {{end}}>
+                25
+              </option>
+              <option value="100" {{if eq .MessagesPageResult.PerPage 100}} selected {{end}}>
+                100
+              </option>
+            </select>
+          </label>
+
+          <label for="ascending">
+            <legend>Order</legend>
+            <input type="checkbox" id="ascending" name="ascending" role="switch" {{ if .MessageFilter.Ascending}}
+              checked {{end}} />
+            Ascending
+          </label>
+        </fieldset>
+
+        <label for="search">
+          Search
+          <input type="search" id="search" name="search" placeholder="Search" value="{{.MessageFilter.Search}}" />
+        </label>
+
+        <fieldset>
+          <legend>Include in search</legend>
+          <div class="grid">
+            <label for="search-subject">
+              <input type="hidden" value="0" name="-search-subject" />
+              <input type="checkbox" id="search-subject" name="search-subject" {{if .MessageFilter.SearchSubject}}
+                checked {{end}} />
+              Subject
+            </label>
+            <label for="search-body">
+              <input type="hidden" value="0" name="-search-body" />
+              <input type="checkbox" id="search-body" name="search-body" {{if .MessageFilter.SearchText}} checked
+                {{end}} />
+              Body
+            </label>
+          </div>
+        </fieldset>
+
+        <div class="grid">
+          <div>
+            <input type="submit" value="Apply" />
+          </div>
+          <div>
+            <a href="/envelopes" role="button" style="width: 100%" class="contrast">
+              Reset
+            </a>
+          </div>
+        </div>
+      </form>
+    </details>
+
+    <figure>
+      <table role="grid">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>From</th>
+            <th>Subject</th>
+            <th>Received Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{range $val := .Messages}}
+          <tr>
+            <td>
+              <a href="/envelopes/{{$val.ID}}">{{$val.ID}}</a>
+            </td>
+            <td>
+              <a href="/envelopes/{{$val.ID}}">{{$val.From}}</a>
+            </td>
+            <td>
+              <a href="/envelopes/{{$val.ID}}">{{$val.Subject}}</a>
+            </td>
+            <td>
+              <a href="/envelopes/{{$val.ID}}" title="{{timeHumanize $val.CreatedAt}}">{{timeFormat $val.CreatedAt}}</a>
+            </td>
+          </tr>
+          {{end}}
+        </tbody>
+      </table>
+    </figure>
+  </section>
+</main>
+
+{{template "p/footer" .}}

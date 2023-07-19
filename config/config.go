@@ -1,96 +1,219 @@
 package config
 
 import (
-	"log"
 	"os"
 	"path"
+	"strconv"
+	"time"
 
-	"github.com/spf13/viper"
+	"github.com/ItsNotGoodName/smtpbridge/internal/endpoints"
+	"github.com/ItsNotGoodName/smtpbridge/internal/models"
+	"github.com/ItsNotGoodName/smtpbridge/internal/rules"
+	"github.com/alecthomas/kong"
+	kongyaml "github.com/alecthomas/kong-yaml"
+	"github.com/labstack/gommon/bytes"
 )
 
 type Config struct {
-	Memory    bool       `json:"memory" mapstructure:"memory"`
-	Directory string     `json:"directory" mapstructure:"directory"`
-	Database  Database   `json:"database" mapstructure:"database"`
-	Storage   Storage    `json:"storage" mapstructure:"storage"`
-	HTTP      HTTP       `json:"http" mapstructure:"http"`
-	SMTP      SMTP       `json:"smtp" mapstructure:"smtp"`
-	Endpoints []Endpoint `json:"endpoints" mapstructure:"endpoints"`
-	Bridges   []Bridge   `json:"bridges" mapstructure:"bridges"`
+	DatabasePath         string
+	AttachmentsDirectory string
+	HTTPAddress          string
+	HTTPBodyLimit        int
+	SMTPAddress          string
+	SMTPMaxMessageBytes  int
+	Endpoints            []endpoints.Endpoint
+	Rules                []rules.Rule
+	RuleEndpoints        map[string][]string
+	RetentionPolicy      models.RetentionPolicy
 }
 
-func New() *Config {
-	home, err := os.UserHomeDir()
+func Parse(raw Raw) (Config, error) {
+	dataDirectory := raw.DataDirectory
+	if !path.IsAbs(raw.DataDirectory) {
+		cwd, err := os.Getwd()
+		if err != nil {
+			return Config{}, err
+		}
+
+		dataDirectory = path.Join(cwd, raw.DataDirectory)
+	}
+
+	if err := os.MkdirAll(dataDirectory, 0755); err != nil {
+		return Config{}, err
+	}
+
+	databasePath := path.Join(dataDirectory, "smtpbridge.db")
+
+	attachmentsDirectory := path.Join(dataDirectory, "attachments")
+	if err := os.MkdirAll(attachmentsDirectory, 0755); err != nil {
+		return Config{}, err
+	}
+
+	maxBytesForEachPayload, err := bytes.Parse(raw.MaxPayloadSize)
 	if err != nil {
-		log.Fatalln("config.New: could not get user's home dir:", err)
+		return Config{}, err
 	}
-	directory := path.Join(home, ".smtpbridge")
 
-	return &Config{
-		Directory: directory,
-		Database: Database{
-			Type: DatabaseTypeBolt,
-			Memory: DatabaseMemory{
-				Limit: 100,
+	var ends []endpoints.Endpoint
+	for k, v := range raw.Endpoints {
+		name := v.Name
+		if name == "" {
+			name = k
+		}
+		end, err := endpoints.New(
+			endpoints.CreateEndpoint{
+				Internal:          true,
+				InternalID:        k,
+				Name:              name,
+				TextDisable:       v.Text_Disable,
+				AttachmentDisable: v.Attachment_Disable,
+				BodyTemplate:      v.Body_Template,
+				Kind:              v.Kind,
+				Config:            v.Config,
 			},
-		},
-		Storage: Storage{
-			Type: StorageTypeFile,
-			Memory: StorageMemory{
-				Size: 1024 * 1024 * 100, // 100 MiB
-			},
-		},
-		HTTP: HTTP{
-			Port: 8080,
-		},
-		SMTP: SMTP{
-			Size: 1024 * 1024 * 25, // 25 MiB
-			Port: 1025,
-		},
-	}
-}
+		)
+		if err != nil {
+			return Config{}, err
+		}
 
-func mustCreatePath(path string) {
-	if err := os.MkdirAll(path, 0755); err != nil {
-		log.Printf("config.Config.Load: could not create directory: %s: %s", path, err)
+		ends = append(ends, end)
 	}
-}
 
-func (c *Config) Load() {
-	if err := viper.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigParseError); ok {
-			log.Fatalln("config.Config.Load:", err)
+	rulesToEndpoints := make(map[string][]string)
+	var rrules []rules.Rule
+	for k, rr := range raw.Rules {
+		name := rr.Name
+		if name == "" {
+			name = k
+		}
+		rule, err := rules.New(rules.CreateRule{
+			Internal:   true,
+			InternalID: k,
+			Name:       name,
+			Template:   rr.Template,
+		})
+		if err != nil {
+			return Config{}, err
+		}
+
+		rulesToEndpoints[k] = rr.Endpoints
+		rrules = append(rrules, rule)
+	}
+
+	var attachmentsSize int64
+	if raw.Retention.AttachmentSize != "" {
+		var err error
+		attachmentsSize, err = bytes.Parse(raw.Retention.AttachmentSize)
+		if err != nil {
+			return Config{}, err
 		}
 	}
-
-	if err := viper.Unmarshal(c); err != nil {
-		log.Fatalln("config.Config.Load: could not load config:", err)
+	var envelopeAge time.Duration
+	if raw.Retention.EnvelopeAge != "" {
+		var err error
+		envelopeAge, err = time.ParseDuration(raw.Retention.EnvelopeAge)
+		if err != nil {
+			return Config{}, err
+		}
+	}
+	retentionPolicy := models.RetentionPolicy{
+		EnvelopeCount:  raw.Retention.EnvelopeCount,
+		AttachmentSize: attachmentsSize,
+		EnvelopeAge:    envelopeAge,
 	}
 
-	// Set default template for endpoint text
-	for i := range c.Endpoints {
-		if c.Endpoints[i].TextTemplate == "" {
-			c.Endpoints[i].TextTemplate = `FROM: {{ .Message.From }}
-SUBJECT: {{ .Message.Subject }}
+	return Config{
+		DatabasePath:         databasePath,
+		AttachmentsDirectory: attachmentsDirectory,
+		HTTPAddress:          raw.HTTP.Host + ":" + strconv.Itoa(raw.HTTP.Port),
+		HTTPBodyLimit:        int(maxBytesForEachPayload),
+		SMTPAddress:          raw.SMTP.Host + ":" + strconv.Itoa(raw.SMTP.Port),
+		SMTPMaxMessageBytes:  int(maxBytesForEachPayload),
+		Endpoints:            ends,
+		Rules:                rrules,
+		RuleEndpoints:        rulesToEndpoints,
+		RetentionPolicy:      retentionPolicy,
+	}, nil
+}
+
+type Raw struct {
+	MaxPayloadSize string `name:"max_payload_size" default:"25MB"`
+	DataDirectory  string `name:"data_directory" default:"smtpbridge_data" arg:""`
+	Retention      struct {
+		EnvelopeCount  int    `name:"envelope_count"`
+		EnvelopeAge    string `name:"envelope_age"`
+		AttachmentSize string `name:"attachment_size"`
+	} `embed:"" prefix:"retention-"`
+	HTTP struct {
+		Disable bool
+		Host    string
+		Port    int `default:"8080"`
+	} `embed:"" prefix:"http-"`
+	SMTP struct {
+		Disable bool
+		Host    string
+		Port    int `default:"1025"`
+	} `embed:"" prefix:"smtp-"`
+	Endpoints map[string]RawEndpoint
+	Rules     map[string]RawRule
+}
+
+type RawEndpoint struct {
+	Name               string
+	Kind               string
+	Text_Disable       bool
+	Body_Template      string
+	Attachment_Disable bool
+	Config             map[string]string
+}
+
+type RawRule struct {
+	Name      string
+	Template  string
+	Endpoints []string
+}
+
+type CLI struct {
+	DataDirectory string `name:"data-directory" help:"Path to store data." type:"path" optional:""`
+}
+
+func Read() (Raw, error) {
+	var raw Raw
+	parser, err := kong.New(&raw, kong.Configuration(
+		kongyaml.Loader,
+		"config.yaml",
+		"config.yml",
+		".smtpbridge.yaml",
+		".smtpbridge.yml",
+		"~/.smtpbridge.yaml",
+		"~/.smtpbridge.yml",
+	))
+	if err != nil {
+		return Raw{}, err
+	}
+
+	_, err = parser.Parse([]string{})
+	if err != nil {
+		return Raw{}, err
+	}
+
+	for k, v := range raw.Endpoints {
+		if v.Body_Template == "" {
+			v.Body_Template = `SUBJECT: {{ .Message.Subject }}
+FROM: {{ .Message.From }}
+
 {{ .Message.Text }}`
+			raw.Endpoints[k] = v
 		}
 	}
 
-	// Override database and storage
-	if c.Memory {
-		c.Database.Type = DatabaseTypeMemory
-		c.Storage.Type = StorageTypeMemory
+	cli := CLI{}
+
+	kong.Parse(&cli)
+
+	if cli.DataDirectory != "" {
+		raw.DataDirectory = cli.DataDirectory
 	}
 
-	// File
-	c.Storage.File.Path = path.Join(c.Directory, "attachments")
-	if c.Storage.IsFile() {
-		mustCreatePath(c.Storage.File.Path)
-	}
-
-	// Bolt
-	c.Database.Bolt.File = path.Join(c.Directory, "bolt.db")
-	if c.Database.IsBolt() {
-		mustCreatePath(c.Directory)
-	}
+	return raw, nil
 }

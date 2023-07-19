@@ -21,21 +21,15 @@ Bridge email to other messaging services.
 smtpbridge
 ```
 
-Run with database and storage in memory.
+## Supported Endpoints
 
-```
-smtpbridge --memory
-```
-
-Restart when config file changes.
-
-```
-smtpbridge --watch
-```
+- console
+- [Telegram](https://telegram.org/)
+- [Shoutrrr](https://github.com/containrrr/shoutrrr)
 
 ## Config
 
-Config file is located at `~/.smtpbridge.yml`.
+Config file is located at `./.smtpbridge.yml`.
 
 ### Starter Config
 
@@ -45,24 +39,32 @@ This saves emails to `~/.smtpbridge` directory.
 
 ```yaml
 endpoints:
-  - name: hello world
-    type: console
+  hello_world:
+    kind: console
+
+rules:
+  hello_world:
+    endpoints:
+      - hello_world
 ```
 
 ### Full Config
 
 ```yaml
-# Database
-database:
-  type: bolt # (bolt, memory)
-  memory:
-    limit: 100 # Max number of envelopes
+# Max message size for envelopes
+max_payload_size: 25 MB
 
-# Storage
-storage:
-  type: file # (file, memory)
-  memory:
-    size: 104857600 # Max memory allocation in bytes, 100 MiB
+# Directory for storing data
+data_directory: smtpbridge_data
+
+# Retention policy for envelopes and attachments
+retention:
+  # Retention policy for envelopes in database
+  envelope_count: 0 # (100) oldest will be deleted
+  envelope_age: "" #  (7 days, 1 month, ...)
+
+  # Retention policy for attachments on disk
+  attachment_size: "" # (100 MB) oldest will be deleted
 
 # HTTP server
 http:
@@ -75,62 +77,113 @@ smtp:
   disable: false # (false, true)
   host: ""
   port: 1025
-  size: 26214400 # Max message size in bytes, 25 MiB
-  username: ""
-  password: ""
 
 # Endpoints for envelopes
 endpoints:
-  - name: example endpoint
+  # Full example
+  example_endpoint:
+    kind: console
+    # Do not send any text
     text_disable: false
-    text_template: |
-      FROM: {{ .Message.From }}
+    # Custom template for body
+    body_template: |
       SUBJECT: {{ .Message.Subject }}
+      FROM: {{ .Message.From }}
+
       {{ .Message.Text }}
-    attachments_disable: false
-    type: console
+    # Do not send any attachments
+    attachment_disable: false
+
   # Console
-  - name: console endpoint
-    type: console
+  console_endpoint:
+    kind: console
+
   # Telegram
-  - name: telegram endpoint
-    type: telegram
+  telegram_endpoint:
+    kind: telegram
     config:
       token: 2222222222222222222222
       chat_id: 111111111111111111111
 
-# Bridges to endpoints, if this is empty then envelopes will always be sent to all endpoints
-bridges:
-  # Send to 'console endpoint'
-  - endpoints: console endpoint
-  # Send to 'console endpoint' if the envelope is from 'foo@example.com' and is to 'bar@example.com'
-  - from: foo@example.com
-    to: bar@example.com
-    endpoints: console endpoint
-  # Send to all endpoints if the envelope is from 'foo@example.com' or 'baz@example.com'
-  - filters:
-      - from: foo@example.com
-      - from: baz@example.com
-  # Send to 'console endpoint' if the envelope to matches regex "@example\.com$"
-  - to_regex: '@example\.com$'
-    endpoints: console endpoint
-  # Send to 'telegram endpoint' and 'console endpoint' if the envelope has more than 4 attachments
-  - match_template: "{{ gt (len .Attachments) 4 }}"
+  # Shoutrrr (can only send text)
+  shoutrrr_endpoint:
+    kind: shoutrrr
+    config:
+      # https://containrrr.dev/shoutrrr/0.7/services/overview/
+      urls: |
+        bark://devicekey@host
+        discord://token@id
+        smtp://username:password@host:port/?from=fromAddress&to=recipient1[,recipient2,...]
+        gotify://gotify-host/token
+        googlechat://chat.googleapis.com/v1/spaces/FOO/messages?key=bar&token=baz
+        ifttt://key/?events=event1[,event2,...]&value1=value1&value2=value2&value3=value3
+        join://shoutrrr:api-key@join/?devices=device1[,device2, ...][&icon=icon][&title=title]
+        mattermost://[username@]mattermost-host/token[/channel]
+        matrix://username:password@host:port/[?rooms=!roomID1[,roomAlias2]]
+        ntfy://username:password@ntfy.sh/topic
+        opsgenie://host/token?responders=responder1[,responder2]
+        pushbullet://api-token[/device/#channel/email]
+        pushover://shoutrrr:apiToken@userKey/?devices=device1[,device2, ...]
+        rocketchat://[username@]rocketchat-host/token[/channel|@recipient]
+        slack://[botname@]token-a/token-b/token-c
+        teams://group@tenant/altId/groupOwner?host=organization.webhook.office.com
+        telegram://token@telegram?chats=@channel-1[,chat-id-1,...]
+        zulip://bot-mail:bot-key@zulip-domain/?stream=name-or-id&topic=name
+
+rules:
+  example_rule:
+    name: Example Rule
+    template: or (eq .Message.Subject "cam-1") (eq .Message.Subject "cam-2")
     endpoints:
-      - telegram endpoint
-      - console endpoint
+      - console_endpoint
 ```
 
 ### Template
 
-Each template has access to the [`Envelope`](./core/envelope/envelope.go) struct.
+Each template has access to [`Envelope`](./internal/envelope/envelope.go) via the `.` operator.
 See [`text/template`](https://pkg.go.dev/text/template) on how to template.
+
+## Docker
+
+### docker-compose
+
+```yaml
+version: "3"
+services:
+  smtpbridge:
+    image: ghcr.io/itsnotgoodname/smtpbridge:latest
+    container_name: smtpbridge
+    ports:
+      - 1025:1025
+      - 8080:8080
+    volumes:
+      - /path/to/data:/data
+      - /path/to/config:/config
+    user: 1000:1000
+    restart: unless-stopped
+```
+
+### docker cli
+
+```sh
+docker run -d \
+  --name=smtpbridge \
+  --user 1000:1000 \
+  -p 1025:1025 \
+  -p 8080:8080 \
+  -v /path/to/config:/config \
+  -v /path/to/data:/data \
+  --restart unless-stopped \
+  ghcr.io/itsnotgoodname/smtpbridge:latest
+```
 
 ## To Do
 
-- Limit database and storage size
-- HTTP auth
-- Read mail files
-- Save raw emails
+- Add [Apprise](https://github.com/caronc/apprise) endpoint
+- SQLite full text search
+- HTTP and SMTP auth
+- Read mailbox files
+- Remove placeholder [Pico CSS](https://picocss.com/) for custom CSS
 - REST API
+- Save raw emails
 - Windows installer

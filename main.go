@@ -1,30 +1,74 @@
-/*
-Copyright © 2022 ItsNotGoodName
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-*/
 package main
 
 import (
-	"github.com/ItsNotGoodName/smtpbridge/cmd"
-	vs "github.com/ItsNotGoodName/smtpbridge/core/version"
+	"context"
+	"os"
+
+	"github.com/ItsNotGoodName/smtpbridge/config"
+	"github.com/ItsNotGoodName/smtpbridge/internal/build"
+	"github.com/ItsNotGoodName/smtpbridge/internal/core"
+	"github.com/ItsNotGoodName/smtpbridge/internal/db"
+	"github.com/ItsNotGoodName/smtpbridge/internal/procs"
+	"github.com/ItsNotGoodName/smtpbridge/pkg/background"
+	"github.com/ItsNotGoodName/smtpbridge/pkg/interrupt"
+	"github.com/ItsNotGoodName/smtpbridge/smtp"
+	"github.com/ItsNotGoodName/smtpbridge/web/http"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
+
+func main() {
+	ctx, shutdown := context.WithCancel(interrupt.Context())
+	defer shutdown()
+
+	<-run(ctx, shutdown)
+}
+
+func run(ctx context.Context, shutdown context.CancelFunc) <-chan struct{} {
+	raw, err := config.Read()
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to read config")
+	}
+
+	cfg, err := config.Parse(raw)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to parse config")
+	}
+
+	// Database
+	bunDB, err := db.New(cfg.DatabasePath)
+	if err != nil {
+		log.Fatal().Err(err).Str("path", cfg.DatabasePath).Msg("Failed to open database")
+	}
+	if err := db.Migrate(ctx, bunDB); err != nil {
+		log.Fatal().Err(err).Str("path", cfg.DatabasePath).Msg("Failed to migrate database")
+	}
+
+	// File Store
+	fileStore := core.NewFileStore(cfg.AttachmentsDirectory)
+
+	// App
+	app := core.NewApp(bunDB, fileStore)
+	if err := procs.InternalSync(app.Context(ctx), cfg.Endpoints, cfg.Rules, cfg.RuleEndpoints); err != nil {
+		log.Fatal().Err(err).Msg("Failed to sync app from config")
+	}
+
+	procs.MailmanStart(ctx, app)
+
+	procs.GardenerStart(ctx, app, cfg.RetentionPolicy)
+
+	// SMTP
+	smtp := smtp.New(app, shutdown, cfg.SMTPAddress, cfg.SMTPMaxMessageBytes)
+
+	// HTTP
+	http := http.New(app, shutdown, cfg.HTTPAddress, cfg.HTTPBodyLimit, cfg.RetentionPolicy)
+
+	// Start
+	return background.Run(ctx,
+		smtp,
+		http,
+	)
+}
 
 var (
 	version = "dev"
@@ -33,7 +77,13 @@ var (
 	builtBy = "unknown"
 )
 
-func main() {
-	vs.SetCurrentVersion(version, commit, date, builtBy)
-	cmd.Execute()
+func init() {
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+
+	build.Current = build.Build{
+		BuiltBy: builtBy,
+		Commit:  commit,
+		Date:    date,
+		Version: version,
+	}
 }

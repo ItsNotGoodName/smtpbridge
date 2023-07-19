@@ -1,0 +1,66 @@
+{{template "p/header" .}}
+
+<main class="container">
+  <article>
+    <h2>Recent Envelopes</h2>
+    {{template "p/recent-envelopes-table" .}}
+  </article>
+  <div class="grid">
+    <article>
+      <h2>Storage</h2>
+      <figure>{{template "p/storage-table" .}}</figure>
+      <button hx-post="/vacuum" data-loading-path="/vacuum" data-loading-disable data-loading-aria-busy
+        data-tooltip="Rebuild database file to take the minimal amount of disk space.">
+        Vacuum Database
+      </button>
+    </article>
+    <article>
+      <h2>Build</h2>
+      <figure>
+        <table>
+          <tbody>
+            <tr>
+              <th scope="row"><strong>Built By</strong></th>
+              <td>{{.Build.BuiltBy}}</td>
+            </tr>
+            <tr>
+              <th scope="row"><strong>Commit</strong></th>
+              <td>{{.Build.Commit}}</td>
+            </tr>
+            <tr>
+              <th scope="row"><strong>Date</strong></th>
+              <td>{{.Build.Date}}</td>
+            </tr>
+            <tr>
+              <th scope="row"><strong>Version</strong></th>
+              <td>{{.Build.Version}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </figure>
+    </article>
+  </div>
+  <article>
+    <h2>Retention Policy</h2>
+    <figure>
+      <table>
+        <tbody>
+          <tr>
+            <th scope="row"><strong>Envelope Count Limit</strong></th>
+            <td>{{.RetentionPolicy.EnvelopeCount}}</td>
+          </tr>
+          <tr>
+            <th scope="row"><strong>Envelope Age Limit</strong></th>
+            <td>{{.RetentionPolicy.EnvelopeAge}}</td>
+          </tr>
+          <tr>
+            <th scope="row"><strong>Attachment Size Limit</strong></th>
+            <td>{{bytesHumanize .RetentionPolicy.AttachmentSize}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </figure>
+  </article>
+</main>
+
+{{template "p/footer" .}}
