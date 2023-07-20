@@ -1,0 +1,3 @@
+<form hx-post="/rules/{{.ID}}/enable" hx-trigger="change from:find input" hx-swap="outerHTML">
+  <input name="enable" {{if .Enable}}checked{{end}} type="checkbox" role="switch" />
+</form>

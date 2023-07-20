@@ -24,7 +24,12 @@ func routes(http *fiber.App, app core.App, retentionPolicy models.RetentionPolic
 		http.Get("/", middleware.App(app, controllers.Attachments))
 	})
 	http.Get("/endpoints", middleware.App(app, controllers.Endpoints))
-	http.Get("/rules", middleware.App(app, controllers.Rules))
+	http.Route("/rules", func(http fiber.Router) {
+		http.Get("/", middleware.App(app, controllers.Rules))
+		http.Route("/:id", func(http fiber.Router) {
+			http.Post("/enable", middleware.AppID(app, controllers.RulesEnable))
+		})
+	})
 	http.Post("/send", middleware.App(app, controllers.Send))
 	http.Post("/vacuum", middleware.App(app, controllers.Vacuum))
 	http.Group("/files", controllers.Files(app))

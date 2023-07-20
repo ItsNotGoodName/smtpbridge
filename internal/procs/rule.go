@@ -27,3 +27,7 @@ func RuleAggregateList(cc *core.Context) ([]rules.Aggregate, error) {
 
 	return aggregateRules, nil
 }
+
+func RuleUpdateEnable(cc *core.Context, ruleID int64, enable bool) (rules.Rule, error) {
+	return db.RuleUpdate(cc, ruleID, enable)
+}

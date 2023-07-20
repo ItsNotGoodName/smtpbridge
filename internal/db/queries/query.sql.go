@@ -51,6 +51,19 @@ func (q *Queries) GetEnvelopeMessageHTML(ctx context.Context, id int64) (string,
 	return html, err
 }
 
+const isRuleInternal = `-- name: IsRuleInternal :one
+;
+
+SELECT internal FROM rules WHERE id = ?1
+`
+
+func (q *Queries) IsRuleInternal(ctx context.Context, id int64) (bool, error) {
+	row := q.db.QueryRowContext(ctx, isRuleInternal, id)
+	var internal bool
+	err := row.Scan(&internal)
+	return internal, err
+}
+
 const upsertInternalEndpoint = `-- name: UpsertInternalEndpoint :exec
 INSERT INTO endpoints (
   internal,
@@ -128,8 +141,8 @@ INSERT INTO rules (
   internal_id=EXCLUDED.internal_id,
   name=EXCLUDED.name,
   template=EXCLUDED.template,
-  updated_at=EXCLUDED.updated_at,
-  enable=EXCLUDED.enable WHERE internal = true
+  updated_at=EXCLUDED.updated_at
+WHERE internal = true
 `
 
 type UpsertInternalRuleParams struct {

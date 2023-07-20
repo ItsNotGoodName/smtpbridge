@@ -49,8 +49,8 @@ INSERT INTO rules (
   internal_id=EXCLUDED.internal_id,
   name=EXCLUDED.name,
   template=EXCLUDED.template,
-  updated_at=EXCLUDED.updated_at,
-  enable=EXCLUDED.enable WHERE internal = true;
+  updated_at=EXCLUDED.updated_at
+WHERE internal = true;
 
 -- name: UpsertInternalRuleToEndpoint :execrows
 INSERT INTO rules_to_endpoints (
@@ -77,3 +77,6 @@ WHERE id NOT IN (
 
 -- name: DeleteEnvelopeOlderThan :execrows
 DELETE FROM messages WHERE created_at < ? ;
+
+-- name: IsRuleInternal :one
+SELECT internal FROM rules WHERE id = ?1;

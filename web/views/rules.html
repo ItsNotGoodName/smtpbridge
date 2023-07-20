@@ -23,8 +23,7 @@
             Enable
           </th>
           <td>
-            <input {{if $val.Rule.Internal}}disabled{{end}} {{if $val.Rule.Enable}}checked{{end}} type="checkbox"
-              role="switch" />
+            {{template "p/rule-enable-form" $val.Rule}}
           </td>
         </tr>
       </tbody>
