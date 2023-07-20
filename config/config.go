@@ -173,11 +173,7 @@ type RawRule struct {
 	Endpoints  []string
 }
 
-type CLI struct {
-	DataDirectory string `name:"data-directory" help:"Path to store data." type:"path" optional:""`
-}
-
-func Read() (Raw, error) {
+func Read(cli CLI) (Raw, error) {
 	var raw Raw
 	parser, err := kong.New(&raw, kong.Configuration(
 		kongyaml.Loader,
@@ -207,13 +203,23 @@ FROM: {{ .Message.From }}
 		}
 	}
 
-	cli := CLI{}
-
-	kong.Parse(&cli)
-
 	if cli.DataDirectory != "" {
 		raw.DataDirectory = cli.DataDirectory
 	}
 
 	return raw, nil
+}
+
+type CLI struct {
+	Command       string   `kong:"-"`
+	DataDirectory string   `name:"data-directory" help:"Path to store data." type:"path" optional:""`
+	Version       struct{} `cmd:"" help:"Show version."`
+}
+
+func ReadAndParseCLI() CLI {
+	cli := CLI{}
+	ctx := kong.Parse(&cli)
+	cli.Command = ctx.Command()
+
+	return cli
 }

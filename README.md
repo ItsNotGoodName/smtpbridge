@@ -184,6 +184,6 @@ docker run -d \
 - HTTP and SMTP auth
 - Read mailbox files
 - Remove placeholder [Pico CSS](https://picocss.com/) for custom CSS
-- REST API
+- JSON API
 - Save raw emails
 - Windows installer

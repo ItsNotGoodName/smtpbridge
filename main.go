@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/ItsNotGoodName/smtpbridge/config"
@@ -18,14 +19,21 @@ import (
 )
 
 func main() {
+	cli := config.ReadAndParseCLI()
+
+	if cli.Command == "version" {
+		fmt.Println(version)
+		return
+	}
+
 	ctx, shutdown := context.WithCancel(interrupt.Context())
 	defer shutdown()
 
-	<-run(ctx, shutdown)
+	<-run(ctx, shutdown, cli)
 }
 
-func run(ctx context.Context, shutdown context.CancelFunc) <-chan struct{} {
-	raw, err := config.Read()
+func run(ctx context.Context, shutdown context.CancelFunc, cli config.CLI) <-chan struct{} {
+	raw, err := config.Read(cli)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to read config")
 	}
