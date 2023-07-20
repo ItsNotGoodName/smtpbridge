@@ -78,7 +78,7 @@ func (e Endpoint) Parse() (ParsedEndpoint, error) {
 		return ParsedEndpoint{}, err
 	}
 
-	sender, err := senderCreate(e.Kind, e.Config)
+	sender, err := SenderFactory(e.Kind, e.Config)
 	if err != nil {
 		return ParsedEndpoint{}, err
 	}

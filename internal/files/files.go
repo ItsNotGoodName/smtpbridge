@@ -28,11 +28,6 @@ func DeleteFile(cc *core.Context, att *envelope.Attachment) error {
 }
 
 func Size(cc *core.Context) (int64, error) {
-	// TODO: Why am I doing this?
-	if err := os.Chdir(cc.File.Dir); err != nil {
-		return 0, err
-	}
-
 	files, err := ioutil.ReadDir(cc.File.Dir)
 	if err != nil {
 		return 0, err

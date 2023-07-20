@@ -9,6 +9,7 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/internal/events"
 	"github.com/ItsNotGoodName/smtpbridge/internal/files"
 	"github.com/ItsNotGoodName/smtpbridge/internal/models"
+	"github.com/dustin/go-humanize"
 	"github.com/rs/zerolog/log"
 )
 
@@ -71,23 +72,34 @@ func gardener(cc *core.Context, policy models.RetentionPolicy, storageC <-chan c
 }
 func gardenerDeleteByStorage(cc *core.Context, policy models.RetentionPolicy, storage models.Storage) {
 	if policy.AttachmentSize != 0 && storage.AttachmentSize > policy.AttachmentSize {
+		count := humanize.Bytes(uint64(storage.AttachmentSize - policy.AttachmentSize))
+		log.Info().Str("count", count).Msg("Deleting attachment files by attachment size retention policy")
+
 		err := files.DeleteFileUntilSize(cc, storage.AttachmentSize, policy.AttachmentSize)
 		if err != nil {
-			log.Err(err).Msg("Failed to trim files")
+			log.Err(err).Msg("Failed to delete attachment files by attachment size retention policy")
 		}
 	}
 
 	if policy.EnvelopeCount != 0 && storage.EnvelopeCount > policy.EnvelopeCount {
-		_, err := db.EnvelopeDeleteUntilCount(cc, policy.EnvelopeCount)
+		count, err := db.EnvelopeDeleteUntilCount(cc, policy.EnvelopeCount)
 		if err != nil {
-			log.Err(err).Msg("Failed to trim envelopes")
+			log.Err(err).Msg("Failed to envelopes by envelope count retention policy")
+		} else {
+			log.Info().Int64("count", count).Msg("Deleted envelopes by envelope count retention policy")
 		}
 	}
 }
 
 func gardenerDeleteByAge(cc *core.Context, policy models.RetentionPolicy) {
 	if policy.EnvelopeAge != 0 {
-		db.EnvelopeDeleteOlderThan(cc, time.Now().Add(-policy.EnvelopeAge))
+		date := time.Now().Add(-policy.EnvelopeAge)
+		count, err := db.EnvelopeDeleteOlderThan(cc, date)
+		if err != nil {
+			log.Err(err).Time("older-than", date).Msg("Failed to delete envelopes by age retention policy")
+		} else {
+			log.Info().Time("older-than", date).Int64("count", count).Msg("Deleted envelopes by age retention policy")
+		}
 	}
 }
 
@@ -103,6 +115,7 @@ func gardenerDeleteOrphanAttachments(cc *core.Context) {
 		}
 
 		for _, a := range atts {
+			log.Info().Int64("id", a.ID).Msg("Deleting orphan attachment")
 			err := db.EnvelopeAttachmentDelete(cc, a)
 			if err != nil {
 				log.Err(err).Msg("Failed to delete orphan attachment")

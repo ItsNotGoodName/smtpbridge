@@ -30,11 +30,6 @@ func NewTelegram(token, chatID string) *Telegram {
 	}
 }
 
-type telegramResponse struct {
-	OK          bool   `json:"ok"`
-	Description string `json:"description"`
-}
-
 func (t *Telegram) Send(cc *core.Context, env envelope.Envelope, config Config) error {
 	atts := FilterImagesOnly(GetAttachments(env, config))
 	text, err := GetBody(env, config)
@@ -71,6 +66,11 @@ func (t *Telegram) Send(cc *core.Context, env envelope.Envelope, config Config) 
 	}
 
 	return nil
+}
+
+type telegramResponse struct {
+	OK          bool   `json:"ok"`
+	Description string `json:"description"`
 }
 
 func (t *Telegram) sendMessage(cc *core.Context, text string) error {

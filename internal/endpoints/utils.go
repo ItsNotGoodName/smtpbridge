@@ -49,7 +49,7 @@ func FilterImagesOnly(atts []*envelope.Attachment) []*envelope.Attachment {
 	return imgAtts
 }
 
-func senderCreate(kind string, config map[string]string) (Sender, error) {
+func SenderFactory(kind string, config map[string]string) (Sender, error) {
 	switch kind {
 	case "console":
 		return NewConsole(), nil
