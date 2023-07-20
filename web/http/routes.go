@@ -20,6 +20,9 @@ func routes(http *fiber.App, app core.App, retentionPolicy models.RetentionPolic
 			http.Get("/html", middleware.AppID(app, controllers.EnvelopesViewHTML))
 		})
 	})
+	http.Route("/attachments", func(http fiber.Router) {
+		http.Get("/", middleware.App(app, controllers.Attachments))
+	})
 	http.Get("/endpoints", middleware.App(app, controllers.Endpoints))
 	http.Get("/rules", middleware.App(app, controllers.Rules))
 	http.Post("/send", middleware.App(app, controllers.Send))

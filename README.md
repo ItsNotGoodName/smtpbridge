@@ -23,7 +23,7 @@ smtpbridge
 
 ## Supported Endpoints
 
-- console
+- Console
 - [Telegram](https://telegram.org/)
 - [Shoutrrr](https://github.com/containrrr/shoutrrr)
 

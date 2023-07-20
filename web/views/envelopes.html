@@ -1,6 +1,7 @@
 {{template "p/header" .}}
 
 <main class="container">
+
   <section>
     <hgroup>
       <h2>Envelopes</h2>
@@ -11,7 +12,11 @@
     </hgroup>
 
     <nav>
-      <ul></ul>
+      <ul>
+        <li>
+          <a href="/envelopes/new" role="button">New</a>
+        </li>
+      </ul>
       <ul>
         <li>
           <a href='/envelopes?{{query .Queries "page" .MessagesPageResult.Previous }}' role="button" {{if not
@@ -59,7 +64,7 @@
 
           <label for="ascending">
             <legend>Order</legend>
-            <input type="checkbox" id="ascending" name="ascending" role="switch" {{ if .MessageFilter.Ascending}}
+            <input type="checkbox" id="ascending" name="ascending" role="switch" {{ if .MessagesFilter.Ascending}}
               checked {{end}} />
             Ascending
           </label>
@@ -67,7 +72,7 @@
 
         <label for="search">
           Search
-          <input type="search" id="search" name="search" placeholder="Search" value="{{.MessageFilter.Search}}" />
+          <input type="search" id="search" name="search" placeholder="Search" value="{{.MessagesFilter.Search}}" />
         </label>
 
         <fieldset>
@@ -75,13 +80,13 @@
           <div class="grid">
             <label for="search-subject">
               <input type="hidden" value="0" name="-search-subject" />
-              <input type="checkbox" id="search-subject" name="search-subject" {{if .MessageFilter.SearchSubject}}
+              <input type="checkbox" id="search-subject" name="search-subject" {{if .MessagesFilter.SearchSubject}}
                 checked {{end}} />
               Subject
             </label>
             <label for="search-body">
               <input type="hidden" value="0" name="-search-body" />
-              <input type="checkbox" id="search-body" name="search-body" {{if .MessageFilter.SearchText}} checked
+              <input type="checkbox" id="search-body" name="search-body" {{if .MessagesFilter.SearchText}} checked
                 {{end}} />
               Body
             </label>

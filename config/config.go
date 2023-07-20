@@ -137,7 +137,7 @@ func Parse(raw Raw) (Config, error) {
 }
 
 type Raw struct {
-	MaxPayloadSize string `name:"max_payload_size" default:"25MB"`
+	MaxPayloadSize string `name:"max_payload_size" default:"25 MB"`
 	DataDirectory  string `name:"data_directory" default:"smtpbridge_data" arg:""`
 	Retention      struct {
 		EnvelopeCount  int    `name:"envelope_count"`

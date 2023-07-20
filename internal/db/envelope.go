@@ -123,9 +123,9 @@ func EnvelopeAttachmentList(cc *core.Context, page pagination.Page, filter envel
 
 	// Filter
 	if filter.Ascending {
-		q = q.Order("created_at ASC")
+		q = q.Order("id ASC")
 	} else {
-		q = q.Order("created_at DESC")
+		q = q.Order("id DESC")
 	}
 
 	ctx := cc.Context()

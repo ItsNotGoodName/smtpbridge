@@ -49,7 +49,7 @@ func Envelopes(c *fiber.Ctx, cc *core.Context) error {
 		"Queries":            queries,
 		"Messages":           res.Messages,
 		"MessagesPageResult": res.PageResult,
-		"MessageFilter":      filter,
+		"MessagesFilter":     filter,
 	})
 }
 
