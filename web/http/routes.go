@@ -13,13 +13,13 @@ func routes(http *fiber.App, app core.App, retentionPolicy models.RetentionPolic
 
 	http.Route("/envelopes", func(http fiber.Router) {
 		http.Get("/", middleware.App(app, controllers.Envelopes))
-		http.Delete("/", middleware.App(app, controllers.EnvelopesDeleteAll))
-		http.Get("/new", controllers.EnvelopesNewGet)
-		http.Post("/new", middleware.App(app, controllers.EnvelopesNewPost))
+		http.Delete("/", middleware.App(app, controllers.EnvelopesDelete))
+		http.Get("/new", controllers.EnvelopeNew)
+		http.Post("/new", middleware.App(app, controllers.EnvelopesCreate))
 		http.Route("/:id", func(http fiber.Router) {
-			http.Get("/", middleware.AppID(app, controllers.EnvelopesView))
-			http.Delete("/", middleware.AppID(app, controllers.EnvelopesDelete))
-			http.Get("/html", middleware.AppID(app, controllers.EnvelopesViewHTML))
+			http.Get("/", middleware.AppID(app, controllers.Envelope))
+			http.Delete("/", middleware.AppID(app, controllers.EnvelopeDelete))
+			http.Get("/html", middleware.AppID(app, controllers.EnvelopeHTML))
 		})
 	})
 
@@ -30,14 +30,14 @@ func routes(http *fiber.App, app core.App, retentionPolicy models.RetentionPolic
 	http.Route("/endpoints", func(http fiber.Router) {
 		http.Get("/", middleware.App(app, controllers.Endpoints))
 		http.Route("/:id", func(http fiber.Router) {
-			http.Post("/test", middleware.AppID(app, controllers.EndpointsTest))
+			http.Post("/test", middleware.AppID(app, controllers.EndpointTest))
 		})
 	})
 
 	http.Route("/rules", func(http fiber.Router) {
 		http.Get("/", middleware.App(app, controllers.Rules))
 		http.Route("/:id", func(http fiber.Router) {
-			http.Post("/enable", middleware.AppID(app, controllers.RulesEnable))
+			http.Post("/enable", middleware.AppID(app, controllers.RuleEnable))
 		})
 	})
 

@@ -79,7 +79,31 @@
     </details>
 
     {{range $val := .Attachments}}
-    {{template "p/attachment" $val}}
+    {{template "p/attachment-card" $val}}
+    {{end}}
+
+    {{if .Attachments}}
+    <nav>
+      <ul></ul>
+      <ul>
+        <li>
+          <a href='/attachments?{{query .Queries "page" .AttachmentsPageResult.Previous }}' role="button" {{if not
+            .AttachmentsPageResult.HasPrevious}} disabled {{end}}>
+            Previous
+          </a>
+        </li>
+        <li>
+          <a href="#" role="button" class="outline">{{.AttachmentsPageResult.Page}} /
+            {{.AttachmentsPageResult.TotalPages}}</a>
+        </li>
+        <li>
+          <a href='/attachments?{{query .Queries "page" .AttachmentsPageResult.Next }}' role="button" {{if not
+            .AttachmentsPageResult.HasNext}} disabled {{end}}>
+            Next
+          </a>
+        </li>
+      </ul>
+    </nav>
     {{end}}
   </section>
 </main>

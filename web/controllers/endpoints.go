@@ -22,7 +22,7 @@ func Endpoints(c *fiber.Ctx, cc *core.Context) error {
 	})
 }
 
-func EndpointsTest(c *fiber.Ctx, cc *core.Context, id int64) error {
+func EndpointTest(c *fiber.Ctx, cc *core.Context, id int64) error {
 	// Execute
 	err := procs.EndpointTest(cc, id)
 	if err != nil {

@@ -20,7 +20,7 @@ func Rules(c *fiber.Ctx, cc *core.Context) error {
 	})
 }
 
-func RulesEnable(c *fiber.Ctx, cc *core.Context, id int64) error {
+func RuleEnable(c *fiber.Ctx, cc *core.Context, id int64) error {
 	// Request
 	enable := c.FormValue("enable") == "on"
 

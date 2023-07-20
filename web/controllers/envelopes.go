@@ -54,7 +54,7 @@ func Envelopes(c *fiber.Ctx, cc *core.Context) error {
 	})
 }
 
-func EnvelopesView(c *fiber.Ctx, cc *core.Context, id int64) error {
+func Envelope(c *fiber.Ctx, cc *core.Context, id int64) error {
 	// Execute
 	env, err := procs.EnvelopeGet(cc, id)
 	if err != nil {
@@ -66,13 +66,13 @@ func EnvelopesView(c *fiber.Ctx, cc *core.Context, id int64) error {
 	}
 
 	// Response
-	return c.Render("envelopes-view", fiber.Map{
+	return c.Render("envelopes-show", fiber.Map{
 		"Envelope":  env,
 		"Endpoints": ends,
 	})
 }
 
-func EnvelopesViewHTML(c *fiber.Ctx, cc *core.Context, id int64) error {
+func EnvelopeHTML(c *fiber.Ctx, cc *core.Context, id int64) error {
 	// Execute
 	html, err := procs.EnvelopeMessageHTMLGet(cc, id)
 	if err != nil {
@@ -84,12 +84,12 @@ func EnvelopesViewHTML(c *fiber.Ctx, cc *core.Context, id int64) error {
 	return c.SendString(html)
 }
 
-func EnvelopesNewGet(c *fiber.Ctx) error {
+func EnvelopeNew(c *fiber.Ctx) error {
 	// Render
 	return c.Render("envelopes-new", fiber.Map{})
 }
 
-func EnvelopesNewPost(c *fiber.Ctx, cc *core.Context) error {
+func EnvelopesCreate(c *fiber.Ctx, cc *core.Context) error {
 	// Request
 	form, err := c.MultipartForm()
 	if err != nil {
@@ -129,7 +129,7 @@ func EnvelopesNewPost(c *fiber.Ctx, cc *core.Context) error {
 	return c.Redirect("/envelopes")
 }
 
-func EnvelopesDelete(c *fiber.Ctx, cc *core.Context, id int64) error {
+func EnvelopeDelete(c *fiber.Ctx, cc *core.Context, id int64) error {
 	// Execute
 	err := procs.EnvelopeDelete(cc, id)
 	if err != nil {
@@ -141,7 +141,7 @@ func EnvelopesDelete(c *fiber.Ctx, cc *core.Context, id int64) error {
 	return c.SendStatus(http.StatusNoContent)
 }
 
-func EnvelopesDeleteAll(c *fiber.Ctx, cc *core.Context) error {
+func EnvelopesDelete(c *fiber.Ctx, cc *core.Context) error {
 	// Execute
 	err := procs.EnvelopeDeleteAll(cc)
 	if err != nil {

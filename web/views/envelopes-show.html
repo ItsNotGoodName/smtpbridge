@@ -55,13 +55,13 @@
   <section id="attachments">
     <h2><a href="#attachments">Attachments</a></h2>
     {{range $val := .Envelope.Attachments}}
-    {{template "p/attachment" $val}}
+    {{template "p/attachment-card" $val}}
     {{end}}
   </section>
   {{end}}
 
-  <section id="test-endpoint">
-    <h2><a href="#test-endpoint">Test Endpoint</a></h2>
+  <section id="endpoints">
+    <h2><a href="#endpoints">Endpoints</a></h2>
     <form method="post" action="/send" hx-post="/send">
       <input type="hidden" id="envelope" name="envelope" value="{{.Envelope.Message.ID}}">
       <label for="endpoint">
@@ -72,7 +72,7 @@
           {{end}}
         </select>
       </label>
-      <button type="submit" data-loading-disable data-loading-aria-busy>Send</button>
+      <button type="submit" data-loading-disable data-loading-aria-busy>Send Envelope</button>
     </form>
   </section>
 

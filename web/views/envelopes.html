@@ -12,11 +12,7 @@
     </hgroup>
 
     <nav>
-      <ul>
-        <li>
-          <a href="/envelopes/new" role="button">New</a>
-        </li>
-      </ul>
+      <ul></ul>
       <ul>
         <li>
           <a href='/envelopes?{{query .Queries "page" .MessagesPageResult.Previous }}' role="button" {{if not
@@ -136,6 +132,8 @@
         </tbody>
       </table>
     </figure>
+
+    <a href="/envelopes/new" role="button">New</a>
   </section>
 </main>
 
