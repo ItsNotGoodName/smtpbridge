@@ -54,8 +54,8 @@ func run(ctx context.Context, shutdown context.CancelFunc) <-chan struct{} {
 	}
 
 	procs.MailmanStart(ctx, app)
-
 	procs.GardenerStart(ctx, app, cfg.RetentionPolicy)
+	procs.VacuumStart(ctx, app)
 
 	// SMTP
 	smtp := smtp.New(app, shutdown, cfg.SMTPAddress, cfg.SMTPMaxMessageBytes)
