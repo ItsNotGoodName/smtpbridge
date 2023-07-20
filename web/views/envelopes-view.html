@@ -54,7 +54,9 @@
   {{if .Envelope.Attachments}}
   <section id="attachments">
     <h2><a href="#attachments">Attachments</a></h2>
-    {{template "p/attachments-table" .Envelope.Attachments}}
+    {{range $val := .Envelope.Attachments}}
+    {{template "p/attachment" $val}}
+    {{end}}
   </section>
   {{end}}
 

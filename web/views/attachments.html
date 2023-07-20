@@ -78,7 +78,9 @@
       </form>
     </details>
 
-    {{template "p/attachments-table" .Attachments}}
+    {{range $val := .Attachments}}
+    {{template "p/attachment" $val}}
+    {{end}}
   </section>
 </main>
 

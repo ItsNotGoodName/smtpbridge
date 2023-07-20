@@ -51,19 +51,19 @@
         <tbody>
           {{if .RetentionPolicy.EnvelopeCount}}
           <tr>
-            <th scope="row"><strong>Envelope Count Limit</strong></th>
+            <th scope="row"><strong>Max Envelope Count</strong></th>
             <td>{{.RetentionPolicy.EnvelopeCount}}</td>
           </tr>
           {{end}}
           {{if .RetentionPolicy.EnvelopeAge}}
           <tr>
-            <th scope="row"><strong>Envelope Age Limit</strong></th>
+            <th scope="row"><strong>Max Envelope Age</strong></th>
             <td>{{.RetentionPolicy.EnvelopeAge}}</td>
           </tr>
           {{end}}
           {{if .RetentionPolicy.AttachmentSize}}
           <tr>
-            <th scope="row"><strong>Attachment Size Limit</strong></th>
+            <th scope="row"><strong>Max Attachments Size</strong></th>
             <td>{{bytesHumanize .RetentionPolicy.AttachmentSize}}</td>
           </tr>
           {{end}}
