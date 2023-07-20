@@ -39,7 +39,7 @@ func mailman(cc *core.Context, evtC <-chan core.EventEnvelopeCreated) {
 			}
 
 			// List all rules
-			rrules, err := db.RuleList(cc)
+			rrules, err := db.RuleListEnable(cc)
 			if err != nil {
 				log.Err(err).Msg("Failed to list rules from database")
 				continue

@@ -19,7 +19,6 @@ type CreateRule struct {
 	InternalID string
 	Name       string
 	Template   string
-	Enable     bool
 }
 
 type Rule struct {

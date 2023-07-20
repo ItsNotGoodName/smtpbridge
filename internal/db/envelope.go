@@ -114,7 +114,7 @@ func EnvelopeCount(cc *core.Context) (int, error) {
 }
 
 func EnvelopeAttachmentCount(cc *core.Context) (int, error) {
-	return cc.DB.NewSelect().Model(&envelope.Attachment{}).Where("message_id != NULL").Count(cc.Context())
+	return cc.DB.NewSelect().Model(&envelope.Attachment{}).Where("message_id IS NOT NULL").Count(cc.Context())
 }
 
 func EnvelopeAttachmentList(cc *core.Context, page pagination.Page, filter envelope.AttachmentFilter) (envelope.AttachmentListResult, error) {

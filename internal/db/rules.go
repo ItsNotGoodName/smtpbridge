@@ -11,6 +11,12 @@ func RuleList(cc *core.Context) ([]rules.Rule, error) {
 	return rrules, err
 }
 
+func RuleListEnable(cc *core.Context) ([]rules.Rule, error) {
+	var rrules []rules.Rule
+	err := cc.DB.NewSelect().Model(&rrules).Where("enable = TRUE").Scan(cc.Context())
+	return rrules, err
+}
+
 func RuleEndpointList(cc *core.Context, ruleID int64) ([]rules.Endpoint, error) {
 	var e []rules.Endpoint
 	err := cc.DB.NewSelect().
