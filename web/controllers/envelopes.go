@@ -27,13 +27,14 @@ func Envelopes(c *fiber.Ctx, cc *core.Context) error {
 		return helpers.Error(c, err, http.StatusBadRequest)
 	}
 
-	// Execute
 	filter := envelope.MessageFilter{
 		Ascending:     c.Query("ascending") != "",
 		Search:        c.Query("search"),
 		SearchSubject: checkbox(c, "search-subject"),
 		SearchText:    checkbox(c, "search-body"),
 	}
+
+	// Execute
 	res, err := procs.EnvelopeMessageList(cc, pagination.NewPage(page, perPage), filter)
 	if err != nil {
 		return helpers.Error(c, err)

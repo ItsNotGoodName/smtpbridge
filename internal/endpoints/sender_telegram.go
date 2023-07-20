@@ -55,6 +55,9 @@ func (t *Telegram) Send(cc *core.Context, env envelope.Envelope, config Config) 
 
 	// Send rest of attachments
 	length := len(atts)
+	if length > 10 {
+		length = 10
+	}
 	for i := 1; i < length; i++ {
 		file, err := files.GetFile(cc, atts[i])
 		if err != nil {

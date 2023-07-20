@@ -9,4 +9,5 @@ func checkbox(c *fiber.Ctx, key string) bool {
 	}
 
 	return true
+
 }
