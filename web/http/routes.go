@@ -13,6 +13,7 @@ func routes(http *fiber.App, app core.App, retentionPolicy models.RetentionPolic
 
 	http.Route("/envelopes", func(http fiber.Router) {
 		http.Get("/", middleware.App(app, controllers.Envelopes))
+		http.Delete("/", middleware.App(app, controllers.EnvelopesDeleteAll))
 		http.Get("/new", controllers.EnvelopesNewGet)
 		http.Post("/new", middleware.App(app, controllers.EnvelopesNewPost))
 		http.Route("/:id", func(http fiber.Router) {

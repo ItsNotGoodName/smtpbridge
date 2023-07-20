@@ -140,3 +140,15 @@ func EnvelopesDelete(c *fiber.Ctx, cc *core.Context, id int64) error {
 	c.Set("HX-Redirect", "/envelopes")
 	return c.SendStatus(http.StatusNoContent)
 }
+
+func EnvelopesDeleteAll(c *fiber.Ctx, cc *core.Context) error {
+	// Execute
+	err := procs.EnvelopeDeleteAll(cc)
+	if err != nil {
+		return helpers.Error(c, err)
+	}
+
+	// Response
+	c.Set("HX-Trigger", "deleteEnvelopes")
+	return c.SendStatus(http.StatusNoContent)
+}

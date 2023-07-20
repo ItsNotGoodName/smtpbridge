@@ -58,6 +58,17 @@ func EnvelopeDelete(cc *core.Context, id int64) error {
 	return nil
 }
 
+func EnvelopeDeleteAll(cc *core.Context) error {
+	err := db.EnvelopeDeleteAll(cc)
+	if err != nil {
+		return err
+	}
+
+	events.PublishEnvelopeDeleted(cc)
+
+	return nil
+}
+
 func EnvelopeAttachmentList(cc *core.Context, page pagination.Page, filter envelope.AttachmentFilter) (envelope.AttachmentListResult, error) {
 	return db.EnvelopeAttachmentList(cc, page, filter)
 }

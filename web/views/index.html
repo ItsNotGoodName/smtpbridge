@@ -13,6 +13,10 @@
         data-tooltip="Rebuild database file to take the minimal amount of disk space.">
         Vacuum Database
       </button>
+      <button hx-delete="/envelopes" data-loading-path="/vacuum" data-loading-disable data-loading-aria-busy
+        hx-confirm="Are you sure you wish to delete all envelopes?" class="contrast">
+        Delete Envelopes
+      </button>
     </article>
     <article>
       <h2>Build</h2>

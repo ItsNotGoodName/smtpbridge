@@ -15,6 +15,11 @@ import (
 	"github.com/uptrace/bun"
 )
 
+func EnvelopeDeleteAll(cc *core.Context) error {
+	_, err := cc.DB.NewDelete().Model(&envelope.Message{}).Where("1=1").Exec(cc.Context())
+	return err
+}
+
 func EnvelopeDelete(cc *core.Context, id int64) error {
 	_, err := cc.DB.NewDelete().Model(&envelope.Message{}).Where("id = ?", id).Exec(cc.Context())
 	return err

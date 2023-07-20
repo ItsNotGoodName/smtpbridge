@@ -11,7 +11,7 @@ type EventEnvelopeCreated struct {
 }
 
 type EventEnvelopeDeleted struct {
-	ID int64
+	IDS []int64
 }
 
 type EventStorageRead struct {

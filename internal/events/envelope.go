@@ -22,10 +22,10 @@ func OnEnvelopeDeleted(app core.App, fn func(cc *core.Context, evt core.EventEnv
 	app.Bus.Mutex.Unlock()
 }
 
-func PublishEnvelopeDeleted(cc *core.Context, id int64) {
+func PublishEnvelopeDeleted(cc *core.Context, ids ...int64) {
 	cc.Bus.Mutex.Lock()
 	for _, v := range cc.Bus.EnvelopeDeleted {
-		v(cc, core.EventEnvelopeDeleted{ID: id})
+		v(cc, core.EventEnvelopeDeleted{IDS: ids})
 	}
 	cc.Bus.Mutex.Unlock()
 }
