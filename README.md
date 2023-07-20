@@ -133,7 +133,7 @@ endpoints:
 rules:
   example_rule:
     name: Example Rule
-    template: or (eq .Message.Subject "cam-1") (eq .Message.Subject "cam-2")
+    expression: or (eq .Message.Subject "cam-1") (eq .Message.Subject "cam-2")
     endpoints:
       - console_endpoint
 ```

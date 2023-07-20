@@ -43,7 +43,7 @@ func RuleUpdate(cc *core.Context, ruleID int64, enable bool) (rules.Rule, error)
 		Model(&rule).
 		Set("enable = ?", enable).
 		Where("id = ?", ruleID).
-		Returning("id, internal, internal_id, name, template, enable").
+		Returning("id, internal, internal_id, name, expression, enable").
 		Exec(cc.Context(), &rule)
 	if err != nil {
 		return rule, err

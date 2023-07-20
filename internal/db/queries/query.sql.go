@@ -127,7 +127,7 @@ INSERT INTO rules (
   internal,
   internal_id,
   name,
-  template,
+  expression,
   updated_at,
   enable
 ) VALUES (
@@ -140,7 +140,7 @@ INSERT INTO rules (
 ) ON CONFLICT (internal_id) DO UPDATE SET
   internal_id=EXCLUDED.internal_id,
   name=EXCLUDED.name,
-  template=EXCLUDED.template,
+  expression=EXCLUDED.expression,
   updated_at=EXCLUDED.updated_at
 WHERE internal = true
 `
@@ -148,7 +148,7 @@ WHERE internal = true
 type UpsertInternalRuleParams struct {
 	InternalID string
 	Name       string
-	Template   string
+	Expression string
 	UpdatedAt  time.Time
 	Enable     bool
 }
@@ -157,7 +157,7 @@ func (q *Queries) UpsertInternalRule(ctx context.Context, arg UpsertInternalRule
 	_, err := q.db.ExecContext(ctx, upsertInternalRule,
 		arg.InternalID,
 		arg.Name,
-		arg.Template,
+		arg.Expression,
 		arg.UpdatedAt,
 		arg.Enable,
 	)

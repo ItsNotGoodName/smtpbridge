@@ -29,9 +29,10 @@
       </tbody>
     </table>
 
-    <label for="template">
-      Rule
-      <textarea id="template" rows="4" {{if $val.Rule.Internal}}readonly{{end}}>{{$val.Rule.Template}}</textarea>
+    <label for="rule-{{$val.Rule.ID}}-expression">
+      Expression
+      <textarea id="rule-{{$val.Rule.ID}}-expression" rows="4" {{if
+        $val.Rule.Internal}}readonly{{end}}>{{$val.Rule.Expression}}</textarea>
     </label>
 
     <h4>Endpoints</h4>
@@ -40,7 +41,7 @@
         {{range $end := $val.Endpoints}}
         <tr>
           <th>
-            <a href="/endpoints#endpoint_{{$end.ID}}">
+            <a href="/endpoints#endpoint-{{$end.ID}}">
               {{$end.Name}}
             </a>
           </th>

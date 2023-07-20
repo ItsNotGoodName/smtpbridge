@@ -35,7 +35,7 @@ INSERT INTO rules (
   internal,
   internal_id,
   name,
-  template,
+  expression,
   updated_at,
   enable
 ) VALUES (
@@ -48,7 +48,7 @@ INSERT INTO rules (
 ) ON CONFLICT (internal_id) DO UPDATE SET
   internal_id=EXCLUDED.internal_id,
   name=EXCLUDED.name,
-  template=EXCLUDED.template,
+  expression=EXCLUDED.expression,
   updated_at=EXCLUDED.updated_at
 WHERE internal = true;
 

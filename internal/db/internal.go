@@ -18,7 +18,7 @@ func InternalRuleUpsert(cc *core.Context, r rules.Rule, updatedAt time.Time) err
 	return queries.New(cc.DB.DB).UpsertInternalRule(cc.Context(), queries.UpsertInternalRuleParams{
 		InternalID: r.InternalID,
 		Name:       r.Name,
-		Template:   r.Template,
+		Expression: r.Expression,
 		UpdatedAt:  updatedAt.UTC(),
 		Enable:     r.Enable,
 	})

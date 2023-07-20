@@ -18,7 +18,7 @@ type CreateRule struct {
 	Internal   bool
 	InternalID string
 	Name       string
-	Template   string
+	Expression string
 }
 
 type Rule struct {
@@ -26,7 +26,7 @@ type Rule struct {
 	Internal   bool
 	InternalID string
 	Name       string
-	Template   string
+	Expression string
 	Enable     bool
 }
 
@@ -43,7 +43,7 @@ func New(req CreateRule) (Rule, error) {
 		Internal:   req.Internal,
 		InternalID: req.InternalID,
 		Name:       req.Name,
-		Template:   req.Template,
+		Expression: req.Expression,
 		Enable:     true,
 	}
 
@@ -52,7 +52,7 @@ func New(req CreateRule) (Rule, error) {
 }
 
 func (r Rule) Parse() (ParsedRule, error) {
-	t := r.Template
+	t := r.Expression
 	if t == "" {
 		t = "\"true\""
 	}

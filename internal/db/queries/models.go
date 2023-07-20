@@ -47,7 +47,7 @@ type Rule struct {
 	Internal   bool
 	InternalID string
 	Name       string
-	Template   string
+	Expression string
 	Enable     bool
 	UpdatedAt  time.Time
 	CreatedAt  time.Time

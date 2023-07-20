@@ -90,7 +90,7 @@ func Parse(raw Raw) (Config, error) {
 			Internal:   true,
 			InternalID: k,
 			Name:       name,
-			Template:   rr.Template,
+			Expression: rr.Expression,
 		})
 		if err != nil {
 			return Config{}, err
@@ -168,9 +168,9 @@ type RawEndpoint struct {
 }
 
 type RawRule struct {
-	Name      string
-	Template  string
-	Endpoints []string
+	Name       string
+	Expression string
+	Endpoints  []string
 }
 
 type CLI struct {

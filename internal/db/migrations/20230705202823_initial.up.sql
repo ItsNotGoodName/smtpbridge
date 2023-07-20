@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS rules (
     internal BOOLEAN NOT NULL,
     internal_id TEXT NOT NULL,
     name TEXT NOT NULL,
-    template TEXT NOT NULL,
+    expression TEXT NOT NULL,
     enable BOOLEAN NOT NULL,
     updated_at DATETIME NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
