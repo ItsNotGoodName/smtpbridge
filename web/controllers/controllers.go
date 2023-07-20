@@ -73,5 +73,6 @@ func Vacuum(c *fiber.Ctx, cc *core.Context) error {
 	}
 
 	// Response
+	c.Set("HX-Trigger", "databaseVacuum")
 	return c.SendStatus(http.StatusNoContent)
 }
