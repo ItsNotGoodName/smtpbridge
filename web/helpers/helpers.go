@@ -6,11 +6,15 @@ import (
 	"io"
 	"time"
 
+	"github.com/ItsNotGoodName/smtpbridge/internal/build"
 	"github.com/ItsNotGoodName/smtpbridge/web"
 	"github.com/dustin/go-humanize"
 )
 
 var Map template.FuncMap = template.FuncMap{
+	"repoURL": func() string {
+		return build.RepoURL
+	},
 	"development": func() bool {
 		return web.Development
 	},
