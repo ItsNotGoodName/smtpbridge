@@ -14,63 +14,65 @@ import (
 )
 
 func GardenerStart(ctx context.Context, app core.App, policy models.RetentionPolicy) {
-	storageC := make(chan core.EventStorageRead, 1)
-	envelopeC := make(chan core.EventEnvelopeDeleted, 1)
+	envDeletedC := make(chan core.EventEnvelopeDeleted, 1)
+	envCreatedC := make(chan core.EventEnvelopeCreated, 1)
 
-	go gardener(app.Context(ctx), policy, storageC, envelopeC)
+	go gardener(app.Context(ctx), policy, envCreatedC, envDeletedC)
 
-	events.OnStorageRead(app, func(cc *core.Context, evt core.EventStorageRead) {
+	events.OnEnvelopeCreated(app, func(cc *core.Context, evt core.EventEnvelopeCreated) {
 		select {
-		case <-storageC:
+		case <-envCreatedC:
 		default:
 		}
 
 		select {
-		case storageC <- evt:
+		case envCreatedC <- evt:
 		default:
 		}
 	})
 
 	events.OnEnvelopeDeleted(app, func(cc *core.Context, evt core.EventEnvelopeDeleted) {
 		select {
-		case <-envelopeC:
+		case <-envDeletedC:
 		default:
 		}
 
 		select {
-		case envelopeC <- evt:
+		case envDeletedC <- evt:
 		default:
 		}
 	})
 }
 
-func gardener(cc *core.Context, policy models.RetentionPolicy, storageC <-chan core.EventStorageRead, envelopeC <-chan core.EventEnvelopeDeleted) {
+func gardener(cc *core.Context, policy models.RetentionPolicy, envCreatedC <-chan core.EventEnvelopeCreated, envDeletedC <-chan core.EventEnvelopeDeleted) {
 	ctx := cc.Context()
-	ticker := time.NewTicker(60 * time.Minute)
+	ticker := time.NewTicker(30 * time.Minute)
 
 	gardenerDeleteByAge(cc, policy)
+
 	gardenerDeleteOrphanAttachments(cc)
 
 	for {
 		select {
 		case <-ctx.Done():
 			return
-		case <-envelopeC:
-			gardenerDeleteOrphanAttachments(cc)
-		case evt := <-storageC:
-			gardenerDeleteByStorage(cc, policy, evt.Storage)
-		case <-ticker.C:
+		case <-envCreatedC:
 			storage, err := StorageGet(cc)
 			if err != nil {
 				log.Err(err).Msg("Failed to get storage")
 				continue
 			}
-			gardenerDeleteByStorage(cc, policy, storage)
+
+			gardenerDeleteByEnvelopeCount(cc, policy, storage)
+			gardenerDeleteByAttachmentSize(cc, policy, storage)
+		case <-envDeletedC:
+			gardenerDeleteOrphanAttachments(cc)
+		case <-ticker.C:
 			gardenerDeleteByAge(cc, policy)
 		}
 	}
 }
-func gardenerDeleteByStorage(cc *core.Context, policy models.RetentionPolicy, storage models.Storage) {
+func gardenerDeleteByAttachmentSize(cc *core.Context, policy models.RetentionPolicy, storage models.Storage) {
 	if policy.AttachmentSize != 0 && storage.AttachmentSize > policy.AttachmentSize {
 		count := humanize.Bytes(uint64(storage.AttachmentSize - policy.AttachmentSize))
 		log.Info().Str("count", count).Msg("Deleting attachment files by attachment size retention policy")
@@ -80,14 +82,16 @@ func gardenerDeleteByStorage(cc *core.Context, policy models.RetentionPolicy, st
 			log.Err(err).Msg("Failed to delete attachment files by attachment size retention policy")
 		}
 	}
+}
 
+func gardenerDeleteByEnvelopeCount(cc *core.Context, policy models.RetentionPolicy, storage models.Storage) {
 	if policy.EnvelopeCount != 0 && storage.EnvelopeCount > policy.EnvelopeCount {
 		date := time.Now().Add(-policy.MinEnvelopeAge)
-		count, err := db.EnvelopeDeleteUntilCount(cc, date, policy.EnvelopeCount)
+		count, err := db.EnvelopeDeleteUntilCount(cc, policy.EnvelopeCount, date)
 		if err != nil {
-			log.Err(err).Time("older-than", date).Int("keep", policy.EnvelopeCount).Msg("Failed to envelopes by envelope count retention policy")
+			log.Err(err).Time("age", date).Int("keep", policy.EnvelopeCount).Msg("Failed to envelopes by envelope count retention policy")
 		} else {
-			log.Info().Time("older-than", date).Int("keep", policy.EnvelopeCount).Int64("deleted", count).Msg("Deleted envelopes by envelope count retention policy")
+			log.Info().Time("age", date).Int("keep", policy.EnvelopeCount).Int64("deleted", count).Msg("Deleted envelopes by envelope count retention policy")
 		}
 	}
 }
@@ -100,9 +104,9 @@ func gardenerDeleteByAge(cc *core.Context, policy models.RetentionPolicy) {
 		}
 		count, err := db.EnvelopeDeleteOlderThan(cc, date)
 		if err != nil {
-			log.Err(err).Time("older-than", date).Msg("Failed to delete envelopes by age retention policy")
+			log.Err(err).Time("age", date).Msg("Failed to delete envelopes by age retention policy")
 		} else {
-			log.Info().Time("older-than", date).Int64("deleted", count).Msg("Deleted envelopes by age retention policy")
+			log.Info().Time("age", date).Int64("deleted", count).Msg("Deleted envelopes by age retention policy")
 		}
 	}
 }

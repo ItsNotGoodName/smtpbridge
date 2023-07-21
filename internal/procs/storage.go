@@ -3,7 +3,6 @@ package procs
 import (
 	"github.com/ItsNotGoodName/smtpbridge/internal/core"
 	"github.com/ItsNotGoodName/smtpbridge/internal/db"
-	"github.com/ItsNotGoodName/smtpbridge/internal/events"
 	"github.com/ItsNotGoodName/smtpbridge/internal/files"
 	"github.com/ItsNotGoodName/smtpbridge/internal/models"
 )
@@ -32,8 +31,6 @@ func StorageGet(cc *core.Context) (models.Storage, error) {
 		AttachmentSize:  attachmentSize,
 		DatabaseSize:    databaseSize,
 	}
-
-	events.PublishStorageRead(cc, storage)
 
 	return storage, nil
 }

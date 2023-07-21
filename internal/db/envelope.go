@@ -159,15 +159,15 @@ func EnvelopeAttachmentListOrphan(cc *core.Context, limit int) ([]*envelope.Atta
 	return atts, err
 }
 
-func EnvelopeDeleteUntilCount(cc *core.Context, date time.Time, keep int) (int64, error) {
+func EnvelopeDeleteUntilCount(cc *core.Context, keep int, olderThan time.Time) (int64, error) {
 	return queries.New(cc.DB.DB).DeleteEnvelopeUntilCount(cc.Context(), queries.DeleteEnvelopeUntilCountParams{
-		CreatedAt: date.UTC(),
+		CreatedAt: olderThan.UTC(),
 		Limit:     int64(keep),
 	})
 }
 
-func EnvelopeDeleteOlderThan(cc *core.Context, date time.Time) (int64, error) {
-	return queries.New(cc.DB.DB).DeleteEnvelopeOlderThan(cc.Context(), date.UTC())
+func EnvelopeDeleteOlderThan(cc *core.Context, olderThan time.Time) (int64, error) {
+	return queries.New(cc.DB.DB).DeleteEnvelopeOlderThan(cc.Context(), olderThan.UTC())
 }
 
 func EnvelopeAttachmentDelete(cc *core.Context, att *envelope.Attachment) error {

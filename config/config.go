@@ -151,7 +151,7 @@ type Raw struct {
 	Retention      struct {
 		EnvelopeCount  int    `name:"envelope_count"`
 		EnvelopeAge    string `name:"envelope_age"`
-		MinEnvelopeAge string `name:"envelope_age_min" default:"5m"`
+		MinEnvelopeAge string `name:"min_envelope_age" default:"5m"`
 		AttachmentSize string `name:"attachment_size"`
 	} `embed:"" prefix:"retention-"`
 	HTTP struct {
