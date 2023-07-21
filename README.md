@@ -168,6 +168,8 @@ services:
     volumes:
       - /path/to/data:/data
       - /path/to/config:/config
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
 ```
 
@@ -180,6 +182,8 @@ docker run -d \
   -p 8080:8080 \
   -v /path/to/config:/config \
   -v /path/to/data:/data \
+  -v /etc/timezone:/etc/timezone:ro \
+  -v /etc/localtime:/etc/localtime:ro \
   --restart unless-stopped \
   ghcr.io/itsnotgoodname/smtpbridge:latest
 ```
