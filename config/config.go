@@ -195,10 +195,7 @@ func Read(cli CLI) (Raw, error) {
 
 	for k, v := range raw.Endpoints {
 		if v.Body_Template == "" {
-			v.Body_Template = `SUBJECT: {{ .Message.Subject }}
-FROM: {{ .Message.From }}
-
-{{ .Message.Text }}`
+			v.Body_Template = `{{ .Message.Text }}`
 			raw.Endpoints[k] = v
 		}
 	}
@@ -213,7 +210,7 @@ FROM: {{ .Message.From }}
 type CLI struct {
 	Command       string   `kong:"-"`
 	DataDirectory string   `name:"data-directory" help:"Path to store data." type:"path" optional:""`
-	Version       struct{} `cmd:"" help:"Show version."`
+	Version       struct{} `cmd:"" hidden:""` // HACK: hidden because kong will throw error if a command is not supplied
 }
 
 func ReadAndParseCLI() CLI {

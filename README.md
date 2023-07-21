@@ -87,9 +87,6 @@ endpoints:
     text_disable: false
     # Custom template for body
     body_template: |
-      SUBJECT: {{ .Message.Subject }}
-      FROM: {{ .Message.From }}
-
       {{ .Message.Text }}
     # Do not send any attachments
     attachment_disable: false
@@ -180,10 +177,11 @@ docker run -d \
 ## To Do
 
 - Add [Apprise](https://github.com/caronc/apprise) endpoint
-- SQLite full text search
 - HTTP and SMTP auth
-- Read mailbox files
 - Remove placeholder [Pico CSS](https://picocss.com/) for custom CSS
-- JSON API
+- CRUD endpoints and rules
+- SQLite full text search
+- Read mailbox files
 - Save raw emails
+- JSON API
 - Windows installer

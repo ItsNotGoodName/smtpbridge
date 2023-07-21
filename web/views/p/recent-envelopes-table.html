@@ -3,8 +3,7 @@
     {{range $val := .Messages}}
     <tr>
       <td>
-        <a href="/envelopes/{{$val.ID}}">{{if $val.Subject}}{{$val.Subject}}{{else}}No Subject{{end}}
-        </a>
+        <a href="/envelopes/{{$val.ID}}">{{$val.Subject}}</a>
       </td>
 
       <td>
