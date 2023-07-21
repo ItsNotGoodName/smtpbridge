@@ -5,45 +5,46 @@
     <h2>Recent Envelopes</h2>
     {{template "p/recent-envelopes-table" .}}
   </article>
-  <div class="grid">
-    <article>
-      <h2>Storage</h2>
-      <figure>{{template "p/storage-table" .}}</figure>
-      <button hx-post="/vacuum" data-loading-path="/vacuum" data-loading-disable data-loading-aria-busy
-        data-tooltip="Rebuild database file to take the minimal amount of disk space.">
-        Vacuum Database
-      </button>
-      <button hx-delete="/envelopes" data-loading-path="/vacuum" data-loading-disable data-loading-aria-busy
-        hx-confirm="Are you sure you wish to delete all envelopes?" class="contrast">
-        Delete Envelopes
-      </button>
-    </article>
-    <article>
-      <h2>Build</h2>
-      <figure>
-        <table>
-          <tbody>
-            <tr>
-              <th scope="row"><strong>Built By</strong></th>
-              <td>{{.Build.BuiltBy}}</td>
-            </tr>
-            <tr>
-              <th scope="row"><strong>Commit</strong></th>
-              <td>{{.Build.Commit}}</td>
-            </tr>
-            <tr>
-              <th scope="row"><strong>Date</strong></th>
-              <td>{{.Build.Date}}</td>
-            </tr>
-            <tr>
-              <th scope="row"><strong>Version</strong></th>
-              <td>{{.Build.Version}}</td>
-            </tr>
-          </tbody>
-        </table>
-      </figure>
-    </article>
-  </div>
+
+  <article>
+    <h2>Storage</h2>
+    <figure>{{template "p/storage-table" .}}</figure>
+    <button hx-post="/vacuum" data-loading-path="/vacuum" data-loading-disable data-loading-aria-busy
+      data-tooltip="Rebuild database file to take the minimal amount of disk space.">
+      Vacuum Database
+    </button>
+    <button hx-delete="/envelopes" data-loading-path="/vacuum" data-loading-disable data-loading-aria-busy
+      hx-confirm="Are you sure you wish to delete all envelopes?" class="contrast">
+      Delete Envelopes
+    </button>
+  </article>
+
+  <article>
+    <h2>Build</h2>
+    <figure>
+      <table>
+        <tbody>
+          <tr>
+            <th scope="row"><strong>Built By</strong></th>
+            <td>{{.Build.BuiltBy}}</td>
+          </tr>
+          <tr>
+            <th scope="row"><strong>Commit</strong></th>
+            <td>{{.Build.Commit}}</td>
+          </tr>
+          <tr>
+            <th scope="row"><strong>Date</strong></th>
+            <td>{{.Build.Date}}</td>
+          </tr>
+          <tr>
+            <th scope="row"><strong>Version</strong></th>
+            <td>{{.Build.Version}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </figure>
+  </article>
+
   <article>
     <h2>Retention Policy</h2>
     <figure>
@@ -51,19 +52,23 @@
         <tbody>
           {{if .RetentionPolicy.EnvelopeCount}}
           <tr>
-            <th scope="row"><strong>Max Envelope Count</strong></th>
+            <th scope="row"><strong>Envelope Count</strong></th>
             <td>{{.RetentionPolicy.EnvelopeCount}}</td>
           </tr>
           {{end}}
           {{if .RetentionPolicy.EnvelopeAge}}
           <tr>
-            <th scope="row"><strong>Max Envelope Age</strong></th>
+            <th scope="row"><strong>Envelope Age</strong></th>
             <td>{{.RetentionPolicy.EnvelopeAge}}</td>
           </tr>
           {{end}}
+          <tr>
+            <th scope="row"><strong>Min Envelope Age</strong></th>
+            <td>{{.RetentionPolicy.MinEnvelopeAge}}</td>
+          </tr>
           {{if .RetentionPolicy.AttachmentSize}}
           <tr>
-            <th scope="row"><strong>Max Attachments Size</strong></th>
+            <th scope="row"><strong>Attachment Size</strong></th>
             <td>{{bytesHumanize .RetentionPolicy.AttachmentSize}}</td>
           </tr>
           {{end}}

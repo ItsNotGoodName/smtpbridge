@@ -61,7 +61,8 @@ data_directory: smtpbridge_data
 retention:
   # Retention policy for envelopes in database
   envelope_count: 0 # (100) oldest will be deleted
-  envelope_age: "" #  (7 days, 1 month, ...)
+  envelope_age: ""
+  min_envelope_age: 5m
 
   # Retention policy for attachments on disk
   attachment_size: "" # (100 MB) oldest will be deleted

@@ -116,10 +116,19 @@ func Parse(raw Raw) (Config, error) {
 			return Config{}, err
 		}
 	}
+	var minEnvelopeAge time.Duration
+	if raw.Retention.MinEnvelopeAge != "" {
+		var err error
+		minEnvelopeAge, err = time.ParseDuration(raw.Retention.MinEnvelopeAge)
+		if err != nil {
+			return Config{}, err
+		}
+	}
 	retentionPolicy := models.RetentionPolicy{
 		EnvelopeCount:  raw.Retention.EnvelopeCount,
 		AttachmentSize: attachmentsSize,
 		EnvelopeAge:    envelopeAge,
+		MinEnvelopeAge: minEnvelopeAge,
 	}
 
 	return Config{
@@ -142,6 +151,7 @@ type Raw struct {
 	Retention      struct {
 		EnvelopeCount  int    `name:"envelope_count"`
 		EnvelopeAge    string `name:"envelope_age"`
+		MinEnvelopeAge string `name:"envelope_age_min" default:"5m"`
 		AttachmentSize string `name:"attachment_size"`
 	} `embed:"" prefix:"retention-"`
 	HTTP struct {

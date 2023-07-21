@@ -73,7 +73,7 @@ WHERE id NOT IN (
   FROM messages
   ORDER BY id DESC
   LIMIT ?
-);
+) AND messages.created_at < ?;
 
 -- name: DeleteEnvelopeOlderThan :execrows
 DELETE FROM messages WHERE created_at < ? ;

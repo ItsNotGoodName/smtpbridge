@@ -29,11 +29,16 @@ WHERE id NOT IN (
   FROM messages
   ORDER BY id DESC
   LIMIT ?
-)
+) AND messages.created_at < ?
 `
 
-func (q *Queries) DeleteEnvelopeUntilCount(ctx context.Context, limit int64) (int64, error) {
-	result, err := q.db.ExecContext(ctx, deleteEnvelopeUntilCount, limit)
+type DeleteEnvelopeUntilCountParams struct {
+	Limit     int64
+	CreatedAt time.Time
+}
+
+func (q *Queries) DeleteEnvelopeUntilCount(ctx context.Context, arg DeleteEnvelopeUntilCountParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, deleteEnvelopeUntilCount, arg.Limit, arg.CreatedAt)
 	if err != nil {
 		return 0, err
 	}

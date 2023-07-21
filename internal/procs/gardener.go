@@ -82,11 +82,12 @@ func gardenerDeleteByStorage(cc *core.Context, policy models.RetentionPolicy, st
 	}
 
 	if policy.EnvelopeCount != 0 && storage.EnvelopeCount > policy.EnvelopeCount {
-		count, err := db.EnvelopeDeleteUntilCount(cc, policy.EnvelopeCount)
+		date := time.Now().Add(-policy.MinEnvelopeAge)
+		count, err := db.EnvelopeDeleteUntilCount(cc, date, policy.EnvelopeCount)
 		if err != nil {
-			log.Err(err).Msg("Failed to envelopes by envelope count retention policy")
+			log.Err(err).Time("older-than", date).Int("keep", policy.EnvelopeCount).Msg("Failed to envelopes by envelope count retention policy")
 		} else {
-			log.Info().Int64("count", count).Msg("Deleted envelopes by envelope count retention policy")
+			log.Info().Time("older-than", date).Int("keep", policy.EnvelopeCount).Int64("deleted", count).Msg("Deleted envelopes by envelope count retention policy")
 		}
 	}
 }
@@ -94,11 +95,14 @@ func gardenerDeleteByStorage(cc *core.Context, policy models.RetentionPolicy, st
 func gardenerDeleteByAge(cc *core.Context, policy models.RetentionPolicy) {
 	if policy.EnvelopeAge != 0 {
 		date := time.Now().Add(-policy.EnvelopeAge)
+		if policy.MinEnvelopeAge > policy.EnvelopeAge {
+			date.Add(-policy.MinEnvelopeAge)
+		}
 		count, err := db.EnvelopeDeleteOlderThan(cc, date)
 		if err != nil {
 			log.Err(err).Time("older-than", date).Msg("Failed to delete envelopes by age retention policy")
 		} else {
-			log.Info().Time("older-than", date).Int64("count", count).Msg("Deleted envelopes by age retention policy")
+			log.Info().Time("older-than", date).Int64("deleted", count).Msg("Deleted envelopes by age retention policy")
 		}
 	}
 }
