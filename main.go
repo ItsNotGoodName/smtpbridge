@@ -21,7 +21,7 @@ import (
 func main() {
 	cli := config.ReadAndParseCLI()
 
-	if cli.Command == "version" {
+	if cli.Version {
 		fmt.Println(version)
 		return
 	}
@@ -65,17 +65,22 @@ func run(ctx context.Context, shutdown context.CancelFunc, cli config.CLI) <-cha
 	procs.GardenerStart(ctx, app, cfg.RetentionPolicy)
 	procs.VacuumStart(ctx, app)
 
+	var backgrounds []background.Background
+
 	// SMTP
-	smtp := smtp.New(app, shutdown, cfg.SMTPAddress, cfg.SMTPMaxMessageBytes)
+	if !cfg.SMTPDisable {
+		smtp := smtp.New(app, shutdown, cfg.SMTPAddress, cfg.SMTPMaxMessageBytes)
+		backgrounds = append(backgrounds, smtp)
+	}
 
 	// HTTP
-	http := http.New(app, shutdown, cfg.HTTPAddress, cfg.HTTPBodyLimit, cfg.RetentionPolicy)
+	if !cfg.HTTPDisable {
+		http := http.New(app, shutdown, cfg.HTTPAddress, cfg.HTTPBodyLimit, cfg.RetentionPolicy)
+		backgrounds = append(backgrounds, http)
+	}
 
 	// Start
-	return background.Run(ctx,
-		smtp,
-		http,
-	)
+	return background.Run(ctx, backgrounds...)
 }
 
 var (

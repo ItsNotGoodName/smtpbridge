@@ -24,7 +24,7 @@ smtpbridge
 ### Show Version
 
 ```
-smtpbridge version
+smtpbridge --version
 ```
 
 ## Supported Endpoints

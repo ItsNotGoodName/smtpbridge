@@ -12,13 +12,16 @@ import (
 	"github.com/alecthomas/kong"
 	kongyaml "github.com/alecthomas/kong-yaml"
 	"github.com/labstack/gommon/bytes"
+	"github.com/rs/zerolog/log"
 )
 
 type Config struct {
 	DatabasePath         string
 	AttachmentsDirectory string
+	HTTPDisable          bool
 	HTTPAddress          string
 	HTTPBodyLimit        int
+	SMTPDisable          bool
 	SMTPAddress          string
 	SMTPMaxMessageBytes  int
 	Endpoints            []endpoints.Endpoint
@@ -127,8 +130,10 @@ func Parse(raw Raw) (Config, error) {
 	return Config{
 		DatabasePath:         databasePath,
 		AttachmentsDirectory: attachmentsDirectory,
+		HTTPDisable:          raw.HTTP.Disable,
 		HTTPAddress:          raw.HTTP.Host + ":" + strconv.Itoa(raw.HTTP.Port),
 		HTTPBodyLimit:        int(maxBytesForEachPayload),
+		SMTPDisable:          raw.SMTP.Disable,
 		SMTPAddress:          raw.SMTP.Host + ":" + strconv.Itoa(raw.SMTP.Port),
 		SMTPMaxMessageBytes:  int(maxBytesForEachPayload),
 		Endpoints:            ends,
@@ -176,16 +181,33 @@ type RawRule struct {
 }
 
 func Read(cli CLI) (Raw, error) {
+	var configFiles []string
+	if cli.Config == nil {
+		configFile, err := resolve([]string{
+			"config.yaml",
+			"config.yml",
+			".smtpbridge.yaml",
+			".smtpbridge.yml",
+			"~/.smtpbridge.yaml",
+			"~/.smtpbridge.yml",
+		})
+		if err != nil {
+			return Raw{}, err
+		}
+
+		if configFile != "" {
+			configFiles = append(configFiles, configFile)
+		}
+	} else if *cli.Config != "" {
+		configFiles = []string{*cli.Config}
+	}
+
+	if len(configFiles) != 0 {
+		log.Info().Str("path", configFiles[0]).Msg("Reading config file")
+	}
+
 	var raw Raw
-	parser, err := kong.New(&raw, kong.Configuration(
-		kongyaml.Loader,
-		"config.yaml",
-		"config.yml",
-		".smtpbridge.yaml",
-		".smtpbridge.yml",
-		"~/.smtpbridge.yaml",
-		"~/.smtpbridge.yml",
-	))
+	parser, err := kong.New(&raw, kong.Configuration(kongyaml.Loader, configFiles...))
 	if err != nil {
 		return Raw{}, err
 	}
@@ -206,19 +228,44 @@ func Read(cli CLI) (Raw, error) {
 		raw.DataDirectory = cli.DataDirectory
 	}
 
+	if cli.SMTPDisable != nil {
+		raw.SMTP.Disable = bool(*cli.SMTPDisable)
+	}
+	if cli.SMTPHost != nil {
+		raw.SMTP.Host = string(*cli.SMTPHost)
+	}
+	if cli.SMTPPort != nil {
+		raw.SMTP.Port = int(*cli.SMTPPort)
+	}
+
+	if cli.HTTPDisable != nil {
+		raw.HTTP.Disable = bool(*cli.HTTPDisable)
+	}
+	if cli.HTTPHost != nil {
+		raw.HTTP.Host = string(*cli.HTTPHost)
+	}
+	if cli.HTTPPort != nil {
+		raw.HTTP.Port = int(*cli.HTTPPort)
+	}
+
 	return raw, nil
 }
 
 type CLI struct {
-	Command       string   `kong:"-"`
-	DataDirectory string   `name:"data-directory" help:"Path to store data." type:"path" optional:""`
-	Version       struct{} `cmd:"" hidden:""` // HACK: hidden because kong will throw error if a command is not supplied
+	Config        *string `name:"config" help:"Path to config file." type:"string"`
+	DataDirectory string  `name:"data-directory" help:"Path to store data." type:"path"`
+	SMTPDisable   *bool   `name:"smtp-disable" help:"Disable SMTP server."`
+	SMTPHost      *string `name:"smtp-host" help:"SMTP host address to listen on."`
+	SMTPPort      *uint16 `name:"smtp-port" help:"SMTP port to listen on"`
+	HTTPDisable   *bool   `name:"http-disable" help:"Disable HTTP server."`
+	HTTPHost      *string `name:"http-host" help:"HTTP host address to listen on."`
+	HTTPPort      *uint16 `name:"http-port" help:"HTTP port to listen on"`
+	Version       bool    `name:"version" help:"Show version."`
 }
 
 func ReadAndParseCLI() CLI {
 	cli := CLI{}
-	ctx := kong.Parse(&cli)
-	cli.Command = ctx.Command()
+	kong.Parse(&cli)
 
 	return cli
 }
