@@ -196,7 +196,7 @@ func Read(cli CLI) (Raw, error) {
 		}
 
 		if configFile != "" {
-			configFiles = append(configFiles, configFile)
+			configFiles = []string{configFile}
 		}
 	} else if *cli.Config != "" {
 		configFiles = []string{*cli.Config}
