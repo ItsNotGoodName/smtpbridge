@@ -21,7 +21,7 @@ Bridge email to other messaging services.
 smtpbridge
 ```
 
-### Show version
+### Show Version
 
 ```
 smtpbridge version
