@@ -1,13 +1,13 @@
-<table hx-trigger="every 5s" hx-get="/p/recent-envelopes-table" hx-swap="outerHTML">
+<table hx-trigger="every 5s, deleteEnvelopes from:body" hx-get="/p/recent-envelopes-table" hx-swap="outerHTML">
   <tbody>
     {{range $val := .Messages}}
     <tr>
-      <td>
+      <td class="text-align: left;">
         <a href="/envelopes/{{$val.ID}}">{{$val.Subject}}</a>
       </td>
 
-      <td>
-        <a href="/envelopes/{{$val.ID}}">{{timeHumanize $val.Date}}</a>
+      <td style="text-align: right;">
+        <a href="/envelopes/{{$val.ID}}" title="{{timeFormat $val.CreatedAt}}">{{timeHumanize $val.CreatedAt}}</a>
       </td>
     </tr>
     {{end}}

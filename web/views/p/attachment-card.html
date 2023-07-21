@@ -3,25 +3,23 @@
   <a href="/files/{{.FileName}}">
     <img src="/files/{{.FileName}}" alt="{{.FileName}}">
   </a>
+  <b>
+    {{.Name}}
+  </b>
   {{else}}
-  <h2>
-    <a href="/files/{{.FileName}}">
-      {{.Name}}
-    </a>
-  </h2>
+  <h2>{{.Name}}</h2>
   {{end}}
-  <aside>
-    <nav>
-      <ul>
-        {{if .IsImage}}
-        <li>
-          {{.Name}}
-        </li>
-        {{end}}
-        <li>
-          <a role="button" href="/envelopes/{{.MessageID}}">Envelope</a>
-        </li>
-      </ul>
-    </nav>
-  </aside>
+
+  <nav>
+    <ul></ul>
+    <ul>
+      <li>
+        <a role="button" href="/envelopes/{{.MessageID}}">Envelope</a>
+      </li>
+
+      <li>
+        <a role="button" href="/files/{{.FileName}}">Download</a>
+      </li>
+    </ul>
+  </nav>
 </article>
