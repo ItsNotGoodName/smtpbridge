@@ -15,7 +15,7 @@ func routes(http *fiber.App, app core.App, retentionPolicy models.RetentionPolic
 		http.Get("/", middleware.App(app, controllers.Envelopes))
 		http.Delete("/", middleware.App(app, controllers.EnvelopesDelete))
 		http.Get("/new", controllers.EnvelopeNew)
-		http.Post("/new", middleware.App(app, controllers.EnvelopesCreate))
+		http.Post("/new", middleware.App(app, controllers.EnvelopeNewPost))
 		http.Route("/:id", func(http fiber.Router) {
 			http.Get("/", middleware.AppID(app, controllers.Envelope))
 			http.Delete("/", middleware.AppID(app, controllers.EnvelopeDelete))

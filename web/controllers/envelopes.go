@@ -89,7 +89,7 @@ func EnvelopeNew(c *fiber.Ctx) error {
 	return c.Render("envelopes-new", fiber.Map{})
 }
 
-func EnvelopesCreate(c *fiber.Ctx, cc *core.Context) error {
+func EnvelopeNewPost(c *fiber.Ctx, cc *core.Context) error {
 	// Request
 	form, err := c.MultipartForm()
 	if err != nil {

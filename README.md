@@ -180,6 +180,7 @@ docker run -d \
 - Add [Apprise](https://github.com/caronc/apprise) endpoint
 - HTTP and SMTP auth
 - Remove placeholder [Pico CSS](https://picocss.com/) for custom CSS
+- Better HTTP error handling with [HTMX](https://htmx.org/)
 - CRUD endpoints and rules
 - SQLite full text search
 - Read mailbox files
