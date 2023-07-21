@@ -73,7 +73,6 @@ retention:
   # Retention policy for envelopes in database
   envelope_count: 0 # (100, 250, ...) Delete oldest first when full
   envelope_age: "" # (5m, 5h45m, ...) Delete older than age
-  min_envelope_age: 5m # (5m, 5h45m, ...) Prevent deleting young envelopes
 
   # Retention policy for attachments on disk
   attachment_size: "" # (100 MB, 1 GB, ...) Delete oldest first when full
