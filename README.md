@@ -29,13 +29,18 @@ smtpbridge
 
 ## Config
 
-Config file is located at `./.smtpbridge.yml`.
+Config file is loaded from one of the following locations. 
+
+- `config.yaml`
+- `config.yml`
+- `.smtpbridge.yaml`
+- `.smtpbridge.yml`
+- `~/.smtpbridge.yaml`
+- `~/.smtpbridge.yml`
 
 ### Starter Config
 
 This config prints emails received via SMTP to console.
-The SMTP server listens on port `1025` and the HTTP server listens on port `8080`.
-This saves emails to `~/.smtpbridge` directory.
 
 ```yaml
 endpoints:
@@ -60,12 +65,12 @@ data_directory: smtpbridge_data
 # Retention policy for envelopes and attachments
 retention:
   # Retention policy for envelopes in database
-  envelope_count: 0 # (100) oldest will be deleted
+  envelope_count: 0 # (100, 250, ...) Will be delete oldest when full
   envelope_age: ""
-  min_envelope_age: 5m
+  min_envelope_age: 5m # (5m, 5h45m, ...)
 
   # Retention policy for attachments on disk
-  attachment_size: "" # (100 MB) oldest will be deleted
+  attachment_size: "" # (100 MB, 1 GB, ...) Will be delete oldest when full
 
 # HTTP server
 http:
@@ -139,6 +144,7 @@ rules:
 ### Template
 
 Each template has access to [`Envelope`](./internal/envelope/envelope.go) via the `.` operator.
+
 See [`text/template`](https://pkg.go.dev/text/template) on how to template.
 
 ## Docker
@@ -157,7 +163,6 @@ services:
     volumes:
       - /path/to/data:/data
       - /path/to/config:/config
-    user: 1000:1000
     restart: unless-stopped
 ```
 
@@ -166,7 +171,6 @@ services:
 ```sh
 docker run -d \
   --name=smtpbridge \
-  --user 1000:1000 \
   -p 1025:1025 \
   -p 8080:8080 \
   -v /path/to/config:/config \
