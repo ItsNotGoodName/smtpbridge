@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/ItsNotGoodName/smtpbridge/internal/build"
 	"github.com/ItsNotGoodName/smtpbridge/internal/core"
 	"github.com/ItsNotGoodName/smtpbridge/internal/envelope"
 	"github.com/ItsNotGoodName/smtpbridge/internal/models"
@@ -31,7 +30,6 @@ func Index(retentionPolicy models.RetentionPolicy) func(c *fiber.Ctx, cc *core.C
 		// Response
 		return c.Render("index", fiber.Map{
 			"Messages":        messages.Messages,
-			"Build":           build.Current,
 			"Storage":         storage,
 			"RetentionPolicy": retentionPolicy,
 		})

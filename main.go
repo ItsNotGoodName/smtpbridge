@@ -84,19 +84,23 @@ func run(ctx context.Context, shutdown context.CancelFunc, cli config.CLI) <-cha
 }
 
 var (
-	version = "dev"
-	commit  = "none"
-	date    = "unknown"
-	builtBy = "unknown"
+	builtBy    = "unknown"
+	commit     = ""
+	date       = ""
+	version    = "dev"
+	repoURL    = "https://github.com/ItsNotGoodName/smtpbridge"
+	releaseURL = ""
 )
 
 func init() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
 	build.Current = build.Build{
-		BuiltBy: builtBy,
-		Commit:  commit,
-		Date:    date,
-		Version: version,
+		BuiltBy:    builtBy,
+		Commit:     commit,
+		Date:       date,
+		Version:    version,
+		RepoURL:    repoURL,
+		ReleaseURL: releaseURL,
 	}
 }

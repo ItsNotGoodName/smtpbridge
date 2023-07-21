@@ -12,8 +12,8 @@ import (
 )
 
 var Map template.FuncMap = template.FuncMap{
-	"repoURL": func() string {
-		return build.RepoURL
+	"build": func() build.Build {
+		return build.Current
 	},
 	"development": func() bool {
 		return web.Development

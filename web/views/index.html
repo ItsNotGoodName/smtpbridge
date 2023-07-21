@@ -28,19 +28,19 @@
         <tbody>
           <tr>
             <th scope="row"><strong>Built By</strong></th>
-            <td>{{.Build.BuiltBy}}</td>
+            <td>{{build.BuiltBy}}</td>
           </tr>
           <tr>
             <th scope="row"><strong>Commit</strong></th>
-            <td><a href="{{repoURL}}/tree/{{.Build.Commit}}">{{.Build.Commit}}</a></td>
+            <td><a href="{{build.CommitURL}}">{{build.Commit}}</a></td>
           </tr>
           <tr>
             <th scope="row"><strong>Date</strong></th>
-            <td>{{.Build.Date}}</td>
+            <td>{{build.Date}}</td>
           </tr>
           <tr>
             <th scope="row"><strong>Version</strong></th>
-            <td>{{.Build.Version}}</td>
+            <td>{{build.Version}}</td>
           </tr>
         </tbody>
       </table>
