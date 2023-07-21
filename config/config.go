@@ -253,7 +253,7 @@ func Read(cli CLI) (Raw, error) {
 
 type CLI struct {
 	Config        *string `name:"config" help:"Path to config file." type:"string"`
-	DataDirectory string  `name:"data-directory" help:"Path to store data." type:"path"`
+	DataDirectory string  `name:"data-directory" help:"Path to data directory." type:"path"`
 	SMTPDisable   *bool   `name:"smtp-disable" help:"Disable SMTP server."`
 	SMTPHost      *string `name:"smtp-host" help:"SMTP host address to listen on."`
 	SMTPPort      *uint16 `name:"smtp-port" help:"SMTP port to listen on"`
@@ -265,7 +265,9 @@ type CLI struct {
 
 func ReadAndParseCLI() CLI {
 	cli := CLI{}
-	kong.Parse(&cli)
-
+	kong.Parse(
+		&cli,
+		kong.Description("Bridge email to other messaging services."),
+	)
 	return cli
 }
