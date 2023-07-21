@@ -63,7 +63,7 @@ func SenderFactory(kind string, config map[string]string) (Sender, error) {
 			return nil, fmt.Errorf("Telegram 'chat_id' empty")
 		}
 
-		return NewTelegram(chatID, token), nil
+		return NewTelegram(token, chatID), nil
 	case "shoutrrr":
 		router, err := shoutrrr.CreateSender(strings.Split(config["urls"], "\n")...)
 		if err != nil {
