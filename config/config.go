@@ -103,21 +103,21 @@ func Parse(raw Raw) (Config, error) {
 		rrules = append(rrules, rule)
 	}
 
-	var attachmentsSize int64
-	if raw.Retention.AttachmentSize != "" {
-		var err error
-		attachmentsSize, err = bytes.Parse(raw.Retention.AttachmentSize)
+	var attachmentsSize *int64
+	if raw.Retention.AttachmentSize != nil {
+		size, err := bytes.Parse(*raw.Retention.AttachmentSize)
 		if err != nil {
 			return Config{}, err
 		}
+		attachmentsSize = &size
 	}
-	var envelopeAge time.Duration
-	if raw.Retention.EnvelopeAge != "" {
-		var err error
-		envelopeAge, err = time.ParseDuration(raw.Retention.EnvelopeAge)
+	var envelopeAge *time.Duration
+	if raw.Retention.EnvelopeAge != nil {
+		age, err := time.ParseDuration(*raw.Retention.EnvelopeAge)
 		if err != nil {
 			return Config{}, err
 		}
+		envelopeAge = &age
 	}
 
 	retentionPolicy := models.RetentionPolicy{
@@ -147,9 +147,9 @@ type Raw struct {
 	MaxPayloadSize string `name:"max_payload_size" default:"25 MB"`
 	DataDirectory  string `name:"data_directory" default:"smtpbridge_data" arg:""`
 	Retention      struct {
-		EnvelopeCount  int    `name:"envelope_count"`
-		EnvelopeAge    string `name:"envelope_age"`
-		AttachmentSize string `name:"attachment_size"`
+		EnvelopeCount  *int    `name:"envelope_count"`
+		EnvelopeAge    *string `name:"envelope_age"`
+		AttachmentSize *string `name:"attachment_size"`
 	} `embed:"" prefix:"retention-"`
 	HTTP struct {
 		Disable bool
