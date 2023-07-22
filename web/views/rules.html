@@ -1,7 +1,11 @@
 {{template "p/header" .}}
 
 <main class="container">
-  <h2>Rules</h2>
+  <hgroup>
+    <h2>Rules</h2>
+    <h2>Showing {{len .AggregateRules}} rules.</h2>
+  </hgroup>
+
   {{range $val := .AggregateRules}}
   <article>
     <h3>{{$val.Rule.Name}}</h3>

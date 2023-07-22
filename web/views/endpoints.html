@@ -1,7 +1,10 @@
 {{template "p/header" .}}
 
 <main class="container">
-  <h2>Endpoints</h2>
+  <hgroup>
+    <h2>Endpoints</h2>
+    <h2>Showing {{len .Endpoints}} endpoints.</h2>
+  </hgroup>
   {{range $val := .Endpoints}}
   <article id="endpoint_{{$val.ID}}">
     <h3>{{$val.Name}}</h3>
