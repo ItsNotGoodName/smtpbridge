@@ -2,6 +2,7 @@ package procs
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/ItsNotGoodName/smtpbridge/internal/core"
@@ -48,9 +49,20 @@ func gardener(cc *core.Context, policy models.RetentionPolicy, envCreatedC <-cha
 	ctx := cc.Context()
 	ticker := time.NewTicker(30 * time.Minute)
 
-	gardenerDeleteByAge(cc, policy)
+	clean := func() {
+		gardenerDeleteByAge(cc, policy)
+		gardenerDeleteOrphanAttachments(cc)
 
-	gardenerDeleteOrphanAttachments(cc)
+		storage, err := StorageGet(cc)
+		if err != nil {
+			log.Err(err).Msg("Failed to get storage")
+			return
+		}
+
+		gardenerDeleteByEnvelopeCount(cc, policy, storage)
+		gardenerDeleteByAttachmentSize(cc, policy, storage)
+	}
+	clean()
 
 	for {
 		select {
@@ -68,7 +80,7 @@ func gardener(cc *core.Context, policy models.RetentionPolicy, envCreatedC <-cha
 		case <-envDeletedC:
 			gardenerDeleteOrphanAttachments(cc)
 		case <-ticker.C:
-			gardenerDeleteByAge(cc, policy)
+			clean()
 		}
 	}
 }
@@ -90,6 +102,7 @@ func gardenerDeleteByAttachmentSize(cc *core.Context, policy models.RetentionPol
 }
 
 func gardenerDeleteByEnvelopeCount(cc *core.Context, policy models.RetentionPolicy, storage models.Storage) {
+	fmt.Println("---------", policy.EnvelopeCount)
 	if policy.EnvelopeCount == nil {
 		return
 	}
