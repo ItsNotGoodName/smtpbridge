@@ -11,27 +11,38 @@
       </h2>
     </hgroup>
 
-    <nav>
-      <ul></ul>
-      <ul>
-        <li>
-          <a href='/envelopes?{{query .Queries "page" .MessagesPageResult.Previous }}' role="button" {{if not
-            .MessagesPageResult.HasPrevious}} disabled {{end}}>
-            Previous
-          </a>
-        </li>
-        <li>
-          <a href="#" role="button" class="outline">{{.MessagesPageResult.Page}} /
-            {{.MessagesPageResult.TotalPages}}</a>
-        </li>
-        <li>
-          <a href='/envelopes?{{query .Queries "page" .MessagesPageResult.Next }}' role="button" {{if not
-            .MessagesPageResult.HasNext}} disabled {{end}}>
-            Next
-          </a>
-        </li>
-      </ul>
-    </nav>
+    <div class="grid">
+      <nav>
+        <ul>
+          <li>
+            <a href="/envelopes/new" role="button" aria-label="New">
+              <div class="i-ri-add-fill h-6 w-6"></div>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <nav>
+        <ul></ul>
+        <ul>
+          <li class="flex">
+            <a href='/envelopes?{{query .Queries "page" .MessagesPageResult.Previous }}' role="button" {{if not
+              .MessagesPageResult.HasPrevious}} disabled {{end}} aria-label="Previous" class="flex flex-items-center">
+              <div class=" i-ri-arrow-left-double-fill"></div>
+            </a>
+          </li>
+          <li>
+            <a href="#" role="button" class="outline">{{.MessagesPageResult.Page}} /
+              {{.MessagesPageResult.TotalPages}}</a>
+          </li>
+          <li class="flex">
+            <a href='/envelopes?{{query .Queries "page" .MessagesPageResult.Next }}' role="button" {{if not
+              .MessagesPageResult.HasNext}} disabled {{end}} aria-label="Next" class="flex flex-items-center">
+              <div class="i-ri-arrow-right-double-fill"></div>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
 
     <details>
       <summary>Advanced</summary>
@@ -94,7 +105,7 @@
             <input type="submit" value="Apply" />
           </div>
           <div>
-            <a href="/envelopes" role="button" style="width: 100%" class="contrast">
+            <a href="/envelopes" role="button" class="contrast w-full">
               Reset
             </a>
           </div>
@@ -132,15 +143,6 @@
         </tbody>
       </table>
     </figure>
-
-    <nav>
-      <ul></ul>
-      <ul>
-        <li>
-          <a href="/envelopes/new" role="button">New</a>
-        </li>
-      </ul>
-    </nav>
   </section>
 </main>
 

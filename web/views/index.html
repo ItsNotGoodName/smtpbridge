@@ -11,14 +11,16 @@
   <article>
     <h2>Storage</h2>
     <figure>{{template "p/storage-table" .}}</figure>
-    <button hx-post="/vacuum" data-loading-path="/vacuum" data-loading-disable data-loading-aria-busy
-      data-tooltip="Rebuild database file to take the minimal amount of disk space.">
-      Vacuum Database
-    </button>
-    <button hx-delete="/envelopes" data-loading-path="/vacuum" data-loading-disable data-loading-aria-busy
-      hx-confirm="Are you sure you wish to delete all envelopes?" class="contrast">
-      Delete Envelopes
-    </button>
+    <div class="grid">
+      <button hx-post="/vacuum" data-loading-path="/vacuum" data-loading-disable data-loading-aria-busy
+        data-tooltip="Rebuild database file to take the minimal amount of disk space.">
+        Vacuum Database
+      </button>
+      <button hx-delete="/envelopes" data-loading-path="/vacuum" data-loading-disable data-loading-aria-busy
+        hx-confirm="Are you sure you wish to delete all envelopes?" class="contrast">
+        Delete Envelopes
+      </button>
+    </div>
   </article>
 
   <article>

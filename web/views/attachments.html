@@ -13,20 +13,20 @@
     <nav>
       <ul></ul>
       <ul>
-        <li>
+        <li class="flex">
           <a href='/attachments?{{query .Queries "page" .AttachmentsPageResult.Previous }}' role="button" {{if not
-            .AttachmentsPageResult.HasPrevious}} disabled {{end}}>
-            Previous
+            .AttachmentsPageResult.HasPrevious}} disabled {{end}} aria-label="Previous" class="flex flex-items-center">
+            <div class=" i-ri-arrow-left-double-fill"></div>
           </a>
         </li>
         <li>
           <a href="#" role="button" class="outline">{{.AttachmentsPageResult.Page}} /
             {{.AttachmentsPageResult.TotalPages}}</a>
         </li>
-        <li>
+        <li class="flex">
           <a href='/attachments?{{query .Queries "page" .AttachmentsPageResult.Next }}' role="button" {{if not
-            .AttachmentsPageResult.HasNext}} disabled {{end}}>
-            Next
+            .AttachmentsPageResult.HasNext}} disabled {{end}} aria-label="Next" class="flex flex-items-center">
+            <div class="i-ri-arrow-right-double-fill"></div>
           </a>
         </li>
       </ul>
@@ -70,7 +70,7 @@
             <input type="submit" value="Apply" />
           </div>
           <div>
-            <a href="/attachments" role="button" style="width: 100%" class="contrast">
+            <a href="/attachments" role="button" class="contrast w-full">
               Reset
             </a>
           </div>
@@ -80,6 +80,7 @@
 
     {{range $val := .Attachments}}
     {{template "p/attachment-card" $val}}
+    <hr>
     {{end}}
 
     {{if .Attachments}}

@@ -2,23 +2,34 @@
 <a href="/files/{{.FileName}}">
   <img src="/files/{{.FileName}}" alt="{{.FileName}}">
 </a>
-<b>
-  {{.Name}}
-</b>
 {{else}}
 <h2>{{.Name}}</h2>
 {{end}}
 
-<nav>
-  <ul></ul>
-  <ul>
-    <li>
-      <a role="button" href="/envelopes/{{.MessageID}}">Envelope</a>
-    </li>
+<div class="grid mt-2">
+  {{if .IsImage}}
+  <div class="flex flex-items-center">
+    <b>
+      {{.Name}}
+    </b>
+  </div>
+  {{end}}
+  <nav>
+    <ul></ul>
+    <ul>
+      <li>
+        <a role="button" href="/envelopes/{{.MessageID}}" class="flex flex-items-center gap-2">
+          <div class="i-ri-mail-fill"></div>Envelope
+        </a>
+      </li>
 
-    <li>
-      <a role="button" href="/files/{{.FileName}}">Download</a>
-    </li>
-  </ul>
-</nav>
-<hr>
+      <li>
+        <a role="button" href="/files/{{.FileName}}" class="flex flex-items-center gap-2">
+          <div class="i-ri-download-fill">
+          </div>
+          Download
+        </a>
+      </li>
+    </ul>
+  </nav>
+</div>

@@ -2,16 +2,80 @@
   <nav>
     <ul>
       <li>
-        <a href="/" class="contrast">
-          <strong>SMTPBridge</strong>
+        <a href="/" class="contrast flex flex-items-center flex-wrap">
+          <img src="/favicon.svg" class="h-8 w-8 mr-2">
+          <strong class="text-xl">SMTPBridge</strong>
         </a>
       </li>
     </ul>
-    <ul style="overflow-x: auto;">
-      <li><a href="/envelopes" class="contrast">Envelopes</a></li>
-      <li><a href="/attachments" class="contrast">Attachments</a></li>
-      <li><a href="/rules" class="contrast">Rules</a></li>
-      <li><a href="/endpoints" class="contrast">Endpoints</a></li>
+    <ul class=" block md:hidden">
+      <li class="p-0 flex flex-items-center h-full">
+        <details role="list" dir="rtl">
+          <summary aria-haspopup="listbox" class="block pico-no-chevron">
+            <div class=" i-ri-align-justify h-6 w-6" />
+          </summary>
+          <ul role="listbox">
+            <li>
+              <a href="/envelopes" class="contrast">
+                <div class="flex flex-items-center flex-row-reverse gap-2">
+                  <div class="i-ri-mail-fill"></div>Envelopes
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="/attachments" class="contrast">
+                <div class="flex flex-items-center flex-row-reverse gap-2">
+                  <div class="i-ri-attachment-fill"></div>Attachments
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="/rules" class="contrast">
+                <div class="flex flex-items-center flex-row-reverse gap-2">
+                  <div class="i-ri-ruler-fill"></div>Rules
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="/endpoints" class="contrast">
+                <div class="flex flex-items-center flex-row-reverse gap-2">
+                  <div class="i-ri-telegram-fill"></div>Endpoints
+                </div>
+              </a>
+            </li>
+          </ul>
+        </details>
+      </li>
+    </ul>
+    <ul class="hidden md:block">
+      <li>
+        <a href="/envelopes" class="contrast">
+          <div class="flex flex-items-center gap-2">
+            <div class="i-ri-mail-fill"></div>Envelopes
+          </div>
+        </a>
+      </li>
+      <li>
+        <a href="/attachments" class="contrast">
+          <div class="flex flex-items-center gap-2">
+            <div class="i-ri-attachment-fill"></div>Attachments
+          </div>
+        </a>
+      </li>
+      <li>
+        <a href="/rules" class="contrast">
+          <div class="flex flex-items-center gap-2">
+            <div class="i-ri-ruler-fill"></div>Rules
+          </div>
+        </a>
+      </li>
+      <li>
+        <a href="/endpoints" class="contrast">
+          <div class="flex flex-items-center gap-2">
+            <div class="i-ri-telegram-fill"></div>Endpoints
+          </div>
+        </a>
+      </li>
     </ul>
   </nav>
 </div>

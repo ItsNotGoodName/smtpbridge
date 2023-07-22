@@ -2,12 +2,12 @@
   <tbody>
     {{range $val := .Messages}}
     <tr>
-      <td class="text-align: left;">
-        <a href="/envelopes/{{$val.ID}}">{{$val.Subject}}</a>
+      <td class="text-left">
+        <a href=" /envelopes/{{$val.ID}}">{{$val.Subject}}</a>
       </td>
 
-      <td style="text-align: right;">
-        <a href="/envelopes/{{$val.ID}}" title="{{timeFormat $val.CreatedAt}}">{{timeHumanize $val.CreatedAt}}</a>
+      <td class="text-right">
+        <a href=" /envelopes/{{$val.ID}}" title="{{timeFormat $val.CreatedAt}}">{{timeHumanize $val.CreatedAt}}</a>
       </td>
     </tr>
     {{end}}

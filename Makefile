@@ -9,8 +9,11 @@ snapshot:
 dev:
 	air
 
-dev-web:
+dev-vite:
 	cd web && pnpm run dev
+
+dev-uno:
+	cd web && pnpm run dev-uno
 
 clean:
 	rm -rf smtpbridge_data

@@ -1,0 +1,8 @@
+.pico-no-chevron::after {
+  content: none !important;
+}
+
+.pico-form-reset{
+  font-size:unset;
+  margin-bottom:unset;
+}
