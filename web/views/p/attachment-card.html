@@ -9,20 +9,19 @@
 <div class="grid mt-2">
   {{if .IsImage}}
   <div class="flex flex-items-center">
-    <b>
+    <b class="break-all">
       {{.Name}}
     </b>
   </div>
   {{end}}
   <nav>
     <ul></ul>
-    <ul>
+    <ul class="flex-wrap">
       <li>
         <a role="button" href="/envelopes/{{.MessageID}}" class="flex flex-items-center gap-2">
           <div class="i-ri-mail-fill"></div>Envelope
         </a>
       </li>
-
       <li>
         <a role="button" href="/files/{{.FileName}}" class="flex flex-items-center gap-2">
           <div class="i-ri-download-fill">

@@ -42,9 +42,15 @@
 .w-full{width:100%;}
 .flex{display:flex;}
 .flex-row-reverse{flex-direction:row-reverse;}
+.flex-col{flex-direction:column;}
 .flex-wrap{flex-wrap:wrap;}
+.justify-between{justify-content:space-between;}
 .gap-2{gap:0.5rem;}
+.gap-4{gap:1rem;}
 .flex-items-center{align-items:center;}
+.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.text-ellipsis{text-overflow:ellipsis;}
+.break-all{word-break:break-all;}
 .p-0{padding:0;}
 .text-left{text-align:left;}
 .text-right{text-align:right;}

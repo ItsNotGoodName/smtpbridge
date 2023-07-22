@@ -6,53 +6,50 @@
   <article>
     <h3>{{$val.Rule.Name}}</h3>
 
-    <table>
-      <tbody>
-        <tr>
-          <th>
-            <em data-tooltip="Endpoint was created internally and cannot be modified.">
-              Internal
-            </em>
-          </th>
-          <td>
-            <input disabled {{if $val.Rule.Internal}}checked{{end}} type="checkbox" role="switch" />
-          </td>
-        </tr>
-        <tr>
-          <th>
-            Enable
-          </th>
-          <td>
-            {{template "p/rule-enable-form" $val.Rule}}
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="flex flex-col gap-4">
+      <div class="flex justify-between gap-2">
+        <div>
+          <em data-placement="right" data-tooltip="Endpoint was created internally and cannot be modified.">
+            Internal
+          </em>
+        </div>
+        <div>
+          <input disabled {{if $val.Rule.Internal}}checked{{end}} type="checkbox" role="switch" />
+        </div>
+      </div>
+      <div class="flex justify-between gap-2">
+        <div>
+          Enable
+        </div>
+        <div>
+          {{template "p/rule-enable-form" $val.Rule}}
+        </div>
+      </div>
 
-    <label for="rule-{{$val.Rule.ID}}-expression">
-      Expression
-      <textarea id="rule-{{$val.Rule.ID}}-expression" rows="4" {{if
-        $val.Rule.Internal}}readonly{{end}}>{{$val.Rule.Expression}}</textarea>
-    </label>
+      <label for="rule-{{$val.Rule.ID}}-expression">
+        Expression
+        <textarea id="rule-{{$val.Rule.ID}}-expression" rows="4" {{if
+          $val.Rule.Internal}}readonly{{end}}>{{$val.Rule.Expression}}</textarea>
+      </label>
+    </div>
 
     <h4>Endpoints</h4>
-    <table>
-      <tbody>
-        {{range $end := $val.Endpoints}}
-        <tr>
-          <th>
-            <a href="/endpoints#endpoint-{{$end.ID}}">
-              {{$end.Name}}
-            </a>
-          </th>
-          <td>
-            <input {{if $val.Rule.Internal}}disabled{{end}} {{if $end.Enable}}checked{{end}} type="checkbox"
-              role="switch" />
-          </td>
-        </tr>
-        {{end}}
-      </tbody>
-    </table>
+
+    <div class="flex flex-col gap-4">
+      {{range $end := $val.Endpoints}}
+      <div class="flex justify-between gap-2">
+        <div class="text-ellipsis truncate">
+          <a href="/endpoints#endpoint-{{$end.ID}}">
+            {{$end.Name}}
+          </a>
+        </div>
+        <div>
+          <input {{if $val.Rule.Internal}}disabled{{end}} {{if $end.Enable}}checked{{end}} type="checkbox"
+            role="switch" />
+        </div>
+      </div>
+      {{end}}
+    </div>
   </article>
   {{end}}
 </main>
