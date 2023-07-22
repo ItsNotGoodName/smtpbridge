@@ -13,7 +13,6 @@ export default defineConfig({
         }
       }
     }],
-
   ],
   presets: [
     presetUno(),
