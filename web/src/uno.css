@@ -28,6 +28,9 @@
 .container{max-width:1536px;}
 }
 /* layer: default */
+.sticky{position:sticky;}
+.top-0{top:0;}
+.z-50{z-index:50;}
 .grid{display:grid;}
 .mr-2{margin-right:0.5rem;}
 .mt-2{margin-top:0.5rem;}
@@ -51,6 +54,7 @@
 .truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .text-ellipsis{text-overflow:ellipsis;}
 .break-all{word-break:break-all;}
+.bg-pico-background{background-color:var(--background-color);}
 .p-0{padding:0;}
 .text-left{text-align:left;}
 .text-right{text-align:right;}

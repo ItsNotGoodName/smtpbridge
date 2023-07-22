@@ -3,7 +3,18 @@ import { presetUno } from 'unocss'
 import presetIcons from '@unocss/preset-icons'
 
 export default defineConfig({
-  rules: [],
+  rules: [
+    [/^bg-(.*)$/, ([, c], { theme }) => {
+      //@ts-ignore
+      if (theme.colors[c]) {
+        return {
+          //@ts-ignore
+          color: theme.colors[c],
+        }
+      }
+    }],
+
+  ],
   presets: [
     presetUno(),
     presetIcons(),
@@ -14,4 +25,11 @@ export default defineConfig({
       outFile: "src/uno.css"
     },
   },
+  theme: {
+    colors: {
+      'pico': {
+        'background': 'var(--background-color)',
+      }
+    },
+  }
 })
