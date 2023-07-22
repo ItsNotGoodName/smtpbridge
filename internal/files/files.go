@@ -16,6 +16,10 @@ func CreateFile(cc *core.Context, datt envelope.DataAttachment) error {
 
 func GetFileData(cc *core.Context, att *envelope.Attachment) (envelope.DataAttachment, error) {
 	data, err := os.ReadFile(filePath(cc, att))
+	if err != nil {
+		return envelope.DataAttachment{}, err
+	}
+
 	return envelope.DataAttachment{Attachment: att, Data: data}, err
 }
 

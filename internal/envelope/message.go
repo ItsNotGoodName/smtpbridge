@@ -7,15 +7,24 @@ import (
 	"github.com/samber/lo"
 )
 
-func NewMessage(from string, to []string, subject, text, html string, date time.Time) *Message {
+type CreateMessage struct {
+	Date    time.Time
+	Subject string
+	From    string
+	To      []string
+	Text    string
+	HTML    string
+}
+
+func NewMessage(r CreateMessage) *Message {
 	return &Message{
-		From:      from,
-		To:        lo.Uniq(to),
+		From:      r.From,
+		To:        lo.Uniq(r.To),
 		CreatedAt: time.Now(),
-		Subject:   subject,
-		Text:      text,
-		HTML:      html,
-		Date:      date,
+		Subject:   r.Subject,
+		Text:      r.Text,
+		HTML:      r.HTML,
+		Date:      r.Date,
 	}
 }
 

@@ -110,14 +110,13 @@ func EnvelopeNewPost(c *fiber.Ctx, cc *core.Context) error {
 		datts = append(datts, envelope.NewDataAttachment(fh.Filename, data))
 	}
 
-	msg := envelope.NewMessage(
-		c.FormValue("from"),
-		strings.Split(c.FormValue("to"), ","),
-		c.FormValue("subject"),
-		c.FormValue("body"),
-		"",
-		time.Now(),
-	)
+	msg := envelope.NewMessage(envelope.CreateMessage{
+		From:    c.FormValue("from"),
+		To:      strings.Split(c.FormValue("to"), ","),
+		Subject: c.FormValue("subject"),
+		Text:    c.FormValue("body"),
+		Date:    time.Now(),
+	})
 
 	// Execute
 	_, err = procs.EnvelopeCreate(cc, msg, datts)

@@ -39,7 +39,12 @@ func EndpointTest(cc *core.Context, id int64) error {
 		return err
 	}
 
-	env := envelope.Envelope{Message: envelope.NewMessage("", []string{}, "Test Subject", "Test Text", "", time.Now())}
+	msg := envelope.NewMessage(envelope.CreateMessage{
+		Subject: "Test Subject",
+		Text:    "Test Text",
+		Date:    time.Now(),
+	})
+	env := envelope.Envelope{Message: msg}
 
 	return parsedEnd.Send(cc, env)
 }

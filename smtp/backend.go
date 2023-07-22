@@ -91,7 +91,14 @@ func (s *session) Data(r io.Reader) error {
 	for _, a := range e.Attachments {
 		datts = append(datts, envelope.NewDataAttachment(a.FileName, a.Content))
 	}
-	msg := envelope.NewMessage(s.from, to, e.GetHeader("Subject"), e.Text, e.HTML, date)
+	msg := envelope.NewMessage(envelope.CreateMessage{
+		From:    s.from,
+		To:      to,
+		Subject: e.GetHeader("Subject"),
+		Text:    e.Text,
+		HTML:    e.HTML,
+		Date:    date,
+	})
 
 	// Create envelope
 	id, err := procs.EnvelopeCreate(s.ctx, msg, datts)
