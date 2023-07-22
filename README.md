@@ -55,8 +55,6 @@ endpoints:
 
 rules:
   hello_world:
-    endpoints:
-      - hello_world
 ```
 
 ### Full Config

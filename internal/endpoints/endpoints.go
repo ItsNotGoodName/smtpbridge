@@ -32,24 +32,28 @@ type Endpoint struct {
 	Config            map[string]string
 }
 
-func New(req CreateEndpoint) (Endpoint, error) {
-	if req.Internal && req.InternalID == "" {
+func New(r CreateEndpoint) (Endpoint, error) {
+	if r.Internal && r.InternalID == "" {
 		return Endpoint{}, fmt.Errorf("internal id is empty")
 	}
 
-	if req.Name == "" {
+	if r.Name == "" {
 		return Endpoint{}, fmt.Errorf("name is empty")
 	}
 
+	if r.BodyTemplate == "" {
+		r.BodyTemplate = "{{ .Message.Text }}"
+	}
+
 	end := Endpoint{
-		Internal:          req.Internal,
-		InternalID:        req.InternalID,
-		Name:              req.Name,
-		AttachmentDisable: req.AttachmentDisable,
-		TextDisable:       req.TextDisable,
-		BodyTemplate:      req.BodyTemplate,
-		Kind:              req.Kind,
-		Config:            req.Config,
+		Internal:          r.Internal,
+		InternalID:        r.InternalID,
+		Name:              r.Name,
+		AttachmentDisable: r.AttachmentDisable,
+		TextDisable:       r.TextDisable,
+		BodyTemplate:      r.BodyTemplate,
+		Kind:              r.Kind,
+		Config:            r.Config,
 	}
 
 	_, err := end.Parse()

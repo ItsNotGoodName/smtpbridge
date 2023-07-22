@@ -217,10 +217,12 @@ func Read(cli CLI) (Raw, error) {
 		return Raw{}, err
 	}
 
-	for k, v := range raw.Endpoints {
-		if v.Body_Template == "" {
-			v.Body_Template = `{{ .Message.Text }}`
-			raw.Endpoints[k] = v
+	for endKey := range raw.Endpoints {
+		for ruleKey, rrule := range raw.Rules {
+			if ruleKey == endKey {
+				rrule.Endpoints = append(rrule.Endpoints, endKey)
+				raw.Rules[ruleKey] = rrule
+			}
 		}
 	}
 
