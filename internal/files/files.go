@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 	"sort"
+	"time"
 
 	"github.com/ItsNotGoodName/smtpbridge/internal/core"
 	"github.com/ItsNotGoodName/smtpbridge/internal/envelope"
@@ -47,7 +48,7 @@ func Size(cc *core.Context) (int64, error) {
 	return dirSize, nil
 }
 
-func DeleteFileUntilSize(cc *core.Context, currentSize, maxSize int64) error {
+func DeleteFileUntilSize(cc *core.Context, currentSize, maxSize int64, age time.Time) error {
 	files, err := ioutil.ReadDir(cc.File.Dir)
 	if err != nil {
 		return err
@@ -60,6 +61,9 @@ func DeleteFileUntilSize(cc *core.Context, currentSize, maxSize int64) error {
 	for i := range files {
 		if currentSize < maxSize {
 			break
+		}
+		if files[i].ModTime().After(age) {
+			continue
 		}
 
 		if err := os.Remove(path.Join(cc.File.Dir, files[i].Name())); err != nil {
