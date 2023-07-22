@@ -69,11 +69,11 @@ data_directory: smtpbridge_data
 # Retention policy for envelopes and attachment files
 retention:
   # # Retention policy for envelopes in database
-  # envelope_count: # (0, 100, 250, ...) [optional]
-  # envelope_age: # (5m, 5h45m, ...) [optional]
+  # envelope_count: # (0, 100, 250, ...)
+  # envelope_age: # (5m, 5h45m, ...)
 
   # # Retention policy for attachment files on disk
-  # attachment_size: # (100 MB, 1 GB, ...) [optional]
+  # attachment_size: # (100 MB, 1 GB, ...)
 
 # HTTP server
 http:

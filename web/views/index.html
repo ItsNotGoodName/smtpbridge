@@ -28,23 +28,23 @@
     <figure>
       <table>
         <tbody>
-          {{if .RetentionPolicy.EnvelopeCount}}
+          <tr>
+            <th scope="row"><strong>Minimum Age</strong></th>
+            <td>{{.RetentionPolicy.MinAge}}</td>
+          </tr>
+          {{if not (eq .RetentionPolicy.EnvelopeCount nil)}}
           <tr>
             <th scope="row"><strong>Envelope Count</strong></th>
             <td>{{.RetentionPolicy.EnvelopeCount}}</td>
           </tr>
           {{end}}
-          {{if .RetentionPolicy.EnvelopeAge}}
+          {{if not (eq .RetentionPolicy.EnvelopeAge nil)}}
           <tr>
             <th scope="row"><strong>Envelope Age</strong></th>
             <td>{{.RetentionPolicy.EnvelopeAge}}</td>
           </tr>
           {{end}}
-          <tr>
-            <th scope="row"><strong>Minimum Envelope Age</strong></th>
-            <td>{{.RetentionPolicy.MinEnvelopeAge}}</td>
-          </tr>
-          {{if .RetentionPolicy.AttachmentSize}}
+          {{if not (eq .RetentionPolicy.AttachmentSize nil)}}
           <tr>
             <th scope="row"><strong>Attachment Size</strong></th>
             <td>{{bytesHumanize .RetentionPolicy.AttachmentSize}}</td>

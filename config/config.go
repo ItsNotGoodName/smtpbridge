@@ -124,7 +124,7 @@ func Parse(raw Raw) (Config, error) {
 		EnvelopeCount:  raw.Retention.EnvelopeCount,
 		AttachmentSize: attachmentsSize,
 		EnvelopeAge:    envelopeAge,
-		MinEnvelopeAge: 5 * time.Minute,
+		MinAge:         5 * time.Minute,
 	}
 
 	return Config{
