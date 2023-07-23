@@ -22,7 +22,7 @@ var Map template.FuncMap = template.FuncMap{
 		return manifest
 	},
 	"timeFormat": func(date time.Time) string {
-		return date.Format("Jan _2 2006 15:04:05")
+		return date.Local().Format("Jan _2 2006 15:04:05")
 	},
 	"timeHumanize": func(date time.Time) string {
 		return humanize.Time(date)
