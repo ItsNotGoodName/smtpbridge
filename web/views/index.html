@@ -13,7 +13,7 @@
     <figure>{{template "p/storage-table" .}}</figure>
     <div class="grid">
       <button hx-post="/vacuum" data-loading-path="/vacuum" data-loading-disable data-loading-aria-busy
-        data-tooltip="Rebuild database file to take the minimal amount of disk space.">
+        title="Rebuild database file to take the minimal amount of disk space.">
         Vacuum Database
       </button>
       <button hx-delete="/envelopes" data-loading-path="/vacuum" data-loading-disable data-loading-aria-busy
