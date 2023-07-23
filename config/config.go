@@ -4,6 +4,7 @@ import (
 	"os"
 	"path"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/ItsNotGoodName/smtpbridge/internal/endpoints"
@@ -180,44 +181,69 @@ type RawRule struct {
 	Endpoints  []string
 }
 
+const envConfigYamlKey = "SMTPBRIDGE_CONFIG_YAML"
+
 func Read(cli CLI) (Raw, error) {
-	var configFiles []string
-	if cli.Config == nil {
-		// DEPS: ../README.md
-		configFile, err := resolve([]string{
-			"config.yaml",
-			"config.yml",
-			".smtpbridge.yaml",
-			".smtpbridge.yml",
-			"~/.smtpbridge.yaml",
-			"~/.smtpbridge.yml",
-			"/etc/smtpbridge.yaml",
-			"/etc/smtpbridge.yml",
-		})
+	var raw Raw
+	envConfigYaml := os.Getenv(envConfigYamlKey)
+	if envConfigYaml == "" {
+		// Resolve config file
+		var configFiles []string
+		if cli.Config == nil {
+			// DEPS: ../README.md
+			configFile, err := resolve([]string{
+				"config.yaml",
+				"config.yml",
+				".smtpbridge.yaml",
+				".smtpbridge.yml",
+				"~/.smtpbridge.yaml",
+				"~/.smtpbridge.yml",
+				"/etc/smtpbridge.yaml",
+				"/etc/smtpbridge.yml",
+			})
+			if err != nil {
+				return Raw{}, err
+			}
+
+			if configFile != "" {
+				configFiles = []string{configFile}
+			}
+		} else if *cli.Config != "" {
+			configFiles = []string{*cli.Config}
+		}
+
+		if len(configFiles) != 0 {
+			// Load config file
+			log.Info().Str("path", configFiles[0]).Msg("Reading config file")
+
+			parser, err := kong.New(&raw, kong.Configuration(kongyaml.Loader, configFiles...))
+			if err != nil {
+				return Raw{}, err
+			}
+
+			_, err = parser.Parse([]string{})
+			if err != nil {
+				return Raw{}, err
+			}
+		}
+	} else {
+		// Load config file from ENV
+		log.Info().Msgf("Reading config from environment variable %s", envConfigYamlKey)
+
+		resolver, err := kongyaml.Loader(strings.NewReader(envConfigYaml))
 		if err != nil {
 			return Raw{}, err
 		}
 
-		if configFile != "" {
-			configFiles = []string{configFile}
+		parser, err := kong.New(&raw, kong.Resolvers(resolver))
+		if err != nil {
+			return Raw{}, err
 		}
-	} else if *cli.Config != "" {
-		configFiles = []string{*cli.Config}
-	}
 
-	if len(configFiles) != 0 {
-		log.Info().Str("path", configFiles[0]).Msg("Reading config file")
-	}
-
-	var raw Raw
-	parser, err := kong.New(&raw, kong.Configuration(kongyaml.Loader, configFiles...))
-	if err != nil {
-		return Raw{}, err
-	}
-
-	_, err = parser.Parse([]string{})
-	if err != nil {
-		return Raw{}, err
+		_, err = parser.Parse([]string{})
+		if err != nil {
+			return Raw{}, err
+		}
 	}
 
 	for endKey := range raw.Endpoints {

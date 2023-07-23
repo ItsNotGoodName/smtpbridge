@@ -162,12 +162,20 @@ services:
   smtpbridge:
     image: ghcr.io/itsnotgoodname/smtpbridge:latest
     container_name: smtpbridge
+    environment:
+      - SMTPBRIDGE_CONFIG_YAML: | # Config option 1
+          endpoints:
+            hello_world:
+              kind: console
+
+          rules:
+            hello_world:
     ports:
       - 1025:1025
       - 8080:8080
     volumes:
+      - /path/to/config:/config # Config option 2
       - /path/to/data:/data
-      - /path/to/config:/config
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
