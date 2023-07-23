@@ -154,7 +154,7 @@ See [`text/template`](https://pkg.go.dev/text/template) on how to template.
 
 ## Docker
 
-### docker-compose
+### Docker Compose
 
 ```yaml
 version: "3"
@@ -164,7 +164,7 @@ services:
     container_name: smtpbridge
     environment:
       TZ: Etc/UTC
-      SMTPBRIDGE_CONFIG_YAML: | # Config option 1
+      SMTPBRIDGE_CONFIG_YAML: | # Config by embedding YAML
         endpoints:
           hello_world:
             kind: console
@@ -175,12 +175,12 @@ services:
       - 1025:1025
       - 8080:8080
     volumes:
-      - /path/to/config:/config # Config option 2
+      - /path/to/config:/config # Config by creating config.yaml file in /config
       - /path/to/data:/data
     restart: unless-stopped
 ```
 
-### docker cli
+### Docker CLI
 
 ```sh
 docker run -d \
