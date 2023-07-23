@@ -48,6 +48,7 @@
 .flex-row-reverse{flex-direction:row-reverse;}
 .flex-col{flex-direction:column;}
 .flex-wrap{flex-wrap:wrap;}
+.flex-justify-between,
 .justify-between{justify-content:space-between;}
 .gap-2{gap:0.5rem;}
 .gap-4{gap:1rem;}

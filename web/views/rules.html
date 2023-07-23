@@ -7,54 +7,59 @@
   </hgroup>
 
   {{range $val := .AggregateRules}}
-  <article>
-    <h3>{{$val.Rule.Name}}</h3>
+  <section id="rule-{{$val.Rule.ID}}">
+    <details>
+      <summary class="pico-no-chevron">
+        <div class="flex flex-justify-between">
+          <div>{{$val.Rule.Name}}</div>
+          <div>
 
-    <div class="flex flex-col gap-4">
-      <div class="flex justify-between gap-2">
-        <div>
-          <em title="Endpoint was created internally and cannot be modified.">
-            Internal
-          </em>
+            <div>
+              {{template "p/rule-enable-form" $val.Rule}}
+            </div>
+          </div>
         </div>
-        <div>
-          <input disabled {{if $val.Rule.Internal}}checked{{end}} type="checkbox" role="switch" />
-        </div>
-      </div>
-      <div class="flex justify-between gap-2">
-        <div>
-          Enable
-        </div>
-        <div>
-          {{template "p/rule-enable-form" $val.Rule}}
-        </div>
-      </div>
+      </summary>
+      <article>
+        <div class="flex flex-col gap-4">
+          <div class="flex justify-between gap-2">
+            <div>
+              <em title="Endpoint was created internally and cannot be modified.">
+                Internal
+              </em>
+            </div>
+            <div>
+              <input disabled {{if $val.Rule.Internal}}checked{{end}} type="checkbox" role="switch" />
+            </div>
+          </div>
 
-      <label for="rule-{{$val.Rule.ID}}-expression">
-        Expression
-        <textarea id="rule-{{$val.Rule.ID}}-expression" rows="4" {{if
-          $val.Rule.Internal}}readonly{{end}}>{{$val.Rule.Expression}}</textarea>
-      </label>
-    </div>
-
-    <h4>Endpoints</h4>
-
-    <div class="flex flex-col gap-4">
-      {{range $end := $val.Endpoints}}
-      <div class="flex justify-between gap-2">
-        <div class="text-ellipsis truncate">
-          <a href="/endpoints#endpoint-{{$end.ID}}">
-            {{$end.Name}}
-          </a>
+          <label for="rule-{{$val.Rule.ID}}-expression">
+            Expression
+            <textarea id="rule-{{$val.Rule.ID}}-expression" rows="4" {{if
+              $val.Rule.Internal}}readonly{{end}}>{{$val.Rule.Expression}}</textarea>
+          </label>
         </div>
-        <div>
-          <input {{if $val.Rule.Internal}}disabled{{end}} {{if $end.Enable}}checked{{end}} type="checkbox"
-            role="switch" />
+
+        <h4>Endpoints</h4>
+
+        <div class="flex flex-col gap-4">
+          {{range $end := $val.Endpoints}}
+          <div class="flex justify-between gap-2">
+            <div class="text-ellipsis truncate">
+              <a href="/endpoints#endpoint-{{$end.ID}}">
+                {{$end.Name}}
+              </a>
+            </div>
+            <div>
+              <input {{if $val.Rule.Internal}}disabled{{end}} {{if $end.Enable}}checked{{end}} type="checkbox"
+                role="switch" />
+            </div>
+          </div>
+          {{end}}
         </div>
-      </div>
-      {{end}}
-    </div>
-  </article>
+      </article>
+    </details>
+  </section>
   {{end}}
 </main>
 

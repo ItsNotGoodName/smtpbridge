@@ -7,76 +7,79 @@
   </hgroup>
 
   {{range $val := .Endpoints}}
-  <article id="endpoint_{{$val.ID}}">
-    <h3>{{$val.Name}}</h3>
+  <section id="endpoint-{{$val.ID}}">
+    <details>
+      <summary>{{$val.Name}}</summary>
+      <article>
+        <div class="flex flex-col gap-4">
+          <div class="flex justify-between gap-2">
+            <div>
+              <em title="Endpoint was created internally and cannot be modified.">
+                Internal
+              </em>
+            </div>
+            <div>
+              <input disabled {{if $val.Internal}}checked{{end}} type="checkbox" role="switch" />
+            </div>
+          </div>
 
-    <div class="flex flex-col gap-4">
-      <div class="flex justify-between gap-2">
-        <div>
-          <em title="Endpoint was created internally and cannot be modified.">
-            Internal
-          </em>
+          <div class="flex justify-between gap-2">
+            <div>Kind</div>
+            <div>{{$val.Kind}}</div>
+          </div>
+
+          <div class="flex justify-between gap-2">
+            <div>
+              <em title="Do not send attachments to endpoint.">
+                Attachment Disable
+              </em>
+            </div>
+            <div>
+              <input {{if $val.Internal}}disabled{{end}} {{if $val.AttachmentDisable}}checked{{end}} type="checkbox"
+                role="switch" />
+            </div>
+          </div>
+
+          <div class="flex justify-between gap-2">
+            <div>
+              <em title="Do not send text to endpoint.">
+                Text Disable
+              </em>
+            </div>
+            <div>
+              <input {{if $val.Internal}}disabled{{end}} {{if $val.TextDisable}}checked{{end}} type="checkbox"
+                role="switch" />
+            </div>
+          </div>
+
+          <label for="body_template">
+            Body Template
+            <textarea id="body_template" rows="4" {{if $val.Internal}}readonly{{end}}>{{$val.BodyTemplate}}</textarea>
+          </label>
         </div>
-        <div>
-          <input disabled {{if $val.Internal}}checked{{end}} type="checkbox" role="switch" />
-        </div>
-      </div>
 
-      <div class="flex justify-between gap-2">
-        <div>Kind</div>
-        <div>{{$val.Kind}}</div>
-      </div>
+        {{if $val.Config}}
+        <h4>Config</h4>
+        <form>
+          {{ range $key, $value := $val.Config }}
+          <label for="config_{{$key}}">
+            {{$key}}
+            <textarea {{if $val.Internal}}readonly{{end}} {{if $value}}placeholder="**********" {{end}}
+              id="config_{{$key}}"></textarea>
+          </label>
+          {{ end }}
+        </form>
+        {{ end }}
 
-      <div class="flex justify-between gap-2">
-        <div>
-          <em title="Do not send attachments to endpoint.">
-            Attachment Disable
-          </em>
-        </div>
-        <div>
-          <input {{if $val.Internal}}disabled{{end}} {{if $val.AttachmentDisable}}checked{{end}} type="checkbox"
-            role="switch" />
-        </div>
-      </div>
-
-      <div class="flex justify-between gap-2">
-        <div>
-          <em title="Do not send text to endpoint.">
-            Text Disable
-          </em>
-        </div>
-        <div>
-          <input {{if $val.Internal}}disabled{{end}} {{if $val.TextDisable}}checked{{end}} type="checkbox"
-            role="switch" />
-        </div>
-      </div>
-
-      <label for="body_template">
-        Body Template
-        <textarea id="body_template" rows="4" {{if $val.Internal}}readonly{{end}}>{{$val.BodyTemplate}}</textarea>
-      </label>
-    </div>
-
-    {{if $val.Config}}
-    <h4>Config</h4>
-    <form>
-      {{ range $key, $value := $val.Config }}
-      <label for="config_{{$key}}">
-        {{$key}}
-        <textarea {{if $val.Internal}}readonly{{end}} {{if $value}}placeholder="**********" {{end}}
-          id="config_{{$key}}"></textarea>
-      </label>
-      {{ end }}
-    </form>
-    {{ end }}
-
-    <form method="post" action="/endpoints/{{$val.ID}}/test" hx-post="/endpoints/{{$val.ID}}/test"
-      class="pico-form-reset">
-      <button type="submit" data-loading-disable data-loading-aria-busy>
-        Test Endpoint
-      </button>
-    </form>
-  </article>
+        <form method="post" action="/endpoints/{{$val.ID}}/test" hx-post="/endpoints/{{$val.ID}}/test"
+          class="pico-form-reset">
+          <button type="submit" data-loading-disable data-loading-aria-busy>
+            Test Endpoint
+          </button>
+        </form>
+      </article>
+    </details>
+  </section>
   {{end}}
 </main>
 
