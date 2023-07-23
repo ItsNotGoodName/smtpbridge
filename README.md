@@ -46,7 +46,7 @@ Config file is loaded from one of the following locations.
 - `/etc/smtpbridge.yaml`
 - `/etc/smtpbridge.yml`
 
-### Starter Config
+### Simple Config
 
 This config prints emails received via SMTP to console.
 
@@ -186,7 +186,6 @@ services:
 ```sh
 docker run -d \
   --name=smtpbridge \
-  -e TZ=Etc/UTC \
   -p 1025:1025 \
   -p 8080:8080 \
   -v /path/to/config:/config \
@@ -195,6 +194,32 @@ docker run -d \
   -v /etc/localtime:/etc/localtime:ro \
   --restart unless-stopped \
   ghcr.io/itsnotgoodname/smtpbridge:latest
+```
+
+## Development
+
+The following programs are required.
+
+- Make
+- Go
+- pnpm
+
+Install dependencies.
+
+```
+make dep
+```
+
+Start the Go server.
+
+```
+make dev
+```
+
+Start Vite.
+
+```
+make dev-web
 ```
 
 ## To Do

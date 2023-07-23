@@ -1,7 +1,4 @@
-all: npm snapshot
-
-npm:
-	cd web && pnpm install
+all: dep-web snapshot
 
 snapshot:
 	goreleaser release --snapshot --clean
@@ -22,3 +19,6 @@ dep-air:
 
 dep-sqlc:
 	go install github.com/kyleconroy/sqlc/cmd/sqlc@latest
+
+dep-web:
+	cd web && pnpm install
