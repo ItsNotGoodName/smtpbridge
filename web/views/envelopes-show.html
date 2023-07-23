@@ -66,7 +66,7 @@
     <form method="post" action="/send" hx-post="/send">
       <input type="hidden" id="envelope" name="envelope" value="{{.Envelope.Message.ID}}">
       <label for="endpoint">
-        Endpoints
+        Endpoint
         <select id="endpoint" name="endpoint">
           {{range $val := .Endpoints}}
           <option value="{{$val.ID}}">{{$val.Name}}</option>

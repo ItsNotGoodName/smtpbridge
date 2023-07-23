@@ -19,9 +19,6 @@ devDependencies:
   '@rollup/plugin-inject':
     specifier: ^5.0.3
     version: 5.0.3
-  '@unocss/cli':
-    specifier: ^0.53.6
-    version: 0.53.6
   '@unocss/preset-icons':
     specifier: ^0.53.6
     version: 0.53.6

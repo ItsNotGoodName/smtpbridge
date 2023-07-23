@@ -40,22 +40,23 @@
           </label>
         </div>
 
-        <h4>Endpoints</h4>
-
-        <div class="flex flex-col gap-4">
-          {{range $end := $val.Endpoints}}
-          <div class="flex justify-between gap-2">
-            <div class="text-ellipsis truncate">
-              <a href="/endpoints#endpoint-{{$end.ID}}">
-                {{$end.Name}}
-              </a>
+        <fieldset>
+          <legend>Endpoints</legend>
+          <div class="flex flex-col gap-2">
+            {{range $end := $val.Endpoints}}
+            <div class="flex justify-between gap-2">
+              <div class="text-ellipsis truncate">
+                <a href="/endpoints#endpoint-{{$end.ID}}">
+                  {{$end.Name}}
+                </a>
+              </div>
+              <div>
+                <input {{if $val.Rule.Internal}}disabled{{end}} {{if $end.Enable}}checked{{end}} type="checkbox"
+                  role="switch" />
+              </div>
             </div>
-            <div>
-              <input {{if $val.Rule.Internal}}disabled{{end}} {{if $end.Enable}}checked{{end}} type="checkbox"
-                role="switch" />
-            </div>
-          </div>
-          {{end}}
+            {{end}}
+        </fieldset>
         </div>
       </article>
     </details>

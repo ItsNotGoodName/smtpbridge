@@ -5,13 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "dev-uno": "unocss --watch",
-    "build": "tsc && unocss && vite build"
+    "build": "tsc && vite build"
   },
   "devDependencies": {
     "@iconify-json/ri": "^1.1.10",
     "@rollup/plugin-inject": "^5.0.3",
-    "@unocss/cli": "^0.53.6",
     "@unocss/preset-icons": "^0.53.6",
     "typescript": "^5.1.6",
     "unocss": "^0.53.6",
