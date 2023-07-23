@@ -148,6 +148,6 @@ func EnvelopesDelete(c *fiber.Ctx, cc *core.Context) error {
 	}
 
 	// Response
-	c.Set("HX-Trigger", "deleteEnvelopes")
+	c.Set("HX-Trigger", "deletedEnvelopes")
 	return c.SendStatus(http.StatusNoContent)
 }

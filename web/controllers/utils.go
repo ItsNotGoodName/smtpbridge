@@ -11,3 +11,7 @@ func checkbox(c *fiber.Ctx, key string) bool {
 	return true
 
 }
+
+func partial(c *fiber.Ctx, name string, bind interface{}) error {
+	return c.Render(name, bind, "")
+}

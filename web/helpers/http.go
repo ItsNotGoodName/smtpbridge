@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// TODO: handle responses for HTMX requests
 func Error(c *fiber.Ctx, err error, code ...int) error {
 	if len(code) == 1 {
 		return c.Status(code[0]).Render("500", fiber.Map{"Error": err})

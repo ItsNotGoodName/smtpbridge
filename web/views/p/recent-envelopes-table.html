@@ -1,4 +1,5 @@
-<table hx-trigger="every 5s, deleteEnvelopes from:body" hx-get="/p/recent-envelopes-table" hx-swap="outerHTML">
+<table hx-trigger="every 5s, deletedEnvelopes from:body, trimmed from:body" hx-get="/p/recent-envelopes-table"
+  hx-swap="outerHTML">
   <tbody>
     {{range $val := .Messages}}
     <tr>

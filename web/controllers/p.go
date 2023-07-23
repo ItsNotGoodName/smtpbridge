@@ -17,9 +17,9 @@ func PRecentEnvelopesTable(c *fiber.Ctx, cc *core.Context) error {
 	}
 
 	// Response
-	return c.Render("p/recent-envelopes-table", fiber.Map{
+	return partial(c, "p/recent-envelopes-table", fiber.Map{
 		"Messages": messages.Messages,
-	}, "")
+	})
 }
 
 func PStorageTable(c *fiber.Ctx, cc *core.Context) error {
@@ -30,7 +30,7 @@ func PStorageTable(c *fiber.Ctx, cc *core.Context) error {
 	}
 
 	// Response
-	return c.Render("p/storage-table", fiber.Map{
+	return partial(c, "p/storage-table", fiber.Map{
 		"Storage": storage,
-	}, "")
+	})
 }

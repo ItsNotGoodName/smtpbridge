@@ -71,7 +71,7 @@ func Vacuum(c *fiber.Ctx, cc *core.Context) error {
 	}
 
 	// Response
-	c.Set("HX-Trigger", "databaseVacuum")
+	c.Set("HX-Trigger", "vacuumed")
 	return c.SendStatus(http.StatusNoContent)
 }
 
@@ -83,6 +83,6 @@ func Trim(c *fiber.Ctx, cc *core.Context) error {
 	}
 
 	// Response
-	c.Set("HX-Trigger", "trim")
+	c.Set("HX-Trigger", "trimmed")
 	return c.SendStatus(http.StatusNoContent)
 }
