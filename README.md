@@ -163,7 +163,6 @@ services:
     image: ghcr.io/itsnotgoodname/smtpbridge:latest
     container_name: smtpbridge
     environment:
-      TZ: Etc/UTC
       SMTPBRIDGE_CONFIG_YAML: | # Config by embedding YAML
         endpoints:
           hello_world:
@@ -177,6 +176,8 @@ services:
     volumes:
       - /path/to/config:/config # Config by creating config.yaml file in /config
       - /path/to/data:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
 ```
 
@@ -190,6 +191,8 @@ docker run -d \
   -p 8080:8080 \
   -v /path/to/config:/config \
   -v /path/to/data:/data \
+  -v /etc/timezone:/etc/timezone:ro \
+  -v /etc/localtime:/etc/localtime:ro \
   --restart unless-stopped \
   ghcr.io/itsnotgoodname/smtpbridge:latest
 ```
