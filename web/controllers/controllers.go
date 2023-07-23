@@ -9,6 +9,7 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/internal/models"
 	"github.com/ItsNotGoodName/smtpbridge/internal/procs"
 	"github.com/ItsNotGoodName/smtpbridge/pkg/pagination"
+	"github.com/ItsNotGoodName/smtpbridge/web"
 	"github.com/ItsNotGoodName/smtpbridge/web/helpers"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
@@ -38,7 +39,8 @@ func Index(retentionPolicy models.RetentionPolicy) func(c *fiber.Ctx, cc *core.C
 
 func Files(app core.App) fiber.Handler {
 	return filesystem.New(filesystem.Config{
-		Root: http.FS(app.File.FS),
+		Root:   http.FS(app.File.FS),
+		MaxAge: web.MaxAge,
 	})
 }
 
