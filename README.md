@@ -35,7 +35,7 @@ smtpbridge --version
 
 ## Config
 
-Config file is loaded from one of the following locations. 
+Config file is loaded from one of the following locations.
 
 - `config.yaml`
 - `config.yml`

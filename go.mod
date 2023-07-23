@@ -11,6 +11,7 @@ require (
 	github.com/emersion/go-smtp v0.16.0
 	github.com/gofiber/fiber/v2 v2.47.0
 	github.com/gofiber/template/html/v2 v2.0.4
+	github.com/jaytaylor/html2text v0.0.0-20200412013138-3577fbdbcff7
 	github.com/jhillyerd/enmime v1.0.0
 	github.com/labstack/gommon v0.4.0
 	github.com/rs/zerolog v1.29.1
@@ -29,7 +30,6 @@ require (
 	github.com/gofiber/utils v1.1.0 // indirect
 	github.com/gogs/chardet v0.0.0-20191104214054-4b6791f73a28 // indirect
 	github.com/google/uuid v1.3.0 // indirect
-	github.com/jaytaylor/html2text v0.0.0-20200412013138-3577fbdbcff7 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/klauspost/compress v1.16.3 // indirect

@@ -34,3 +34,7 @@ func fileExtension(name string, mimeT string) string {
 	}
 	return extension
 }
+
+func isHTML(maybeHTML string) bool {
+	return strings.HasPrefix(maybeHTML, "<!DOCTYPE html>")
+}

@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/ItsNotGoodName/smtpbridge/pkg/pagination"
+	"github.com/jaytaylor/html2text"
 	"github.com/samber/lo"
 )
 
@@ -17,12 +18,21 @@ type CreateMessage struct {
 }
 
 func NewMessage(r CreateMessage) *Message {
+	text := r.Text
+	if isHTML(r.Text) {
+		var err error
+		text, err = html2text.FromString(r.Text)
+		if err != nil {
+			text = r.Text
+		}
+	}
+
 	return &Message{
 		From:      r.From,
 		To:        lo.Uniq(r.To),
 		CreatedAt: time.Now(),
 		Subject:   r.Subject,
-		Text:      r.Text,
+		Text:      text,
 		HTML:      r.HTML,
 		Date:      r.Date,
 	}
