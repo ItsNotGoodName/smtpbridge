@@ -88,9 +88,6 @@ smtp:
   disable: false # (false, true)
   host: ""
   port: 1025
-  auth:
-    username: username
-    password: password
 
 # Endpoints for envelopes
 endpoints:

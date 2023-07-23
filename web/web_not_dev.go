@@ -14,7 +14,7 @@ import (
 
 var Development = false
 
-const MaxAge = 3600
+const CacheControl = 3600
 
 //go:embed dist
 var assets embed.FS
@@ -30,7 +30,7 @@ func AssetsFS() fs.FS {
 func UseAssets(app *fiber.App) {
 	app.Use(filesystem.New(filesystem.Config{
 		Root:   http.FS(AssetsFS()),
-		MaxAge: MaxAge,
+		MaxAge: CacheControl,
 	}))
 }
 

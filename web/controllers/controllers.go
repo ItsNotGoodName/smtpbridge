@@ -40,7 +40,7 @@ func Index(retentionPolicy models.RetentionPolicy) func(c *fiber.Ctx, cc *core.C
 func Files(app core.App) fiber.Handler {
 	return filesystem.New(filesystem.Config{
 		Root:   http.FS(app.File.FS),
-		MaxAge: web.MaxAge,
+		MaxAge: web.CacheControl,
 	})
 }
 

@@ -15,7 +15,7 @@ import (
 
 var Development = true
 
-const MaxAge = 0
+const CacheControl = 0
 
 var pathAssets string
 var pathViews string
