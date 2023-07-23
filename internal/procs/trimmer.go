@@ -13,26 +13,26 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func GardenStart(cc *core.Context) error {
+func TrimStart(cc *core.Context) error {
 	ctx := cc.Context()
 	select {
 	case <-ctx.Done():
 		return ctx.Err()
-	case res := <-events.PublishGardenStart(cc):
+	case res := <-events.PublishTrimStart(cc):
 		if res {
 			return nil
 		}
 
-		return fmt.Errorf("already gardening")
+		return fmt.Errorf("already trimming")
 	}
 }
 
-func GardenerBackground(ctx context.Context, app core.App, policy models.RetentionPolicy) {
+func TrimmerBackground(ctx context.Context, app core.App, policy models.RetentionPolicy) {
 	envDeletedC := make(chan core.EventEnvelopeDeleted, 1)
 	envCreatedC := make(chan core.EventEnvelopeCreated, 1)
-	evtGardenStart := make(chan core.EventGardenStart, 1)
+	evtTrimStart := make(chan core.EventTrimStart, 1)
 
-	go gardener(app.Context(ctx), policy, envCreatedC, envDeletedC, evtGardenStart)
+	go trimmer(app.Context(ctx), policy, envCreatedC, envDeletedC, evtTrimStart)
 
 	events.OnEnvelopeCreated(app, func(cc *core.Context, evt core.EventEnvelopeCreated) {
 		select {
@@ -58,9 +58,9 @@ func GardenerBackground(ctx context.Context, app core.App, policy models.Retenti
 		}
 	})
 
-	events.OnGardenStart(app, func(cc *core.Context, evt core.EventGardenStart) {
+	events.OnTrimStart(app, func(cc *core.Context, evt core.EventTrimStart) {
 		select {
-		case evtGardenStart <- evt:
+		case evtTrimStart <- evt:
 		default:
 			select {
 			case <-ctx.Done():
@@ -71,19 +71,19 @@ func GardenerBackground(ctx context.Context, app core.App, policy models.Retenti
 	})
 }
 
-func gardener(
+func trimmer(
 	cc *core.Context,
 	policy models.RetentionPolicy,
 	envCreatedC <-chan core.EventEnvelopeCreated,
 	envDeletedC <-chan core.EventEnvelopeDeleted,
-	evtGardenStart <-chan core.EventGardenStart,
+	evtTrimStart <-chan core.EventTrimStart,
 ) {
 	ctx := cc.Context()
 	ticker := time.NewTicker(30 * time.Minute)
 
 	clean := func() {
-		gardenerDeleteByAge(cc, policy)
-		gardenerDeleteOrphanAttachments(cc)
+		trimmerDeleteByAge(cc, policy)
+		trimmerDeleteOrphanAttachments(cc)
 
 		storage, err := StorageGet(cc)
 		if err != nil {
@@ -91,8 +91,8 @@ func gardener(
 			return
 		}
 
-		gardenerDeleteByEnvelopeCount(cc, policy, storage)
-		gardenerDeleteByAttachmentSize(cc, policy, storage)
+		trimmerDeleteByEnvelopeCount(cc, policy, storage)
+		trimmerDeleteByAttachmentSize(cc, policy, storage)
 	}
 	clean()
 
@@ -107,13 +107,13 @@ func gardener(
 				continue
 			}
 
-			gardenerDeleteByEnvelopeCount(cc, policy, storage)
-			gardenerDeleteByAttachmentSize(cc, policy, storage)
+			trimmerDeleteByEnvelopeCount(cc, policy, storage)
+			trimmerDeleteByAttachmentSize(cc, policy, storage)
 		case <-envDeletedC:
-			gardenerDeleteOrphanAttachments(cc)
+			trimmerDeleteOrphanAttachments(cc)
 		case <-ticker.C:
 			clean()
-		case evt := <-evtGardenStart:
+		case evt := <-evtTrimStart:
 			clean()
 
 			select {
@@ -124,7 +124,7 @@ func gardener(
 		}
 	}
 }
-func gardenerDeleteByAttachmentSize(cc *core.Context, policy models.RetentionPolicy, storage models.Storage) {
+func trimmerDeleteByAttachmentSize(cc *core.Context, policy models.RetentionPolicy, storage models.Storage) {
 	if policy.AttachmentSize == nil {
 		return
 	}
@@ -140,7 +140,7 @@ func gardenerDeleteByAttachmentSize(cc *core.Context, policy models.RetentionPol
 	}
 }
 
-func gardenerDeleteByEnvelopeCount(cc *core.Context, policy models.RetentionPolicy, storage models.Storage) {
+func trimmerDeleteByEnvelopeCount(cc *core.Context, policy models.RetentionPolicy, storage models.Storage) {
 	if policy.EnvelopeCount == nil {
 		return
 	}
@@ -157,7 +157,7 @@ func gardenerDeleteByEnvelopeCount(cc *core.Context, policy models.RetentionPoli
 	}
 }
 
-func gardenerDeleteByAge(cc *core.Context, policy models.RetentionPolicy) {
+func trimmerDeleteByAge(cc *core.Context, policy models.RetentionPolicy) {
 	if policy.EnvelopeAge == nil {
 		return
 	}
@@ -171,7 +171,7 @@ func gardenerDeleteByAge(cc *core.Context, policy models.RetentionPolicy) {
 	}
 }
 
-func gardenerDeleteOrphanAttachments(cc *core.Context) {
+func trimmerDeleteOrphanAttachments(cc *core.Context) {
 	for {
 		atts, err := db.EnvelopeAttachmentListOrphan(cc, 10)
 		if err != nil {

@@ -43,7 +43,7 @@ func routes(http *fiber.App, app core.App, retentionPolicy models.RetentionPolic
 
 	http.Post("/send", middleware.App(app, controllers.Send))
 	http.Post("/vacuum", middleware.App(app, controllers.Vacuum))
-	http.Post("/garden", middleware.App(app, controllers.Garden))
+	http.Post("/trim", middleware.App(app, controllers.Trim))
 	http.Group("/files", controllers.Files(app))
 
 	http.Route("/p", func(http fiber.Router) {

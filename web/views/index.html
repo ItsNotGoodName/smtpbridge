@@ -16,7 +16,10 @@
         title="Rebuild database file to take the minimal amount of disk space.">
         Vacuum Database
       </button>
-      <button hx-delete="/envelopes" data-loading-path="/vacuum" data-loading-disable data-loading-aria-busy
+      <button hx-post="/trim" data-loading-path="/trim" data-loading-disable data-loading-aria-busy>
+        Trim Data
+      </button>
+      <button hx-delete="/envelopes" data-loading-path="/envelopes" data-loading-disable data-loading-aria-busy
         hx-confirm="Are you sure you wish to delete all envelopes?" class="contrast">
         Delete Envelopes
       </button>
@@ -53,9 +56,6 @@
         </tbody>
       </table>
     </figure>
-    <button hx-post="/garden" data-loading-path="/garden" data-loading-disable data-loading-aria-busy>
-      Garden Data
-    </button>
   </article>
 
   <article>

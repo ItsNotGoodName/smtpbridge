@@ -75,14 +75,14 @@ func Vacuum(c *fiber.Ctx, cc *core.Context) error {
 	return c.SendStatus(http.StatusNoContent)
 }
 
-func Garden(c *fiber.Ctx, cc *core.Context) error {
+func Trim(c *fiber.Ctx, cc *core.Context) error {
 	// Execute
-	err := procs.GardenStart(cc)
+	err := procs.TrimStart(cc)
 	if err != nil {
 		return helpers.Error(c, err)
 	}
 
 	// Response
-	c.Set("HX-Trigger", "garden")
+	c.Set("HX-Trigger", "trim")
 	return c.SendStatus(http.StatusNoContent)
 }

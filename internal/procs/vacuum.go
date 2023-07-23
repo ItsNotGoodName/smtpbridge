@@ -8,7 +8,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func VacuumStart(ctx context.Context, app core.App) {
+func VacuumBackground(ctx context.Context, app core.App) {
 	go vacuum(app.Context(ctx))
 }
 

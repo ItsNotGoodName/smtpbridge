@@ -62,8 +62,8 @@ func run(ctx context.Context, shutdown context.CancelFunc, cli config.CLI) <-cha
 	}
 
 	procs.MailmanBackground(ctx, app)
-	procs.GardenerBackground(ctx, app, cfg.RetentionPolicy)
-	procs.VacuumStart(ctx, app)
+	procs.TrimmerBackground(ctx, app, cfg.RetentionPolicy)
+	procs.VacuumBackground(ctx, app)
 
 	var backgrounds []background.Background
 
