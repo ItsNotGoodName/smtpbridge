@@ -43,6 +43,8 @@ Config file is loaded from one of the following locations.
 - `.smtpbridge.yml`
 - `~/.smtpbridge.yaml`
 - `~/.smtpbridge.yml`
+- `/etc/smtpbridge.yaml`
+- `/etc/smtpbridge.yml`
 
 ### Starter Config
 
@@ -60,7 +62,7 @@ rules:
 ### Full Config
 
 ```yaml
-# Max message size for envelopes
+# Maximum message size for envelopes
 max_payload_size: 25 MB
 
 # Directory for storing data
@@ -191,7 +193,6 @@ docker run -d \
 - Reload on config change
 - Add [Apprise](https://github.com/caronc/apprise) endpoint
 - HTTP and SMTP auth
-- Remove placeholder [Pico CSS](https://picocss.com/) for custom CSS
 - Better HTTP error handling with [HTMX](https://htmx.org/)
 - CRUD endpoints and rules
 - SQLite full text search

@@ -183,6 +183,7 @@ type RawRule struct {
 func Read(cli CLI) (Raw, error) {
 	var configFiles []string
 	if cli.Config == nil {
+		// DEPS: ../README.md
 		configFile, err := resolve([]string{
 			"config.yaml",
 			"config.yml",
@@ -190,6 +191,8 @@ func Read(cli CLI) (Raw, error) {
 			".smtpbridge.yml",
 			"~/.smtpbridge.yaml",
 			"~/.smtpbridge.yml",
+			"/etc/smtpbridge.yaml",
+			"/etc/smtpbridge.yml",
 		})
 		if err != nil {
 			return Raw{}, err
@@ -258,10 +261,10 @@ type CLI struct {
 	DataDirectory string  `name:"data-directory" help:"Path to data directory." type:"path"`
 	SMTPDisable   *bool   `name:"smtp-disable" help:"Disable SMTP server."`
 	SMTPHost      *string `name:"smtp-host" help:"SMTP host address to listen on."`
-	SMTPPort      *uint16 `name:"smtp-port" help:"SMTP port to listen on"`
+	SMTPPort      *uint16 `name:"smtp-port" help:"SMTP port to listen on."`
 	HTTPDisable   *bool   `name:"http-disable" help:"Disable HTTP server."`
 	HTTPHost      *string `name:"http-host" help:"HTTP host address to listen on."`
-	HTTPPort      *uint16 `name:"http-port" help:"HTTP port to listen on"`
+	HTTPPort      *uint16 `name:"http-port" help:"HTTP port to listen on."`
 	Version       bool    `name:"version" help:"Show version."`
 }
 
