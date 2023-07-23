@@ -70,7 +70,12 @@
     </form>
     {{ end }}
 
-    <button hx-post="/endpoints/{{$val.ID}}/test" data-loading-disable data-loading-aria-busy>Test Endpoint</button>
+    <form method="post" action="/endpoints/{{$val.ID}}/test" hx-post="/endpoints/{{$val.ID}}/test"
+      class="pico-form-reset">
+      <button type="submit" data-loading-disable data-loading-aria-busy>
+        Test Endpoint
+      </button>
+    </form>
   </article>
   {{end}}
 </main>
