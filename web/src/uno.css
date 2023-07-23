@@ -32,6 +32,7 @@
 .top-0{top:0;}
 .z-50{z-index:50;}
 .grid{display:grid;}
+.mx-auto{margin-left:auto;margin-right:auto;}
 .mr-2{margin-right:0.5rem;}
 .mt-2{margin-top:0.5rem;}
 .block{display:block;}
@@ -55,6 +56,7 @@
 .text-ellipsis{text-overflow:ellipsis;}
 .break-all{word-break:break-all;}
 .bg-pico-background{background-color:var(--background-color);}
+.bg-pico-card{background-color:var(--card-background-color);}
 .p-0{padding:0;}
 .text-left{text-align:left;}
 .text-right{text-align:right;}

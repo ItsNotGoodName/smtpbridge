@@ -1,19 +1,15 @@
 {{if .IsImage}}
-<a href="/files/{{.FileName}}">
-  <img src="/files/{{.FileName}}" alt="{{.FileName}}">
+<a href=" /files/{{.FileName}}" class="flex bg-pico-card shadow">
+  <img src="/files/{{.FileName}}" alt="{{.FileName}}" class="mx-auto">
 </a>
-{{else}}
-<h2>{{.Name}}</h2>
 {{end}}
 
 <div class="grid mt-2">
-  {{if .IsImage}}
   <div class="flex flex-items-center">
     <b class="break-all">
       {{.Name}}
     </b>
   </div>
-  {{end}}
   <nav>
     <ul></ul>
     <ul class="flex-wrap">

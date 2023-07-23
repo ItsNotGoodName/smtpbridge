@@ -16,7 +16,8 @@
         title="Rebuild database file to take the minimal amount of disk space.">
         Vacuum Database
       </button>
-      <button hx-post="/trim" data-loading-path="/trim" data-loading-disable data-loading-aria-busy>
+      <button hx-post="/trim" data-loading-path="/trim" data-loading-disable data-loading-aria-busy
+        title="Apply retention policy against data.">
         Trim Data
       </button>
       <button hx-delete="/envelopes" data-loading-path="/envelopes" data-loading-disable data-loading-aria-busy
@@ -37,19 +38,19 @@
           </tr>
           {{if not (eq .RetentionPolicy.EnvelopeCount nil)}}
           <tr>
-            <th scope="row"><strong>Envelope Count</strong></th>
+            <th scope="row"><strong>Total Envelope Count</strong></th>
             <td>{{.RetentionPolicy.EnvelopeCount}}</td>
           </tr>
           {{end}}
           {{if not (eq .RetentionPolicy.EnvelopeAge nil)}}
           <tr>
-            <th scope="row"><strong>Envelope Age</strong></th>
+            <th scope="row"><strong>Total Envelope Age</strong></th>
             <td>{{.RetentionPolicy.EnvelopeAge}}</td>
           </tr>
           {{end}}
           {{if not (eq .RetentionPolicy.AttachmentSize nil)}}
           <tr>
-            <th scope="row"><strong>Attachment Size</strong></th>
+            <th scope="row"><strong>Total Attachment Size</strong></th>
             <td>{{bytesHumanize .RetentionPolicy.AttachmentSize}}</td>
           </tr>
           {{end}}

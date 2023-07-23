@@ -14,7 +14,7 @@ func (b Build) CommitURL() string {
 }
 
 func (b Build) LicenseURL() string {
-	return b.CommitURL() + "/LICENSE"
+	return b.RepoURL + "/blob/master/LICENSE"
 }
 
 var Current Build

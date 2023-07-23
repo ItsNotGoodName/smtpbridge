@@ -27,6 +27,7 @@ export default defineConfig({
   theme: {
     colors: {
       'pico': {
+        'card': 'var(--card-background-color)',
         'background': 'var(--background-color)',
       }
     },
