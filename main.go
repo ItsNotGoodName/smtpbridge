@@ -61,8 +61,8 @@ func run(ctx context.Context, shutdown context.CancelFunc, cli config.CLI) <-cha
 		log.Fatal().Err(err).Msg("Failed to sync app from config")
 	}
 
-	procs.MailmanStart(ctx, app)
-	procs.GardenerStart(ctx, app, cfg.RetentionPolicy)
+	procs.MailmanBackground(ctx, app)
+	procs.GardenerBackground(ctx, app, cfg.RetentionPolicy)
 	procs.VacuumStart(ctx, app)
 
 	var backgrounds []background.Background

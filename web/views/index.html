@@ -8,7 +8,7 @@
     </figure>
   </article>
 
-  <article>
+  <article id="storage">
     <h2>Storage</h2>
     <figure>{{template "p/storage-table" .}}</figure>
     <div class="grid">
@@ -53,6 +53,9 @@
         </tbody>
       </table>
     </figure>
+    <button hx-post="/garden" data-loading-path="/garden" data-loading-disable data-loading-aria-busy>
+      Garden Data
+    </button>
   </article>
 
   <article>

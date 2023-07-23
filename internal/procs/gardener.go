@@ -2,6 +2,7 @@ package procs
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/ItsNotGoodName/smtpbridge/internal/core"
@@ -12,11 +13,26 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func GardenerStart(ctx context.Context, app core.App, policy models.RetentionPolicy) {
+func GardenStart(cc *core.Context) error {
+	ctx := cc.Context()
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case res := <-events.PublishGardenStart(cc):
+		if res {
+			return nil
+		}
+
+		return fmt.Errorf("already gardening")
+	}
+}
+
+func GardenerBackground(ctx context.Context, app core.App, policy models.RetentionPolicy) {
 	envDeletedC := make(chan core.EventEnvelopeDeleted, 1)
 	envCreatedC := make(chan core.EventEnvelopeCreated, 1)
+	evtGardenStart := make(chan core.EventGardenStart, 1)
 
-	go gardener(app.Context(ctx), policy, envCreatedC, envDeletedC)
+	go gardener(app.Context(ctx), policy, envCreatedC, envDeletedC, evtGardenStart)
 
 	events.OnEnvelopeCreated(app, func(cc *core.Context, evt core.EventEnvelopeCreated) {
 		select {
@@ -41,9 +57,27 @@ func GardenerStart(ctx context.Context, app core.App, policy models.RetentionPol
 		default:
 		}
 	})
+
+	events.OnGardenStart(app, func(cc *core.Context, evt core.EventGardenStart) {
+		select {
+		case evtGardenStart <- evt:
+		default:
+			select {
+			case <-ctx.Done():
+				return
+			case evt.Response <- false:
+			}
+		}
+	})
 }
 
-func gardener(cc *core.Context, policy models.RetentionPolicy, envCreatedC <-chan core.EventEnvelopeCreated, envDeletedC <-chan core.EventEnvelopeDeleted) {
+func gardener(
+	cc *core.Context,
+	policy models.RetentionPolicy,
+	envCreatedC <-chan core.EventEnvelopeCreated,
+	envDeletedC <-chan core.EventEnvelopeDeleted,
+	evtGardenStart <-chan core.EventGardenStart,
+) {
 	ctx := cc.Context()
 	ticker := time.NewTicker(30 * time.Minute)
 
@@ -79,6 +113,14 @@ func gardener(cc *core.Context, policy models.RetentionPolicy, envCreatedC <-cha
 			gardenerDeleteOrphanAttachments(cc)
 		case <-ticker.C:
 			clean()
+		case evt := <-evtGardenStart:
+			clean()
+
+			select {
+			case <-ctx.Done():
+				return
+			case evt.Response <- true:
+			}
 		}
 	}
 }

@@ -9,7 +9,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func MailmanStart(ctx context.Context, app core.App) {
+func MailmanBackground(ctx context.Context, app core.App) {
 	evtC := make(chan core.EventEnvelopeCreated, 25)
 
 	go mailman(app.Context(ctx), evtC)

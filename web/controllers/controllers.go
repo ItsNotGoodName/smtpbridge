@@ -74,3 +74,15 @@ func Vacuum(c *fiber.Ctx, cc *core.Context) error {
 	c.Set("HX-Trigger", "databaseVacuum")
 	return c.SendStatus(http.StatusNoContent)
 }
+
+func Garden(c *fiber.Ctx, cc *core.Context) error {
+	// Execute
+	err := procs.GardenStart(cc)
+	if err != nil {
+		return helpers.Error(c, err)
+	}
+
+	// Response
+	c.Set("HX-Trigger", "garden")
+	return c.SendStatus(http.StatusNoContent)
+}

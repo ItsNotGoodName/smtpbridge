@@ -29,3 +29,20 @@ func PublishEnvelopeDeleted(cc *core.Context, ids ...int64) {
 	}
 	cc.Bus.Mutex.Unlock()
 }
+
+func OnGardenStart(app core.App, fn func(cc *core.Context, evt core.EventGardenStart)) {
+	app.Bus.Mutex.Lock()
+	if app.Bus.GardenStart != nil {
+		panic("GardenStart handler is being redefined")
+	}
+	app.Bus.GardenStart = fn
+	app.Bus.Mutex.Unlock()
+}
+
+func PublishGardenStart(cc *core.Context) <-chan bool {
+	res := make(chan bool)
+	cc.Bus.Mutex.Lock()
+	cc.Bus.GardenStart(cc, core.EventGardenStart{Response: res})
+	cc.Bus.Mutex.Unlock()
+	return res
+}
