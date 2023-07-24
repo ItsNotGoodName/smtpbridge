@@ -11,6 +11,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/csrf"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/rs/zerolog/log"
 )
 
@@ -21,6 +22,8 @@ type HTTP struct {
 }
 
 func New(app core.App, shutdown context.CancelFunc, address string, bodyLimit int) HTTP {
+	store := session.New()
+
 	// Fiber
 	views := web.Engine()
 	views.AddFuncMap(helpers.Map)
@@ -43,12 +46,13 @@ func New(app core.App, shutdown context.CancelFunc, address string, bodyLimit in
 	http.Use(csrf.New(csrf.Config{
 		KeyLookup: "cookie:csrf_",
 	}))
-
-	// Routes
-	routes(http, app)
-
-	// Middleware
 	web.UseAssets(http)
+
+	route(app,
+		store,
+		http,
+	)
+
 	http.Use(helpers.NotFound)
 
 	return HTTP{

@@ -3,52 +3,59 @@ package http
 import (
 	"github.com/ItsNotGoodName/smtpbridge/internal/core"
 	"github.com/ItsNotGoodName/smtpbridge/web/controllers"
-	"github.com/ItsNotGoodName/smtpbridge/web/middleware"
+	"github.com/ItsNotGoodName/smtpbridge/web/inject"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/session"
 )
 
-func routes(http *fiber.App, app core.App) {
-	http.Get("/", middleware.App(app, controllers.Index))
+func route(app core.App, store *session.Store, http fiber.Router) {
+	authSkip := inject.AppStore(app, store, controllers.AuthSkip)
+	authRequire := inject.AppStore(app, store, controllers.AuthRequire)
+
+	http.Get("/login", authSkip, inject.App(app, controllers.Login))
+	http.Post("/auth", authSkip, inject.AppStore(app, store, controllers.AuthLogin))
+	http.Delete("/auth", authRequire, inject.AppStore(app, store, controllers.AuthLogout))
+
+	http.Get("/", authRequire, inject.App(app, controllers.Index))
 	http.Route("/index", func(http fiber.Router) {
-		http.Get("/storage-table", middleware.App(app, controllers.IndexStorageTable))
-		http.Get("/recent-envelopes-table", middleware.App(app, controllers.IndexRecentEnvelopesTable))
+		http.Get("/storage-table", authRequire, inject.App(app, controllers.IndexStorageTable))
+		http.Get("/recent-envelopes-table", authRequire, inject.App(app, controllers.IndexRecentEnvelopesTable))
 	})
 
-	http.Get("/login", middleware.App(app, controllers.AuthLogin))
-
 	http.Route("/envelopes", func(http fiber.Router) {
-		http.Get("/", middleware.App(app, controllers.Envelopes))
-		http.Delete("/", middleware.App(app, controllers.EnvelopesDelete))
-		http.Get("/new", controllers.EnvelopeNew)
-		http.Post("/new", middleware.App(app, controllers.EnvelopeNewPost))
+		http.Get("/", authRequire, inject.App(app, controllers.Envelopes))
+		http.Delete("/", authRequire, inject.App(app, controllers.EnvelopesDelete))
+		http.Get("/new", authRequire, controllers.EnvelopeNew)
+		http.Post("/new", authRequire, inject.App(app, controllers.EnvelopeNewPost))
 		http.Route("/:id", func(http fiber.Router) {
-			http.Get("/", middleware.AppID(app, controllers.Envelope))
-			http.Delete("/", middleware.AppID(app, controllers.EnvelopeDelete))
-			http.Get("/html", middleware.AppID(app, controllers.EnvelopeHTML))
+			http.Get("/", authRequire, inject.AppID(app, controllers.Envelope))
+			http.Delete("/", authRequire, inject.AppID(app, controllers.EnvelopeDelete))
+			http.Get("/html", authRequire, inject.AppID(app, controllers.EnvelopeHTML))
 		})
 	})
 
 	http.Route("/attachments", func(http fiber.Router) {
-		http.Get("/", middleware.App(app, controllers.Attachments))
+		http.Get("/", authRequire, inject.App(app, controllers.Attachments))
 	})
 
 	http.Route("/endpoints", func(http fiber.Router) {
-		http.Get("/", middleware.App(app, controllers.Endpoints))
+		http.Get("/", authRequire, inject.App(app, controllers.Endpoints))
 		http.Route("/:id", func(http fiber.Router) {
-			http.Post("/test", middleware.AppID(app, controllers.EndpointTest))
+			http.Post("/test", authRequire, inject.AppID(app, controllers.EndpointTest))
 		})
 	})
 
 	http.Route("/rules", func(http fiber.Router) {
-		http.Get("/", middleware.App(app, controllers.Rules))
+		http.Get("/", authRequire, inject.App(app, controllers.Rules))
 		http.Route("/:id", func(http fiber.Router) {
-			http.Post("/enable", middleware.AppID(app, controllers.RuleEnable))
+			http.Post("/enable", authRequire, inject.AppID(app, controllers.RuleEnable))
 		})
 	})
 
-	http.Post("/send", middleware.App(app, controllers.Send))
-	http.Post("/vacuum", middleware.App(app, controllers.Vacuum))
-	http.Post("/trim", middleware.App(app, controllers.Trim))
-	http.Group("/files", controllers.Files(app))
+	http.Post("/send", authRequire, inject.App(app, controllers.Send))
+	http.Post("/vacuum", authRequire, inject.App(app, controllers.Vacuum))
+	http.Post("/trim", authRequire, inject.App(app, controllers.Trim))
+	http.Group("/files", authRequire, controllers.Files(app))
+
 	http.Get("/something-went-wrong", controllers.SomethingWentWrong)
 }

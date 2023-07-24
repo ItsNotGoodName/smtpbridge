@@ -8,7 +8,7 @@
         </a>
       </li>
     </ul>
-    <ul class=" block md:hidden">
+    <ul class=" block lg:hidden">
       <li class="p-0 flex flex-items-center h-full">
         <details role="list" dir="rtl">
           <summary aria-haspopup="listbox" class="block pico-no-chevron">
@@ -43,11 +43,18 @@
                 </div>
               </a>
             </li>
+            <li>
+              <a href="#" class="contrast" hx-delete="/auth">
+                <div class="flex flex-items-center flex-row-reverse gap-2">
+                  <div class="i-ri-logout-box-r-fill"></div>Log out
+                </div>
+              </a>
+            </li>
           </ul>
         </details>
       </li>
     </ul>
-    <ul class="hidden md:block">
+    <ul class="hidden lg:block">
       <li>
         <a href="/envelopes" class="contrast">
           <div class="flex flex-items-center gap-2">
@@ -73,6 +80,13 @@
         <a href="/endpoints" class="contrast">
           <div class="flex flex-items-center gap-2">
             <div class="i-ri-telegram-fill"></div>Endpoints
+          </div>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="contrast" hx-delete="/auth">
+          <div class="flex flex-items-center gap-2">
+            <div class="i-ri-logout-box-r-fill"></div>Log out
           </div>
         </a>
       </li>
