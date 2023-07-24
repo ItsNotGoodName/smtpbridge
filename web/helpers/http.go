@@ -1,23 +1,15 @@
 package helpers
 
 import (
-	"database/sql"
-	"net/http"
-
 	"github.com/gofiber/fiber/v2"
 )
 
-// TODO: handle responses for HTMX requests
-func Error(c *fiber.Ctx, err error, code ...int) error {
-	if len(code) == 1 {
-		return c.Status(code[0]).Render("500", fiber.Map{"Error": err})
+func Error(c *fiber.Ctx, err error, codes ...int) error {
+	if IsHTMXRequest(c) {
+		c.Set("HX-Redirect", "/something-went-wrong")
 	}
 
-	if err == sql.ErrNoRows {
-		return NotFound(c)
-	}
-
-	return c.Status(http.StatusInternalServerError).Render("500", fiber.Map{"Error": err})
+	return c.Render("something-went-wrong", fiber.Map{"Error": err})
 }
 
 func NotFound(c *fiber.Ctx) error {

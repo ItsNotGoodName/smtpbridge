@@ -2,7 +2,10 @@
 
 <main class="container">
   <section>
-    Something went wrong.
+    <div>Something went wrong.</div>
+    {{with .Error}}
+    <p>{{.}}</p>
+    {{end}}
   </section>
 </main>
 
