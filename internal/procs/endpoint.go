@@ -9,13 +9,13 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/internal/envelope"
 )
 
-func EndpointSend(cc core.Context, envelope_id int64, endpoint_id int64) error {
-	end, err := db.EndpointGet(cc, endpoint_id)
+func EndpointSend(cc core.Context, envelopeID int64, endpointID int64) error {
+	end, err := db.EndpointGet(cc, endpointID)
 	if err != nil {
 		return err
 	}
 
-	env, err := db.EnvelopeGet(cc, envelope_id)
+	env, err := db.EnvelopeGet(cc, envelopeID)
 	if err != nil {
 		return err
 	}

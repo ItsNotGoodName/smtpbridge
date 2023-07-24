@@ -71,17 +71,17 @@ func Files(app core.App) fiber.Handler {
 
 func Send(c *fiber.Ctx, cc core.Context) error {
 	// Request
-	envelope_id, err := strconv.ParseInt(c.FormValue("envelope"), 10, 64)
+	envelopeID, err := strconv.ParseInt(c.FormValue("envelope"), 10, 64)
 	if err != nil {
 		return helpers.Error(c, err, http.StatusBadRequest)
 	}
-	endpoint_id, err := strconv.ParseInt(c.FormValue("endpoint"), 10, 64)
+	endpointID, err := strconv.ParseInt(c.FormValue("endpoint"), 10, 64)
 	if err != nil {
 		return helpers.Error(c, err, http.StatusBadRequest)
 	}
 
 	// Execute
-	err = procs.EndpointSend(cc, envelope_id, endpoint_id)
+	err = procs.EndpointSend(cc, envelopeID, endpointID)
 	if err != nil {
 		return helpers.Error(c, err)
 	}

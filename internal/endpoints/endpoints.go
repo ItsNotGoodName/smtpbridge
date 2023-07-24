@@ -103,7 +103,7 @@ func (pe ParsedEndpoint) Send(cc core.Context, env envelope.Envelope) error {
 		return err
 	}
 
-	log.Info().Int64("envelope_id", env.Message.ID).Int64("endpoint_id", pe.ID).Msg("Envelope sent to endpoint")
+	log.Info().Int64("envelope-id", env.Message.ID).Int64("endpoint-id", pe.ID).Msg("Envelope sent to endpoint")
 
 	return nil
 }

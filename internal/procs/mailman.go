@@ -90,7 +90,7 @@ func mailman(cc core.Context, evtC <-chan core.EventEnvelopeCreated) {
 
 					// Send envelope to endpoint
 					if err := parsedEndpoint.Send(cc, env); err != nil {
-						log.Err(err).Int64("envelope_id", env.Message.ID).Int64("endpoint_id", end.ID).Msg("Failed to send envelope to endpoint")
+						log.Err(err).Int64("envelope-id", env.Message.ID).Int64("endpoint-id", end.ID).Msg("Failed to send envelope to endpoint")
 					}
 				}
 			}
