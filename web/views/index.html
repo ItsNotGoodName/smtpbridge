@@ -5,7 +5,7 @@
     <h2>Recent Envelopes</h2>
     <figure>
       {{block "recent-envelopes-table" .}}
-      <table hx-trigger="every 5s, deletedEnvelopes from:body, trimmed from:body" hx-get="/p/recent-envelopes-table"
+      <table hx-trigger="every 5s, deletedEnvelopes from:body, trimmed from:body" hx-get="/index/recent-envelopes-table"
         hx-swap="outerHTML">
         <tbody>
           {{range $val := .Messages}}
@@ -31,7 +31,7 @@
     <figure>
       {{block "storage-table" .}}
       <table hx-trigger="every 5s, vacuumed from:body, trimmed from:body, deletedEnvelopes from:body"
-        hx-get="/p/storage-table" hx-swap="outerHTML">
+        hx-get="/index/storage-table" hx-swap="outerHTML">
         <tbody>
           <tr>
             <th scope="row"><strong>Envelope Count</strong></th>

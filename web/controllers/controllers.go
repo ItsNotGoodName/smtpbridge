@@ -37,7 +37,7 @@ func Index(retentionPolicy models.RetentionPolicy) func(c *fiber.Ctx, cc *core.C
 	}
 }
 
-func IndexPStorageTable(c *fiber.Ctx, cc *core.Context) error {
+func IndexStorageTable(c *fiber.Ctx, cc *core.Context) error {
 	// Execute
 	storage, err := procs.StorageGet(cc)
 	if err != nil {
@@ -50,7 +50,7 @@ func IndexPStorageTable(c *fiber.Ctx, cc *core.Context) error {
 	}, "storage-table")
 }
 
-func IndexPRecentEnvelopesTable(c *fiber.Ctx, cc *core.Context) error {
+func IndexRecentEnvelopesTable(c *fiber.Ctx, cc *core.Context) error {
 	// Execute
 	messages, err := procs.EnvelopeMessageList(cc, pagination.NewPage(1, 5), envelope.MessageFilter{})
 	if err != nil {

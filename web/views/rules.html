@@ -13,15 +13,12 @@
         <div class="flex flex-justify-between">
           <div>{{$val.Rule.Name}}</div>
           <div>
-
-            <div>
-              {{block "rule-enable-form" $val.Rule}}
-              <form hx-post="/rules/{{.ID}}/enable" hx-trigger="change from:find input" hx-swap="outerHTML swap:100ms"
-                class="pico-form-reset">
-                <input name="enable" {{if .Enable}}checked{{end}} type="checkbox" role="switch" />
-              </form>
-              {{end}}
-            </div>
+            {{block "rule-enable-form" $val.Rule}}
+            <form hx-post="/rules/{{.ID}}/enable" hx-trigger="change from:find input" hx-swap="outerHTML swap:100ms"
+              class="pico-form-reset">
+              <input name="enable" {{if .Enable}}checked{{end}} data-loading-disable type="checkbox" role="switch" />
+            </form>
+            {{end}}
           </div>
         </div>
       </summary>

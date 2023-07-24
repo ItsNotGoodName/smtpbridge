@@ -10,10 +10,12 @@ import (
 
 func routes(http *fiber.App, app core.App, retentionPolicy models.RetentionPolicy) {
 	http.Get("/", middleware.App(app, controllers.Index(retentionPolicy)))
-	http.Route("/p", func(http fiber.Router) {
-		http.Get("/storage-table", middleware.App(app, controllers.IndexPStorageTable))
-		http.Get("/recent-envelopes-table", middleware.App(app, controllers.IndexPRecentEnvelopesTable))
+	http.Route("/index", func(http fiber.Router) {
+		http.Get("/storage-table", middleware.App(app, controllers.IndexStorageTable))
+		http.Get("/recent-envelopes-table", middleware.App(app, controllers.IndexRecentEnvelopesTable))
 	})
+
+	http.Get("/login", middleware.App(app, controllers.AuthLogin))
 
 	http.Route("/envelopes", func(http fiber.Router) {
 		http.Get("/", middleware.App(app, controllers.Envelopes))
@@ -41,7 +43,7 @@ func routes(http *fiber.App, app core.App, retentionPolicy models.RetentionPolic
 	http.Route("/rules", func(http fiber.Router) {
 		http.Get("/", middleware.App(app, controllers.Rules))
 		http.Route("/:id", func(http fiber.Router) {
-			http.Post("/enable", middleware.AppID(app, controllers.RulePEnableForm))
+			http.Post("/enable", middleware.AppID(app, controllers.RuleEnable))
 		})
 	})
 
