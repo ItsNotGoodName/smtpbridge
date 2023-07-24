@@ -9,7 +9,7 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/internal/procs"
 	"github.com/ItsNotGoodName/smtpbridge/pkg/pagination"
 	"github.com/ItsNotGoodName/smtpbridge/web"
-	"github.com/ItsNotGoodName/smtpbridge/web/helpers"
+	h "github.com/ItsNotGoodName/smtpbridge/web/helpers"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 )
@@ -18,18 +18,18 @@ func Index(c *fiber.Ctx, cc core.Context) error {
 	// Execute
 	storage, err := procs.StorageGet(cc)
 	if err != nil {
-		return helpers.Error(c, err)
+		return h.Error(c, err)
 	}
 
 	messages, err := procs.EnvelopeMessageList(cc, pagination.NewPage(1, 5), envelope.MessageFilter{})
 	if err != nil {
-		return helpers.Error(c, err)
+		return h.Error(c, err)
 	}
 
 	policy := procs.RetentionPolicyGet(cc)
 
 	// Response
-	return c.Render("index", fiber.Map{
+	return h.Render(c, "index", fiber.Map{
 		"Messages":        messages.Messages,
 		"Storage":         storage,
 		"RetentionPolicy": policy,
@@ -40,11 +40,11 @@ func IndexStorageTable(c *fiber.Ctx, cc core.Context) error {
 	// Execute
 	storage, err := procs.StorageGet(cc)
 	if err != nil {
-		return helpers.Error(c, err)
+		return h.Error(c, err)
 	}
 
 	// Response
-	return c.Render("index", fiber.Map{
+	return h.Render(c, "index", fiber.Map{
 		"Storage": storage,
 	}, "storage-table")
 }
@@ -53,11 +53,11 @@ func IndexRecentEnvelopesTable(c *fiber.Ctx, cc core.Context) error {
 	// Execute
 	messages, err := procs.EnvelopeMessageList(cc, pagination.NewPage(1, 5), envelope.MessageFilter{})
 	if err != nil {
-		return helpers.Error(c, err)
+		return h.Error(c, err)
 	}
 
 	// Response
-	return c.Render("index", fiber.Map{
+	return h.Render(c, "index", fiber.Map{
 		"Messages": messages.Messages,
 	}, "recent-envelopes-table")
 }
@@ -73,17 +73,17 @@ func Send(c *fiber.Ctx, cc core.Context) error {
 	// Request
 	envelopeID, err := strconv.ParseInt(c.FormValue("envelope"), 10, 64)
 	if err != nil {
-		return helpers.Error(c, err, http.StatusBadRequest)
+		return h.Error(c, err, http.StatusBadRequest)
 	}
 	endpointID, err := strconv.ParseInt(c.FormValue("endpoint"), 10, 64)
 	if err != nil {
-		return helpers.Error(c, err, http.StatusBadRequest)
+		return h.Error(c, err, http.StatusBadRequest)
 	}
 
 	// Execute
 	err = procs.EndpointSend(cc, envelopeID, endpointID)
 	if err != nil {
-		return helpers.Error(c, err)
+		return h.Error(c, err)
 	}
 
 	// Response
@@ -94,7 +94,7 @@ func Vacuum(c *fiber.Ctx, cc core.Context) error {
 	// Execute
 	err := procs.DatabaseVacuum(cc)
 	if err != nil {
-		return helpers.Error(c, err)
+		return h.Error(c, err)
 	}
 
 	// Response
@@ -106,7 +106,7 @@ func Trim(c *fiber.Ctx, cc core.Context) error {
 	// Execute
 	err := procs.TrimStart(cc)
 	if err != nil {
-		return helpers.Error(c, err)
+		return h.Error(c, err)
 	}
 
 	// Response
@@ -115,5 +115,5 @@ func Trim(c *fiber.Ctx, cc core.Context) error {
 }
 
 func SomethingWentWrong(c *fiber.Ctx) error {
-	return c.Render("something-went-wrong", fiber.Map{"Error": ""})
+	return h.Render(c, "something-went-wrong", fiber.Map{"Error": ""})
 }

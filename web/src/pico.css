@@ -3,6 +3,9 @@
 }
 
 .pico-form-reset{
-  font-size:unset;
-  margin-bottom:unset;
+  all: unset;
+}
+
+.pico-button-reset{
+  all: unset;
 }

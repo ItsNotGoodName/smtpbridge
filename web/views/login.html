@@ -9,6 +9,7 @@
     <h2>Login</h2>
     {{block "form" .}}
     <form method="post" action="/login" hx-post="/login" hx-swap="outerHTML">
+      {{csrf $}}
       <label for="username">
         Username
         <input type="text" id="username" name="username" placeholder="Username" />

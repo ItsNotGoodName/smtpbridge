@@ -3,6 +3,9 @@ all: dep-web snapshot
 snapshot:
 	goreleaser release --snapshot --clean
 
+preview:
+	go generate ./... && go run .
+
 dev:
 	air
 

@@ -2,12 +2,14 @@ package helpers
 
 import (
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"time"
 
 	"github.com/ItsNotGoodName/smtpbridge/internal/build"
 	"github.com/ItsNotGoodName/smtpbridge/web"
 	"github.com/dustin/go-humanize"
+	"github.com/gofiber/fiber/v2"
 )
 
 var Map template.FuncMap = template.FuncMap{
@@ -39,5 +41,14 @@ var Map template.FuncMap = template.FuncMap{
 	},
 	"query": func(queries map[string]string, vals ...any) template.URL {
 		return template.URL(Query(queries, vals...))
+	},
+	"set": func(c fiber.Map, name string, value any) fiber.Map {
+		return fiber.Map{
+			"Meta": c["Meta"],
+			name:   value,
+		}
+	},
+	"csrf": func(c fiber.Map) template.HTML {
+		return template.HTML(fmt.Sprintf(`<input type="hidden" name="csrf" value="%s" />`, c["Meta"].(Meta).CSRF))
 	},
 }

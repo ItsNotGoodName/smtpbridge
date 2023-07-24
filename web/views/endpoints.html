@@ -74,6 +74,7 @@
 
         <form method="post" action="/endpoints/{{$val.ID}}/test" hx-post="/endpoints/{{$val.ID}}/test"
           class="pico-form-reset">
+          {{csrf $}}
           <button type="submit" data-loading-disable data-loading-aria-busy>
             Test Endpoint
           </button>

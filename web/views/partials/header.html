@@ -43,13 +43,20 @@
                 </div>
               </a>
             </li>
+            {{if not .Meta.Anonymous}}
             <li>
-              <a href="#" class="contrast" hx-post="/logout">
-                <div class="flex flex-items-center flex-row-reverse gap-2">
-                  <div class="i-ri-logout-box-r-fill"></div>Log out
-                </div>
-              </a>
+              <form method="post" action="/logout" class="pico-form-reset">
+                {{csrf $}}
+                <button type="submit" class="pico-button-reset">
+                  <a href="#" class="contrast" hx-post="/logout">
+                    <div class="flex flex-items-center flex-row-reverse gap-2">
+                      <div class="i-ri-logout-box-r-fill"></div>Log out
+                    </div>
+                  </a>
+                </button>
+              </form>
             </li>
+            {{end}}
           </ul>
         </details>
       </li>
@@ -83,13 +90,20 @@
           </div>
         </a>
       </li>
+      {{if not .Meta.Anonymous}}
       <li>
-        <a href="#" class="contrast" hx-post="/logout">
-          <div class="flex flex-items-center gap-2">
-            <div class="i-ri-logout-box-r-fill"></div>Log out
-          </div>
-        </a>
+        <form method="post" action="/logout" class="pico-form-reset">
+          {{csrf $}}
+          <button type="submit" class="pico-button-reset">
+            <a href="#" class="contrast" hx-post="/logout">
+              <div class="flex flex-items-center gap-2">
+                <div class="i-ri-logout-box-r-fill"></div>Log out
+              </div>
+            </a>
+          </button>
+        </form>
       </li>
+      {{end}}
     </ul>
   </nav>
 </div>

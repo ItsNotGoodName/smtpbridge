@@ -3,17 +3,19 @@ package controllers
 import (
 	"github.com/ItsNotGoodName/smtpbridge/internal/core"
 	"github.com/ItsNotGoodName/smtpbridge/internal/procs"
-	"github.com/ItsNotGoodName/smtpbridge/web/helpers"
+	h "github.com/ItsNotGoodName/smtpbridge/web/helpers"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/session"
 )
 
-type LoginData struct {
-	Flash string
+func loginData(flash string) fiber.Map {
+	return fiber.Map{
+		"Flash": flash,
+	}
 }
 
 func Login(c *fiber.Ctx, cc core.Context) error {
-	return c.Render("login", LoginData{})
+	return h.Render(c, "login", fiber.Map{})
 }
 
 func LoginPost(c *fiber.Ctx, cc core.Context, store *session.Store) error {
@@ -24,43 +26,43 @@ func LoginPost(c *fiber.Ctx, cc core.Context, store *session.Store) error {
 	// Execute
 	err := procs.AuthHTTPLogin(cc, username, password)
 	if err != nil {
-		if helpers.IsHTMXRequest(c) {
-			return c.Render("login", LoginData{Flash: err.Error()}, "form")
+		if h.IsHTMXRequest(c) {
+			return h.Render(c, "login", loginData(err.Error()), "form")
 		}
-		return c.Render("login", LoginData{Flash: err.Error()})
+		return h.Render(c, "login", loginData(err.Error()))
 	}
 
 	// Response
 	sess, err := store.Get(c)
 	if err != nil {
-		return helpers.Error(c, err)
+		return h.Error(c, err)
 	}
 
 	sess.Set("auth", true)
 	if err := sess.Save(); err != nil {
-		return helpers.Error(c, err)
+		return h.Error(c, err)
 	}
 
-	return helpers.Redirect(c, "/")
+	return h.Redirect(c, "/")
 }
 
 func Logout(c *fiber.Ctx, cc core.Context, store *session.Store) error {
 	sess, err := store.Get(c)
 	if err != nil {
-		return helpers.Error(c, err)
+		return h.Error(c, err)
 	}
 
 	sess.Delete("auth")
 	if err := sess.Save(); err != nil {
-		return helpers.Error(c, err)
+		return h.Error(c, err)
 	}
 
-	return helpers.Redirect(c, "/login")
+	return h.Redirect(c, "/login")
 }
 
 func UserRequire(c *fiber.Ctx, cc core.Context, store *session.Store) error {
 	if procs.AuthHTTPAnonymous(cc) {
-		return helpers.NotFound(c)
+		return h.NotFound(c)
 	}
 
 	return authRequire(c, cc, store)
@@ -68,6 +70,7 @@ func UserRequire(c *fiber.Ctx, cc core.Context, store *session.Store) error {
 
 func AuthRequire(c *fiber.Ctx, cc core.Context, store *session.Store) error {
 	if procs.AuthHTTPAnonymous(cc) {
+		c.Locals(h.AnonymousContextKey, true)
 		return c.Next()
 	}
 
@@ -82,7 +85,7 @@ func authRequire(c *fiber.Ctx, cc core.Context, store *session.Store) error {
 
 	auth := sess.Get("auth")
 	if auth == nil {
-		return helpers.Redirect(c, "/login")
+		return h.Redirect(c, "/login")
 	}
 
 	return c.Next()
@@ -90,17 +93,17 @@ func authRequire(c *fiber.Ctx, cc core.Context, store *session.Store) error {
 
 func AuthRestrict(c *fiber.Ctx, cc core.Context, store *session.Store) error {
 	if procs.AuthHTTPAnonymous(cc) {
-		return helpers.Redirect(c, "/")
+		return h.Redirect(c, "/")
 	}
 
 	sess, err := store.Get(c)
 	if err != nil {
-		return helpers.Error(c, err)
+		return h.Error(c, err)
 	}
 
 	auth := sess.Get("auth")
 	if auth != nil {
-		return helpers.Redirect(c, "/")
+		return h.Redirect(c, "/")
 	}
 
 	return c.Next()

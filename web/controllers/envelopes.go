@@ -11,7 +11,7 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/internal/envelope"
 	"github.com/ItsNotGoodName/smtpbridge/internal/procs"
 	"github.com/ItsNotGoodName/smtpbridge/pkg/pagination"
-	"github.com/ItsNotGoodName/smtpbridge/web/helpers"
+	h "github.com/ItsNotGoodName/smtpbridge/web/helpers"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -19,12 +19,12 @@ func Envelopes(c *fiber.Ctx, cc core.Context) error {
 	// Request
 	page, err := strconv.Atoi(c.Query("page", "1"))
 	if err != nil {
-		return helpers.Error(c, err, http.StatusBadRequest)
+		return h.Error(c, err, http.StatusBadRequest)
 	}
 
 	perPage, err := strconv.Atoi(c.Query("perPage", "1"))
 	if err != nil {
-		return helpers.Error(c, err, http.StatusBadRequest)
+		return h.Error(c, err, http.StatusBadRequest)
 	}
 
 	filter := envelope.MessageFilter{
@@ -37,16 +37,16 @@ func Envelopes(c *fiber.Ctx, cc core.Context) error {
 	// Execute
 	res, err := procs.EnvelopeMessageList(cc, pagination.NewPage(page, perPage), filter)
 	if err != nil {
-		return helpers.Error(c, err)
+		return h.Error(c, err)
 	}
 
 	// Response
 	queries := c.Queries()
 	if res.PageResult.Page > res.PageResult.TotalPages {
-		return c.Redirect("/envelopes?" + helpers.Query(queries, "page", res.PageResult.TotalPages))
+		return c.Redirect("/envelopes?" + h.Query(queries, "page", res.PageResult.TotalPages))
 	}
 
-	return c.Render("envelopes", fiber.Map{
+	return h.Render(c, "envelopes", fiber.Map{
 		"Queries":            queries,
 		"Messages":           res.Messages,
 		"MessagesPageResult": res.PageResult,
@@ -58,15 +58,15 @@ func Envelope(c *fiber.Ctx, cc core.Context, id int64) error {
 	// Execute
 	env, err := procs.EnvelopeGet(cc, id)
 	if err != nil {
-		return helpers.Error(c, err)
+		return h.Error(c, err)
 	}
 	ends, err := procs.EndpointList(cc)
 	if err != nil {
-		return helpers.Error(c, err)
+		return h.Error(c, err)
 	}
 
 	// Response
-	return c.Render("envelopes-show", fiber.Map{
+	return h.Render(c, "envelopes-show", fiber.Map{
 		"Envelope":  env,
 		"Endpoints": ends,
 	})
@@ -76,7 +76,7 @@ func EnvelopeHTML(c *fiber.Ctx, cc core.Context, id int64) error {
 	// Execute
 	html, err := procs.EnvelopeMessageHTMLGet(cc, id)
 	if err != nil {
-		return helpers.Error(c, err)
+		return h.Error(c, err)
 	}
 
 	// Response
@@ -86,25 +86,25 @@ func EnvelopeHTML(c *fiber.Ctx, cc core.Context, id int64) error {
 
 func EnvelopeNew(c *fiber.Ctx) error {
 	// Render
-	return c.Render("envelopes-new", fiber.Map{})
+	return h.Render(c, "envelopes-new", fiber.Map{})
 }
 
 func EnvelopeNewPost(c *fiber.Ctx, cc core.Context) error {
 	// Request
 	form, err := c.MultipartForm()
 	if err != nil {
-		return helpers.Error(c, err, http.StatusBadRequest)
+		return h.Error(c, err, http.StatusBadRequest)
 	}
 	var datts []envelope.DataAttachment
 	for _, fh := range form.File["attachments"] {
 		a, err := fh.Open()
 		if err != nil {
-			return helpers.Error(c, err, http.StatusBadRequest)
+			return h.Error(c, err, http.StatusBadRequest)
 		}
 
 		data, err := io.ReadAll(a)
 		if err != nil {
-			return helpers.Error(c, err, http.StatusBadRequest)
+			return h.Error(c, err, http.StatusBadRequest)
 		}
 
 		datts = append(datts, envelope.NewDataAttachment(fh.Filename, data))
@@ -121,7 +121,7 @@ func EnvelopeNewPost(c *fiber.Ctx, cc core.Context) error {
 	// Execute
 	_, err = procs.EnvelopeCreate(cc, msg, datts)
 	if err != nil {
-		return helpers.Error(c, err)
+		return h.Error(c, err)
 	}
 
 	// Response
@@ -132,7 +132,7 @@ func EnvelopeDelete(c *fiber.Ctx, cc core.Context, id int64) error {
 	// Execute
 	err := procs.EnvelopeDelete(cc, id)
 	if err != nil {
-		return helpers.Error(c, err)
+		return h.Error(c, err)
 	}
 
 	// Response
@@ -144,7 +144,7 @@ func EnvelopesDelete(c *fiber.Ctx, cc core.Context) error {
 	// Execute
 	err := procs.EnvelopeDeleteAll(cc)
 	if err != nil {
-		return helpers.Error(c, err)
+		return h.Error(c, err)
 	}
 
 	// Response

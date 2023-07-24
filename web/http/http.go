@@ -6,7 +6,7 @@ import (
 
 	"github.com/ItsNotGoodName/smtpbridge/internal/core"
 	"github.com/ItsNotGoodName/smtpbridge/web"
-	"github.com/ItsNotGoodName/smtpbridge/web/helpers"
+	h "github.com/ItsNotGoodName/smtpbridge/web/helpers"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/csrf"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -26,14 +26,14 @@ func New(app core.App, shutdown context.CancelFunc, address string, bodyLimit in
 
 	// Fiber
 	views := web.Engine()
-	views.AddFuncMap(helpers.Map)
+	views.AddFuncMap(h.Map)
 	http := fiber.New(fiber.Config{
 		DisableStartupMessage: true,
 		Views:                 views,
 		ViewsLayout:           "layouts/index",
 		BodyLimit:             bodyLimit,
 		ErrorHandler: func(c *fiber.Ctx, err error) error {
-			if helpers.IsHTMXRequest(c) {
+			if h.IsHTMXRequest(c) {
 				c.Set("HX-Redirect", "/something-went-wrong")
 			}
 
@@ -45,7 +45,8 @@ func New(app core.App, shutdown context.CancelFunc, address string, bodyLimit in
 	http.Use(recover.New())
 	http.Use(logger.New())
 	http.Use(csrf.New(csrf.Config{
-		KeyLookup: "cookie:csrf_",
+		ContextKey: h.CSRFContextKey,
+		Extractor:  csrfExtractor(),
 	}))
 	web.UseAssets(http)
 
@@ -54,7 +55,7 @@ func New(app core.App, shutdown context.CancelFunc, address string, bodyLimit in
 		http,
 	)
 
-	http.Use(helpers.NotFound)
+	http.Use(h.NotFound)
 
 	return HTTP{
 		http:     http,

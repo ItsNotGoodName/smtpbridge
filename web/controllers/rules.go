@@ -3,7 +3,7 @@ package controllers
 import (
 	"github.com/ItsNotGoodName/smtpbridge/internal/core"
 	"github.com/ItsNotGoodName/smtpbridge/internal/procs"
-	"github.com/ItsNotGoodName/smtpbridge/web/helpers"
+	h "github.com/ItsNotGoodName/smtpbridge/web/helpers"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -11,11 +11,11 @@ func Rules(c *fiber.Ctx, cc core.Context) error {
 	// Execute
 	aggregateRules, err := procs.RuleAggregateList(cc)
 	if err != nil {
-		return helpers.Error(c, err)
+		return h.Error(c, err)
 	}
 
 	// Response
-	return c.Render("rules", fiber.Map{
+	return h.Render(c, "rules", fiber.Map{
 		"AggregateRules": aggregateRules,
 	})
 }
@@ -27,9 +27,11 @@ func RuleEnable(c *fiber.Ctx, cc core.Context, id int64) error {
 	// Execute
 	rule, err := procs.RuleUpdateEnable(cc, id, enable)
 	if err != nil {
-		return helpers.Error(c, err)
+		return h.Error(c, err)
 	}
 
 	// Response
-	return c.Render("rules", rule, "rule-enable-form")
+	return h.Render(c, "rules", fiber.Map{
+		"Rule": rule,
+	}, "rule-enable-form")
 }

@@ -64,6 +64,7 @@
   <section id="endpoints">
     <h2><a href="#endpoints">Endpoints</a></h2>
     <form method="post" action="/send" hx-post="/send">
+      {{csrf $}}
       <input type="hidden" id="envelope" name="envelope" value="{{.Envelope.Message.ID}}">
       <label for="endpoint">
         Endpoint
