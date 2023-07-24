@@ -6,6 +6,7 @@ import (
 
 	"github.com/ItsNotGoodName/smtpbridge/internal/core"
 	"github.com/ItsNotGoodName/smtpbridge/web"
+	"github.com/ItsNotGoodName/smtpbridge/web/controllers"
 	h "github.com/ItsNotGoodName/smtpbridge/web/helpers"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/csrf"
@@ -48,14 +49,14 @@ func New(app core.App, shutdown context.CancelFunc, address string, bodyLimit in
 		ContextKey: h.CSRFContextKey,
 		Extractor:  csrfExtractor(),
 	}))
-	web.UseAssets(http)
 
 	route(app,
 		store,
 		http,
 	)
 
-	http.Use(h.NotFound)
+	web.UseAssets(http)
+	http.Use(controllers.NotFound)
 
 	return HTTP{
 		http:     http,

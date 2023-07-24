@@ -29,20 +29,21 @@ func Error(c *fiber.Ctx, err error, codes ...int) error {
 	return Render(c, "something-went-wrong", fiber.Map{"Error": err})
 }
 
-func NotFound(c *fiber.Ctx) error {
-	return Render(c.Status(404), "404", nil)
-}
-
 type Meta struct {
 	Anonymous bool
 	CSRF      string
 }
 
 func Render(c *fiber.Ctx, name string, data fiber.Map, layouts ...string) error {
-	data["Meta"] = Meta{
-		Anonymous: c.Locals(AnonymousContextKey) != nil,
-		CSRF:      c.Locals(CSRFContextKey).(string),
+	meta := Meta{}
+	if c.Locals(AnonymousContextKey) != nil {
+		meta.Anonymous = true
 	}
+	if csrfRaw := c.Locals(CSRFContextKey); csrfRaw != "" {
+		meta.CSRF = csrfRaw.(string)
+	}
+
+	data["Meta"] = meta
 
 	return c.Render(name, data, layouts...)
 }

@@ -62,7 +62,7 @@ func Logout(c *fiber.Ctx, cc core.Context, store *session.Store) error {
 
 func UserRequire(c *fiber.Ctx, cc core.Context, store *session.Store) error {
 	if procs.AuthHTTPAnonymous(cc) {
-		return h.NotFound(c)
+		return NotFound(c)
 	}
 
 	return authRequire(c, cc, store)

@@ -7,7 +7,7 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/internal/core"
 )
 
-var ErrorLogin = fmt.Errorf("login error")
+var ErrorLogin = fmt.Errorf("login invalid")
 
 func AuthHTTPAnonymous(cc core.Context) bool {
 	return cc.Config.AuthHTTP.Username == "" && cc.Config.AuthHTTP.Password == ""
