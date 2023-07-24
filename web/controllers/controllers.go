@@ -114,3 +114,7 @@ func Trim(c *fiber.Ctx, cc *core.Context) error {
 	c.Set("HX-Trigger", "trimmed")
 	return c.SendStatus(http.StatusNoContent)
 }
+
+func SomethingWentWrong(c *fiber.Ctx) error {
+	return c.Render("something-went-wrong", nil)
+}

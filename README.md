@@ -227,7 +227,6 @@ make dev-web
 - Reload on config change
 - Add [Apprise](https://github.com/caronc/apprise) endpoint
 - HTTP and SMTP auth
-- Better HTTP error handling with [HTMX](https://htmx.org/)
 - CRUD endpoints and rules
 - SQLite full text search
 - Read mailbox files

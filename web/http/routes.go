@@ -41,7 +41,7 @@ func routes(http *fiber.App, app core.App, retentionPolicy models.RetentionPolic
 	http.Route("/rules", func(http fiber.Router) {
 		http.Get("/", middleware.App(app, controllers.Rules))
 		http.Route("/:id", func(http fiber.Router) {
-			http.Post("/enable", middleware.AppID(app, controllers.RuleEnable))
+			http.Post("/enable", middleware.AppID(app, controllers.RulePEnableForm))
 		})
 	})
 
@@ -49,5 +49,5 @@ func routes(http *fiber.App, app core.App, retentionPolicy models.RetentionPolic
 	http.Post("/vacuum", middleware.App(app, controllers.Vacuum))
 	http.Post("/trim", middleware.App(app, controllers.Trim))
 	http.Group("/files", controllers.Files(app))
-
+	http.Get("/something-went-wrong", controllers.SomethingWentWrong)
 }
