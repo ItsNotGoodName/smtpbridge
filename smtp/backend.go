@@ -29,19 +29,18 @@ func (b *backend) NewSession(state *smtp.Conn) (smtp.Session, error) {
 
 // A Session is returned after EHLO.
 type session struct {
-	ctx        core.Context
+	cc         core.Context
 	from       string
 	to         string
 	remoteAddr net.Addr
 }
 
 func newSession(ctx core.Context, remoteAddr net.Addr) *session {
-	return &session{ctx: ctx, remoteAddr: remoteAddr}
+	return &session{cc: ctx, remoteAddr: remoteAddr}
 }
 
 func (s *session) AuthPlain(username, password string) error {
-	// TODO: auth
-	return nil
+	return procs.SMTPLogin(s.cc, username, password)
 }
 
 func (s *session) Mail(from string, opts *smtp.MailOptions) error {
@@ -101,7 +100,7 @@ func (s *session) Data(r io.Reader) error {
 	})
 
 	// Create envelope
-	id, err := procs.EnvelopeCreate(s.ctx, msg, datts)
+	id, err := procs.EnvelopeCreate(s.cc, msg, datts)
 	if err != nil {
 		log.Error().Err(err).Str("remoteAddr", s.remoteAddr.String()).Msg("failed to create envelope")
 		return err

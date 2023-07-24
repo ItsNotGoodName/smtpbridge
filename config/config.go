@@ -28,7 +28,7 @@ type Config struct {
 	Endpoints            []endpoints.Endpoint
 	Rules                []rules.Rule
 	RuleEndpoints        map[string][]string
-	RetentionPolicy      models.RetentionPolicy
+	Config               *models.Config
 }
 
 func Parse(raw Raw) (Config, error) {
@@ -128,6 +128,16 @@ func Parse(raw Raw) (Config, error) {
 		MinAge:         5 * time.Minute,
 	}
 
+	authSMTP := models.Auth{
+		Username: raw.SMTP.Username,
+		Password: raw.SMTP.Password,
+	}
+
+	authHTTP := models.Auth{
+		Username: raw.HTTP.Username,
+		Password: raw.HTTP.Password,
+	}
+
 	return Config{
 		DatabasePath:         databasePath,
 		AttachmentsDirectory: attachmentsDirectory,
@@ -140,7 +150,11 @@ func Parse(raw Raw) (Config, error) {
 		Endpoints:            ends,
 		Rules:                rrules,
 		RuleEndpoints:        rulesToEndpoints,
-		RetentionPolicy:      retentionPolicy,
+		Config: &models.Config{
+			RetentionPolicy: retentionPolicy,
+			AuthSMTP:        authSMTP,
+			AuthHTTP:        authHTTP,
+		},
 	}, nil
 }
 
@@ -153,14 +167,18 @@ type Raw struct {
 		AttachmentSize *string `name:"attachment_size"`
 	} `embed:"" prefix:"retention-"`
 	HTTP struct {
-		Disable bool
-		Host    string
-		Port    int `default:"8080"`
+		Disable  bool
+		Host     string
+		Port     int `default:"8080"`
+		Username string
+		Password string
 	} `embed:"" prefix:"http-"`
 	SMTP struct {
-		Disable bool
-		Host    string
-		Port    int `default:"1025"`
+		Disable  bool
+		Host     string
+		Port     int `default:"1025"`
+		Username string
+		Password string
 	} `embed:"" prefix:"smtp-"`
 	Endpoints map[string]RawEndpoint
 	Rules     map[string]RawRule

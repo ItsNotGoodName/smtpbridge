@@ -83,11 +83,19 @@ http:
   host: ""
   port: 8080
 
+  # Authentication is disabled if both username and password are empty
+  username: ""
+  password: ""
+
 # SMTP server
 smtp:
   disable: false # (false, true)
   host: ""
   port: 1025
+
+  # Authentication is disabled if both username and password are empty
+  username: ""
+  password: ""
 
 # Endpoints for envelopes
 endpoints:

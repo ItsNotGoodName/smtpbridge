@@ -12,7 +12,7 @@ import (
 func MailmanBackground(ctx context.Context, app core.App) {
 	evtC := make(chan core.EventEnvelopeCreated, 25)
 
-	go mailman(app.Context(ctx), evtC)
+	go mailman(app.SystemContext(ctx), evtC)
 
 	events.OnEnvelopeCreated(app, func(cc core.Context, evt core.EventEnvelopeCreated) {
 		select {

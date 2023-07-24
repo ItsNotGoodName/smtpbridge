@@ -6,7 +6,6 @@ import (
 
 	"github.com/ItsNotGoodName/smtpbridge/internal/core"
 	"github.com/ItsNotGoodName/smtpbridge/internal/envelope"
-	"github.com/ItsNotGoodName/smtpbridge/internal/models"
 	"github.com/ItsNotGoodName/smtpbridge/internal/procs"
 	"github.com/ItsNotGoodName/smtpbridge/pkg/pagination"
 	"github.com/ItsNotGoodName/smtpbridge/web"
@@ -15,26 +14,26 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 )
 
-func Index(retentionPolicy models.RetentionPolicy) func(c *fiber.Ctx, cc core.Context) error {
-	return func(c *fiber.Ctx, cc core.Context) error {
-		// Execute
-		storage, err := procs.StorageGet(cc)
-		if err != nil {
-			return helpers.Error(c, err)
-		}
-
-		messages, err := procs.EnvelopeMessageList(cc, pagination.NewPage(1, 5), envelope.MessageFilter{})
-		if err != nil {
-			return helpers.Error(c, err)
-		}
-
-		// Response
-		return c.Render("index", fiber.Map{
-			"Messages":        messages.Messages,
-			"Storage":         storage,
-			"RetentionPolicy": retentionPolicy,
-		})
+func Index(c *fiber.Ctx, cc core.Context) error {
+	// Execute
+	storage, err := procs.StorageGet(cc)
+	if err != nil {
+		return helpers.Error(c, err)
 	}
+
+	messages, err := procs.EnvelopeMessageList(cc, pagination.NewPage(1, 5), envelope.MessageFilter{})
+	if err != nil {
+		return helpers.Error(c, err)
+	}
+
+	policy := procs.RetentionPolicyGet(cc)
+
+	// Response
+	return c.Render("index", fiber.Map{
+		"Messages":        messages.Messages,
+		"Storage":         storage,
+		"RetentionPolicy": policy,
+	})
 }
 
 func IndexStorageTable(c *fiber.Ctx, cc core.Context) error {

@@ -56,14 +56,14 @@ func run(ctx context.Context, shutdown context.CancelFunc, cli config.CLI) <-cha
 	fileStore := core.NewFileStore(cfg.AttachmentsDirectory)
 
 	// App
-	app := core.NewApp(bunDB, fileStore)
-	if err := procs.InternalSync(app.Context(ctx), cfg.Endpoints, cfg.Rules, cfg.RuleEndpoints); err != nil {
+	app := core.NewApp(cfg.Config, bunDB, fileStore)
+	if err := procs.InternalSync(app.SystemContext(ctx), cfg.Endpoints, cfg.Rules, cfg.RuleEndpoints); err != nil {
 		log.Fatal().Err(err).Msg("Failed to sync app from config")
 	}
 
 	procs.MailmanBackground(ctx, app)
-	procs.TrimmerBackground(ctx, app, cfg.RetentionPolicy)
-	procs.VacuumBackground(ctx, app)
+	procs.TrimmerBackground(ctx, app)
+	procs.VacuumerBackground(ctx, app)
 
 	var backgrounds []background.Background
 
@@ -75,7 +75,7 @@ func run(ctx context.Context, shutdown context.CancelFunc, cli config.CLI) <-cha
 
 	// HTTP
 	if !cfg.HTTPDisable {
-		http := http.New(app, shutdown, cfg.HTTPAddress, cfg.HTTPBodyLimit, cfg.RetentionPolicy)
+		http := http.New(app, shutdown, cfg.HTTPAddress, cfg.HTTPBodyLimit)
 		backgrounds = append(backgrounds, http)
 	}
 

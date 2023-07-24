@@ -27,12 +27,12 @@ func TrimStart(cc core.Context) error {
 	}
 }
 
-func TrimmerBackground(ctx context.Context, app core.App, policy models.RetentionPolicy) {
+func TrimmerBackground(ctx context.Context, app core.App) {
 	envDeletedC := make(chan core.EventEnvelopeDeleted, 1)
 	envCreatedC := make(chan core.EventEnvelopeCreated, 1)
 	evtTrimStart := make(chan core.EventTrimStart, 1)
 
-	go trimmer(app.Context(ctx), policy, envCreatedC, envDeletedC, evtTrimStart)
+	go trimmer(app.SystemContext(ctx), envCreatedC, envDeletedC, evtTrimStart)
 
 	events.OnEnvelopeCreated(app, func(cc core.Context, evt core.EventEnvelopeCreated) {
 		select {
@@ -73,7 +73,6 @@ func TrimmerBackground(ctx context.Context, app core.App, policy models.Retentio
 
 func trimmer(
 	cc core.Context,
-	policy models.RetentionPolicy,
 	envCreatedC <-chan core.EventEnvelopeCreated,
 	envDeletedC <-chan core.EventEnvelopeDeleted,
 	evtTrimStart <-chan core.EventTrimStart,
@@ -82,7 +81,7 @@ func trimmer(
 	ticker := time.NewTicker(30 * time.Minute)
 
 	clean := func() {
-		trimmerDeleteByAge(cc, policy)
+		trimmerDeleteByAge(cc, cc.Config.RetentionPolicy)
 		trimmerDeleteOrphanAttachments(cc)
 
 		storage, err := StorageGet(cc)
@@ -91,8 +90,8 @@ func trimmer(
 			return
 		}
 
-		trimmerDeleteByEnvelopeCount(cc, policy, storage)
-		trimmerDeleteByAttachmentSize(cc, policy, storage)
+		trimmerDeleteByEnvelopeCount(cc, cc.Config.RetentionPolicy, storage)
+		trimmerDeleteByAttachmentSize(cc, cc.Config.RetentionPolicy, storage)
 	}
 	clean()
 
@@ -107,8 +106,8 @@ func trimmer(
 				continue
 			}
 
-			trimmerDeleteByEnvelopeCount(cc, policy, storage)
-			trimmerDeleteByAttachmentSize(cc, policy, storage)
+			trimmerDeleteByEnvelopeCount(cc, cc.Config.RetentionPolicy, storage)
+			trimmerDeleteByAttachmentSize(cc, cc.Config.RetentionPolicy, storage)
 		case <-envDeletedC:
 			trimmerDeleteOrphanAttachments(cc)
 		case <-ticker.C:

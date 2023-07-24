@@ -8,8 +8,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func VacuumBackground(ctx context.Context, app core.App) {
-	go vacuum(app.Context(ctx))
+func VacuumerBackground(ctx context.Context, app core.App) {
+	go vacuum(app.SystemContext(ctx))
 }
 
 func vacuum(cc core.Context) {

@@ -2,14 +2,13 @@ package http
 
 import (
 	"github.com/ItsNotGoodName/smtpbridge/internal/core"
-	"github.com/ItsNotGoodName/smtpbridge/internal/models"
 	"github.com/ItsNotGoodName/smtpbridge/web/controllers"
 	"github.com/ItsNotGoodName/smtpbridge/web/middleware"
 	"github.com/gofiber/fiber/v2"
 )
 
-func routes(http *fiber.App, app core.App, retentionPolicy models.RetentionPolicy) {
-	http.Get("/", middleware.App(app, controllers.Index(retentionPolicy)))
+func routes(http *fiber.App, app core.App) {
+	http.Get("/", middleware.App(app, controllers.Index))
 	http.Route("/index", func(http fiber.Router) {
 		http.Get("/storage-table", middleware.App(app, controllers.IndexStorageTable))
 		http.Get("/recent-envelopes-table", middleware.App(app, controllers.IndexRecentEnvelopesTable))

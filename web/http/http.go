@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/ItsNotGoodName/smtpbridge/internal/core"
-	"github.com/ItsNotGoodName/smtpbridge/internal/models"
 	"github.com/ItsNotGoodName/smtpbridge/web"
 	"github.com/ItsNotGoodName/smtpbridge/web/helpers"
 	"github.com/gofiber/fiber/v2"
@@ -21,7 +20,7 @@ type HTTP struct {
 	address  string
 }
 
-func New(app core.App, shutdown context.CancelFunc, address string, bodyLimit int, retentionPolicy models.RetentionPolicy) HTTP {
+func New(app core.App, shutdown context.CancelFunc, address string, bodyLimit int) HTTP {
 	// Fiber
 	views := web.Engine()
 	views.AddFuncMap(helpers.Map)
@@ -46,7 +45,7 @@ func New(app core.App, shutdown context.CancelFunc, address string, bodyLimit in
 	}))
 
 	// Routes
-	routes(http, app, retentionPolicy)
+	routes(http, app)
 
 	// Middleware
 	web.UseAssets(http)
