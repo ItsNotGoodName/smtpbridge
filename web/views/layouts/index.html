@@ -14,17 +14,7 @@
   <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
   <meta name="msapplication-TileColor" content="#da532c" />
   <meta name="theme-color" content="#ffffff" />
-  {{if development}}
-  <!-- if development -->
-  <script type="module" src="http://localhost:5173/@vite/client"></script>
-  <script type="module" src="http://localhost:5173/src/main.ts"></script>
-  {{else}}
-  <!-- if production -->
-  {{range $val := manifest.CSS}}
-  <link rel="stylesheet" href="/{{$val}}" />
-  {{end}}
-  <script type="module" src="/{{manifest.File}}"></script>
-  {{end}}
+  {{headTags}}
 </head>
 
 <body hx-ext="loading-states">

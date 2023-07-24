@@ -3,8 +3,6 @@
 package web
 
 import (
-	"io/fs"
-	"os"
 	"path"
 	"path/filepath"
 	"runtime"
@@ -13,9 +11,10 @@ import (
 	"github.com/gofiber/template/html/v2"
 )
 
-var Development = true
-
 const CacheControl = 0
+
+const HeadTags = `<script type="module" src="http://localhost:5173/@vite/client"></script>
+<script type="module" src="http://localhost:5173/src/main.ts"></script>`
 
 var pathAssets string
 var pathViews string
@@ -29,10 +28,6 @@ func init() {
 	cwd := filepath.Dir(filename)
 	pathAssets = path.Join(cwd, "public")
 	pathViews = path.Join(cwd, "views")
-}
-
-func AssetsFS() fs.FS {
-	return os.DirFS(pathAssets)
 }
 
 func UseAssets(app *fiber.App) {
