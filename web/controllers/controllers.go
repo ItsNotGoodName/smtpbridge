@@ -117,7 +117,3 @@ func Trim(c *fiber.Ctx, cc core.Context) error {
 func SomethingWentWrong(c *fiber.Ctx) error {
 	return h.Render(c, "something-went-wrong", fiber.Map{"Error": ""})
 }
-
-func NotFound(c *fiber.Ctx) error {
-	return h.Render(c.Status(404), "404", fiber.Map{})
-}

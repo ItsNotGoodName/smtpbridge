@@ -4,14 +4,15 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/internal/core"
 	"github.com/ItsNotGoodName/smtpbridge/web/controllers"
 	"github.com/ItsNotGoodName/smtpbridge/web/inject"
+	"github.com/ItsNotGoodName/smtpbridge/web/middleware"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/session"
 )
 
 func route(app core.App, store *session.Store, http fiber.Router) {
-	userRequire := inject.AppStore(app, store, controllers.UserRequire)
-	authRequire := inject.AppStore(app, store, controllers.AuthRequire)
-	authSkip := inject.AppStore(app, store, controllers.AuthRestrict)
+	userRequire := inject.AppStore(app, store, middleware.UserRequire)
+	authRequire := inject.AppStore(app, store, middleware.AuthRequire)
+	authSkip := inject.AppStore(app, store, middleware.AuthRestrict)
 
 	http.Get("/login", authSkip, inject.App(app, controllers.Login))
 	http.Post("/login", authSkip, inject.AppStore(app, store, controllers.LoginPost))

@@ -29,6 +29,10 @@ func Error(c *fiber.Ctx, err error, codes ...int) error {
 	return Render(c, "something-went-wrong", fiber.Map{"Error": err})
 }
 
+func NotFound(c *fiber.Ctx) error {
+	return Render(c.Status(404), "404", fiber.Map{})
+}
+
 type Meta struct {
 	Anonymous bool
 	CSRF      string
