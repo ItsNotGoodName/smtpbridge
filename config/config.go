@@ -246,7 +246,7 @@ func Read(cli CLI) (Raw, error) {
 		}
 	} else {
 		// Load config file from ENV
-		log.Info().Msgf("Reading config from environment variable %s", envConfigYamlKey)
+		log.Info().Str("env", envConfigYamlKey).Msgf("Reading config from environment")
 
 		resolver, err := kongyaml.Loader(strings.NewReader(envConfigYaml))
 		if err != nil {

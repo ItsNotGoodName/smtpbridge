@@ -28,9 +28,10 @@ func New(app core.App, shutdown context.CancelFunc, address string, bodyLimit in
 	views := web.Engine()
 	views.AddFuncMap(helpers.Map)
 	http := fiber.New(fiber.Config{
-		Views:       views,
-		ViewsLayout: "layouts/index",
-		BodyLimit:   bodyLimit,
+		DisableStartupMessage: true,
+		Views:                 views,
+		ViewsLayout:           "layouts/index",
+		BodyLimit:             bodyLimit,
 		ErrorHandler: func(c *fiber.Ctx, err error) error {
 			if helpers.IsHTMXRequest(c) {
 				c.Set("HX-Redirect", "/something-went-wrong")
