@@ -16,11 +16,6 @@ type Context struct {
 	ctx    context.Context
 }
 
-func (c Context) WithActor(actor Actor) Context {
-	c.Actor = actor
-	return c
-}
-
 func (c Context) Context() context.Context {
 	return c.ctx
 }

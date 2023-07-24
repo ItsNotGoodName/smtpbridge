@@ -26,7 +26,7 @@ func HTTPLogin(cc core.Context, username, password string) error {
 }
 
 func SMTPLogin(cc core.Context, username, password string) error {
-	if cc.Config.AuthSMTP.Username == "" && cc.Config.AuthHTTP.Password == "" {
+	if cc.Config.AuthSMTP.Username == "" && cc.Config.AuthSMTP.Password == "" {
 		return nil
 	}
 
