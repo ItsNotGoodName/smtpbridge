@@ -31,5 +31,5 @@ func RuleEnable(c *fiber.Ctx, cc *core.Context, id int64) error {
 	}
 
 	// Response
-	return partial(c, "p/rule-enable-form", rule)
+	return c.Render("rules", rule, "rule-enable-form")
 }

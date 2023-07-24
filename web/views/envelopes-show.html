@@ -1,4 +1,4 @@
-{{template "p/header" .}}
+{{template "partials/header" .}}
 
 <main class="container">
   <nav aria-label="breadcrumb">
@@ -55,7 +55,7 @@
   <section id="attachments">
     <h2><a href="#attachments">Attachments</a></h2>
     {{range $val := .Envelope.Attachments}}
-    {{template "p/attachment-card" $val}}
+    {{template "partials/attachment-card" $val}}
     <hr>
     {{end}}
   </section>
@@ -93,4 +93,4 @@
   {{end}}
 </main>
 
-{{template "p/footer" .}}
+{{template "partials/footer" .}}

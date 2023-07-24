@@ -1,4 +1,4 @@
-{{template "p/header" .}}
+{{template "partials/header" .}}
 
 <main class="container">
   <section>
@@ -79,7 +79,7 @@
     </details>
 
     {{range $val := .Attachments}}
-    {{template "p/attachment-card" $val}}
+    {{template "partials/attachment-card" $val}}
     <hr>
     {{end}}
 
@@ -109,4 +109,4 @@
   </section>
 </main>
 
-{{template "p/footer" .}}
+{{template "partials/footer" .}}

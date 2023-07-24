@@ -37,6 +37,32 @@ func Index(retentionPolicy models.RetentionPolicy) func(c *fiber.Ctx, cc *core.C
 	}
 }
 
+func IndexPStorageTable(c *fiber.Ctx, cc *core.Context) error {
+	// Execute
+	storage, err := procs.StorageGet(cc)
+	if err != nil {
+		return helpers.Error(c, err)
+	}
+
+	// Response
+	return c.Render("index", fiber.Map{
+		"Storage": storage,
+	}, "storage-table")
+}
+
+func IndexPRecentEnvelopesTable(c *fiber.Ctx, cc *core.Context) error {
+	// Execute
+	messages, err := procs.EnvelopeMessageList(cc, pagination.NewPage(1, 5), envelope.MessageFilter{})
+	if err != nil {
+		return helpers.Error(c, err)
+	}
+
+	// Response
+	return c.Render("index", fiber.Map{
+		"Messages": messages.Messages,
+	}, "recent-envelopes-table")
+}
+
 func Files(app core.App) fiber.Handler {
 	return filesystem.New(filesystem.Config{
 		Root:   http.FS(app.File.FS),
