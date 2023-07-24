@@ -15,8 +15,8 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 )
 
-func Index(retentionPolicy models.RetentionPolicy) func(c *fiber.Ctx, cc *core.Context) error {
-	return func(c *fiber.Ctx, cc *core.Context) error {
+func Index(retentionPolicy models.RetentionPolicy) func(c *fiber.Ctx, cc core.Context) error {
+	return func(c *fiber.Ctx, cc core.Context) error {
 		// Execute
 		storage, err := procs.StorageGet(cc)
 		if err != nil {
@@ -37,7 +37,7 @@ func Index(retentionPolicy models.RetentionPolicy) func(c *fiber.Ctx, cc *core.C
 	}
 }
 
-func IndexStorageTable(c *fiber.Ctx, cc *core.Context) error {
+func IndexStorageTable(c *fiber.Ctx, cc core.Context) error {
 	// Execute
 	storage, err := procs.StorageGet(cc)
 	if err != nil {
@@ -50,7 +50,7 @@ func IndexStorageTable(c *fiber.Ctx, cc *core.Context) error {
 	}, "storage-table")
 }
 
-func IndexRecentEnvelopesTable(c *fiber.Ctx, cc *core.Context) error {
+func IndexRecentEnvelopesTable(c *fiber.Ctx, cc core.Context) error {
 	// Execute
 	messages, err := procs.EnvelopeMessageList(cc, pagination.NewPage(1, 5), envelope.MessageFilter{})
 	if err != nil {
@@ -70,7 +70,7 @@ func Files(app core.App) fiber.Handler {
 	})
 }
 
-func Send(c *fiber.Ctx, cc *core.Context) error {
+func Send(c *fiber.Ctx, cc core.Context) error {
 	// Request
 	envelope_id, err := strconv.ParseInt(c.FormValue("envelope"), 10, 64)
 	if err != nil {
@@ -91,7 +91,7 @@ func Send(c *fiber.Ctx, cc *core.Context) error {
 	return c.SendStatus(http.StatusNoContent)
 }
 
-func Vacuum(c *fiber.Ctx, cc *core.Context) error {
+func Vacuum(c *fiber.Ctx, cc core.Context) error {
 	// Execute
 	err := procs.DatabaseVacuum(cc)
 	if err != nil {
@@ -103,7 +103,7 @@ func Vacuum(c *fiber.Ctx, cc *core.Context) error {
 	return c.SendStatus(http.StatusNoContent)
 }
 
-func Trim(c *fiber.Ctx, cc *core.Context) error {
+func Trim(c *fiber.Ctx, cc core.Context) error {
 	// Execute
 	err := procs.TrimStart(cc)
 	if err != nil {

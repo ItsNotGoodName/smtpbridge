@@ -13,7 +13,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func TrimStart(cc *core.Context) error {
+func TrimStart(cc core.Context) error {
 	ctx := cc.Context()
 	select {
 	case <-ctx.Done():
@@ -34,7 +34,7 @@ func TrimmerBackground(ctx context.Context, app core.App, policy models.Retentio
 
 	go trimmer(app.Context(ctx), policy, envCreatedC, envDeletedC, evtTrimStart)
 
-	events.OnEnvelopeCreated(app, func(cc *core.Context, evt core.EventEnvelopeCreated) {
+	events.OnEnvelopeCreated(app, func(cc core.Context, evt core.EventEnvelopeCreated) {
 		select {
 		case <-envCreatedC:
 		default:
@@ -46,7 +46,7 @@ func TrimmerBackground(ctx context.Context, app core.App, policy models.Retentio
 		}
 	})
 
-	events.OnEnvelopeDeleted(app, func(cc *core.Context, evt core.EventEnvelopeDeleted) {
+	events.OnEnvelopeDeleted(app, func(cc core.Context, evt core.EventEnvelopeDeleted) {
 		select {
 		case <-envDeletedC:
 		default:
@@ -58,7 +58,7 @@ func TrimmerBackground(ctx context.Context, app core.App, policy models.Retentio
 		}
 	})
 
-	events.OnTrimStart(app, func(cc *core.Context, evt core.EventTrimStart) {
+	events.OnTrimStart(app, func(cc core.Context, evt core.EventTrimStart) {
 		select {
 		case evtTrimStart <- evt:
 		default:
@@ -72,7 +72,7 @@ func TrimmerBackground(ctx context.Context, app core.App, policy models.Retentio
 }
 
 func trimmer(
-	cc *core.Context,
+	cc core.Context,
 	policy models.RetentionPolicy,
 	envCreatedC <-chan core.EventEnvelopeCreated,
 	envDeletedC <-chan core.EventEnvelopeDeleted,
@@ -124,7 +124,7 @@ func trimmer(
 		}
 	}
 }
-func trimmerDeleteByAttachmentSize(cc *core.Context, policy models.RetentionPolicy, storage models.Storage) {
+func trimmerDeleteByAttachmentSize(cc core.Context, policy models.RetentionPolicy, storage models.Storage) {
 	if policy.AttachmentSize == nil {
 		return
 	}
@@ -140,7 +140,7 @@ func trimmerDeleteByAttachmentSize(cc *core.Context, policy models.RetentionPoli
 	}
 }
 
-func trimmerDeleteByEnvelopeCount(cc *core.Context, policy models.RetentionPolicy, storage models.Storage) {
+func trimmerDeleteByEnvelopeCount(cc core.Context, policy models.RetentionPolicy, storage models.Storage) {
 	if policy.EnvelopeCount == nil {
 		return
 	}
@@ -157,7 +157,7 @@ func trimmerDeleteByEnvelopeCount(cc *core.Context, policy models.RetentionPolic
 	}
 }
 
-func trimmerDeleteByAge(cc *core.Context, policy models.RetentionPolicy) {
+func trimmerDeleteByAge(cc core.Context, policy models.RetentionPolicy) {
 	if policy.EnvelopeAge == nil {
 		return
 	}
@@ -171,7 +171,7 @@ func trimmerDeleteByAge(cc *core.Context, policy models.RetentionPolicy) {
 	}
 }
 
-func trimmerDeleteOrphanAttachments(cc *core.Context) {
+func trimmerDeleteOrphanAttachments(cc core.Context) {
 	for {
 		atts, err := db.EnvelopeAttachmentListOrphan(cc, 10)
 		if err != nil {

@@ -11,11 +11,11 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/internal/envelope"
 )
 
-func CreateFile(cc *core.Context, datt envelope.DataAttachment) error {
+func CreateFile(cc core.Context, datt envelope.DataAttachment) error {
 	return os.WriteFile(filePath(cc, datt.Attachment), datt.Data, 0644)
 }
 
-func GetFileData(cc *core.Context, att *envelope.Attachment) (envelope.DataAttachment, error) {
+func GetFileData(cc core.Context, att *envelope.Attachment) (envelope.DataAttachment, error) {
 	data, err := os.ReadFile(filePath(cc, att))
 	if err != nil {
 		return envelope.DataAttachment{}, err
@@ -24,15 +24,15 @@ func GetFileData(cc *core.Context, att *envelope.Attachment) (envelope.DataAttac
 	return envelope.DataAttachment{Attachment: att, Data: data}, err
 }
 
-func GetFile(cc *core.Context, att *envelope.Attachment) (*os.File, error) {
+func GetFile(cc core.Context, att *envelope.Attachment) (*os.File, error) {
 	return os.Open(filePath(cc, att))
 }
 
-func DeleteFile(cc *core.Context, att *envelope.Attachment) error {
+func DeleteFile(cc core.Context, att *envelope.Attachment) error {
 	return os.Remove(filePath(cc, att))
 }
 
-func Size(cc *core.Context) (int64, error) {
+func Size(cc core.Context) (int64, error) {
 	files, err := ioutil.ReadDir(cc.File.Dir)
 	if err != nil {
 		return 0, err
@@ -48,7 +48,7 @@ func Size(cc *core.Context) (int64, error) {
 	return dirSize, nil
 }
 
-func DeleteFileUntilSize(cc *core.Context, currentSize, maxSize int64, age time.Time) error {
+func DeleteFileUntilSize(cc core.Context, currentSize, maxSize int64, age time.Time) error {
 	files, err := ioutil.ReadDir(cc.File.Dir)
 	if err != nil {
 		return err
@@ -76,6 +76,6 @@ func DeleteFileUntilSize(cc *core.Context, currentSize, maxSize int64, age time.
 	return nil
 }
 
-func filePath(cc *core.Context, att *envelope.Attachment) string {
+func filePath(cc core.Context, att *envelope.Attachment) string {
 	return path.Join(cc.File.Dir, att.FileName())
 }

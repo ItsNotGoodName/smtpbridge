@@ -2,13 +2,13 @@ package events
 
 import "github.com/ItsNotGoodName/smtpbridge/internal/core"
 
-func OnEnvelopeCreated(app core.App, fn func(cc *core.Context, evt core.EventEnvelopeCreated)) {
+func OnEnvelopeCreated(app core.App, fn func(cc core.Context, evt core.EventEnvelopeCreated)) {
 	app.Bus.Mutex.Lock()
 	app.Bus.EnvelopeCreated = append(app.Bus.EnvelopeCreated, fn)
 	app.Bus.Mutex.Unlock()
 }
 
-func PublishEnvelopeCreated(cc *core.Context, id int64) {
+func PublishEnvelopeCreated(cc core.Context, id int64) {
 	cc.Bus.Mutex.Lock()
 	for _, v := range cc.Bus.EnvelopeCreated {
 		v(cc, core.EventEnvelopeCreated{ID: id})
@@ -16,13 +16,13 @@ func PublishEnvelopeCreated(cc *core.Context, id int64) {
 	cc.Bus.Mutex.Unlock()
 }
 
-func OnEnvelopeDeleted(app core.App, fn func(cc *core.Context, evt core.EventEnvelopeDeleted)) {
+func OnEnvelopeDeleted(app core.App, fn func(cc core.Context, evt core.EventEnvelopeDeleted)) {
 	app.Bus.Mutex.Lock()
 	app.Bus.EnvelopeDeleted = append(app.Bus.EnvelopeDeleted, fn)
 	app.Bus.Mutex.Unlock()
 }
 
-func PublishEnvelopeDeleted(cc *core.Context, ids ...int64) {
+func PublishEnvelopeDeleted(cc core.Context, ids ...int64) {
 	cc.Bus.Mutex.Lock()
 	for _, v := range cc.Bus.EnvelopeDeleted {
 		v(cc, core.EventEnvelopeDeleted{IDS: ids})
@@ -30,7 +30,7 @@ func PublishEnvelopeDeleted(cc *core.Context, ids ...int64) {
 	cc.Bus.Mutex.Unlock()
 }
 
-func OnTrimStart(app core.App, fn func(cc *core.Context, evt core.EventTrimStart)) {
+func OnTrimStart(app core.App, fn func(cc core.Context, evt core.EventTrimStart)) {
 	app.Bus.Mutex.Lock()
 	if app.Bus.TrimStart != nil {
 		panic("TrimStart handler is being redefined")
@@ -39,7 +39,7 @@ func OnTrimStart(app core.App, fn func(cc *core.Context, evt core.EventTrimStart
 	app.Bus.Mutex.Unlock()
 }
 
-func PublishTrimStart(cc *core.Context) <-chan bool {
+func PublishTrimStart(cc core.Context) <-chan bool {
 	res := make(chan bool)
 	cc.Bus.Mutex.Lock()
 	cc.Bus.TrimStart(cc, core.EventTrimStart{Response: res})

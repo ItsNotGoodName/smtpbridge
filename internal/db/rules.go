@@ -8,19 +8,19 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/internal/rules"
 )
 
-func RuleList(cc *core.Context) ([]rules.Rule, error) {
+func RuleList(cc core.Context) ([]rules.Rule, error) {
 	var rrules []rules.Rule
 	err := cc.DB.NewSelect().Model(&rrules).Scan(cc.Context())
 	return rrules, err
 }
 
-func RuleListEnable(cc *core.Context) ([]rules.Rule, error) {
+func RuleListEnable(cc core.Context) ([]rules.Rule, error) {
 	var rrules []rules.Rule
 	err := cc.DB.NewSelect().Model(&rrules).Where("enable = TRUE").Scan(cc.Context())
 	return rrules, err
 }
 
-func RuleEndpointList(cc *core.Context, ruleID int64) ([]rules.Endpoint, error) {
+func RuleEndpointList(cc core.Context, ruleID int64) ([]rules.Endpoint, error) {
 	var e []rules.Endpoint
 	err := cc.DB.NewSelect().
 		ColumnExpr("id, name, (rule_id IS NOT NULL) AS enable").
@@ -31,11 +31,11 @@ func RuleEndpointList(cc *core.Context, ruleID int64) ([]rules.Endpoint, error) 
 	return e, err
 }
 
-func RuleIsInternal(cc *core.Context, ruleID int64) (bool, error) {
+func RuleIsInternal(cc core.Context, ruleID int64) (bool, error) {
 	return queries.New(cc.DB.DB).IsRuleInternal(cc.Context(), ruleID)
 }
 
-func RuleUpdate(cc *core.Context, ruleID int64, enable bool) (rules.Rule, error) {
+func RuleUpdate(cc core.Context, ruleID int64, enable bool) (rules.Rule, error) {
 	rule := rules.Rule{}
 	res, err := cc.
 		DB.

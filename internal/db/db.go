@@ -55,13 +55,13 @@ func Migrate(cc context.Context, bunDB *bun.DB) error {
 	return nil
 }
 
-func Size(cc *core.Context) (int64, error) {
+func Size(cc core.Context) (int64, error) {
 	var size int64
 	err := cc.DB.QueryRow("SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size();").Scan(&size)
 	return size, err
 }
 
-func Vacuum(cc *core.Context) error {
+func Vacuum(cc core.Context) error {
 	_, err := cc.DB.Exec("VACUUM;")
 	return err
 }

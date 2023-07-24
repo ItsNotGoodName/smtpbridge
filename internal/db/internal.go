@@ -14,7 +14,7 @@ import (
 	"github.com/uptrace/bun"
 )
 
-func InternalRuleUpsert(cc *core.Context, r rules.Rule, updatedAt time.Time) error {
+func InternalRuleUpsert(cc core.Context, r rules.Rule, updatedAt time.Time) error {
 	return queries.New(cc.DB.DB).UpsertInternalRule(cc.Context(), queries.UpsertInternalRuleParams{
 		InternalID: r.InternalID,
 		Name:       r.Name,
@@ -24,7 +24,7 @@ func InternalRuleUpsert(cc *core.Context, r rules.Rule, updatedAt time.Time) err
 	})
 }
 
-func InternalEndpointUpsert(cc *core.Context, end endpoints.Endpoint, updatedAt time.Time) error {
+func InternalEndpointUpsert(cc core.Context, end endpoints.Endpoint, updatedAt time.Time) error {
 	config, err := json.Marshal(end.Config)
 	if err != nil {
 		return err
@@ -42,7 +42,7 @@ func InternalEndpointUpsert(cc *core.Context, end endpoints.Endpoint, updatedAt 
 	})
 }
 
-func InternalRuleEndpointsUpsert(cc *core.Context, ruleInternalID string, endpointInternalIDs []string, updatedAt time.Time) error {
+func InternalRuleEndpointsUpsert(cc core.Context, ruleInternalID string, endpointInternalIDs []string, updatedAt time.Time) error {
 	if len(endpointInternalIDs) == 0 {
 		return nil
 	}
@@ -65,7 +65,7 @@ func InternalRuleEndpointsUpsert(cc *core.Context, ruleInternalID string, endpoi
 	return nil
 }
 
-func InternalDeleteOlderThan(cc *core.Context, date time.Time) error {
+func InternalDeleteOlderThan(cc core.Context, date time.Time) error {
 	return cc.DB.RunInTx(cc.Context(), &sql.TxOptions{}, func(ctx context.Context, tx bun.Tx) error {
 		for _, table := range []string{"endpoints", "rules", "rules_to_endpoints"} {
 			_, err := tx.NewDelete().Table(table).Where("updated_at < ?", date).Where("internal = true").Exec(ctx)

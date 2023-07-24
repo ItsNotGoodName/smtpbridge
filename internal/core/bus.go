@@ -18,9 +18,9 @@ type EventTrimStart struct {
 
 type Bus struct {
 	Mutex           sync.Mutex
-	EnvelopeCreated []func(cc *Context, evt EventEnvelopeCreated)
-	EnvelopeDeleted []func(cc *Context, evt EventEnvelopeDeleted)
-	TrimStart       func(cc *Context, evt EventTrimStart)
+	EnvelopeCreated []func(cc Context, evt EventEnvelopeCreated)
+	EnvelopeDeleted []func(cc Context, evt EventEnvelopeDeleted)
+	TrimStart       func(cc Context, evt EventTrimStart)
 }
 
 func NewBus() *Bus {

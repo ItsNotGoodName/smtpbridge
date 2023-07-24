@@ -15,17 +15,17 @@ import (
 	"github.com/uptrace/bun"
 )
 
-func EnvelopeDeleteAll(cc *core.Context) error {
+func EnvelopeDeleteAll(cc core.Context) error {
 	_, err := cc.DB.NewDelete().Model(&envelope.Message{}).Where("1=1").Exec(cc.Context())
 	return err
 }
 
-func EnvelopeDelete(cc *core.Context, id int64) error {
+func EnvelopeDelete(cc core.Context, id int64) error {
 	_, err := cc.DB.NewDelete().Model(&envelope.Message{}).Where("id = ?", id).Exec(cc.Context())
 	return err
 }
 
-func EnvelopeCreate(cc *core.Context, msg *envelope.Message, atts []*envelope.Attachment) (int64, []int64, error) {
+func EnvelopeCreate(cc core.Context, msg *envelope.Message, atts []*envelope.Attachment) (int64, []int64, error) {
 	err := cc.DB.RunInTx(cc.Context(), &sql.TxOptions{}, func(ctx context.Context, tx bun.Tx) error {
 		_, err := tx.NewInsert().Model(msg).Exec(ctx)
 		if err != nil {
@@ -54,7 +54,7 @@ func EnvelopeCreate(cc *core.Context, msg *envelope.Message, atts []*envelope.At
 	return msg.ID, attIDS, nil
 }
 
-func EnvelopeMessageList(cc *core.Context, page pagination.Page, filter envelope.MessageFilter) (envelope.MessageListResult, error) {
+func EnvelopeMessageList(cc core.Context, page pagination.Page, filter envelope.MessageFilter) (envelope.MessageListResult, error) {
 	var msgs []*envelope.Message
 	q := cc.DB.NewSelect().Model(&msgs).Limit(page.Limit()).Offset(page.Offset())
 
@@ -90,7 +90,7 @@ func EnvelopeMessageList(cc *core.Context, page pagination.Page, filter envelope
 	}, nil
 }
 
-func EnvelopeGet(cc *core.Context, id int64) (envelope.Envelope, error) {
+func EnvelopeGet(cc core.Context, id int64) (envelope.Envelope, error) {
 	ctx := cc.Context()
 	msg := &envelope.Message{}
 	err := cc.DB.NewSelect().Model(msg).Where("id = ?", id).Scan(ctx, msg)
@@ -110,19 +110,19 @@ func EnvelopeGet(cc *core.Context, id int64) (envelope.Envelope, error) {
 	}, nil
 }
 
-func EnvelopeMessageHTMLGet(cc *core.Context, id int64) (string, error) {
+func EnvelopeMessageHTMLGet(cc core.Context, id int64) (string, error) {
 	return queries.New(cc.DB.DB).GetEnvelopeMessageHTML(cc.Context(), id)
 }
 
-func EnvelopeCount(cc *core.Context) (int, error) {
+func EnvelopeCount(cc core.Context) (int, error) {
 	return cc.DB.NewSelect().Model(&envelope.Message{}).Count(cc.Context())
 }
 
-func EnvelopeAttachmentCount(cc *core.Context) (int, error) {
+func EnvelopeAttachmentCount(cc core.Context) (int, error) {
 	return cc.DB.NewSelect().Model(&envelope.Attachment{}).Where("message_id IS NOT NULL").Count(cc.Context())
 }
 
-func EnvelopeAttachmentList(cc *core.Context, page pagination.Page, filter envelope.AttachmentFilter) (envelope.AttachmentListResult, error) {
+func EnvelopeAttachmentList(cc core.Context, page pagination.Page, filter envelope.AttachmentFilter) (envelope.AttachmentListResult, error) {
 	var atts []*envelope.Attachment
 	q := cc.DB.NewSelect().Model(&atts).Limit(page.Limit()).Offset(page.Offset()).Where("message_id IS NOT NULL")
 
@@ -153,24 +153,24 @@ func EnvelopeAttachmentList(cc *core.Context, page pagination.Page, filter envel
 	}, nil
 }
 
-func EnvelopeAttachmentListOrphan(cc *core.Context, limit int) ([]*envelope.Attachment, error) {
+func EnvelopeAttachmentListOrphan(cc core.Context, limit int) ([]*envelope.Attachment, error) {
 	var atts []*envelope.Attachment
 	err := cc.DB.NewSelect().Model(&atts).Limit(limit).Where("message_id IS NULL").Scan(cc.Context())
 	return atts, err
 }
 
-func EnvelopeDeleteUntilCount(cc *core.Context, keep int, olderThan time.Time) (int64, error) {
+func EnvelopeDeleteUntilCount(cc core.Context, keep int, olderThan time.Time) (int64, error) {
 	return queries.New(cc.DB.DB).DeleteEnvelopeUntilCount(cc.Context(), queries.DeleteEnvelopeUntilCountParams{
 		CreatedAt: olderThan.UTC(),
 		Limit:     int64(keep),
 	})
 }
 
-func EnvelopeDeleteOlderThan(cc *core.Context, olderThan time.Time) (int64, error) {
+func EnvelopeDeleteOlderThan(cc core.Context, olderThan time.Time) (int64, error) {
 	return queries.New(cc.DB.DB).DeleteEnvelopeOlderThan(cc.Context(), olderThan.UTC())
 }
 
-func EnvelopeAttachmentDelete(cc *core.Context, att *envelope.Attachment) error {
+func EnvelopeAttachmentDelete(cc core.Context, att *envelope.Attachment) error {
 	err := files.DeleteFile(cc, att)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return err

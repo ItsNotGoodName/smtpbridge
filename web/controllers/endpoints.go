@@ -9,7 +9,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func Endpoints(c *fiber.Ctx, cc *core.Context) error {
+func Endpoints(c *fiber.Ctx, cc core.Context) error {
 	// Execute
 	ends, err := procs.EndpointList(cc)
 	if err != nil {
@@ -22,7 +22,7 @@ func Endpoints(c *fiber.Ctx, cc *core.Context) error {
 	})
 }
 
-func EndpointTest(c *fiber.Ctx, cc *core.Context, id int64) error {
+func EndpointTest(c *fiber.Ctx, cc core.Context, id int64) error {
 	// Execute
 	err := procs.EndpointTest(cc, id)
 	if err != nil {

@@ -10,13 +10,13 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func App(app core.App, fn func(c *fiber.Ctx, cc *core.Context) error) fiber.Handler {
+func App(app core.App, fn func(c *fiber.Ctx, cc core.Context) error) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		return fn(c, app.Context(context.Background()))
 	}
 }
 
-func AppID(app core.App, fn func(c *fiber.Ctx, cc *core.Context, id int64) error) fiber.Handler {
+func AppID(app core.App, fn func(c *fiber.Ctx, cc core.Context, id int64) error) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		id, err := strconv.ParseInt(c.Params("id"), 10, 64)
 		if err != nil {

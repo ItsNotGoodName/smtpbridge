@@ -9,7 +9,7 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/internal/rules"
 )
 
-func InternalSync(cc *core.Context, eendpoints []endpoints.Endpoint, rrules []rules.Rule, ruleToEndpoints map[string][]string) error {
+func InternalSync(cc core.Context, eendpoints []endpoints.Endpoint, rrules []rules.Rule, ruleToEndpoints map[string][]string) error {
 	updatedAt := time.Now()
 
 	for _, se := range eendpoints {

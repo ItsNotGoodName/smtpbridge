@@ -5,7 +5,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func AuthLogin(c *fiber.Ctx, cc *core.Context) error {
+func AuthLogin(c *fiber.Ctx, cc core.Context) error {
 	// Request
 
 	// Execute

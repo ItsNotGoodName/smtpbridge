@@ -13,7 +13,7 @@ func NewConsole() Console {
 	return Console{}
 }
 
-func (c Console) Send(cc *core.Context, env envelope.Envelope, config Config) error {
+func (c Console) Send(cc core.Context, env envelope.Envelope, config Config) error {
 	body, err := GetBody(env, config)
 	if err != nil {
 		return err

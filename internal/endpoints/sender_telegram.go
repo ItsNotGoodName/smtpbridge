@@ -30,7 +30,7 @@ func NewTelegram(token, chatID string) *Telegram {
 	}
 }
 
-func (t *Telegram) Send(cc *core.Context, env envelope.Envelope, config Config) error {
+func (t *Telegram) Send(cc core.Context, env envelope.Envelope, config Config) error {
 	atts := FilterImagesOnly(GetAttachments(env, config))
 	text, err := GetBody(env, config)
 	if err != nil {
@@ -76,7 +76,7 @@ type telegramResponse struct {
 	Description string `json:"description"`
 }
 
-func (t *Telegram) sendMessage(cc *core.Context, text string) error {
+func (t *Telegram) sendMessage(cc core.Context, text string) error {
 	if text == "" {
 		return nil
 	}
@@ -115,7 +115,7 @@ func (t *Telegram) sendMessage(cc *core.Context, text string) error {
 	return nil
 }
 
-func (t *Telegram) sendPhoto(cc *core.Context, caption, name string, file *os.File) error {
+func (t *Telegram) sendPhoto(cc core.Context, caption, name string, file *os.File) error {
 	defer file.Close()
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)

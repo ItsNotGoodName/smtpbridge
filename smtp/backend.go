@@ -29,13 +29,13 @@ func (b *backend) NewSession(state *smtp.Conn) (smtp.Session, error) {
 
 // A Session is returned after EHLO.
 type session struct {
-	ctx        *core.Context
+	ctx        core.Context
 	from       string
 	to         string
 	remoteAddr net.Addr
 }
 
-func newSession(ctx *core.Context, remoteAddr net.Addr) *session {
+func newSession(ctx core.Context, remoteAddr net.Addr) *session {
 	return &session{ctx: ctx, remoteAddr: remoteAddr}
 }
 

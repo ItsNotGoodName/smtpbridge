@@ -7,21 +7,36 @@ import (
 )
 
 type Context struct {
-	Bus  *Bus
-	DB   *bun.DB
-	File FileStore
-	ctx  context.Context
+	Actor Actor
+	Bus   *Bus
+	DB    *bun.DB
+	File  FileStore
+	ctx   context.Context
 }
 
-func (a App) Context(ctx context.Context) *Context {
-	return &Context{
-		Bus:  a.Bus,
-		DB:   a.DB,
-		File: a.File,
-		ctx:  ctx,
+func (a App) Context(ctx context.Context) Context {
+	return Context{
+		Actor: ActorAnon,
+		Bus:   a.Bus,
+		DB:    a.DB,
+		File:  a.File,
+		ctx:   ctx,
 	}
 }
 
-func (c *Context) Context() context.Context {
+func (c Context) WithActor(actor Actor) Context {
+	c.Actor = actor
+	return c
+}
+
+func (c Context) Context() context.Context {
 	return c.ctx
 }
+
+type Actor int
+
+const (
+	ActorAnon Actor = iota
+	ActorUser
+	ActorSystem
+)

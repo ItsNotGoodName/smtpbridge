@@ -14,7 +14,7 @@ func MailmanBackground(ctx context.Context, app core.App) {
 
 	go mailman(app.Context(ctx), evtC)
 
-	events.OnEnvelopeCreated(app, func(cc *core.Context, evt core.EventEnvelopeCreated) {
+	events.OnEnvelopeCreated(app, func(cc core.Context, evt core.EventEnvelopeCreated) {
 		select {
 		case evtC <- evt:
 		default:
@@ -23,7 +23,7 @@ func MailmanBackground(ctx context.Context, app core.App) {
 	})
 }
 
-func mailman(cc *core.Context, evtC <-chan core.EventEnvelopeCreated) {
+func mailman(cc core.Context, evtC <-chan core.EventEnvelopeCreated) {
 	ctx := cc.Context()
 
 	for {

@@ -9,11 +9,11 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/pkg/pagination"
 )
 
-func EnvelopeMessageList(cc *core.Context, page pagination.Page, filter envelope.MessageFilter) (envelope.MessageListResult, error) {
+func EnvelopeMessageList(cc core.Context, page pagination.Page, filter envelope.MessageFilter) (envelope.MessageListResult, error) {
 	return db.EnvelopeMessageList(cc, page, filter)
 }
 
-func EnvelopeCreate(cc *core.Context, msg *envelope.Message, datts []envelope.DataAttachment) (int64, error) {
+func EnvelopeCreate(cc core.Context, msg *envelope.Message, datts []envelope.DataAttachment) (int64, error) {
 	// Extract attachments
 	atts := make([]*envelope.Attachment, len(datts))
 	for i := range atts {
@@ -39,15 +39,15 @@ func EnvelopeCreate(cc *core.Context, msg *envelope.Message, datts []envelope.Da
 	return msgID, nil
 }
 
-func EnvelopeGet(cc *core.Context, id int64) (envelope.Envelope, error) {
+func EnvelopeGet(cc core.Context, id int64) (envelope.Envelope, error) {
 	return db.EnvelopeGet(cc, id)
 }
 
-func EnvelopeMessageHTMLGet(cc *core.Context, id int64) (string, error) {
+func EnvelopeMessageHTMLGet(cc core.Context, id int64) (string, error) {
 	return db.EnvelopeMessageHTMLGet(cc, id)
 }
 
-func EnvelopeDelete(cc *core.Context, id int64) error {
+func EnvelopeDelete(cc core.Context, id int64) error {
 	err := db.EnvelopeDelete(cc, id)
 	if err != nil {
 		return err
@@ -58,7 +58,7 @@ func EnvelopeDelete(cc *core.Context, id int64) error {
 	return nil
 }
 
-func EnvelopeDeleteAll(cc *core.Context) error {
+func EnvelopeDeleteAll(cc core.Context) error {
 	err := db.EnvelopeDeleteAll(cc)
 	if err != nil {
 		return err
@@ -69,6 +69,6 @@ func EnvelopeDeleteAll(cc *core.Context) error {
 	return nil
 }
 
-func EnvelopeAttachmentList(cc *core.Context, page pagination.Page, filter envelope.AttachmentFilter) (envelope.AttachmentListResult, error) {
+func EnvelopeAttachmentList(cc core.Context, page pagination.Page, filter envelope.AttachmentFilter) (envelope.AttachmentListResult, error) {
 	return db.EnvelopeAttachmentList(cc, page, filter)
 }

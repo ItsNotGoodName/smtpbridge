@@ -7,7 +7,7 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/internal/models"
 )
 
-func StorageGet(cc *core.Context) (models.Storage, error) {
+func StorageGet(cc core.Context) (models.Storage, error) {
 	attachmentCount, err := db.EnvelopeAttachmentCount(cc)
 	if err != nil {
 		return models.Storage{}, err

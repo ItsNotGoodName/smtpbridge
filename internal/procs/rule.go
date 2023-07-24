@@ -6,7 +6,7 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/internal/rules"
 )
 
-func RuleAggregateList(cc *core.Context) ([]rules.Aggregate, error) {
+func RuleAggregateList(cc core.Context) ([]rules.Aggregate, error) {
 	rrules, err := db.RuleList(cc)
 	if err != nil {
 		return nil, err
@@ -28,6 +28,6 @@ func RuleAggregateList(cc *core.Context) ([]rules.Aggregate, error) {
 	return aggregateRules, nil
 }
 
-func RuleUpdateEnable(cc *core.Context, ruleID int64, enable bool) (rules.Rule, error) {
+func RuleUpdateEnable(cc core.Context, ruleID int64, enable bool) (rules.Rule, error) {
 	return db.RuleUpdate(cc, ruleID, enable)
 }

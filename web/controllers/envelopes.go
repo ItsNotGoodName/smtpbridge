@@ -15,7 +15,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func Envelopes(c *fiber.Ctx, cc *core.Context) error {
+func Envelopes(c *fiber.Ctx, cc core.Context) error {
 	// Request
 	page, err := strconv.Atoi(c.Query("page", "1"))
 	if err != nil {
@@ -54,7 +54,7 @@ func Envelopes(c *fiber.Ctx, cc *core.Context) error {
 	})
 }
 
-func Envelope(c *fiber.Ctx, cc *core.Context, id int64) error {
+func Envelope(c *fiber.Ctx, cc core.Context, id int64) error {
 	// Execute
 	env, err := procs.EnvelopeGet(cc, id)
 	if err != nil {
@@ -72,7 +72,7 @@ func Envelope(c *fiber.Ctx, cc *core.Context, id int64) error {
 	})
 }
 
-func EnvelopeHTML(c *fiber.Ctx, cc *core.Context, id int64) error {
+func EnvelopeHTML(c *fiber.Ctx, cc core.Context, id int64) error {
 	// Execute
 	html, err := procs.EnvelopeMessageHTMLGet(cc, id)
 	if err != nil {
@@ -89,7 +89,7 @@ func EnvelopeNew(c *fiber.Ctx) error {
 	return c.Render("envelopes-new", fiber.Map{})
 }
 
-func EnvelopeNewPost(c *fiber.Ctx, cc *core.Context) error {
+func EnvelopeNewPost(c *fiber.Ctx, cc core.Context) error {
 	// Request
 	form, err := c.MultipartForm()
 	if err != nil {
@@ -128,7 +128,7 @@ func EnvelopeNewPost(c *fiber.Ctx, cc *core.Context) error {
 	return c.Redirect("/envelopes")
 }
 
-func EnvelopeDelete(c *fiber.Ctx, cc *core.Context, id int64) error {
+func EnvelopeDelete(c *fiber.Ctx, cc core.Context, id int64) error {
 	// Execute
 	err := procs.EnvelopeDelete(cc, id)
 	if err != nil {
@@ -140,7 +140,7 @@ func EnvelopeDelete(c *fiber.Ctx, cc *core.Context, id int64) error {
 	return c.SendStatus(http.StatusNoContent)
 }
 
-func EnvelopesDelete(c *fiber.Ctx, cc *core.Context) error {
+func EnvelopesDelete(c *fiber.Ctx, cc core.Context) error {
 	// Execute
 	err := procs.EnvelopeDeleteAll(cc)
 	if err != nil {

@@ -19,7 +19,7 @@ func NewShoutrrr(router *router.ServiceRouter) Shoutrrr {
 	}
 }
 
-func (s Shoutrrr) Send(cc *core.Context, env envelope.Envelope, config Config) error {
+func (s Shoutrrr) Send(cc core.Context, env envelope.Envelope, config Config) error {
 	body, err := GetBody(env, config)
 	if err != nil {
 		return err

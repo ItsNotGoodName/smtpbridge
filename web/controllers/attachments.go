@@ -12,7 +12,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func Attachments(c *fiber.Ctx, cc *core.Context) error {
+func Attachments(c *fiber.Ctx, cc core.Context) error {
 	// Request
 	page, err := strconv.Atoi(c.Query("page", "1"))
 	if err != nil {

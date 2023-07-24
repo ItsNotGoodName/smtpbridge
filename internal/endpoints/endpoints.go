@@ -67,7 +67,7 @@ type Config struct {
 }
 
 type Sender interface {
-	Send(cc *core.Context, env envelope.Envelope, config Config) error
+	Send(cc core.Context, env envelope.Envelope, config Config) error
 }
 
 type ParsedEndpoint struct {
@@ -98,7 +98,7 @@ func (e Endpoint) Parse() (ParsedEndpoint, error) {
 	}, nil
 }
 
-func (pe ParsedEndpoint) Send(cc *core.Context, env envelope.Envelope) error {
+func (pe ParsedEndpoint) Send(cc core.Context, env envelope.Envelope) error {
 	if err := pe.Sender.Send(cc, env, pe.Config); err != nil {
 		return err
 	}

@@ -7,7 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func Rules(c *fiber.Ctx, cc *core.Context) error {
+func Rules(c *fiber.Ctx, cc core.Context) error {
 	// Execute
 	aggregateRules, err := procs.RuleAggregateList(cc)
 	if err != nil {
@@ -20,7 +20,7 @@ func Rules(c *fiber.Ctx, cc *core.Context) error {
 	})
 }
 
-func RuleEnable(c *fiber.Ctx, cc *core.Context, id int64) error {
+func RuleEnable(c *fiber.Ctx, cc core.Context, id int64) error {
 	// Request
 	enable := c.FormValue("enable") == "on"
 

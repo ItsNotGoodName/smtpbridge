@@ -9,7 +9,7 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/internal/envelope"
 )
 
-func EndpointSend(cc *core.Context, envelope_id int64, endpoint_id int64) error {
+func EndpointSend(cc core.Context, envelope_id int64, endpoint_id int64) error {
 	end, err := db.EndpointGet(cc, endpoint_id)
 	if err != nil {
 		return err
@@ -28,7 +28,7 @@ func EndpointSend(cc *core.Context, envelope_id int64, endpoint_id int64) error 
 	return parsedEnd.Send(cc, env)
 }
 
-func EndpointTest(cc *core.Context, id int64) error {
+func EndpointTest(cc core.Context, id int64) error {
 	end, err := db.EndpointGet(cc, id)
 	if err != nil {
 		return err
@@ -49,6 +49,6 @@ func EndpointTest(cc *core.Context, id int64) error {
 	return parsedEnd.Send(cc, env)
 }
 
-func EndpointList(cc *core.Context) ([]endpoints.Endpoint, error) {
+func EndpointList(cc core.Context) ([]endpoints.Endpoint, error) {
 	return db.EndpointList(cc)
 }
