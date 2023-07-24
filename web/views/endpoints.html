@@ -9,7 +9,11 @@
   {{range $val := .Endpoints}}
   <section id="endpoint-{{$val.ID}}">
     <details>
-      <summary>{{$val.Name}}</summary>
+      <summary class="pico-no-chevron">
+        <div class="flex justify-between">
+          {{$val.Name}}<b>{{$val.Kind}}</b>
+        </div>
+      </summary>
       <article>
         <div class="flex flex-col gap-4">
           <div class="flex justify-between gap-2">
@@ -21,11 +25,6 @@
             <div>
               <input disabled {{if $val.Internal}}checked{{end}} type="checkbox" role="switch" />
             </div>
-          </div>
-
-          <div class="flex justify-between gap-2">
-            <div>Kind</div>
-            <div>{{$val.Kind}}</div>
           </div>
 
           <div class="flex justify-between gap-2">
@@ -59,15 +58,17 @@
         </div>
 
         {{if $val.Config}}
-        <h4>Config</h4>
         <form>
-          {{ range $key, $value := $val.Config }}
-          <label for="config_{{$key}}">
-            {{$key}}
-            <textarea {{if $val.Internal}}readonly{{end}} {{if $value}}placeholder="**********" {{end}}
-              id="config_{{$key}}"></textarea>
-          </label>
-          {{ end }}
+          <fieldset>
+            <legend><b>Config</b></legend>
+            {{ range $key, $value := $val.Config }}
+            <label for="config_{{$key}}">
+              {{$key}}
+              <textarea {{if $val.Internal}}readonly{{end}} {{if $value}}placeholder="**********" {{end}}
+                id="config_{{$key}}"></textarea>
+            </label>
+            {{ end }}
+          </fieldset>
         </form>
         {{ end }}
 
