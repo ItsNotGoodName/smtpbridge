@@ -35,7 +35,7 @@ func (a App) newContext(ctx context.Context, actor Actor) Context {
 }
 
 func (a App) Context(ctx context.Context) Context {
-	return a.newContext(ctx, ActorAnonymous)
+	return a.newContext(ctx, ActorUnknown)
 }
 
 func (a App) SystemContext(ctx context.Context) Context {

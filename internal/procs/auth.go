@@ -9,8 +9,12 @@ import (
 
 var ErrorLogin = fmt.Errorf("login error")
 
-func HTTPLogin(cc core.Context, username, password string) error {
-	if cc.Config.AuthHTTP.Username == "" && cc.Config.AuthHTTP.Password == "" {
+func AuthHTTPAnonymous(cc core.Context) bool {
+	return cc.Config.AuthHTTP.Username == "" && cc.Config.AuthHTTP.Password == ""
+}
+
+func AuthHTTPLogin(cc core.Context, username, password string) error {
+	if AuthHTTPAnonymous(cc) {
 		return nil
 	}
 

@@ -8,7 +8,6 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/internal/build"
 	"github.com/ItsNotGoodName/smtpbridge/web"
 	"github.com/dustin/go-humanize"
-	"github.com/gofiber/fiber/v2"
 )
 
 var Map template.FuncMap = template.FuncMap{
@@ -41,9 +40,4 @@ var Map template.FuncMap = template.FuncMap{
 	"query": func(queries map[string]string, vals ...any) template.URL {
 		return template.URL(Query(queries, vals...))
 	},
-}
-
-func IsHTMXRequest(c *fiber.Ctx) bool {
-	_, isHTMXRequest := c.GetReqHeaders()["Hx-Request"]
-	return isHTMXRequest
 }

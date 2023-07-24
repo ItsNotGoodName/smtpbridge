@@ -234,7 +234,6 @@ make dev-web
 
 - Reload on config change
 - Add [Apprise](https://github.com/caronc/apprise) endpoint
-- HTTP and SMTP auth
 - CRUD endpoints and rules
 - SQLite full text search
 - Read mailbox files

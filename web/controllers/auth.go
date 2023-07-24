@@ -8,12 +8,12 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/session"
 )
 
-type Flash struct {
+type LoginData struct {
 	Flash string
 }
 
 func Login(c *fiber.Ctx, cc core.Context) error {
-	return c.Render("login", Flash{})
+	return c.Render("login", LoginData{})
 }
 
 func AuthLogin(c *fiber.Ctx, cc core.Context, store *session.Store) error {
@@ -22,43 +22,47 @@ func AuthLogin(c *fiber.Ctx, cc core.Context, store *session.Store) error {
 	password := c.FormValue("password")
 
 	// Execute
-	err := procs.HTTPLogin(cc, username, password)
+	err := procs.AuthHTTPLogin(cc, username, password)
 	if err != nil {
 		if helpers.IsHTMXRequest(c) {
-			return c.Render("login", Flash{Flash: err.Error()}, "form")
+			return c.Render("login", LoginData{Flash: err.Error()}, "form")
 		}
-		return c.Render("login", Flash{Flash: err.Error()})
+		return c.Render("login", LoginData{Flash: err.Error()})
 	}
 
 	// Response
 	sess, err := store.Get(c)
 	if err != nil {
-		panic(err)
+		return helpers.Error(c, err)
 	}
 
 	sess.Set("auth", true)
 	if err := sess.Save(); err != nil {
-		panic(err)
+		return helpers.Error(c, err)
 	}
 
-	return redirect(c, "/")
+	return helpers.Redirect(c, "/")
 }
 
 func AuthLogout(c *fiber.Ctx, cc core.Context, store *session.Store) error {
 	sess, err := store.Get(c)
 	if err != nil {
-		panic(err)
+		return helpers.Error(c, err)
 	}
 
 	sess.Delete("auth")
 	if err := sess.Save(); err != nil {
-		panic(err)
+		return helpers.Error(c, err)
 	}
 
-	return redirect(c, "/login")
+	return helpers.Redirect(c, "/login")
 }
 
 func AuthRequire(c *fiber.Ctx, cc core.Context, store *session.Store) error {
+	if procs.AuthHTTPAnonymous(cc) {
+		return c.Next()
+	}
+
 	sess, err := store.Get(c)
 	if err != nil {
 		panic(err)
@@ -66,21 +70,25 @@ func AuthRequire(c *fiber.Ctx, cc core.Context, store *session.Store) error {
 
 	auth := sess.Get("auth")
 	if auth == nil {
-		return redirect(c, "/login")
+		return helpers.Redirect(c, "/login")
 	}
 
 	return c.Next()
 }
 
 func AuthSkip(c *fiber.Ctx, cc core.Context, store *session.Store) error {
+	if procs.AuthHTTPAnonymous(cc) {
+		return helpers.Redirect(c, "/")
+	}
+
 	sess, err := store.Get(c)
 	if err != nil {
-		panic(err)
+		return helpers.Error(c, err)
 	}
 
 	auth := sess.Get("auth")
 	if auth != nil {
-		return redirect(c, "/")
+		return helpers.Redirect(c, "/")
 	}
 
 	return c.Next()

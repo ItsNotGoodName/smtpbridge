@@ -3,6 +3,6 @@ package core
 type Actor int
 
 const (
-	ActorAnonymous Actor = iota
+	ActorUnknown Actor = iota
 	ActorSystem
 )
