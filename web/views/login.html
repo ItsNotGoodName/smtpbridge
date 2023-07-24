@@ -8,7 +8,7 @@
   <article class="max-w-md mx-auto">
     <h2>Login</h2>
     {{block "form" .}}
-    <form method="post" action="/auth" hx-post="/auth" hx-swap="outerHTML">
+    <form method="post" action="/login" hx-post="/login" hx-swap="outerHTML">
       <label for="username">
         Username
         <input type="text" id="username" name="username" placeholder="Username" />
@@ -19,7 +19,7 @@
         <input type="password" id="password" name="password" placeholder="Password" />
       </label>
 
-      <button data-loading-path="/auth" data-loading-disable data-loading-aria-busy>
+      <button data-loading-path="/login" data-loading-disable data-loading-aria-busy>
         Log in
       </button>
       {{with .Flash}}

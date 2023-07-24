@@ -9,12 +9,13 @@ import (
 )
 
 func route(app core.App, store *session.Store, http fiber.Router) {
-	authSkip := inject.AppStore(app, store, controllers.AuthSkip)
+	userRequire := inject.AppStore(app, store, controllers.UserRequire)
 	authRequire := inject.AppStore(app, store, controllers.AuthRequire)
+	authSkip := inject.AppStore(app, store, controllers.AuthRestrict)
 
 	http.Get("/login", authSkip, inject.App(app, controllers.Login))
-	http.Post("/auth", authSkip, inject.AppStore(app, store, controllers.AuthLogin))
-	http.Delete("/auth", authRequire, inject.AppStore(app, store, controllers.AuthLogout))
+	http.Post("/login", authSkip, inject.AppStore(app, store, controllers.LoginPost))
+	http.Post("/logout", userRequire, inject.AppStore(app, store, controllers.Logout))
 
 	http.Get("/", authRequire, inject.App(app, controllers.Index))
 	http.Route("/index", func(http fiber.Router) {

@@ -16,7 +16,7 @@ func Login(c *fiber.Ctx, cc core.Context) error {
 	return c.Render("login", LoginData{})
 }
 
-func AuthLogin(c *fiber.Ctx, cc core.Context, store *session.Store) error {
+func LoginPost(c *fiber.Ctx, cc core.Context, store *session.Store) error {
 	// Request
 	username := c.FormValue("username")
 	password := c.FormValue("password")
@@ -44,7 +44,7 @@ func AuthLogin(c *fiber.Ctx, cc core.Context, store *session.Store) error {
 	return helpers.Redirect(c, "/")
 }
 
-func AuthLogout(c *fiber.Ctx, cc core.Context, store *session.Store) error {
+func Logout(c *fiber.Ctx, cc core.Context, store *session.Store) error {
 	sess, err := store.Get(c)
 	if err != nil {
 		return helpers.Error(c, err)
@@ -58,11 +58,23 @@ func AuthLogout(c *fiber.Ctx, cc core.Context, store *session.Store) error {
 	return helpers.Redirect(c, "/login")
 }
 
+func UserRequire(c *fiber.Ctx, cc core.Context, store *session.Store) error {
+	if procs.AuthHTTPAnonymous(cc) {
+		return helpers.NotFound(c)
+	}
+
+	return authRequire(c, cc, store)
+}
+
 func AuthRequire(c *fiber.Ctx, cc core.Context, store *session.Store) error {
 	if procs.AuthHTTPAnonymous(cc) {
 		return c.Next()
 	}
 
+	return authRequire(c, cc, store)
+}
+
+func authRequire(c *fiber.Ctx, cc core.Context, store *session.Store) error {
 	sess, err := store.Get(c)
 	if err != nil {
 		panic(err)
@@ -76,7 +88,7 @@ func AuthRequire(c *fiber.Ctx, cc core.Context, store *session.Store) error {
 	return c.Next()
 }
 
-func AuthSkip(c *fiber.Ctx, cc core.Context, store *session.Store) error {
+func AuthRestrict(c *fiber.Ctx, cc core.Context, store *session.Store) error {
 	if procs.AuthHTTPAnonymous(cc) {
 		return helpers.Redirect(c, "/")
 	}
