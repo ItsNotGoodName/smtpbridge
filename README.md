@@ -232,6 +232,8 @@ make dev-web
 
 ## To Do
 
+- Add attachment when testing endpoint
+- Add `PermaLink` function in templates
 - Reload on config change
 - Add [Apprise](https://github.com/caronc/apprise) endpoint
 - CRUD endpoints and rules
@@ -240,3 +242,4 @@ make dev-web
 - Save raw emails
 - JSON API
 - Windows installer
+- Better HTTP error handling
