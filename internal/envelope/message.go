@@ -21,7 +21,9 @@ func NewMessage(r CreateMessage) *Message {
 	text := r.Text
 	if isHTML(r.Text) {
 		var err error
-		text, err = html2text.FromString(r.Text)
+		text, err = html2text.FromString(r.Text, html2text.Options{
+			TextOnly: true,
+		})
 		if err != nil {
 			text = r.Text
 		}

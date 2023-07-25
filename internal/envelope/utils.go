@@ -36,5 +36,11 @@ func fileExtension(name string, mimeT string) string {
 }
 
 func isHTML(maybeHTML string) bool {
-	return strings.HasPrefix(maybeHTML, "<!DOCTYPE html>")
+	prefix := "<!doctype html>"
+	prefixLen := len(prefix)
+	if len(maybeHTML) < prefixLen {
+		return false
+	}
+
+	return strings.ToLower(maybeHTML[:prefixLen]) == prefix
 }
