@@ -1,5 +1,5 @@
 {{if .IsImage}}
-<a href=" /files/{{.FileName}}" class="flex bg-pico-card shadow">
+<a href=" /files/{{.FileName}}" class="flex bg-pico-card shadow" hx-boost="false">
   <img src="/files/{{.FileName}}" alt="{{.FileName}}" class="mx-auto">
 </a>
 {{end}}
@@ -19,7 +19,7 @@
         </a>
       </li>
       <li>
-        <a role="button" href="/files/{{.FileName}}" class="flex flex-items-center gap-2">
+        <a role="button" href="/files/{{.FileName}}" class="flex flex-items-center gap-2" hx-boost="false">
           <div class="i-ri-download-fill">
           </div>
           Download
