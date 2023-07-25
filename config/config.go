@@ -130,15 +130,15 @@ func Parse(raw Raw) (Config, error) {
 		MinAge:         5 * time.Minute,
 	}
 
-	authSMTP := models.Auth{
-		Username: raw.SMTP.Username,
-		Password: raw.SMTP.Password,
-	}
+	authSMTP := models.NewAuth(
+		raw.SMTP.Username,
+		raw.SMTP.Password,
+	)
 
-	authHTTP := models.Auth{
-		Username: raw.HTTP.Username,
-		Password: raw.HTTP.Password,
-	}
+	authHTTP := models.NewAuth(
+		raw.HTTP.Username,
+		raw.HTTP.Password,
+	)
 
 	return Config{
 		DatabasePath:         databasePath,

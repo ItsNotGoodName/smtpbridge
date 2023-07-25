@@ -40,7 +40,7 @@ func newSession(ctx core.Context, remoteAddr net.Addr) *session {
 }
 
 func (s *session) AuthPlain(username, password string) error {
-	return procs.SMTPLogin(s.cc, username, password)
+	return procs.AuthSMTPLogin(s.cc, username, password)
 }
 
 func (s *session) Mail(from string, opts *smtp.MailOptions) error {

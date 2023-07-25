@@ -10,7 +10,7 @@ import (
 var ErrorLogin = fmt.Errorf("login invalid")
 
 func AuthHTTPAnonymous(cc core.Context) bool {
-	return cc.Config.AuthHTTP.Username == "" && cc.Config.AuthHTTP.Password == ""
+	return cc.Config.AuthHTTP.Anonymous
 }
 
 func AuthHTTPLogin(cc core.Context, username, password string) error {
@@ -29,7 +29,7 @@ func AuthHTTPLogin(cc core.Context, username, password string) error {
 	return nil
 }
 
-func SMTPLogin(cc core.Context, username, password string) error {
+func AuthSMTPLogin(cc core.Context, username, password string) error {
 	if cc.Config.AuthSMTP.Username == "" && cc.Config.AuthSMTP.Password == "" {
 		return nil
 	}
