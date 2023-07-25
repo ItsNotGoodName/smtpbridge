@@ -1,10 +1,8 @@
-all: dep-web snapshot
-
 snapshot:
 	goreleaser release --snapshot --clean
 
 preview:
-	go generate ./... && go run .
+	cd web && npm run build && cd .. && go run .
 
 dev:
 	air
