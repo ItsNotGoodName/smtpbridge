@@ -46,7 +46,6 @@ export default defineConfig({
     manifest: true,
     rollupOptions: {
       // overwrite default .html entry
-      // DEPS: ./views/layouts/index.html
       input: 'src/main.ts',
     },
   },

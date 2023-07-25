@@ -8,6 +8,7 @@ import (
 
 var ErrorLogin = fmt.Errorf("login invalid")
 
+// AuthHTTPAnonymous checks if anonymous access is allowed.
 func AuthHTTPAnonymous(cc core.Context) bool {
 	return cc.Config.AuthHTTP.Anonymous
 }

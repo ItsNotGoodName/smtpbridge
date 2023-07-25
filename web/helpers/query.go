@@ -8,6 +8,7 @@ import (
 	"github.com/samber/lo"
 )
 
+// Query merges current URL query with new values.
 func Query(queries map[string]string, vals ...any) string {
 	tuple := []lo.Tuple2[string, any]{}
 	for i := 0; i < len(vals); i += 2 {
