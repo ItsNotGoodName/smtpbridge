@@ -10,30 +10,32 @@ Bridge email to other messaging services.
 
 **Do not expose this to the Internet, this is only intended to be used on a local network.**
 
-## Use Cases
+[Screenshot](./assets/demo.png)
+
+# Use Cases
 
 - Pictures from IP cameras
 - System messages from servers
 
-## Usage
+# Usage
 
 ```
 smtpbridge
 ```
 
-### Show Version
+## Show Version
 
 ```
 smtpbridge --version
 ```
 
-## Supported Endpoints
+# Supported Endpoints
 
-- Console
+- console
 - [Telegram](https://telegram.org/)
 - [Shoutrrr](https://github.com/containrrr/shoutrrr)
 
-## Config
+# Config
 
 Config file is loaded from one of the following locations.
 
@@ -46,7 +48,7 @@ Config file is loaded from one of the following locations.
 - `/etc/smtpbridge.yaml`
 - `/etc/smtpbridge.yml`
 
-### Simple Config
+## Simple Config
 
 This config prints emails received via SMTP to console.
 
@@ -59,7 +61,7 @@ rules:
   hello_world:
 ```
 
-### Full Config
+## Full Config
 
 ```yaml
 # Maximum message size for envelopes
@@ -154,15 +156,15 @@ rules:
       - console_endpoint
 ```
 
-### Template
+## Template
 
 Each template has access to [`Envelope`](./internal/envelope/envelope.go) via the `.` operator.
 
 See [`text/template`](https://pkg.go.dev/text/template) on how to template.
 
-## Docker
+# Docker
 
-### Docker Compose
+## Docker Compose
 
 ```yaml
 version: "3"
@@ -189,7 +191,7 @@ services:
     restart: unless-stopped
 ```
 
-### Docker CLI
+## Docker CLI
 
 ```sh
 docker run -d \
@@ -204,7 +206,7 @@ docker run -d \
   ghcr.io/itsnotgoodname/smtpbridge:latest
 ```
 
-## Development
+# Development
 
 The following programs are required.
 
@@ -230,7 +232,7 @@ Start Vite.
 make dev-web
 ```
 
-## To Do
+# To Do
 
 - Add attachment when testing endpoint
 - Add `PermaLink` function in templates
