@@ -75,7 +75,7 @@ func run(ctx context.Context, shutdown context.CancelFunc, cli config.CLI) <-cha
 
 	// HTTP
 	if !cfg.HTTPDisable {
-		http := http.New(app, shutdown, cfg.HTTPAddress, cfg.HTTPBodyLimit)
+		http := http.New(app, shutdown, cfg.HTTPAddress, cfg.HTTPBodyLimit, cfg.SessionsPath)
 		backgrounds = append(backgrounds, http)
 	}
 

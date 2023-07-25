@@ -12,6 +12,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/session"
+	"github.com/gofiber/storage/bbolt"
 	"github.com/rs/zerolog/log"
 )
 
@@ -21,8 +22,12 @@ type HTTP struct {
 	address  string
 }
 
-func New(app core.App, shutdown context.CancelFunc, address string, bodyLimit int) HTTP {
-	store := session.New()
+func New(app core.App, shutdown context.CancelFunc, address string, bodyLimit int, sessionsPath string) HTTP {
+	store := session.New(session.Config{
+		Storage: bbolt.New(bbolt.Config{
+			Database: sessionsPath,
+		}),
+	})
 
 	// Fiber
 	views := web.Engine()

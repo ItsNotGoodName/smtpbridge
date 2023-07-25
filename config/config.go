@@ -18,6 +18,7 @@ import (
 
 type Config struct {
 	DatabasePath         string
+	SessionsPath         string
 	AttachmentsDirectory string
 	HTTPDisable          bool
 	HTTPAddress          string
@@ -47,6 +48,7 @@ func Parse(raw Raw) (Config, error) {
 	}
 
 	databasePath := path.Join(dataDirectory, "smtpbridge.db")
+	sessionsPath := path.Join(dataDirectory, "sessions.db")
 
 	attachmentsDirectory := path.Join(dataDirectory, "attachments")
 	if err := os.MkdirAll(attachmentsDirectory, 0755); err != nil {
@@ -140,6 +142,7 @@ func Parse(raw Raw) (Config, error) {
 
 	return Config{
 		DatabasePath:         databasePath,
+		SessionsPath:         sessionsPath,
 		AttachmentsDirectory: attachmentsDirectory,
 		HTTPDisable:          raw.HTTP.Disable,
 		HTTPAddress:          raw.HTTP.Host + ":" + strconv.Itoa(raw.HTTP.Port),
