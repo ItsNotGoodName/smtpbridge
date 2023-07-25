@@ -1,5 +1,7 @@
 package models
 
+import "strings"
+
 type Auth struct {
 	Anonymous bool
 	Username  string
@@ -17,4 +19,8 @@ func NewAuth(username, password string) Auth {
 		Username:  username,
 		Password:  password,
 	}
+}
+
+func (a Auth) Check(username, password string) bool {
+	return strings.ToLower(username) == strings.ToLower(a.Username) && password == a.Password
 }
