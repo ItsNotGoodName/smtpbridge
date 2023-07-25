@@ -8,7 +8,7 @@
   <article class="max-w-md mx-auto">
     <h2>Login</h2>
     {{block "form" .}}
-    <form method="post" action="/login" hx-post="/login" hx-swap="outerHTML">
+    <form method="post" action="/login" hx-post="/login" hx-swap="outerHTML" hx-boost="false">
       {{csrf $}}
       <label for="username">
         Username

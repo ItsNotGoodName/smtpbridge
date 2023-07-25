@@ -14,7 +14,7 @@ func IsHTMXRequest(c *fiber.Ctx) bool {
 
 func Redirect(c *fiber.Ctx, path string) error {
 	if IsHTMXRequest(c) {
-		c.Set("HX-Location", path)
+		c.Set("HX-Redirect", path)
 		return nil
 	} else {
 		return c.Redirect(path)
