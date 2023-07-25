@@ -12,6 +12,7 @@
 
   <form method="post" enctype="multipart/form-data">
     <div class="grid">
+      {{csrf $}}
       <label for="from">
         From
         <input type="text" id="from" name="from" placeholder="From" />

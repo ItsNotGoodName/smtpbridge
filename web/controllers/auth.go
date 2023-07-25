@@ -21,9 +21,9 @@ func LoginPost(c *fiber.Ctx, cc core.Context, store *session.Store) error {
 	err := procs.AuthHTTPLogin(cc, username, password)
 	if err != nil {
 		if h.IsHTMXRequest(c) {
-			return h.Render(c, "login", loginData(err.Error()), "form")
+			return h.Render(c, "login", loginData(username, err.Error()), "form")
 		}
-		return h.Render(c, "login", loginData(err.Error()))
+		return h.Render(c, "login", loginData(username, err.Error()))
 	}
 
 	// Response
@@ -54,8 +54,9 @@ func Logout(c *fiber.Ctx, cc core.Context, store *session.Store) error {
 	return h.Redirect(c, "/login")
 }
 
-func loginData(flash string) fiber.Map {
+func loginData(username, flash string) fiber.Map {
 	return fiber.Map{
-		"Flash": flash,
+		"Username": username,
+		"Flash":    flash,
 	}
 }

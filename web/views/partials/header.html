@@ -10,7 +10,7 @@
     </ul>
     <ul class=" block lg:hidden">
       <li class="p-0 flex flex-items-center h-full">
-        <details role="list" dir="rtl">
+        <details role="list" dir="rtl" open>
           <summary aria-haspopup="listbox" class="block pico-no-chevron">
             <div class=" i-ri-align-justify h-6 w-6" />
           </summary>
@@ -45,16 +45,11 @@
             </li>
             {{if not .Meta.Anonymous}}
             <li>
-              <form method="post" action="/logout" class="pico-form-reset">
-                {{csrf $}}
-                <button type="submit" class="pico-button-reset">
-                  <a href="#" class="contrast" hx-post="/logout">
-                    <div class="flex flex-items-center flex-row-reverse gap-2">
-                      <div class="i-ri-logout-box-r-fill"></div>Log out
-                    </div>
-                  </a>
-                </button>
-              </form>
+              <a href="#" class="contrast" hx-post="/logout">
+                <div class="flex flex-items-center flex-row-reverse gap-2">
+                  <div class="i-ri-logout-box-r-fill"></div>Log out
+                </div>
+              </a>
             </li>
             {{end}}
           </ul>
@@ -92,16 +87,11 @@
       </li>
       {{if not .Meta.Anonymous}}
       <li>
-        <form method="post" action="/logout" class="pico-form-reset">
-          {{csrf $}}
-          <button type="submit" class="pico-button-reset">
-            <a href="#" class="contrast" hx-post="/logout">
-              <div class="flex flex-items-center gap-2">
-                <div class="i-ri-logout-box-r-fill"></div>Log out
-              </div>
-            </a>
-          </button>
-        </form>
+        <a href="#" class="contrast" hx-post="/logout">
+          <div class="flex flex-items-center gap-2">
+            <div class="i-ri-logout-box-r-fill"></div>Log out
+          </div>
+        </a>
       </li>
       {{end}}
     </ul>
