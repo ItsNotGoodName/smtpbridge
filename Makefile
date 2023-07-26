@@ -2,7 +2,7 @@ snapshot:
 	goreleaser release --snapshot --clean
 
 preview:
-	cd web && npm run build && cd .. && go run .
+	cd web && pnpm run build && cd .. && go run .
 
 dev:
 	air
@@ -13,7 +13,7 @@ dev-web:
 clean:
 	rm -rf smtpbridge_data
 
-dep: dep-air dep-sqlc
+dep: dep-air dep-sqlc dep-web
 
 dep-air:
 	go install github.com/cosmtrek/air@latest
