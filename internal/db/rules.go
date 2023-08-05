@@ -4,8 +4,9 @@ import (
 	"database/sql"
 
 	"github.com/ItsNotGoodName/smtpbridge/internal/core"
-	"github.com/ItsNotGoodName/smtpbridge/internal/db/queries"
+	. "github.com/ItsNotGoodName/smtpbridge/internal/dbgen/table"
 	"github.com/ItsNotGoodName/smtpbridge/internal/rules"
+	. "github.com/go-jet/jet/v2/sqlite"
 )
 
 func RuleList(cc core.Context) ([]rules.Rule, error) {
@@ -32,7 +33,16 @@ func RuleEndpointList(cc core.Context, ruleID int64) ([]rules.Endpoint, error) {
 }
 
 func RuleIsInternal(cc core.Context, ruleID int64) (bool, error) {
-	return queries.New(cc.DB.DB).IsRuleInternal(cc.Context(), ruleID)
+	rows, err := Rules.
+		SELECT(Rules.Internal).
+		WHERE(Rules.ID.EQ(Int64(ruleID))).
+		Rows(cc.Context(), cc.DB)
+	if err != nil {
+		return false, err
+	}
+	var internal bool
+	err = rows.Scan(&internal)
+	return internal, err
 }
 
 func RuleUpdate(cc core.Context, ruleID int64, enable bool) (rules.Rule, error) {

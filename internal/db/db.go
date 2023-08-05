@@ -43,6 +43,7 @@ func Migrate(cc context.Context, bunDB *bun.DB) error {
 	// Migrate
 	group, err := migrator.Migrate(cc)
 	if err != nil {
+		migrator.Rollback(cc)
 		return err
 	}
 

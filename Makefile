@@ -1,3 +1,6 @@
+gen:
+	jet -source=sqlite -dsn="./smtpbridge_data/smtpbridge.db" -path=./internal/dbgen -ignore-tables bun_migrations,bun_migration_locks
+
 snapshot:
 	goreleaser release --snapshot --clean
 
@@ -13,13 +16,13 @@ dev-web:
 clean:
 	rm -rf smtpbridge_data
 
-dep: dep-air dep-sqlc dep-web
+dep: dep-air dep-jet dep-web
 
 dep-air:
 	go install github.com/cosmtrek/air@latest
 
-dep-sqlc:
-	go install github.com/kyleconroy/sqlc/cmd/sqlc@latest
+dep-jet:
+	go install github.com/go-jet/jet/v2/cmd/jet@latest
 
 dep-web:
 	cd web && pnpm install

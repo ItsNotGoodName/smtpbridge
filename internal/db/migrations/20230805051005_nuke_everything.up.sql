@@ -1,5 +1,13 @@
-CREATE TABLE IF NOT EXISTS messages (
-    id INTEGER PRIMARY KEY,
+DROP TABLE IF EXISTS rules_to_endpoints;
+DROP TABLE IF EXISTS rules;
+DROP TABLE IF EXISTS endpoints;
+DROP TABLE IF EXISTS attachments;
+DROP TABLE IF EXISTS messages;
+
+--bun:split
+
+CREATE TABLE messages (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     from_ TEXT NOT NULL,
     to_ JSON NOT NULL,
     subject TEXT NOT NULL,
@@ -11,9 +19,9 @@ CREATE TABLE IF NOT EXISTS messages (
 
 --bun:split
 
-CREATE TABLE IF NOT EXISTS attachments (
-    id INTEGER PRIMARY KEY,
-    message_id INTEGER,
+CREATE TABLE attachments (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    message_id INTEGER NOT NULL,
     name TEXT NOT NULL,
     mime TEXT NOT NULL,
     extension TEXT NOT NULL,
@@ -22,8 +30,8 @@ CREATE TABLE IF NOT EXISTS attachments (
 
 --bun:split
 
-CREATE TABLE IF NOT EXISTS endpoints (
-    id INTEGER PRIMARY KEY,
+CREATE TABLE endpoints (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     internal BOOLEAN NOT NULL,
     internal_id TEXT NOT NULL,
     name TEXT NOT NULL,
@@ -39,8 +47,8 @@ CREATE TABLE IF NOT EXISTS endpoints (
 
 --bun:split
 
-CREATE TABLE IF NOT EXISTS rules (
-    id INTEGER PRIMARY KEY,
+CREATE TABLE rules (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     internal BOOLEAN NOT NULL,
     internal_id TEXT NOT NULL,
     name TEXT NOT NULL,

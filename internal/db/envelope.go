@@ -8,10 +8,12 @@ import (
 	"time"
 
 	"github.com/ItsNotGoodName/smtpbridge/internal/core"
-	"github.com/ItsNotGoodName/smtpbridge/internal/db/queries"
+	"github.com/ItsNotGoodName/smtpbridge/internal/dbgen/model"
+	. "github.com/ItsNotGoodName/smtpbridge/internal/dbgen/table"
 	"github.com/ItsNotGoodName/smtpbridge/internal/envelope"
 	"github.com/ItsNotGoodName/smtpbridge/internal/files"
 	"github.com/ItsNotGoodName/smtpbridge/pkg/pagination"
+	. "github.com/go-jet/jet/v2/sqlite"
 	"github.com/uptrace/bun"
 )
 
@@ -111,7 +113,12 @@ func EnvelopeGet(cc core.Context, id int64) (envelope.Envelope, error) {
 }
 
 func EnvelopeMessageHTMLGet(cc core.Context, id int64) (string, error) {
-	return queries.New(cc.DB.DB).GetEnvelopeMessageHTML(cc.Context(), id)
+	res := model.Messages{}
+	err := Messages.
+		SELECT(Messages.HTML).
+		WHERE(Messages.ID.EQ(Int64(id))).
+		QueryContext(cc.Context(), cc.DB, &res)
+	return res.HTML, err
 }
 
 func EnvelopeCount(cc core.Context) (int, error) {
@@ -160,14 +167,28 @@ func EnvelopeAttachmentListOrphan(cc core.Context, limit int) ([]*envelope.Attac
 }
 
 func EnvelopeDeleteUntilCount(cc core.Context, keep int, olderThan time.Time) (int64, error) {
-	return queries.New(cc.DB.DB).DeleteEnvelopeUntilCount(cc.Context(), queries.DeleteEnvelopeUntilCountParams{
-		CreatedAt: olderThan.UTC(),
-		Limit:     int64(keep),
-	})
+	// DELETE FROM messages WHERE id NOT IN ( SELECT id FROM messages ORDER BY id DESC LIMIT ?) AND messages.created_at < ?;
+
+	res, err := Messages.
+		DELETE().
+		WHERE(Messages.ID.NOT_IN(Messages.SELECT(Messages.ID).ORDER_BY(Messages.ID).LIMIT(int64(keep))).
+			AND(Messages.CreatedAt.LT(DATETIME(olderThan))),
+		).ExecContext(cc.Context(), cc.DB)
+	if err != nil {
+		return 0, err
+	}
+
+	return res.RowsAffected()
 }
 
 func EnvelopeDeleteOlderThan(cc core.Context, olderThan time.Time) (int64, error) {
-	return queries.New(cc.DB.DB).DeleteEnvelopeOlderThan(cc.Context(), olderThan.UTC())
+	res, err := Messages.DELETE().WHERE(Messages.CreatedAt.LT(DATETIME(olderThan))).ExecContext(cc.Context(), cc.DB)
+	if err != nil {
+		return 0, err
+	}
+
+	return res.RowsAffected()
+
 }
 
 func EnvelopeAttachmentDelete(cc core.Context, att *envelope.Attachment) error {
