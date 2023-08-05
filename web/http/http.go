@@ -23,25 +23,18 @@ type HTTP struct {
 }
 
 func New(app core.App, shutdown context.CancelFunc, address string, bodyLimit int, sessionsPath string) HTTP {
-	store := session.New(session.Config{
-		Storage: bbolt.New(bbolt.Config{
-			Database: sessionsPath,
-		}),
-	})
-
-	// Fiber
+	// Views
 	views := web.Engine()
 	views.AddFuncMap(h.Map)
+
+	// Fiber
 	http := fiber.New(fiber.Config{
 		DisableStartupMessage: true,
 		Views:                 views,
 		ViewsLayout:           "layouts/index",
 		BodyLimit:             bodyLimit,
 		ErrorHandler: func(c *fiber.Ctx, err error) error {
-			if h.IsHTMXRequest(c) {
-				c.Set("HX-Redirect", "/something-went-wrong")
-			}
-
+			c.Set("HX-Redirect", "/something-went-wrong")
 			return fiber.DefaultErrorHandler(c, err)
 		},
 	})
@@ -52,10 +45,20 @@ func New(app core.App, shutdown context.CancelFunc, address string, bodyLimit in
 	http.Use(csrf.New(csrf.Config{
 		ContextKey: h.CSRFContextKey,
 		Extractor:  csrfExtractor(),
+		ErrorHandler: func(c *fiber.Ctx, err error) error {
+			c.Set("HX-Redirect", "/something-went-wrong")
+			return fiber.DefaultErrorHandler(c, err)
+		},
 	}))
 
+	sessionStore := session.New(session.Config{
+		Storage: bbolt.New(bbolt.Config{
+			Database: sessionsPath,
+		}),
+	})
+
 	route(app,
-		store,
+		sessionStore,
 		http,
 	)
 

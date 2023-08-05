@@ -20,10 +20,7 @@ func LoginPost(c *fiber.Ctx, cc core.Context, store *session.Store) error {
 	// Execute
 	err := procs.AuthHTTPLogin(cc, username, password)
 	if err != nil {
-		if h.IsHTMXRequest(c) {
-			return h.Render(c, "login", loginData(username, err.Error()), "form")
-		}
-		return h.Render(c, "login", loginData(username, err.Error()))
+		return h.Render(c, "login", loginData(username, err.Error()), "form")
 	}
 
 	// Response

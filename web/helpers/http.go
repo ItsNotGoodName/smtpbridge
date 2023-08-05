@@ -2,31 +2,21 @@ package helpers
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/rs/zerolog/log"
 )
 
 const CSRFContextKey = "csrf_key"
 const AnonymousContextKey = "anonymous_key"
 
-func IsHTMXRequest(c *fiber.Ctx) bool {
-	_, isHTMXRequest := c.GetReqHeaders()["Hx-Request"]
-	return isHTMXRequest
-}
-
 func Redirect(c *fiber.Ctx, path string) error {
-	if IsHTMXRequest(c) {
-		c.Set("HX-Redirect", path)
-		return nil
-	} else {
-		return c.Redirect(path)
-	}
+	c.Set("HX-Redirect", path)
+	return nil
 }
 
 func Error(c *fiber.Ctx, err error, codes ...int) error {
-	if IsHTMXRequest(c) {
-		c.Set("HX-Redirect", "/something-went-wrong")
-	}
-
-	return Render(c, "something-went-wrong", fiber.Map{"Error": err})
+	c.Set("HX-Redirect", "/something-went-wrong")
+	log.Err(err).Msg("Request failed")
+	return nil
 }
 
 func NotFound(c *fiber.Ctx) error {
