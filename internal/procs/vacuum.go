@@ -13,7 +13,7 @@ func VacuumerBackground(ctx context.Context, app core.App) {
 }
 
 func vacuum(cc core.Context) {
-	ctx := cc.Context()
+	ctx := cc
 	ticker := time.NewTicker(24 * time.Hour)
 
 	run := func() {

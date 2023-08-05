@@ -18,17 +18,17 @@ import (
 )
 
 func EnvelopeDeleteAll(cc core.Context) error {
-	_, err := cc.DB.NewDelete().Model(&envelope.Message{}).Where("1=1").Exec(cc.Context())
+	_, err := cc.DB.NewDelete().Model(&envelope.Message{}).Where("1=1").Exec(cc)
 	return err
 }
 
 func EnvelopeDelete(cc core.Context, id int64) error {
-	_, err := cc.DB.NewDelete().Model(&envelope.Message{}).Where("id = ?", id).Exec(cc.Context())
+	_, err := cc.DB.NewDelete().Model(&envelope.Message{}).Where("id = ?", id).Exec(cc)
 	return err
 }
 
 func EnvelopeCreate(cc core.Context, msg *envelope.Message, atts []*envelope.Attachment) (int64, []int64, error) {
-	err := cc.DB.RunInTx(cc.Context(), &sql.TxOptions{}, func(ctx context.Context, tx bun.Tx) error {
+	err := cc.DB.RunInTx(cc, &sql.TxOptions{}, func(ctx context.Context, tx bun.Tx) error {
 		_, err := tx.NewInsert().Model(msg).Exec(ctx)
 		if err != nil {
 			return err
@@ -74,7 +74,7 @@ func EnvelopeMessageList(cc core.Context, page pagination.Page, filter envelope.
 		}
 	}
 
-	ctx := cc.Context()
+	ctx := cc
 
 	err := q.Scan(ctx, &msgs)
 	if err != nil {
@@ -93,7 +93,7 @@ func EnvelopeMessageList(cc core.Context, page pagination.Page, filter envelope.
 }
 
 func EnvelopeGet(cc core.Context, id int64) (envelope.Envelope, error) {
-	ctx := cc.Context()
+	ctx := cc
 	msg := &envelope.Message{}
 	err := cc.DB.NewSelect().Model(msg).Where("id = ?", id).Scan(ctx, msg)
 	if err != nil {
@@ -117,16 +117,16 @@ func EnvelopeMessageHTMLGet(cc core.Context, id int64) (string, error) {
 	err := Messages.
 		SELECT(Messages.HTML).
 		WHERE(Messages.ID.EQ(Int64(id))).
-		QueryContext(cc.Context(), cc.DB, &res)
+		QueryContext(cc, cc, &res)
 	return res.HTML, err
 }
 
 func EnvelopeCount(cc core.Context) (int, error) {
-	return cc.DB.NewSelect().Model(&envelope.Message{}).Count(cc.Context())
+	return cc.DB.NewSelect().Model(&envelope.Message{}).Count(cc)
 }
 
 func EnvelopeAttachmentCount(cc core.Context) (int, error) {
-	return cc.DB.NewSelect().Model(&envelope.Attachment{}).Where("message_id IS NOT NULL").Count(cc.Context())
+	return cc.DB.NewSelect().Model(&envelope.Attachment{}).Where("message_id IS NOT NULL").Count(cc)
 }
 
 func EnvelopeAttachmentList(cc core.Context, page pagination.Page, filter envelope.AttachmentFilter) (envelope.AttachmentListResult, error) {
@@ -140,7 +140,7 @@ func EnvelopeAttachmentList(cc core.Context, page pagination.Page, filter envelo
 		q = q.Order("id DESC")
 	}
 
-	ctx := cc.Context()
+	ctx := cc
 
 	// Scan
 	err := q.Scan(ctx, &atts)
@@ -162,7 +162,7 @@ func EnvelopeAttachmentList(cc core.Context, page pagination.Page, filter envelo
 
 func EnvelopeAttachmentListOrphan(cc core.Context, limit int) ([]*envelope.Attachment, error) {
 	var atts []*envelope.Attachment
-	err := cc.DB.NewSelect().Model(&atts).Limit(limit).Where("message_id IS NULL").Scan(cc.Context())
+	err := cc.DB.NewSelect().Model(&atts).Limit(limit).Where("message_id IS NULL").Scan(cc)
 	return atts, err
 }
 
@@ -173,7 +173,7 @@ func EnvelopeDeleteUntilCount(cc core.Context, keep int, olderThan time.Time) (i
 		DELETE().
 		WHERE(Messages.ID.NOT_IN(Messages.SELECT(Messages.ID).ORDER_BY(Messages.ID).LIMIT(int64(keep))).
 			AND(Messages.CreatedAt.LT(DATETIME(olderThan))),
-		).ExecContext(cc.Context(), cc.DB)
+		).ExecContext(cc, cc.DB)
 	if err != nil {
 		return 0, err
 	}
@@ -182,7 +182,7 @@ func EnvelopeDeleteUntilCount(cc core.Context, keep int, olderThan time.Time) (i
 }
 
 func EnvelopeDeleteOlderThan(cc core.Context, olderThan time.Time) (int64, error) {
-	res, err := Messages.DELETE().WHERE(Messages.CreatedAt.LT(DATETIME(olderThan))).ExecContext(cc.Context(), cc.DB)
+	res, err := Messages.DELETE().WHERE(Messages.CreatedAt.LT(DATETIME(olderThan))).ExecContext(cc, cc.DB)
 	if err != nil {
 		return 0, err
 	}
@@ -197,7 +197,7 @@ func EnvelopeAttachmentDelete(cc core.Context, att *envelope.Attachment) error {
 		return err
 	}
 
-	_, err = cc.DB.NewDelete().Model(&envelope.Attachment{}).Where("id = ?", att.ID).Exec(cc.Context())
+	_, err = cc.DB.NewDelete().Model(&envelope.Attachment{}).Where("id = ?", att.ID).Exec(cc)
 
 	return err
 }

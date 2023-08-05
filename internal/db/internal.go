@@ -35,7 +35,7 @@ func InternalRuleUpsert(cc core.Context, r rules.Rule, updatedAt time.Time) erro
 		Rules.Name.SET(Rules.EXCLUDED.Name),
 		Rules.Expression.SET(Rules.EXCLUDED.Expression),
 		Rules.UpdatedAt.SET(Rules.EXCLUDED.UpdatedAt),
-	)).ExecContext(cc.Context(), cc.DB)
+	)).ExecContext(cc, cc)
 
 	return err
 }
@@ -75,7 +75,7 @@ func InternalEndpointUpsert(cc core.Context, r endpoints.Endpoint, updatedAt tim
 		Endpoints.Kind.SET(Endpoints.EXCLUDED.Kind),
 		Endpoints.Config.SET(Endpoints.EXCLUDED.Config),
 		Endpoints.UpdatedAt.SET(Endpoints.EXCLUDED.UpdatedAt),
-	)).ExecContext(cc.Context(), cc.DB)
+	)).ExecContext(cc, cc)
 
 	return err
 }
@@ -86,7 +86,7 @@ func InternalRuleEndpointsUpsert(cc core.Context, ruleInternalID string, endpoin
 	}
 
 	for _, endpointInternalID := range endpointInternalIDs {
-		rows, err := cc.DB.ExecContext(cc.Context(), `
+		rows, err := cc.DB.ExecContext(cc, `
 			INSERT INTO rules_to_endpoints (
 				internal,
 				rule_id,
@@ -113,7 +113,7 @@ func InternalRuleEndpointsUpsert(cc core.Context, ruleInternalID string, endpoin
 }
 
 func InternalDeleteOlderThan(cc core.Context, date time.Time) error {
-	return cc.DB.RunInTx(cc.Context(), &sql.TxOptions{}, func(ctx context.Context, tx bun.Tx) error {
+	return cc.DB.RunInTx(cc, &sql.TxOptions{}, func(ctx context.Context, tx bun.Tx) error {
 		for _, table := range []string{"endpoints", "rules", "rules_to_endpoints"} {
 			_, err := tx.NewDelete().Table(table).Where("updated_at < ?", date).Where("internal = true").Exec(ctx)
 			if err != nil {

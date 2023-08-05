@@ -92,7 +92,7 @@ func (t *Telegram) sendMessage(cc core.Context, text string) error {
 	if err != nil {
 		return err
 	}
-	req = req.WithContext(cc.Context())
+	req = req.WithContext(cc)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	// Send request
@@ -152,7 +152,7 @@ func (t *Telegram) sendPhoto(cc core.Context, caption, name string, file *os.Fil
 	if err != nil {
 		return err
 	}
-	req = req.WithContext(cc.Context())
+	req = req.WithContext(cc)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 
 	// Send request

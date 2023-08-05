@@ -24,7 +24,7 @@ func MailmanBackground(ctx context.Context, app core.App) {
 }
 
 func mailman(cc core.Context, evtC <-chan core.EventEnvelopeCreated) {
-	ctx := cc.Context()
+	ctx := cc
 
 	for {
 		select {

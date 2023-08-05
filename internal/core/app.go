@@ -25,12 +25,12 @@ func NewApp(config *models.Config, bunDB *bun.DB, fileStore FileStore) App {
 
 func (a App) newContext(ctx context.Context, actor Actor) Context {
 	return Context{
-		Bus:    a.Bus,
-		DB:     a.DB,
-		File:   a.File,
-		Config: a.Config,
-		ctx:    ctx,
-		Actor:  actor,
+		Context: ctx,
+		DB:      a.DB,
+		Bus:     a.Bus,
+		File:    a.File,
+		Config:  a.Config,
+		Actor:   actor,
 	}
 }
 

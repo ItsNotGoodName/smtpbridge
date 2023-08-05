@@ -14,7 +14,7 @@ import (
 )
 
 func TrimStart(cc core.Context) error {
-	ctx := cc.Context()
+	ctx := cc
 	select {
 	case <-ctx.Done():
 		return ctx.Err()
@@ -77,7 +77,7 @@ func trimmer(
 	envDeletedC <-chan core.EventEnvelopeDeleted,
 	evtTrimStart <-chan core.EventTrimStart,
 ) {
-	ctx := cc.Context()
+	ctx := cc
 	ticker := time.NewTicker(30 * time.Minute)
 
 	clean := func() {
