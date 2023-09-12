@@ -2,9 +2,9 @@ package http
 
 import (
 	"io/fs"
+	"net/http"
 
 	"github.com/ItsNotGoodName/smtpbridge/internal/core"
-	"github.com/ItsNotGoodName/smtpbridge/pkg/chiext"
 	"github.com/ItsNotGoodName/smtpbridge/web"
 	"github.com/ItsNotGoodName/smtpbridge/web/pages"
 	"github.com/ItsNotGoodName/smtpbridge/web/routes"
@@ -25,7 +25,7 @@ func NewRouter(ct pages.Controller, app core.App, fileFS fs.FS, csrfSecret []byt
 	r.Use(middleware.Recoverer)
 	r.Use(csrf.Protect(csrfSecret, csrf.Secure(false)))
 
-	chiext.MountFS(r, web.FS)
+	mountWebFS(r, web.FS)
 
 	// Login
 	r.Group(func(r chi.Router) {
@@ -124,4 +124,38 @@ func NewRouter(ct pages.Controller, app core.App, fileFS fs.FS, csrfSecret []byt
 	})
 
 	return r
+}
+
+func mountWebFS(r chi.Router, f fs.FS) error {
+	fsHandler := http.StripPrefix("/", http.FileServer(http.FS(f)))
+
+	normalFS := func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Cache-Control", "max-age=3600")
+		fsHandler.ServeHTTP(w, r)
+	}
+
+	// Files in assets have a hash
+	assetsFS := func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Cache-Control", "max-age=31536000,immutable")
+		fsHandler.ServeHTTP(w, r)
+	}
+
+	if files, err := fs.ReadDir(f, "."); err == nil {
+		for _, f := range files {
+			name := f.Name()
+			if f.IsDir() {
+				if name == "assets" {
+					r.Get("/"+name+"/*", assetsFS)
+				} else {
+					r.Get("/"+name+"/*", normalFS)
+				}
+			} else {
+				r.Get("/"+name, normalFS)
+			}
+		}
+	} else if err != fs.ErrNotExist {
+		return err
+	}
+
+	return nil
 }
