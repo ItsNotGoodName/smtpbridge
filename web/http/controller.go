@@ -9,6 +9,7 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/internal/core"
 	"github.com/ItsNotGoodName/smtpbridge/web"
 	c "github.com/ItsNotGoodName/smtpbridge/web/components"
+	"github.com/ItsNotGoodName/smtpbridge/web/events"
 	"github.com/ItsNotGoodName/smtpbridge/web/meta"
 	"github.com/ItsNotGoodName/smtpbridge/web/routes"
 	"github.com/a-h/templ"
@@ -54,10 +55,15 @@ func (ct Controller) Meta(r *http.Request) meta.Meta {
 
 func (ct Controller) Page(w http.ResponseWriter, r *http.Request, body templ.Component) {
 	csrfToken := csrf.Token(r)
+	events.CSRFToken(csrfToken).SetTrigger(w)
+
 	c.Base(ct.head, body, csrfToken).Render(r.Context(), w)
 }
 
 func (ct Controller) Component(w http.ResponseWriter, r *http.Request, body templ.Component) {
+	csrfToken := csrf.Token(r)
+	events.CSRFToken(csrfToken).SetTrigger(w)
+
 	body.Render(r.Context(), w)
 }
 

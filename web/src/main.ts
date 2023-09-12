@@ -4,11 +4,20 @@ import "./index.css"
 
 import "htmx.org"
 
-const csrfToken = (document.getElementsByName("gorilla.csrf.Token").item(0) as HTMLMetaElement).content
+// csrfToken is first loaded from meta tag and then is updated through HX-Trigger HTTP response headers.
+// This allows HX-Boost to happen without invalidating previous csrfToken.
+{
+  let csrfToken = (document.getElementsByName("gorilla.csrf.Token").item(0) as HTMLMetaElement).content
 
-document.body.addEventListener('htmx:configRequest', function(evt: any) {
-  evt.detail.headers['X-CSRF-Token'] = csrfToken;
-});
+  document.body.addEventListener("csrfToken", function(evt: any) {
+    csrfToken = evt.detail.value
+  })
+
+  document.body.addEventListener('htmx:configRequest', function(evt: any) {
+    // TODO: why can't I use console.log here?
+    evt.detail.headers['X-CSRF-Token'] = csrfToken;
+  });
+}
 
 // ------------- Toastify
 
