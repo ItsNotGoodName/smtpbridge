@@ -12,6 +12,7 @@ package table
 func UseSchema(schema string) {
 	Attachments = Attachments.FromSchema(schema)
 	Endpoints = Endpoints.FromSchema(schema)
+	MailmanQueue = MailmanQueue.FromSchema(schema)
 	Messages = Messages.FromSchema(schema)
 	Rules = Rules.FromSchema(schema)
 	RulesToEndpoints = RulesToEndpoints.FromSchema(schema)

@@ -2,7 +2,6 @@ package mailman
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/ItsNotGoodName/smtpbridge/internal/core"
@@ -18,7 +17,6 @@ type Mailman struct {
 	app             core.App
 	fileStore       endpoint.FileStore
 	endpointFactory endpoint.Factory
-	queueLimit      int
 }
 
 func New(app core.App, bus core.Bus, fileStore endpoint.FileStore, endpointFactory endpoint.Factory) Mailman {
@@ -27,20 +25,15 @@ func New(app core.App, bus core.Bus, fileStore endpoint.FileStore, endpointFacto
 		bus:             bus,
 		fileStore:       fileStore,
 		endpointFactory: endpointFactory,
-		queueLimit:      100,
 	}
 }
 
 func (m Mailman) Serve(ctx context.Context) error {
-	idC := make(chan int64, m.queueLimit)
-	release := m.bus.OnEnvelopeCreated(func(ctx context.Context, evt models.EventEnvelopeCreated) error {
+	checkC := make(chan struct{}, 1)
+	release := m.bus.OnMailmanEnqueued(func(ctx context.Context, evt models.EventMailmanEnqueued) error {
 		select {
-		case idC <- evt.ID:
+		case checkC <- struct{}{}:
 		default:
-			m.app.Tracer(trace.SourceMailman).Trace(ctx,
-				"mailman.overflow",
-				trace.WithEnvelope(evt.ID),
-				trace.WithError(fmt.Errorf("mailman is full")))
 		}
 
 		return nil
@@ -51,28 +44,34 @@ func (m Mailman) Serve(ctx context.Context) error {
 		select {
 		case <-ctx.Done():
 			return nil
-		case id := <-idC:
-			tracer := m.app.Tracer(trace.SourceMailman).
-				Sticky(trace.WithEnvelope(id))
+		case <-checkC:
+			for {
+				tracer := m.app.Tracer(trace.SourceMailman)
 
-			tracer.Trace(ctx, "mailman.start")
-			err := m.send(ctx, tracer, id)
-			if err != nil {
-				tracer.Trace(ctx, "mailman.error", trace.WithError(err))
-				log.Err(err).Int64("envelope-id", id).Msg("Failed to send envelope")
+				maybeEnv, err := m.app.MailmanDequeue(ctx)
+				if err != nil {
+					tracer.Trace(ctx, "mailman.dequeue", trace.WithError(err))
+					break
+				}
+				if maybeEnv == nil {
+					break
+				}
+				env := *maybeEnv
+
+				tracer = tracer.Sticky(trace.WithEnvelope(env.Message.ID))
+
+				tracer.Trace(ctx, "mailman.start")
+				if err := m.send(ctx, tracer, env); err != nil {
+					tracer.Trace(ctx, "mailman.error", trace.WithError(err))
+					log.Err(err).Int64("envelope-id", env.Message.ID).Msg("Failed to send envelope")
+				}
+				tracer.Trace(ctx, "mailman.end")
 			}
-			tracer.Trace(ctx, "mailman.end")
 		}
 	}
 }
 
-func (m Mailman) send(ctx context.Context, tracer trace.Tracer, envelopeID int64) error {
-	// Get envelope
-	env, err := m.app.EnvelopeGet(ctx, envelopeID)
-	if err != nil {
-		return err
-	}
-
+func (m Mailman) send(ctx context.Context, tracer trace.Tracer, env models.Envelope) error {
 	// List all rules
 	rules, err := m.app.RuleEndpointsList(ctx)
 	if err != nil {
@@ -80,7 +79,7 @@ func (m Mailman) send(ctx context.Context, tracer trace.Tracer, envelopeID int64
 	}
 
 	if len(rules) == 0 {
-		tracer.Trace(ctx, "mailman.rules.skip.empty")
+		tracer.Trace(ctx, "mailman.rules.skip(empty)")
 		return nil
 	}
 
@@ -89,7 +88,7 @@ func (m Mailman) send(ctx context.Context, tracer trace.Tracer, envelopeID int64
 		tracer := tracer.Sticky(trace.WithRule(r.Rule.ID))
 
 		if len(r.Endpoints) == 0 {
-			tracer.Trace(ctx, "mailman.rule.endpoints.skip.empty")
+			tracer.Trace(ctx, "mailman.rule.endpoints.skip(empty)")
 			continue
 		}
 
@@ -111,14 +110,14 @@ func (m Mailman) send(ctx context.Context, tracer trace.Tracer, envelopeID int64
 			continue
 		}
 
-		tracer.Trace(ctx, "mailman.rule.match.pass")
+		tracer.Trace(ctx, "mailman.rule.match.success")
 
 		for _, e := range r.Endpoints {
 			tracer := tracer.Sticky(trace.WithEndpoint(e.ID))
 
 			// Prevent duplicate envelopes
 			if _, ok := sent[e.ID]; ok {
-				tracer.Trace(ctx, "mailman.rule.endpoint.skip.duplicate")
+				tracer.Trace(ctx, "mailman.rule.endpoint.skip(duplicate)")
 				continue
 			}
 			sent[e.ID] = struct{}{}
@@ -137,7 +136,7 @@ func (m Mailman) send(ctx context.Context, tracer trace.Tracer, envelopeID int64
 			if err != nil {
 				tracer.Trace(ctx, "mailman.rule.endpoint.send.error", trace.WithError(err), trace.WithDuration(time.Now().Sub(start)))
 			} else {
-				tracer.Trace(ctx, "mailman.rule.endpoint.send", trace.WithDuration(time.Now().Sub(start)))
+				tracer.Trace(ctx, "mailman.rule.endpoint.send.success", trace.WithDuration(time.Now().Sub(start)))
 			}
 		}
 	}

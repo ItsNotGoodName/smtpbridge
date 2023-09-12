@@ -13,6 +13,8 @@ type Bus interface {
 	OnEnvelopeCreated(func(ctx context.Context, evt models.EventEnvelopeCreated) error) func()
 	EnvelopeDeleted(ctx context.Context)
 	OnEnvelopeDeleted(func(ctx context.Context, evt models.EventEnvelopeDeleted) error) func()
+	MailmanEnqueued(ctx context.Context)
+	OnMailmanEnqueued(func(ctx context.Context, evt models.EventMailmanEnqueued) error) func()
 }
 
 type App interface {
@@ -46,4 +48,6 @@ type App interface {
 	TraceDrop(ctx context.Context) error
 	TraceList(ctx context.Context, page pagination.Page, req models.DTOTraceListRequest) (models.DTOTraceListResult, error)
 	Tracer(source string) trace.Tracer
+	MailmanEnqueue(ctx context.Context, envelopeID int64) error
+	MailmanDequeue(ctx context.Context) (*models.Envelope, error)
 }

@@ -19,7 +19,7 @@ func EventHook() suture.EventHook {
 			log.Info().Str("supervisor", e.SupervisorName).Str("service", e.ServiceName).Msg("Service failed to terminate in a timely manner")
 		case suture.EventServicePanic:
 			log.Warn().Msg("Caught a service panic, which shouldn't happen")
-			logJSON(log.Info(), e)
+			log.Info().Str("panic", e.PanicMsg).Msg(e.Stacktrace)
 		case suture.EventServiceTerminate:
 			if e.ServiceName == prevTerminate.ServiceName && e.Err == prevTerminate.Err {
 				log.Debug().Str("supervisor", e.SupervisorName).Str("service", e.ServiceName).Str("err", fmt.Sprint(e.Err)).Msg("Service failed")

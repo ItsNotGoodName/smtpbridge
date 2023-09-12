@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"time"
@@ -355,6 +356,37 @@ func (a App) RetentionPolicyRun(ctx context.Context, tracer trace.Tracer) error 
 	if err != nil {
 		return err
 	}
+
+	return nil
+}
+
+func (a App) MailmanDequeue(ctx context.Context) (*models.Envelope, error) {
+	envelopeID, err := repo.MailmanDequeue(ctx, a.db)
+	if err != nil {
+		if errors.Is(err, repo.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	env, err := repo.EnvelopeGet(ctx, a.db, envelopeID)
+	if err != nil {
+		if errors.Is(err, repo.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &env, nil
+}
+
+func (a App) MailmanEnqueue(ctx context.Context, envelopeID int64) error {
+	err := repo.MailmanEnqueue(ctx, a.db, envelopeID)
+	if err != nil {
+		return err
+	}
+
+	a.bus.MailmanEnqueued(ctx)
 
 	return nil
 }

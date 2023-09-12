@@ -17,8 +17,16 @@ CREATE TABLE `rules_to_endpoints` (`internal` boolean NOT NULL, `rule_id` intege
 CREATE UNIQUE INDEX `rules_to_endpoints_rule_id_endpoint_id_idx` ON `rules_to_endpoints` (`rule_id`, `endpoint_id`);
 -- create "traces" table
 CREATE TABLE `traces` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `request_id` text NOT NULL, `source` text NOT NULL, `seq` integer NOT NULL, `action` text NOT NULL, `level` text NOT NULL, `data` json NOT NULL, `created_at` datetime NOT NULL);
+-- create "mailman_queue" table
+CREATE TABLE `mailman_queue` (`message_id` integer NOT NULL, `created_at` datetime NOT NULL, CONSTRAINT `message_id` FOREIGN KEY (`message_id`) REFERENCES `messages` (`id`) ON UPDATE CASCADE ON DELETE CASCADE);
+-- create index "mailman_queue_message_id_idx" to table: "mailman_queue"
+CREATE UNIQUE INDEX `mailman_queue_message_id_idx` ON `mailman_queue` (`message_id`);
 
 -- +goose Down
+-- reverse: create index "mailman_queue_message_id_idx" to table: "mailman_queue"
+DROP INDEX `mailman_queue_message_id_idx`;
+-- reverse: create "mailman_queue" table
+DROP TABLE `mailman_queue`;
 -- reverse: create "traces" table
 DROP TABLE `traces`;
 -- reverse: create index "rules_to_endpoints_rule_id_endpoint_id_idx" to table: "rules_to_endpoints"

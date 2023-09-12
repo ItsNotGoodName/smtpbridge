@@ -6,3 +6,6 @@ type EventEnvelopeCreated struct {
 
 type EventEnvelopeDeleted struct {
 }
+
+type EventMailmanEnqueued struct {
+}

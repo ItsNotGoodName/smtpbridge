@@ -250,5 +250,26 @@ table "traces" {
     columns = [column.id]
   }
 }
+table "mailman_queue" {
+  schema = schema.main
+  column "message_id" {
+    null = false
+    type = integer
+  }
+  column "created_at" {
+    null    = false
+    type    = datetime
+  }
+  index "mailman_queue_message_id_idx" {
+    columns = [column.message_id]
+    unique  = true
+  }
+  foreign_key "message_id" {
+    columns     = [column.message_id]
+    ref_columns = [table.messages.column.id]
+    on_update   = CASCADE 
+    on_delete   = CASCADE
+  }
+}
 schema "main" {
 }
