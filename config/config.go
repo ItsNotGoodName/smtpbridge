@@ -254,6 +254,15 @@ func (p Parser) Parse(raw Raw) (Config, error) {
 			ruleToEndpoints[key] = value.Endpoints
 			rules = append(rules, r)
 		}
+
+		// Special case where if the keys of rules and endpoints match then we should assume the user wants them to be connected
+		for endKey := range raw.Endpoints {
+			for ruleKey := range raw.Rules {
+				if ruleKey == endKey {
+					ruleToEndpoints[ruleKey] = append(ruleToEndpoints[ruleKey], endKey)
+				}
+			}
+		}
 	}
 
 	var timeHourFormat string
