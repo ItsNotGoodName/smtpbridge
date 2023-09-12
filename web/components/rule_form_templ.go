@@ -136,7 +136,7 @@ func RuleFormCreate(props RuleFormCreateProps) templ.Component {
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("</label></div><div class=\"form-control\"><label class=\"label\"><span class=\"label-text\">")
+		_, err = templBuffer.WriteString("</label></div><fieldset><legend>")
 		if err != nil {
 			return err
 		}
@@ -145,12 +145,21 @@ func RuleFormCreate(props RuleFormCreateProps) templ.Component {
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("</span></label><select name=\"endpoints\" class=\"select select-bordered\" multiple>")
+		_, err = templBuffer.WriteString("</legend>")
 		if err != nil {
 			return err
 		}
 		for i, end := range props.Endpoints {
-			_, err = templBuffer.WriteString("<option value=\"")
+			_, err = templBuffer.WriteString("<div class=\"form-control\"><label class=\"cursor-pointer label\"><span class=\"label-text\">")
+			if err != nil {
+				return err
+			}
+			var var_8 string = end.Name
+			_, err = templBuffer.WriteString(templ.EscapeString(var_8))
+			if err != nil {
+				return err
+			}
+			_, err = templBuffer.WriteString("</span><input type=\"checkbox\" class=\"toggle\" name=\"endpoints\" value=\"")
 			if err != nil {
 				return err
 			}
@@ -163,26 +172,17 @@ func RuleFormCreate(props RuleFormCreateProps) templ.Component {
 				return err
 			}
 			if props.EndpointsSelections[i] {
-				_, err = templBuffer.WriteString(" selected")
+				_, err = templBuffer.WriteString(" checked")
 				if err != nil {
 					return err
 				}
 			}
-			_, err = templBuffer.WriteString(">")
-			if err != nil {
-				return err
-			}
-			var var_8 string = end.Name
-			_, err = templBuffer.WriteString(templ.EscapeString(var_8))
-			if err != nil {
-				return err
-			}
-			_, err = templBuffer.WriteString("</option>")
+			_, err = templBuffer.WriteString("></label></div>")
 			if err != nil {
 				return err
 			}
 		}
-		_, err = templBuffer.WriteString("</select></div><button type=\"submit\" class=\"btn btn-primary btn-block\">")
+		_, err = templBuffer.WriteString("</fieldset><button type=\"submit\" class=\"btn btn-primary btn-block\">")
 		if err != nil {
 			return err
 		}
@@ -334,7 +334,7 @@ func RuleFormUpdate(props RuleFormUpdateProps) templ.Component {
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("</label></div><div class=\"form-control\"><label class=\"label\"><span class=\"label-text\">")
+		_, err = templBuffer.WriteString("</label></div><fieldset><legend class=\"label-text\">")
 		if err != nil {
 			return err
 		}
@@ -343,22 +343,31 @@ func RuleFormUpdate(props RuleFormUpdateProps) templ.Component {
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("</span></label><select")
-		if err != nil {
-			return err
-		}
-		if props.Rule.Internal {
-			_, err = templBuffer.WriteString(" disabled")
-			if err != nil {
-				return err
-			}
-		}
-		_, err = templBuffer.WriteString(" name=\"endpoints\" class=\"select select-bordered\" multiple>")
+		_, err = templBuffer.WriteString("</legend>")
 		if err != nil {
 			return err
 		}
 		for i, end := range props.Endpoints {
-			_, err = templBuffer.WriteString("<option value=\"")
+			_, err = templBuffer.WriteString("<div class=\"form-control\"><label class=\"cursor-pointer label\"><span class=\"label-text\">")
+			if err != nil {
+				return err
+			}
+			var var_16 string = end.Name
+			_, err = templBuffer.WriteString(templ.EscapeString(var_16))
+			if err != nil {
+				return err
+			}
+			_, err = templBuffer.WriteString("</span><input")
+			if err != nil {
+				return err
+			}
+			if props.Rule.Internal {
+				_, err = templBuffer.WriteString(" disabled")
+				if err != nil {
+					return err
+				}
+			}
+			_, err = templBuffer.WriteString(" type=\"checkbox\" class=\"toggle\" name=\"endpoints\" value=\"")
 			if err != nil {
 				return err
 			}
@@ -371,26 +380,17 @@ func RuleFormUpdate(props RuleFormUpdateProps) templ.Component {
 				return err
 			}
 			if props.EndpointsSelections[i] {
-				_, err = templBuffer.WriteString(" selected")
+				_, err = templBuffer.WriteString(" checked")
 				if err != nil {
 					return err
 				}
 			}
-			_, err = templBuffer.WriteString(">")
-			if err != nil {
-				return err
-			}
-			var var_16 string = end.Name
-			_, err = templBuffer.WriteString(templ.EscapeString(var_16))
-			if err != nil {
-				return err
-			}
-			_, err = templBuffer.WriteString("</option>")
+			_, err = templBuffer.WriteString("></label></div>")
 			if err != nil {
 				return err
 			}
 		}
-		_, err = templBuffer.WriteString("</select></div><button")
+		_, err = templBuffer.WriteString("</fieldset><button")
 		if err != nil {
 			return err
 		}

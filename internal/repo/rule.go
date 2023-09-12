@@ -154,6 +154,10 @@ func RuleEndpointsSet(ctx context.Context, db database.Querier, ruleID int64, en
 }
 
 func ruleEndpointsSet(ctx context.Context, db database.QuerierTx, now models.Time, ruleID int64, endpointIDs []int64) error {
+	if len(endpointIDs) == 0 {
+		return nil
+	}
+
 	stmt := RulesToEndpoints.
 		INSERT(
 			RulesToEndpoints.Internal,

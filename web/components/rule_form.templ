@@ -43,16 +43,17 @@ templ RuleFormCreate(props RuleFormCreateProps) {
         })
       </label>
     </div>
-    <div class="form-control">
-      <label class="label">
-        <span class="label-text">Endpoints</span>
-      </label>
-      <select name="endpoints" class="select select-bordered" multiple>
-        for i, end := range props.Endpoints {
-          <option value={ strconv.FormatInt(end.ID, 10) } selected?={ props.EndpointsSelections[i] }>{ end.Name }</option>
-        }
-      </select>
-    </div>
+    <fieldset>
+      <legend>Endpoints</legend>
+      for i, end := range props.Endpoints {
+        <div class="form-control">
+          <label class="cursor-pointer label">
+            <span class="label-text">{ end.Name }</span> 
+            <input type="checkbox" class="toggle" name="endpoints" value={ strconv.FormatInt(end.ID, 10) } checked?={ props.EndpointsSelections[i] } />
+          </label>
+        </div>
+      }
+    </fieldset>
     <button type="submit" class="btn btn-primary btn-block">Create Rule</button>
     if props.Flash != nil {
       {! props.Flash }
@@ -95,16 +96,17 @@ templ RuleFormUpdate(props RuleFormUpdateProps) {
         @RuleExpressionCheckLabel(RuleExpressionLabelProps{Error: props.ExpressionError})
       </label>
     </div>
-    <div class="form-control">
-      <label class="label">
-        <span class="label-text">Endpoints</span>
-      </label>
-      <select disabled?={ props.Rule.Internal } name="endpoints" class="select select-bordered" multiple>
+    <fieldset>
+      <legend class="label-text">Endpoints</legend>
       for i, end := range props.Endpoints {
-        <option value={ strconv.FormatInt(end.ID, 10) } selected?={ props.EndpointsSelections[i] }>{ end.Name }</option>
+        <div class="form-control">
+          <label class="cursor-pointer label">
+            <span class="label-text">{ end.Name }</span> 
+            <input disabled?={ props.Rule.Internal } type="checkbox" class="toggle" name="endpoints" value={ strconv.FormatInt(end.ID, 10) } checked?={ props.EndpointsSelections[i] } />
+          </label>
+        </div>
       }
-      </select>
-    </div>
+    </fieldset>
     <button disabled?={ props.Rule.Internal } type="submit" class="btn btn-primary btn-block">Update Rule</button>
     if props.Flash != nil {
       {! props.Flash }
