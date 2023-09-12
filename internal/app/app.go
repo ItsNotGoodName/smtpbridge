@@ -34,7 +34,7 @@ type App struct {
 	bus             core.Bus
 	config          *models.Config
 	endpointFactory endpoint.Factory
-	testFileStore   TestFileStore
+	webFileStore    WebFileStore
 }
 
 func (a App) RuleEndpointsGet(ctx context.Context, id int64) (models.RuleEndpoints, error) {
@@ -102,7 +102,7 @@ func New(
 	bus core.Bus,
 	config *models.Config,
 	endpointFactory endpoint.Factory,
-	testFileStore TestFileStore,
+	webFileStore WebFileStore,
 ) App {
 	return App{
 		db:              db,
@@ -110,7 +110,7 @@ func New(
 		bus:             bus,
 		config:          config,
 		endpointFactory: endpointFactory,
-		testFileStore:   testFileStore,
+		webFileStore:    webFileStore,
 	}
 }
 
@@ -296,7 +296,7 @@ func (a App) EndpointTest(ctx context.Context, id int64) error {
 		return err
 	}
 
-	file, err := a.testFileStore.File()
+	file, err := a.webFileStore.File()
 	if err != nil {
 		return err
 	}
@@ -313,7 +313,7 @@ func (a App) EndpointTest(ctx context.Context, id int64) error {
 		Text:    "Test Body",
 	}), datt.Attachment)
 
-	return end.Send(ctx, a.testFileStore, env)
+	return end.Send(ctx, a.webFileStore, env)
 }
 
 func (a App) Tracer(source string) trace.Tracer {

@@ -10,7 +10,6 @@ import (
 
 type LogStore struct{}
 
-// Save implements Store.
 func (LogStore) Save(ctx context.Context, trace models.Trace) error {
 	switch trace.Level {
 	case LevelInfo:

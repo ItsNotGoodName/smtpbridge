@@ -77,6 +77,6 @@ func (s Factory) build(kind string, config models.EndpointConfig) (Sender, error
 	case "apprise":
 		return senders.NewApprise(s.pythonExecutable, s.appriseScriptPath, config.StrSlice("urls")), nil
 	default:
-		return nil, fmt.Errorf("invalid sender type: %s", kind)
+		return nil, fmt.Errorf("invalid sender kind: %s", kind)
 	}
 }

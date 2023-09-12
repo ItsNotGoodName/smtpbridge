@@ -30,23 +30,23 @@ const (
 )
 
 type Config struct {
-	Debug                  bool
-	TimeHourFormat         string
-	DatabasePath           string
-	AttachmentsDirectory   string
-	CSRFSecretPath         string
-	SessionSecretPath      string
-	SessionsDirectory      string
-	HTTPDisable            bool
-	HTTPAddress            string
-	HTTPPort               uint16
-	HTTPBodyLimit          int64
-	HTTPURL                string
-	SMTPDisable            bool
-	SMTPAddress            string
-	SMTPMaxMessageBytes    int64
-	IMAPDisable            bool
-	IMAPAddress            string
+	Debug                bool
+	TimeHourFormat       string
+	DatabasePath         string
+	AttachmentsDirectory string
+	CSRFSecretPath       string
+	SessionSecretPath    string
+	SessionsDirectory    string
+	HTTPDisable          bool
+	HTTPAddress          string
+	HTTPPort             uint16
+	HTTPBodyLimit        int64
+	HTTPURL              string
+	SMTPDisable          bool
+	SMTPAddress          string
+	SMTPMaxMessageBytes  int64
+	// IMAPDisable            bool
+	// IMAPAddress            string
 	Config                 *models.Config
 	EndpointFactory        endpoint.Factory
 	InternalEndpoints      []models.Endpoint
@@ -74,11 +74,11 @@ type Raw struct {
 	HTTPUsername            string  `koanf:"http.username"`
 	HTTPPassword            string  `koanf:"http.password"`
 	HTTPURL                 string  `koanf:"http.url"`
-	IMAPDisable             bool    `koanf:"imap.disable"`
-	IMAPHost                string  `koanf:"imap.host"`
-	IMAPPort                uint16  `koanf:"imap.port"`
-	Endpoints               map[string]RawEndpoint
-	Rules                   map[string]RawRule
+	// IMAPDisable             bool    `koanf:"imap.disable"`
+	// IMAPHost                string  `koanf:"imap.host"`
+	// IMAPPort                uint16  `koanf:"imap.port"`
+	Endpoints map[string]RawEndpoint
+	Rules     map[string]RawRule
 }
 
 type RawEndpoint struct {
@@ -104,7 +104,7 @@ var RawDefault = struct {
 	PythonExecutable string `koanf:"python_executable"`
 	SMTPPort         uint16 `koanf:"smtp.port"`
 	HTTPPort         uint16 `koanf:"http.port"`
-	IMAPPort         uint16 `koanf:"imap.port"`
+	// IMAPPort         uint16 `koanf:"imap.port"`
 }{
 	TimeFormat:       TimeFormat12H,
 	MaxPayloadSize:   "25 MB",
@@ -112,7 +112,7 @@ var RawDefault = struct {
 	PythonExecutable: "python3",
 	SMTPPort:         1025,
 	HTTPPort:         8080,
-	IMAPPort:         10143,
+	// IMAPPort:         10143,
 }
 
 func WithFlagSet(flags *flag.FlagSet) *flag.FlagSet {
@@ -131,9 +131,9 @@ func WithFlagSet(flags *flag.FlagSet) *flag.FlagSet {
 	flags.Int("http-port", 0, flagUsageInt(int(RawDefault.HTTPPort), "HTTP port to listen on."))
 	flags.Int("http-url", 0, flagUsageString("", "HTTP public URL (e.g. http://127.0.0.1:8080)."))
 
-	flags.Bool("imap-disable", false, flagUsageBool(false, "Disable IMAP server."))
-	flags.String("imap-host", "", flagUsageString("", "IMAP host address to listen on."))
-	flags.Int("imap-port", 0, flagUsageInt(int(RawDefault.IMAPPort), "HTTP port to listen on."))
+	// flags.Bool("imap-disable", false, flagUsageBool(false, "Disable IMAP server."))
+	// flags.String("imap-host", "", flagUsageString("", "IMAP host address to listen on."))
+	// flags.Int("imap-port", 0, flagUsageInt(int(RawDefault.IMAPPort), "HTTP port to listen on."))
 
 	return flags
 }
@@ -279,26 +279,26 @@ func (p Parser) Parse(raw Raw) (Config, error) {
 
 	smtpAddress := raw.SMTPHost + ":" + strconv.Itoa(int(raw.SMTPPort))
 
-	imapAddress := raw.IMAPHost + ":" + strconv.Itoa(int(raw.IMAPPort))
+	// imapAddress := raw.IMAPHost + ":" + strconv.Itoa(int(raw.IMAPPort))
 
 	return Config{
-		Debug:                  raw.Debug,
-		TimeHourFormat:         timeHourFormat,
-		DatabasePath:           databasePath,
-		CSRFSecretPath:         csrfSecretPath,
-		SessionSecretPath:      sessionSecretPath,
-		SessionsDirectory:      sessionsDirectory,
-		AttachmentsDirectory:   attachmentsDirectory,
-		HTTPDisable:            raw.HTTPDisable,
-		HTTPAddress:            httpAddress,
-		HTTPPort:               raw.HTTPPort,
-		HTTPBodyLimit:          maxBytesForEachPayload,
-		HTTPURL:                raw.HTTPURL,
-		SMTPDisable:            raw.SMTPDisable,
-		SMTPAddress:            smtpAddress,
-		SMTPMaxMessageBytes:    maxBytesForEachPayload,
-		IMAPDisable:            raw.IMAPDisable,
-		IMAPAddress:            imapAddress,
+		Debug:                raw.Debug,
+		TimeHourFormat:       timeHourFormat,
+		DatabasePath:         databasePath,
+		CSRFSecretPath:       csrfSecretPath,
+		SessionSecretPath:    sessionSecretPath,
+		SessionsDirectory:    sessionsDirectory,
+		AttachmentsDirectory: attachmentsDirectory,
+		HTTPDisable:          raw.HTTPDisable,
+		HTTPAddress:          httpAddress,
+		HTTPPort:             raw.HTTPPort,
+		HTTPBodyLimit:        maxBytesForEachPayload,
+		HTTPURL:              raw.HTTPURL,
+		SMTPDisable:          raw.SMTPDisable,
+		SMTPAddress:          smtpAddress,
+		SMTPMaxMessageBytes:  maxBytesForEachPayload,
+		// IMAPDisable:            raw.IMAPDisable,
+		// IMAPAddress:            imapAddress,
 		Config:                 config,
 		EndpointFactory:        endpointFactory,
 		InternalEndpoints:      endpoints,

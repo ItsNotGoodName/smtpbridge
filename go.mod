@@ -7,7 +7,6 @@ require (
 	github.com/a-h/templ v0.2.334
 	github.com/containrrr/shoutrrr v0.8.0
 	github.com/dustin/go-humanize v1.0.1
-	github.com/emersion/go-imap v1.2.1
 	github.com/emersion/go-sasl v0.0.0-20220912192320-0145f2c60ead
 	github.com/emersion/go-smtp v0.18.1
 	github.com/go-chi/chi/v5 v5.0.10
@@ -38,7 +37,6 @@ require (
 require (
 	github.com/cention-sany/utf7 v0.0.0-20170124080048-26cad61bd60a // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/emersion/go-message v0.16.0 // indirect
 	github.com/fatih/color v1.15.0 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect

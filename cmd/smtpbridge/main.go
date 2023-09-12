@@ -93,8 +93,8 @@ func run(flags *flag.FlagSet) lieut.Executor {
 		}
 
 		// App
-		testFileStore := app.NewTestFileStore("apple-touch-icon.png", fmt.Sprintf("http://127.0.0.1:%d", cfg.HTTPPort))
-		app := app.New(db, fileStore, bus, cfg.Config, cfg.EndpointFactory, testFileStore)
+		webFileStore := app.NewWebFileStore("apple-touch-icon.png", fmt.Sprintf("http://127.0.0.1:%d", cfg.HTTPPort))
+		app := app.New(db, fileStore, bus, cfg.Config, cfg.EndpointFactory, webFileStore)
 
 		// Supervisor
 		super := suture.New("root", suture.Spec{
