@@ -1,0 +1,56 @@
+package components
+
+import (
+  "strconv"
+
+  "github.com/ItsNotGoodName/smtpbridge/web/routes"
+  "github.com/ItsNotGoodName/smtpbridge/internal/models"
+)
+
+type EnvelopeTabProps struct {
+  Envelope models.Envelope
+  Tab      routes.EnvelopeTab
+}
+
+templ EnvelopeTab(props EnvelopeTabProps) {
+  <div id="tabs" hx-target="#tabs" hx-swap="innerHTML">
+    <div class="flex">
+      <div class="border-base-200 w-4 border-b"></div>
+      <div class="tabs" role="tablist">
+        <a class={ "tab tab-lifted", templ.KV("tab-active", props.Tab == routes.EnvelopeTabText) } hx-get={ routes.EnvelopeTabComponent(props.Envelope.Message.ID, routes.EnvelopeTabText).URLString() } aria-controls="tab-content" role="tab">
+          Text
+        </a> 
+        if props.Envelope.Message.HTML != "" {
+          <a class={ "tab tab-lifted", templ.KV("tab-active", props.Tab == routes.EnvelopeTabHTML) } hx-get={ routes.EnvelopeTabComponent(props.Envelope.Message.ID, routes.EnvelopeTabHTML).URLString() } aria-controls="tab-content" role="tab">
+            HTML
+          </a> 
+        }
+        if len(props.Envelope.Attachments) != 0 {
+          <a class={ "tab tab-lifted flex gap-2", templ.KV("tab-active", props.Tab == routes.EnvelopeTabAttachments) } hx-get={ routes.EnvelopeTabComponent(props.Envelope.Message.ID, routes.EnvelopeTabAttachments).URLString() } aria-controls="tab-content" role="tab">
+            Attachments
+            <div class="badge badge-primary">
+              <td>{ strconv.Itoa(len(props.Envelope.Attachments)) }</td>
+            </div>
+          </a>
+        }
+      </div>
+      <div class="border-base-200 flex-1 border-b"></div>
+    </div>
+    <div class="p-4" id="tab-content" role="tabpanel" >
+      switch props.Tab {
+        case routes.EnvelopeTabText:
+          <pre class="overflow-x-auto">
+            { props.Envelope.Message.Text }
+          </pre>
+        case routes.EnvelopeTabHTML:
+          <iframe src={ routes.EnvelopeHTML(props.Envelope.Message.ID).URLString() } sandbox="" class="h-screen w-full rounded border-base-200 border"></iframe>
+        case routes.EnvelopeTabAttachments:
+          <div class="flex flex-wrap gap-4">
+            for _, att := range props.Envelope.Attachments {
+              @AttachmentCard(AttachmentCardProps{Attachment: att})
+            }
+          </div>
+      }
+    </div>
+  </div>
+}

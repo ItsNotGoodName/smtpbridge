@@ -3,21 +3,28 @@
 package web
 
 import (
+	"embed"
+	"fmt"
+	"os"
 	"path"
 	"path/filepath"
 	"runtime"
-
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/template/html/v2"
 )
 
-const CacheControl = 0
+var HeadTags []string
 
-const HeadTags = `<script type="module" src="http://localhost:5173/@vite/client"></script>
-<script type="module" src="http://localhost:5173/src/main.ts"></script>`
+var DevMode bool = true
 
-var pathAssets string
-var pathViews string
+var FS = mustSubFS(public, "public")
+
+//go:embed public
+var public embed.FS
+
+func reloadVite() {
+	os.Create(reloadViteFilePath)
+}
+
+var reloadViteFilePath string
 
 func init() {
 	_, filename, _, ok := runtime.Caller(0)
@@ -26,16 +33,15 @@ func init() {
 	}
 
 	cwd := filepath.Dir(filename)
-	pathAssets = path.Join(cwd, "public")
-	pathViews = path.Join(cwd, "views")
-}
+	reloadViteFilePath = path.Join(cwd, "reload-vite.local")
 
-func UseAssets(app *fiber.App) {
-	app.Static("/", pathAssets)
-}
+	devIP := os.Getenv("DEV_IP")
+	if devIP == "" {
+		devIP = "127.0.0.1"
+	}
 
-func Engine() *html.Engine {
-	engine := html.New(pathViews, ".html")
-	engine.Reload(true)
-	return engine
+	HeadTags = []string{
+		fmt.Sprintf(`<script type="module" src="http://%s:5173/@vite/client"></script>`, devIP),
+		fmt.Sprintf(`<script type="module" src="http://%s:5173/src/main.ts"></script>`, devIP),
+	}
 }

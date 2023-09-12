@@ -1,0 +1,60 @@
+package components
+
+import (
+  "net/url"
+  "strconv"
+
+  "github.com/ItsNotGoodName/smtpbridge/pkg/pagination"
+  "github.com/ItsNotGoodName/smtpbridge/web/routes"
+  "github.com/ItsNotGoodName/smtpbridge/web/helpers"
+)
+
+type PaginateHeaderProps struct {
+  Route      routes.Route
+  Query      url.Values
+  PageResult pagination.PageResult
+  Ascending  bool
+}
+
+templ PaginateHeader(props PaginateHeaderProps) {
+  <div class="flex flex-col items-center justify-between gap-4 sm:flex-row">
+    <div class="mr-auto flex flex-row items-center gap-2">
+      <details class="dropdown">
+        <summary class="btn btn-sm btn-outline">
+          { strconv.Itoa(props.PageResult.PerPage) }
+        </summary>
+        <ul class="menu dropdown-content bg-base-100 rounded-box z-50 w-52 p-2 shadow-lg">
+        for _, option := range limits {
+          <li>
+            <a href={ props.Route.URLQuery(helpers.Query(props.Query, "perPage", option)) }>
+              { strconv.Itoa(option) }
+            </a>
+          </li>
+        }
+        </ul>
+      </details>
+      if props.Ascending {
+        <a class="btn btn-sm btn-outline" href={ props.Route.URLQuery(helpers.Query(props.Query, "ascending", "")) }>
+          ASC
+        </a>
+      } else {
+      <a class="btn btn-sm btn-outline" href={ props.Route.URLQuery(helpers.Query(props.Query, "ascending", "1")) }>
+        DESC
+      </a>
+      }
+    </div>
+    <div class="ml-auto flex flex-row items-center justify-between gap-4">
+      <div class="join">
+        <a class="join-item btn btn-sm btn-outline" disabled?={ !props.PageResult.HasPrevious() } href={ props.Route.URLQuery((helpers.Query(props.Query, "page", props.PageResult.Previous()))) }>
+          Previous
+        </a>
+        <button class="join-item btn btn-sm btn-outline">
+          { strconv.Itoa(props.PageResult.Page) } / { strconv.Itoa(props.PageResult.TotalPages) }
+        </button>
+        <a class="join-item btn btn-sm btn-outline" disabled?={ !props.PageResult.HasNext() } href={ props.Route.URLQuery(helpers.Query(props.Query, "page", props.PageResult.Next())) }>
+          Next
+        </a>
+      </div>
+    </div>
+  </div>
+}

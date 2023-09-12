@@ -1,0 +1,13 @@
+package components
+
+type RuleExpressionLabelProps struct {
+  Error error
+}
+
+templ RuleExpressionCheckLabel(props RuleExpressionLabelProps) {
+  if props.Error != nil {
+    <span class="label-text-alt text-error">{ props.Error.Error() }</span>
+  } else {
+    <span class="label-text-alt text-success">Valid!</span>
+  }
+}

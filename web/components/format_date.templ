@@ -1,0 +1,8 @@
+package components
+
+import "time"
+import "github.com/ItsNotGoodName/smtpbridge/web/meta"
+
+templ FormatDate(m meta.Meta, t time.Time) {
+  <sl-format-date month="numeric" day="numeric" year="numeric" hour="numeric" minute="numeric" hour-format={ m.TimeHourFormat } date={ t.Format(time.RFC3339) }></sl-format-date>
+}

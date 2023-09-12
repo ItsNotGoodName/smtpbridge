@@ -1,0 +1,34 @@
+package components
+
+import "github.com/ItsNotGoodName/smtpbridge/web/icons"
+import "github.com/ItsNotGoodName/smtpbridge/web/routes"
+import "github.com/ItsNotGoodName/smtpbridge/web/helpers"
+import "net/url"
+
+type TableOrderTHProps struct {
+  Query         url.Values
+	Ascending     bool
+	Order         string
+  Field         string
+}
+
+func tableOrderTHAscending(enable, ascending bool) string {
+  if !enable || ascending {
+    return ""
+  }
+
+  return "1"
+}
+
+templ TableOrderTH(props TableOrderTHProps) {
+  <a class="w-full flex justify-between items-center" href={ routes.EnvelopeList().URLQuery(helpers.Query(props.Query, "order", props.Field, "ascending", tableOrderTHAscending(props.Order == props.Field, props.Ascending))) }>
+    { children... }
+    if props.Order == props.Field {
+      if props.Ascending {
+        @icons.ArrowUpS("h-4 w-4")
+      } else {
+        @icons.ArrowDownS("h-4 w-4")
+      }
+    }
+  </a>
+}

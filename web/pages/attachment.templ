@@ -1,0 +1,53 @@
+package pages
+
+import (
+  "net/url"
+
+  c "github.com/ItsNotGoodName/smtpbridge/web/components"
+  "github.com/ItsNotGoodName/smtpbridge/web/routes"
+  "github.com/ItsNotGoodName/smtpbridge/internal/models"
+  "github.com/ItsNotGoodName/smtpbridge/web/meta"
+  "github.com/ItsNotGoodName/smtpbridge/web/icons"
+)
+
+type attachmentListViewProps struct {
+  AttachmentRequest models.DTOAttachmentListRequest
+  AttachmentResult models.DTOAttachmentListResult
+  Query url.Values
+}
+
+templ attachmentListView(m meta.Meta, props attachmentListViewProps) {
+	@c.LayoutDefault(m) {
+    <div class="border-base-200 breadcrumbs border-b p-4 text-xl font-bold">
+      <ul>
+        <li>Attachments</li>
+      </ul>
+    </div>
+    <div class="flex flex-col gap-4 p-4">
+      <div class="join flex items-center justify-end">
+        <button class="btn btn-sm btn-info join-item" hx-post={ routes.AttachmentTrim().URLString() }>
+          @icons.Recycle("w-5 h-5")
+        </button>
+      </div>
+      @c.PaginateHeader(c.PaginateHeaderProps{
+        Route: routes.AttachmentList(),
+        Query: props.Query,
+        PageResult: props.AttachmentResult.PageResult,
+        Ascending: props.AttachmentRequest.Ascending,
+      })
+    </div>
+		<div class="flex flex-wrap gap-4 px-4">
+			for _, att := range props.AttachmentResult.Attachments {
+				@c.AttachmentCard(c.AttachmentCardProps{Attachment: att})
+			}
+		</div>
+		if len(props.AttachmentResult.Attachments) != 0 {
+			@c.PaginateFooter(c.PaginateFooterProps{
+        Route: routes.AttachmentList(),
+        Query: props.Query,
+        PageResult: props.AttachmentResult.PageResult,
+      })
+		}
+	}
+}
+

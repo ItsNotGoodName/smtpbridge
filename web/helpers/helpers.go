@@ -1,54 +1,135 @@
+// helpers are used by pages/components packages.
 package helpers
 
 import (
 	"encoding/json"
 	"fmt"
-	"html/template"
+	"net/http"
+	"net/url"
+	"sort"
+	"strconv"
+	"strings"
 	"time"
 
-	"github.com/ItsNotGoodName/smtpbridge/internal/build"
-	"github.com/ItsNotGoodName/smtpbridge/web"
+	"github.com/ItsNotGoodName/smtpbridge/internal/core"
+	"github.com/ItsNotGoodName/smtpbridge/internal/models"
+	"github.com/ItsNotGoodName/smtpbridge/internal/trace"
+	"github.com/ItsNotGoodName/smtpbridge/pkg/pagination"
 	"github.com/dustin/go-humanize"
-	"github.com/gofiber/fiber/v2"
+	"github.com/gorilla/schema"
+	"github.com/samber/lo"
 )
 
-var Map template.FuncMap = template.FuncMap{
-	"build": func() build.Build {
-		return build.Current
-	},
-	"headTags": func() template.HTML {
-		return template.HTML(web.HeadTags)
-	},
-	"timeFormat": func(date time.Time) string {
-		return date.Local().Format("Jan _2 2006 15:04:05")
-	},
-	"timeHumanize": func(date time.Time) string {
-		return humanize.Time(date)
-	},
-	"bytesHumanize": func(bytes int64) string {
-		return humanize.Bytes(uint64(bytes))
-	},
-	"json": func(data any) string {
-		jsonData, err := json.MarshalIndent(data, "", "  ")
-		if err != nil {
-			panic(err)
-		}
+var TimeHourFormat12 string = "12"
+var TimeHourFormat24 string = "24"
 
-		return string(jsonData)
-	},
-	"unescape": func(s string) template.HTML {
-		return template.HTML(s)
-	},
-	"query": func(queries map[string]string, vals ...any) template.URL {
-		return template.URL(Query(queries, vals...))
-	},
-	"set": func(c fiber.Map, name string, value any) fiber.Map {
-		return fiber.Map{
-			"Meta": c["Meta"],
-			name:   value,
+func BytesHumanize(bytes int64) string {
+	return humanize.Bytes(uint64(bytes))
+}
+
+func TimeHumanize(date time.Time) string {
+	return humanize.Time(date)
+}
+
+func JSON(data any) string {
+	jsonData, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		panic(err)
+	}
+
+	return string(jsonData)
+}
+
+// Query merges current URL query with new values.
+func Query(queries url.Values, vals ...any) string {
+	tuple := []lo.Tuple2[string, any]{}
+	for i := 0; i < len(vals); i += 2 {
+		tuple = append(tuple, lo.Tuple2[string, any]{A: (vals[i]).(string), B: vals[i+1]})
+	}
+
+	var newQueries []string
+	for _, t := range tuple {
+		newQueries = append(newQueries, t.A+"="+fmt.Sprint(t.B))
+	}
+
+	for key := range queries {
+		_, found := queryTupleFind(tuple, key)
+		if !found {
+			newQueries = append(newQueries, key+"="+queries.Get(key))
 		}
-	},
-	"csrf": func(c fiber.Map) template.HTML {
-		return template.HTML(fmt.Sprintf(`<input type="hidden" name="csrf" value="%s" />`, c["Meta"].(Meta).CSRF))
-	},
+	}
+
+	sort.Slice(newQueries, func(i, j int) bool {
+		return newQueries[i] < newQueries[j]
+	})
+
+	return strings.Join(newQueries, "&")
+}
+
+func queryTupleFind(tuple []lo.Tuple2[string, any], key string) (int, bool) {
+	for i, t := range tuple {
+		if t.A == key {
+			return i, true
+		}
+	}
+
+	return 0, false
+}
+
+func Checkbox(r *http.Request, key string) bool {
+	q := r.URL.Query()
+	if q.Get("-"+key) != "" {
+		return q.Get(key) != ""
+	}
+
+	return true
+}
+
+func Pagination(q url.Values) (pagination.Page, error) {
+	page := 1
+	if str := q.Get("page"); str != "" {
+		var err error
+		page, err = strconv.Atoi(q.Get("page"))
+		if err != nil {
+			return pagination.Page{}, err
+		}
+	}
+
+	perPage := 1
+	if str := q.Get("perPage"); str != "" {
+		var err error
+		perPage, err = strconv.Atoi(q.Get("perPage"))
+		if err != nil {
+			return pagination.Page{}, err
+		}
+	}
+
+	return pagination.NewPage(page, perPage), nil
+}
+
+func EndpointsSelections(selected []models.Endpoint, all []models.Endpoint) []bool {
+	var endpointsSelections []bool
+	for _, end := range all {
+		has := lo.ContainsBy(selected, func(e models.Endpoint) bool { return e.ID == end.ID })
+		endpointsSelections = append(endpointsSelections, has)
+	}
+	return endpointsSelections
+}
+
+func Tracer(app core.App, r *http.Request) trace.Tracer {
+	return app.Tracer(trace.SourceHTTP).Sticky(trace.WithAddress(r.RemoteAddr))
+}
+
+var decoder = schema.NewDecoder()
+
+func DecodeForm(w http.ResponseWriter, r *http.Request, form any) error {
+	if err := r.ParseForm(); err != nil {
+		return err
+	}
+
+	if err := decoder.Decode(form, r.PostForm); err != nil {
+		return err
+	}
+
+	return nil
 }

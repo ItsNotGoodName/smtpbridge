@@ -10,7 +10,9 @@ Bridge email to other messaging services.
 
 **Do not expose this to the Internet, this is only intended to be used on a local network.**
 
-[Screenshot](./assets/demo.png)
+![Screenshot](https://static.gurnain.com/github/smtpbridge/demo-small.png)
+
+[Full Screenshot](https://static.gurnain.com/github/smtpbridge/demo.png)
 
 # Use Cases
 
@@ -26,7 +28,7 @@ smtpbridge
 ## Show Version
 
 ```
-smtpbridge --version
+smtpbridge -version
 ```
 
 # Supported Endpoints
@@ -34,6 +36,25 @@ smtpbridge --version
 - console
 - [Telegram](https://telegram.org/)
 - [Shoutrrr](https://github.com/containrrr/shoutrrr)
+- [Apprise](https://github.com/caronc/apprise)
+
+## Apprise
+
+Apprise requires Python to be installed along with the `apprise` package.
+
+Install Apprise with the following command.
+
+```
+pip install apprise
+```
+
+If you are using a Python virtual environment, then set the `python_executable` config variable.
+
+```yaml
+python_executable: .venv/bin/python3
+```
+
+Make sure you install Apprise in that virtual environment.
 
 # Config
 
@@ -59,16 +80,27 @@ endpoints:
 
 rules:
   hello_world:
+    endpoints:
+      - hello_world
 ```
 
 ## Full Config
 
 ```yaml
+# Used for development
+debug: false
+
+# Used by HTTP, ...
+time_format: 12h # (12h, 24h)
+
 # Maximum message size for envelopes
 max_payload_size: 25 MB
 
 # Directory for storing data
 data_directory: smtpbridge_data
+
+# Python executable
+python_executable: python3
 
 # Retention policy for envelopes and attachment files
 retention:
@@ -89,6 +121,9 @@ http:
   username: ""
   password: ""
 
+  # Public URL
+  url: "" # (http://127.0.0.1:8080)
+
 # SMTP server
 smtp:
   disable: false # (false, true)
@@ -99,19 +134,9 @@ smtp:
   username: ""
   password: ""
 
+
 # Endpoints for envelopes
 endpoints:
-  # Full example
-  example_endpoint:
-    kind: console
-    # Do not send any text
-    text_disable: false
-    # Custom template for body
-    body_template: |
-      {{ .Message.Text }}
-    # Do not send any attachments
-    attachment_disable: false
-
   # Console
   console_endpoint:
     kind: console
@@ -127,26 +152,28 @@ endpoints:
   shoutrrr_endpoint:
     kind: shoutrrr
     config:
-      # https://containrrr.dev/shoutrrr/0.7/services/overview/
-      urls: |
-        bark://devicekey@host
-        discord://token@id
-        smtp://username:password@host:port/?from=fromAddress&to=recipient1[,recipient2,...]
-        gotify://gotify-host/token
-        googlechat://chat.googleapis.com/v1/spaces/FOO/messages?key=bar&token=baz
-        ifttt://key/?events=event1[,event2,...]&value1=value1&value2=value2&value3=value3
-        join://shoutrrr:api-key@join/?devices=device1[,device2, ...][&icon=icon][&title=title]
-        mattermost://[username@]mattermost-host/token[/channel]
-        matrix://username:password@host:port/[?rooms=!roomID1[,roomAlias2]]
-        ntfy://username:password@ntfy.sh/topic
-        opsgenie://host/token?responders=responder1[,responder2]
-        pushbullet://api-token[/device/#channel/email]
-        pushover://shoutrrr:apiToken@userKey/?devices=device1[,device2, ...]
-        rocketchat://[username@]rocketchat-host/token[/channel|@recipient]
-        slack://[botname@]token-a/token-b/token-c
-        teams://group@tenant/altId/groupOwner?host=organization.webhook.office.com
-        telegram://token@telegram?chats=@channel-1[,chat-id-1,...]
-        zulip://bot-mail:bot-key@zulip-domain/?stream=name-or-id&topic=name
+      # https://containrrr.dev/shoutrrr/v0.8/services/overview/
+      urls: telegram://token@telegram?chats=@channel-1[,chat-id-1,...]
+
+  # Apprise
+  shoutrrr_endpoint:
+    kind: apprise
+    config:
+      # https://github.com/caronc/apprise#supported-notifications
+      urls: tgram://bottoken/ChatID
+
+  # Full example
+  example_endpoint:
+    kind: console
+    name: Example Endpoint
+    # Do not send title and body
+    text_disable: false
+    # Do not send attachments
+    attachment_disable: false
+    # Custom template for title
+    title_template: {{ .Message.Subject }}
+    # Custom template for body
+    body_template: {{ .Message.Text }}
 
 rules:
   example_rule:
@@ -156,11 +183,21 @@ rules:
       - console_endpoint
 ```
 
-## Template
-
-Each template has access to [`Envelope`](./internal/envelope/envelope.go) via the `.` operator.
+## Templates
 
 See [`text/template`](https://pkg.go.dev/text/template) on how to template.
+
+Each `*_template` config variable has access to the [Envelope](./internal/models/models.go) model via the `.` operator.
+
+The following custom functions are available in endpoint templates.
+
+| Name      | Description                             | Example                                                           |
+| --------- | --------------------------------------- | ----------------------------------------------------------------- |
+| PermaLink | Permanent HTTP link to the given model. | `{{ PermaLink .Message }}` => `http://127.0.0.1:8080/envelopes/1` |
+
+## Expressions
+
+Rule expressions are just [Templates](#templates) without `{{ }}` and without the custom functions.
 
 # Docker
 
@@ -173,7 +210,9 @@ services:
     image: ghcr.io/itsnotgoodname/smtpbridge:latest
     container_name: smtpbridge
     environment:
-      SMTPBRIDGE_CONFIG_YAML: | # Config by embedding YAML
+      APPRISE_ENABLE: "true" # Optional
+      APPRISE_VERSION: "1.5.0" # Optional
+      SMTPBRIDGE_CONFIG_YAML: | # Optional
         endpoints:
           hello_world:
             kind: console
@@ -184,10 +223,10 @@ services:
       - 1025:1025
       - 8080:8080
     volumes:
-      - /path/to/config:/config # Config by creating config.yaml file in /config
       - /path/to/data:/data
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
+      - /path/to/config:/config # Optional
+      - /etc/timezone:/etc/timezone:ro # Optional
+      - /etc/localtime:/etc/localtime:ro # Optional
     restart: unless-stopped
 ```
 
@@ -196,12 +235,14 @@ services:
 ```sh
 docker run -d \
   --name=smtpbridge \
+  -e APPRISE_ENABLE=true `# Optional` \
+  -e APPRISE_ENABLE=1.5.0 `# Optional` \
   -p 1025:1025 \
   -p 8080:8080 \
-  -v /path/to/config:/config \
   -v /path/to/data:/data \
-  -v /etc/timezone:/etc/timezone:ro \
-  -v /etc/localtime:/etc/localtime:ro \
+  -v /path/to/config:/config `# Optional` \
+  -v /etc/timezone:/etc/timezone:ro `# Optional` \
+  -v /etc/localtime:/etc/localtime:ro `# Optional` \
   --restart unless-stopped \
   ghcr.io/itsnotgoodname/smtpbridge:latest
 ```
@@ -213,6 +254,10 @@ The following programs are required.
 - Make
 - Go
 - pnpm
+
+## Make
+
+**You should look at the [Makefile](./Makefile) before running any of the following commands.**
 
 Install dependencies.
 
@@ -234,14 +279,9 @@ make dev-web
 
 # To Do
 
-- Add attachment when testing endpoint
-- Add `PermaLink` function in templates
-- Reload on config change
-- Add [Apprise](https://github.com/caronc/apprise) endpoint
-- CRUD endpoints and rules
-- SQLite full text search
-- Read mailbox files
-- Save raw emails
-- JSON API
-- Windows installer
-- Better HTTP error handling
+- feat: CRUD endpoints
+- feat: read [mbox](https://access.redhat.com/articles/6167512) files
+- feat: IMAP for viewing mail
+- feat: JSON API
+- feat: Windows installer
+- fix: chrome keeps thinking the HTTP pages `/` and `/traces` are French

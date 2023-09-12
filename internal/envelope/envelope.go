@@ -1,48 +1,67 @@
 package envelope
 
 import (
-	"strconv"
+	"bufio"
+	"io"
+	"net/http"
 	"strings"
 	"time"
+
+	"github.com/ItsNotGoodName/smtpbridge/internal/models"
+	"github.com/jaytaylor/html2text"
+	"github.com/samber/lo"
 )
 
-type Envelope struct {
-	Message     *Message
-	Attachments []*Attachment
+func New(msg models.Message, atts ...models.Attachment) models.Envelope {
+	return models.Envelope{
+		Message:     msg,
+		Attachments: atts,
+	}
 }
 
-type Message struct {
-	ID        int64 `bun:"id,pk,autoincrement"`
-	CreatedAt time.Time
-	Date      time.Time
-	Subject   string
-	From      string   `bun:"from_"`
-	To        []string `bun:"to_"`
-	Text      string
-	HTML      string
-}
-
-func (e Message) IsTo(to string) bool {
-	for _, t := range e.To {
-		if t == to {
-			return true
+func NewMessage(r models.DTOMessageCreate) models.Message {
+	text := r.Text
+	if isHTML(r.Text) {
+		var err error
+		text, err = html2text.FromString(r.Text, html2text.Options{
+			TextOnly: true,
+		})
+		if err != nil {
+			text = r.Text
 		}
 	}
-	return false
+
+	to := lo.Filter(lo.Uniq(r.To), func(to string, _ int) bool {
+		return strings.Trim(to, " ") != ""
+	})
+
+	return models.Message{
+		From:      r.From,
+		To:        to,
+		CreatedAt: models.NewTime(time.Now()),
+		Subject:   r.Subject,
+		Text:      text,
+		HTML:      r.HTML,
+		Date:      models.NewTime(r.Date),
+	}
 }
 
-type Attachment struct {
-	ID        int64 `bun:"id,pk,autoincrement"`
-	MessageID int64
-	Name      string
-	Mime      string
-	Extension string
-}
+func NewDataAttachment(name string, data io.Reader) (models.DataAttachment, error) {
+	rd := bufio.NewReaderSize(data, 512)
+	b, err := rd.Peek(512)
+	if err != nil {
+		return models.DataAttachment{}, err
+	}
 
-func (a *Attachment) IsImage() bool {
-	return strings.HasPrefix(a.Mime, "image/")
-}
+	mimeT := http.DetectContentType(b)
+	extension := fileExtension(name, mimeT)
 
-func (a *Attachment) FileName() string {
-	return strconv.FormatInt(a.ID, 10) + a.Extension
+	return models.DataAttachment{
+		Attachment: models.Attachment{
+			Name:      name,
+			Mime:      mimeT,
+			Extension: extension,
+		},
+		Reader: rd,
+	}, nil
 }

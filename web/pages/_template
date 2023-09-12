@@ -1,0 +1,17 @@
+// Controller
+
+func _(ct Controller, app core.App) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+	}
+}
+
+// View
+
+type _Props struct {
+}
+
+templ _(m meta.Meta, props _Props) {
+	@c.LayoutDefault(m) {
+		Page: default
+	}
+}

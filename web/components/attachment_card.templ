@@ -1,0 +1,25 @@
+package components
+
+import (
+  "github.com/ItsNotGoodName/smtpbridge/web/routes"
+  "github.com/ItsNotGoodName/smtpbridge/internal/models"
+)
+
+type AttachmentCardProps struct {
+  Attachment models.Attachment
+}
+
+templ AttachmentCard(props AttachmentCardProps) {
+	<div class="card card-compact bg-base-100 border-base-200 w-full border sm:w-80">
+		if props.Attachment.IsImage() {
+			<figure><img src={ routes.AttachmentFile(props.Attachment.FileName()).URLString() } alt={ props.Attachment.Name }/></figure>
+		}
+		<div class="card-body">
+			<h2 class="card-title break-all">{ props.Attachment.Name }</h2>
+			<div class="card-actions justify-end">
+        <a href={ routes.AttachmentFile(props.Attachment.FileName()).URLQuery("download=1") } class="btn btn-primary">Download</a>
+      </div>
+		</div>
+	</div>
+}
+

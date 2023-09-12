@@ -1,0 +1,9 @@
+// Component
+package components
+
+type _Props struct {
+}
+
+templ _(props _Props) {
+  Component: default
+}

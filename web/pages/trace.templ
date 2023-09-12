@@ -1,0 +1,96 @@
+package pages
+
+import (
+  "strconv"
+  "net/url"
+
+  c "github.com/ItsNotGoodName/smtpbridge/web/components"
+  "github.com/ItsNotGoodName/smtpbridge/web/routes"
+  "github.com/ItsNotGoodName/smtpbridge/web/icons"
+  "github.com/ItsNotGoodName/smtpbridge/internal/models"
+  "github.com/ItsNotGoodName/smtpbridge/internal/trace"
+  "github.com/ItsNotGoodName/smtpbridge/web/meta"
+)
+
+type traceListViewProps struct {
+  TraceListRequest models.DTOTraceListRequest
+  TraceListResult models.DTOTraceListResult
+  Query url.Values
+}
+
+templ traceListView(m meta.Meta, props traceListViewProps) {
+	@c.LayoutDefault(m) {
+    <div class="border-base-200 breadcrumbs border-b p-4 text-xl font-bold">
+      <ul>
+        <li>Traces</li>
+      </ul>
+    </div>
+    <div class="flex flex-col gap-4 p-4">
+      <div class="join flex items-center justify-end">
+        <button class="btn btn-sm btn-error" hx-delete={ routes.TraceList().URLString() } hx-confirm="Are you sure you wish to delete all traces?">
+          @icons.Trash("w-5 h-5")
+        </button>
+      </div>
+      @c.PaginateHeader(c.PaginateHeaderProps{
+        Route: routes.TraceList(),
+        Query: props.Query,
+        PageResult: props.TraceListResult.PageResult,
+        Ascending: props.TraceListRequest.Ascending,
+      })
+    </div>
+		<div class="flex flex-col gap-4 px-4">
+			for _, traces := range props.TraceListResult.Traces {
+				<div class={ "w-full", templ.KV("join join-vertical", len(traces) > 1) }>
+					for _, t := range traces {
+						<div class="collapse-arrow join-item border-base-content collapse border">
+							<input type="radio" name={ "trace-" + strconv.FormatInt(t.ID, 10) }/>
+							<div class="collapse-title flex flex-col items-center justify-between sm:flex-row">
+								<div class="flex flex-col items-center gap-2 sm:flex-row">
+									<div class="flex flex-row items-center gap-2">
+										<div class="badge btn-outline">{ strconv.Itoa(t.Seq) }</div>
+										if t.Level == trace.LevelError {
+											<svg class="fill-error h-6 w-6 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM11 15H13V17H11V15ZM11 7H13V13H11V7Z"></path></svg>
+										}
+									</div>
+									<span>@c.FormatDate(m, t.CreatedAt.Time())</span>
+								</div>
+								<div class="font-bold">{ string(t.Action) }</div>
+							</div>
+							<div class="collapse-content bg-base-200 rounded-none">
+                <div class="border-base-content flex flex-col rounded-none border-b p-1 sm:flex-row">
+                  <div class="flex-1 font-bold">source</div>
+                  <div class="flex-1 text-right">{ t.Source }</div>
+                </div>
+								for _, kv := range t.Data {
+									<div class="border-base-content flex flex-col rounded-none border-b p-1 sm:flex-row">
+										<div class="flex-1 font-bold">{ kv.Key }</div>
+										<div class="flex-1 text-right">
+											switch kv.Key {
+												case trace.KeyEnvelope:
+													<a class="link" href={ routes.Envelope(kv.ValueInt64()).URL() }>{ kv.Value }</a>
+												case trace.KeyRule:
+													<a class="link" href={ routes.Rule(kv.ValueInt64()).URL() }>{ kv.Value }</a>
+												case trace.KeyEndpoint:
+													<a class="link" href={ routes.Endpoint(kv.ValueInt64()).URL() }>{ kv.Value }</a>
+												default:
+													{ kv.Value }
+											}
+										</div>
+									</div>
+								}
+							</div>
+						</div>
+					}
+				</div>
+			}
+		</div>
+		if len(props.TraceListResult.Traces) != 0 {
+			@c.PaginateFooter(c.PaginateFooterProps{
+        Route: routes.TraceList(),
+        Query: props.Query,
+        PageResult: props.TraceListResult.PageResult,
+      })
+		}
+	}
+}
+

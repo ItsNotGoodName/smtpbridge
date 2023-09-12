@@ -1,0 +1,220 @@
+package pages
+
+import (
+  "strconv"
+  "time"
+  "net/url"
+
+  "github.com/ItsNotGoodName/smtpbridge/web/meta"
+  c "github.com/ItsNotGoodName/smtpbridge/web/components"
+  "github.com/ItsNotGoodName/smtpbridge/web/routes"
+  "github.com/ItsNotGoodName/smtpbridge/internal/models"
+  "github.com/ItsNotGoodName/smtpbridge/web/helpers"
+  "github.com/ItsNotGoodName/smtpbridge/web/icons"
+)
+
+type envelopeViewProps struct {
+  Envelope models.Envelope
+  Endpoints []models.Endpoint
+  Tab      routes.EnvelopeTab
+}
+
+templ envelopeView(m meta.Meta, props envelopeViewProps) {
+	@c.LayoutDefault(m) {
+    <div class="border-base-200 breadcrumbs border-b p-4 text-xl font-bold">
+      <ul>
+        <li><a href={routes.EnvelopeList().URL() }>Envelopes</a></li>
+        <li>{ strconv.FormatInt(props.Envelope.Message.ID, 10) }</li>
+      </ul>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="table">
+        <tbody>
+          <tr>
+            <th class="w-0 whitespace-nowrap">From</th>
+            <td>{ props.Envelope.Message.From }</td>
+          </tr>
+          <tr>
+            <th class="w-0 whitespace-nowrap">Subject</th>
+            <td>{ props.Envelope.Message.Subject }</td>
+          </tr>
+          <tr>
+            <th class="w-0 whitespace-nowrap">To</th>
+            <td>
+            for _, to := range props.Envelope.Message.To { 
+              <span class="badge">
+                { to }
+              </span>
+            }
+            </td>
+          </tr>
+          <tr>
+            <th class="w-0 whitespace-nowrap">Date</th>
+            <td>@c.FormatDate(m, props.Envelope.Message.Date.Time())</td>
+          </tr>
+          <tr>
+            <th class="w-0 whitespace-nowrap">Created At</th>
+            <td>@c.FormatDate(m, props.Envelope.Message.CreatedAt.Time())</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="flex flex-col gap-4 p-4">
+      <form class="join" hx-post={ routes.EnvelopeEndpointSend(props.Envelope.Message.ID).URLString() } hx-target="next div" hx-swap="outerHTML">
+        <select name="endpoint" id="endpoint" class="select select-bordered select-sm join-item w-full">
+          <option disabled selected>Endpoint</option>
+          for _, end := range props.Endpoints {
+            <option value={ strconv.FormatInt(end.ID, 10) }>{ end.Name }</option>
+          }
+        </select>
+        <button type="submit" class="btn-sm btn btn-primary join-item">Send</button>
+      </form>
+      <div class="hidden"></div>
+    </div>
+    @c.EnvelopeTab(c.EnvelopeTabProps{Envelope: props.Envelope, Tab: props.Tab})
+  }
+}
+
+type envelopeListViewProps struct {
+  EnvelopeRequestRequest models.DTOEnvelopeListRequest
+  EnvelopeRequestResult models.DTOEnvelopeListResult
+  Query url.Values
+}
+
+templ envelopeListView(m meta.Meta, props envelopeListViewProps) {
+	@c.LayoutDefault(m) {
+    <div class="border-base-200 breadcrumbs border-b p-4 text-xl font-bold">
+      <ul>
+        <li>Envelopes</li>
+      </ul>
+    </div>
+    <div class="flex flex-col gap-4 p-4">
+      <div class="flex flex-col-reverse justify-between gap-4 sm:flex-row">
+        <form class="join flex">
+          <input name="search" type="text" placeholder="Search" class="input input-sm input-bordered join-item w-full max-w-xs" value={ props.EnvelopeRequestRequest.Search } />
+          <button type="submit" class="btn btn-sm btn-primary join-item">@icons.Search("w-5 h-5")</button>
+        </form>
+        <div class="join flex items-center justify-end">
+          <a class="btn btn-sm btn-success join-item" href={ routes.EnvelopeCreate().URL() }>
+            @icons.Add("w-5 h-5")
+          </a>
+          <button class="btn btn-sm btn-error join-item" hx-delete={ routes.EnvelopeList().URLString() } hx-confirm="Are you sure you wish to delete all envelopes?">
+            @icons.Trash("w-5 h-5")
+          </button>
+        </div>
+      </div>
+      @c.PaginateHeader(c.PaginateHeaderProps{
+        Route: routes.EnvelopeList(),
+        Query: props.Query,
+        PageResult: props.EnvelopeRequestResult.PageResult,
+        Ascending: props.EnvelopeRequestRequest.Ascending,
+      })
+    </div>
+    <div class="bordery overflow-x-auto">
+      <table class="table-zebra table-pin-cols table">
+        <thead>
+          <tr>
+            <th>
+              @c.TableOrderTH(c.TableOrderTHProps{
+                Query     : props.Query,
+                Ascending : props.EnvelopeRequestRequest.Ascending,
+                Order     : string(props.EnvelopeRequestRequest.Order),
+                Field     : models.DTOEnvelopeFieldCreatedAt,
+              }) {
+                Created At
+              }
+            </th>
+            <th>
+              @c.TableOrderTH(c.TableOrderTHProps{
+                Query     : props.Query,
+                Ascending : props.EnvelopeRequestRequest.Ascending,
+                Order     : string(props.EnvelopeRequestRequest.Order),
+                Field     : models.DTOEnvelopeFieldFrom,
+              }) {
+                From
+              }
+            </th>
+            <th>
+              @c.TableOrderTH(c.TableOrderTHProps{
+                Query     : props.Query,
+                Ascending : props.EnvelopeRequestRequest.Ascending,
+                Order     : string(props.EnvelopeRequestRequest.Order),
+                Field     : models.DTOEnvelopeFieldSubject,
+              }) {
+                Subject
+              }
+            </th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          for _, env := range props.EnvelopeRequestResult.Envelopes {
+          <tr>
+            <td class="w-0 whitespace-nowrap">
+              <div class="tooltip tooltip-right" data-tip={ helpers.TimeHumanize(env.Message.CreatedAt.Time()) }>
+                <a href={ routes.Envelope(env.Message.ID).URL() }>
+                  @c.FormatDate(m, time.Time(env.Message.CreatedAt))
+                </a>
+              </div>
+            </td>
+            <td class="w-0 whitespace-nowrap">
+              <a href={ routes.Envelope(env.Message.ID).URL() }>
+                { env.Message.From }
+              </a>
+            </td>
+            <td class="whitespace-nowrap">
+              <a href={ routes.Envelope(env.Message.ID).URL() }>
+                { env.Message.Subject }
+              </a>
+            </td>
+            <td class="w-0 whitespace-nowrap">
+            if len(env.Attachments) != 0 {
+              <a href={ routes.Envelope(env.Message.ID).URLQuery("tab=" + routes.EnvelopeTabAttachments.String()) } class="tooltip tooltip-left fill-current" data-tip={ strconv.Itoa(len(env.Attachments)) + " Attachment(s)"  }>
+                @icons.Attachment("h-4 w-4")
+              </a>
+            }
+            </td>
+            <th class="w-0 whitespace-nowrap">
+              <div class="join flex items-center">
+                <a href={ routes.Envelope(env.Message.ID).URL() } class="btn btn-primary btn-xs join-item">
+                  @icons.Eye("h-4 w-4")
+                </a>
+                <button class="btn btn-error btn-xs join-item" hx-delete={ routes.Envelope(env.Message.ID).URLString() } hx-target="closest tr" hx-confirm="Are you sure you wish to delete this envelope?" >
+                  @icons.Trash("h-4 w-4")
+                </button>
+              </div>
+            </th>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    if len(props.EnvelopeRequestResult.Envelopes) != 0 {
+      @c.PaginateFooter(c.PaginateFooterProps{
+        Route: routes.EnvelopeList(),
+        Query: props.Query,
+        PageResult: props.EnvelopeRequestResult.PageResult,
+      })
+    }
+  }
+}
+
+type envelopeCreateViewProps struct {
+}
+
+templ envelopeCreateView(m meta.Meta, props envelopeCreateViewProps) {
+	@c.LayoutDefault(m) {
+    <div>
+      <div class="border-base-200 breadcrumbs border-b p-4 text-xl font-bold">
+        <ul>
+          <li><a href={ routes.EnvelopeList().URL() }>Envelopes</a></li>
+          <li>Create</li>
+        </ul>
+      </div>
+      <div class="mx-auto flex max-w-lg flex-col gap-4 p-4">
+        @c.EnvelopeForm(c.EnvelopeFormProps{})
+      </div>
+    </div>
+  }
+}
+
