@@ -261,7 +261,7 @@ func (p Parser) Parse(raw Raw) (Config, error) {
 	case TimeFormat12H:
 		timeHourFormat = helpers.TimeHourFormat12
 	case TimeFormat24H:
-		timeHourFormat = helpers.TimeHourFormat12
+		timeHourFormat = helpers.TimeHourFormat24
 	default:
 		return Config{}, fmt.Errorf("invalid time format: %s", raw.TimeFormat)
 	}
@@ -306,42 +306,43 @@ func NewParser(flags *flag.FlagSet) (Parser, error) {
 	var k = koanf.New(".")
 
 	// Load defaults
-	k.Load(structs.Provider(RawDefault, "koanf"), nil)
+	k.Load(structs.ProviderWithDelim(RawDefault, "koanf", "."), nil)
 
-	// Load YAML
-	var configFile string
-	if p := flags.Lookup("config"); p != nil && p.Value.String() != "" {
-		// Config file from flag
-		configFile = p.Value.String()
+	if envConfig := os.Getenv("SMTPBRIDGE_CONFIG_YAML"); envConfig == "" {
+		// Load YAML file
+		var configFile string
+		if p := flags.Lookup("config"); p != nil && p.Value.String() != "" {
+			// Config file from flag
+			configFile = p.Value.String()
+		} else {
+			// Config file from default
+			var err error
+			configFile, err = resolve([]string{
+				"config.yaml",
+				"config.yml",
+				".smtpbridge.yaml",
+				".smtpbridge.yml",
+				"~/.smtpbridge.yaml",
+				"~/.smtpbridge.yml",
+				"/etc/smtpbridge.yaml",
+				"/etc/smtpbridge.yml",
+			})
+			if err != nil {
+				return Parser{}, err
+			}
+		}
+		if configFile != "" {
+			log.Info().Str("path", configFile).Msg("Reading config from file")
+			if err := k.Load(file.Provider(configFile), yaml.Parser()); err != nil {
+				return Parser{}, err
+			}
+		}
 	} else {
-		// Config file from default
-		var err error
-		configFile, err = resolve([]string{
-			"config.yaml",
-			"config.yml",
-			".smtpbridge.yaml",
-			".smtpbridge.yml",
-			"~/.smtpbridge.yaml",
-			"~/.smtpbridge.yml",
-			"/etc/smtpbridge.yaml",
-			"/etc/smtpbridge.yml",
-		})
-		if err != nil {
-			return Parser{}, err
+		// Load YAML env
+		if envConfig != "" {
+			log.Info().Str("env", "SMTPBRIDGE_CONFIG_YAML").Msgf("Reading config from environment")
+			k.Load(rawbytes.Provider([]byte(envConfig)), yaml.Parser())
 		}
-	}
-	if configFile != "" {
-		log.Info().Str("path", configFile).Msg("Reading config from file")
-		if err := k.Load(file.Provider(configFile), yaml.Parser()); err != nil {
-			return Parser{}, err
-		}
-	}
-
-	// Load env
-	envConfig := os.Getenv("SMTPBRIDGE_CONFIG_YAML")
-	if envConfig != "" {
-		log.Info().Str("env", "SMTPBRIDGE_CONFIG_YAML").Msgf("Reading config from environment")
-		k.Load(rawbytes.Provider([]byte(envConfig)), yaml.Parser())
 	}
 
 	// Load flag
