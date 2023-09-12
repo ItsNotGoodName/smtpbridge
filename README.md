@@ -4,15 +4,12 @@
 [![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/itsnotgoodname/smtpbridge)](https://github.com/ItsNotGoodName/smtpbridge/tags)
 [![GitHub last commit](https://img.shields.io/github/last-commit/itsnotgoodname/smtpbridge)](https://github.com/ItsNotGoodName/smtpbridge)
 [![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/itsnotgoodname/smtpbridge)](./go.mod)
-[![Go Report Card](https://goreportcard.com/badge/github.com/ItsNotGoodName/smtpbridge)](https://goreportcard.com/report/github.com/ItsNotGoodName/smtpbridge)
 
 Bridge email to other messaging services.
 
-**Do not expose this to the Internet, this is only intended to be used on a local network.**
+**Do not expose this to the Internet as this is only intended to be used on a local network.**
 
-![Screenshot](https://static.gurnain.com/github/smtpbridge/demo-small.png)
-
-[Full Screenshot](https://static.gurnain.com/github/smtpbridge/demo.png)
+[![Screenshot](https://static.gurnain.com/github/smtpbridge/demo-small.png)](https://static.gurnain.com/github/smtpbridge/demo.png)
 
 # Use Cases
 
@@ -58,7 +55,7 @@ Make sure you install Apprise in that virtual environment.
 
 # Config
 
-Config file is loaded from one of the following locations.
+Config file is loaded from one of the following locations in order.
 
 - `config.yaml`
 - `config.yml`
@@ -80,8 +77,6 @@ endpoints:
 
 rules:
   hello_world:
-    endpoints:
-      - hello_world
 ```
 
 ## Full Config
@@ -133,7 +128,6 @@ smtp:
   # Authentication is disabled if both username and password are empty
   username: ""
   password: ""
-
 
 # Endpoints for envelopes
 endpoints:
@@ -279,9 +273,9 @@ make dev-web
 
 # To Do
 
-- feat: CRUD endpoints
 - feat: read [mbox](https://access.redhat.com/articles/6167512) files
+- feat: CRUD endpoints
 - feat: IMAP for viewing mail
 - feat: JSON API
 - feat: Windows installer
-- fix: chrome keeps thinking the HTTP pages `/` and `/traces` are French
+- fix: chrome keeps thinking some HTTP pages are French
