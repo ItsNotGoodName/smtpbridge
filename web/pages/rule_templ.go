@@ -73,7 +73,7 @@ func ruleListView(m meta.Meta, props ruleListViewProps) templ.Component {
 				return err
 			}
 			for _, rule := range props.Rules {
-				_, err = templBuffer.WriteString("<div class=\"hover:bg-base-200 border-base-200 flex items-center justify-between gap-2 border-b first:border-t\" hx-target=\"this\" hx-swap=\"outerHTML\"><a class=\"flex-1 truncate py-4 pl-4\" href=\"")
+				_, err = templBuffer.WriteString("<div class=\"hover:bg-base-200 border-base-200 flex items-center justify-between gap-2 border-b first:border-t\" id=\"rule-row\"><a class=\"flex-1 truncate py-4 pl-4\" href=\"")
 				if err != nil {
 					return err
 				}
@@ -104,7 +104,7 @@ func ruleListView(m meta.Meta, props ruleListViewProps) templ.Component {
 					if err != nil {
 						return err
 					}
-					_, err = templBuffer.WriteString("\" hx-confirm=\"Are you sure you wish to delete this rule?\">")
+					_, err = templBuffer.WriteString("\" hx-confirm=\"Are you sure you wish to delete this rule?\" hx-target=\"closest #rule-row\" hx-swap=\"outerHTML\">")
 					if err != nil {
 						return err
 					}

@@ -84,8 +84,8 @@ func SetReswap(w http.ResponseWriter) {
 }
 
 // SetRetarget is a CSS selector that updates the target of the content update to a different element on the page.
-func SetRetarget(w http.ResponseWriter) {
-	w.Header().Set("HX-Retarget", "true")
+func SetRetarget(w http.ResponseWriter, target string) {
+	w.Header().Set("HX-Retarget", target)
 }
 
 // SetReselect is a CSS selector that allows you to choose which part of the response is used to be swapped in.

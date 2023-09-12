@@ -283,7 +283,35 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</li></ul></div> <div class=\"flex flex-col gap-4 p-4\"><div class=\"flex flex-col-reverse justify-between gap-4 sm:flex-row\"><form class=\"join flex\"><input name=\"search\" type=\"text\" placeholder=\"Search\" class=\"input input-sm input-bordered join-item w-full max-w-xs\" value=\"")
+			_, err = templBuffer.WriteString("</li></ul></div> <div class=\"flex flex-col gap-4 p-4\"><div class=\"flex flex-col-reverse justify-between gap-4 sm:flex-row\"><form class=\"join flex\" hx-boost=\"false\">")
+			if err != nil {
+				return err
+			}
+			for k := range props.Query {
+				if k != "search" {
+					_, err = templBuffer.WriteString("<input type=\"hidden\" name=\"")
+					if err != nil {
+						return err
+					}
+					_, err = templBuffer.WriteString(templ.EscapeString(k))
+					if err != nil {
+						return err
+					}
+					_, err = templBuffer.WriteString("\" value=\"")
+					if err != nil {
+						return err
+					}
+					_, err = templBuffer.WriteString(templ.EscapeString(props.Query.Get(k)))
+					if err != nil {
+						return err
+					}
+					_, err = templBuffer.WriteString("\">")
+					if err != nil {
+						return err
+					}
+				}
+			}
+			_, err = templBuffer.WriteString("<input name=\"search\" type=\"text\" placeholder=\"Search\" class=\"input input-sm input-bordered join-item w-full max-w-xs\" value=\"")
 			if err != nil {
 				return err
 			}

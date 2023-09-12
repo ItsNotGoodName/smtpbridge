@@ -66,7 +66,7 @@ func AttachmentCard(props AttachmentCardProps) templ.Component {
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("</h2><div class=\"card-actions justify-end\"><a href=\"")
+		_, err = templBuffer.WriteString("</h2><div class=\"card-actions justify-end\"><a hx-boost=\"false\" href=\"")
 		if err != nil {
 			return err
 		}

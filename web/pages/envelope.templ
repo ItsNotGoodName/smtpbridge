@@ -90,7 +90,12 @@ templ envelopeListView(m meta.Meta, props envelopeListViewProps) {
     </div>
     <div class="flex flex-col gap-4 p-4">
       <div class="flex flex-col-reverse justify-between gap-4 sm:flex-row">
-        <form class="join flex">
+        <form class="join flex" hx-boost="false">
+          for k := range props.Query {
+            if k != "search" {
+              <input type="hidden" name={ k } value={ props.Query.Get(k) } /> 
+            }
+          }
           <input name="search" type="text" placeholder="Search" class="input input-sm input-bordered join-item w-full max-w-xs" value={ props.EnvelopeRequestRequest.Search } />
           <button type="submit" class="btn btn-sm btn-primary join-item">@icons.Search("w-5 h-5")</button>
         </form>

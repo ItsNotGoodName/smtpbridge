@@ -164,7 +164,7 @@ func EnvelopeListView(ct Controller, app core.App) http.HandlerFunc {
 	}
 }
 
-func EnvelopeListDrop(ct Controller, app core.App) http.HandlerFunc {
+func EnvelopeListDrop(ct Controller, app core.App, view http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
@@ -174,7 +174,8 @@ func EnvelopeListDrop(ct Controller, app core.App) http.HandlerFunc {
 			return
 		}
 
-		htmx.SetRefresh(w)
+		htmx.SetRetarget(w, "body")
+		view.ServeHTTP(w, r)
 	}
 }
 
@@ -471,7 +472,7 @@ func TraceListView(ct Controller, app core.App) http.HandlerFunc {
 	}
 }
 
-func TraceListDrop(ct Controller, app core.App) http.HandlerFunc {
+func TraceListDrop(ct Controller, app core.App, view http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
@@ -481,7 +482,8 @@ func TraceListDrop(ct Controller, app core.App) http.HandlerFunc {
 			return
 		}
 
-		htmx.SetRefresh(w)
+		htmx.SetRetarget(w, "body")
+		view.ServeHTTP(w, r)
 	}
 }
 func RuleListView(ct Controller, app core.App) http.HandlerFunc {
@@ -500,7 +502,7 @@ func RuleListView(ct Controller, app core.App) http.HandlerFunc {
 	}
 }
 
-func AttachmentTrim(ct Controller, app core.App) http.HandlerFunc {
+func AttachmentTrim(ct Controller, app core.App, view http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		tracer := helpers.Tracer(app, r)
@@ -511,8 +513,8 @@ func AttachmentTrim(ct Controller, app core.App) http.HandlerFunc {
 			return
 		}
 
-		htmx.SetRefresh(w)
-		w.WriteHeader(http.StatusOK)
+		htmx.SetRetarget(w, "body")
+		view.ServeHTTP(w, r)
 	}
 }
 

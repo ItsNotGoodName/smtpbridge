@@ -47,7 +47,7 @@ func Base(head, body templ.Component, csrfToken string) templ.Component {
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("</head><body>")
+		_, err = templBuffer.WriteString("</head><body hx-boost=\"true\">")
 		if err != nil {
 			return err
 		}

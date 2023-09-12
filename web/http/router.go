@@ -49,8 +49,6 @@ func NewRouter(ct pages.Controller, app core.App, fileFS fs.FS, csrfSecret []byt
 			pages.IndexView(ct, app))
 
 		// Envelope
-		r.Get(routes.EnvelopeList().String(),
-			pages.EnvelopeListView(ct, app))
 		r.Get(routes.EnvelopeCreate().String(),
 			pages.EnvelopeCreateView(ct, app))
 		r.Post(routes.EnvelopeCreate().String(),
@@ -61,18 +59,26 @@ func NewRouter(ct pages.Controller, app core.App, fileFS fs.FS, csrfSecret []byt
 			pages.EnvelopeDelete(ct, app))
 		r.Get(routes.EnvelopeHTML(paramID).String(),
 			pages.EnvelopeHTMLView(ct, app))
-		r.Delete(routes.EnvelopeList().String(),
-			pages.EnvelopeListDrop(ct, app))
 		r.Post(routes.EnvelopeEndpointSend(paramID).String(),
 			pages.EnvelopeEndpointSend(ct, app))
+		{
+			envelopeListView := pages.EnvelopeListView(ct, app)
+			r.Get(routes.EnvelopeList().String(),
+				envelopeListView)
+			r.Delete(routes.EnvelopeList().String(),
+				pages.EnvelopeListDrop(ct, app, envelopeListView))
+		}
 
 		// Attachment
-		r.Get(routes.AttachmentList().String(),
-			pages.AttachmentListView(ct, app))
 		r.Get(routes.AttachmentFile("*").String(),
 			pages.Files(ct, app, fileFS))
-		r.Post(routes.AttachmentTrim().String(),
-			pages.AttachmentTrim(ct, app))
+		{
+			attachmentListView := pages.AttachmentListView(ct, app)
+			r.Get(routes.AttachmentList().String(),
+				attachmentListView)
+			r.Post(routes.AttachmentTrim().String(),
+				pages.AttachmentTrim(ct, app, attachmentListView))
+		}
 
 		// Endpoint
 		r.Get(routes.EndpointList().String(),
@@ -81,10 +87,13 @@ func NewRouter(ct pages.Controller, app core.App, fileFS fs.FS, csrfSecret []byt
 			pages.EndpointTest(ct, app))
 
 		// Traces
-		r.Get(routes.TraceList().String(),
-			pages.TraceListView(ct, app))
-		r.Delete(routes.TraceList().String(),
-			pages.TraceListDrop(ct, app))
+		{
+			traceListView := pages.TraceListView(ct, app)
+			r.Get(routes.TraceList().String(),
+				traceListView)
+			r.Delete(routes.TraceList().String(),
+				pages.TraceListDrop(ct, app, traceListView))
+		}
 
 		// Rules
 		r.Get(routes.RuleList().String(),
