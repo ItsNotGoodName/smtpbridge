@@ -3,6 +3,7 @@ package smtp
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"net/mail"
 
@@ -34,8 +35,11 @@ func (b *Backend) NewSession(state *smtp.Conn) (smtp.Session, error) {
 	tracer := b.app.Tracer(trace.SourceSMTP).Sticky(trace.WithAddress(address))
 	log := b.log.With().Str("address", address).Logger()
 
+	// log.Debug().Msg("NewSession")
+
 	return &session{
 		app:     b.app,
+		auth:    b.app.AuthSMTPAnonymous(),
 		log:     log,
 		tracer:  tracer,
 		address: address,
@@ -44,6 +48,7 @@ func (b *Backend) NewSession(state *smtp.Conn) (smtp.Session, error) {
 
 // A Session is returned after EHLO.
 type session struct {
+	auth    bool
 	app     core.App
 	log     zerolog.Logger
 	tracer  trace.Tracer
@@ -53,22 +58,44 @@ type session struct {
 }
 
 func (s *session) AuthPlain(username, password string) error {
-	return s.app.AuthSMTPLogin(context.Background(), username, password)
+	// s.log.Debug().Str("username", username).Str("password", password).Msg("AuthPlain")
+	err := s.app.AuthSMTPLogin(context.Background(), username, password)
+	if err != nil {
+		return smtp.ErrAuthFailed
+	}
+
+	s.auth = true
+	fmt.Println("1.1", s.auth)
+
+	return nil
 }
 
 func (s *session) Mail(from string, opts *smtp.MailOptions) error {
+	// s.log.Debug().Str("from", from).Msg("Mail")
+	if !s.auth {
+		return smtp.ErrAuthRequired
+	}
 	// log.Println("Mail from:", from)
 	s.from = from
 	return nil
 }
 
 func (s *session) Rcpt(to string, opts *smtp.RcptOptions) error {
+	// s.log.Debug().Str("to", to).Msg("Rcpt")
+	if !s.auth {
+		return smtp.ErrAuthRequired
+	}
 	// log.Println("Rcpt to:", to)
 	s.to = to
 	return nil
 }
 
 func (s *session) Data(r io.Reader) error {
+	// s.log.Debug().Msg("Data")
+	if !s.auth {
+		return smtp.ErrAuthRequired
+	}
+
 	e, err := enmime.ReadEnvelope(r)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to read envelope")
@@ -127,8 +154,11 @@ func (s *session) Data(r io.Reader) error {
 	return nil
 }
 
-func (s *session) Reset() {}
+func (s *session) Reset() {
+	// s.log.Debug().Msg("Reset")
+}
 
 func (s *session) Logout() error {
+	// s.log.Debug().Msg("Logout")
 	return nil
 }

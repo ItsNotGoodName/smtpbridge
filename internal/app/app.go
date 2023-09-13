@@ -117,6 +117,10 @@ func New(
 
 var ErrorLogin = fmt.Errorf("login invalid")
 
+func (a App) AuthSMTPAnonymous() bool {
+	return a.config.AuthSMTP.Anonymous
+}
+
 // AuthHTTPAnonymous checks if anonymous access is allowed.
 func (a App) AuthHTTPAnonymous() bool {
 	return a.config.AuthHTTP.Anonymous
