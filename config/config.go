@@ -115,11 +115,17 @@ var RawDefault = struct {
 	// IMAPPort:         10143,
 }
 
+var flagFlatKeys map[string]string = map[string]string{
+	"time-format":       "time_format",
+	"data-directory":    "data_directory",
+	"python-executable": "python_executable",
+}
+
 func WithFlagSet(flags *flag.FlagSet) *flag.FlagSet {
 	flags.String("config", "", flagUsageString("", "Path to config file."))
-	flags.String("time_format", "", flagUsageString(TimeFormat12H, fmt.Sprintf("Format for time display (%s/%s).", TimeFormat12H, TimeFormat24H)))
-	flags.String("data_directory", "", flagUsageString(RawDefault.DataDirectory, "Path to data directory."))
-	flags.String("python_executable", "", flagUsageString(RawDefault.PythonExecutable, "Python executable."))
+	flags.String("time-format", "", flagUsageString(TimeFormat12H, fmt.Sprintf("Format for time display (%s/%s).", TimeFormat12H, TimeFormat24H)))
+	flags.String("data-directory", "", flagUsageString(RawDefault.DataDirectory, "Path to data directory."))
+	flags.String("python-executable", "", flagUsageString(RawDefault.PythonExecutable, "Python executable."))
 	flags.Bool("debug", false, flagUsageBool(false, "Run in debug mode."))
 
 	flags.Bool("smtp-disable", false, flagUsageBool(false, "Disable SMTP server."))
@@ -358,6 +364,9 @@ func NewParser(flags *flag.FlagSet) (Parser, error) {
 	k.Load(basicflag.ProviderWithValue(flags, "-", func(key, value string) (string, interface{}) {
 		if value == "" || value == "0" || value == "false" {
 			return "", nil
+		}
+		if remap, ok := flagFlatKeys[key]; ok {
+			return remap, ok
 		}
 		return key, value
 	}), nil)

@@ -38,7 +38,7 @@ func main() {
 	flags := config.WithFlagSet(flag.NewFlagSet(os.Args[0], flag.ExitOnError))
 
 	app := lieut.NewSingleCommandApp(
-		lieut.AppInfo{Name: "smtpbridge", Version: build.Current.Version},
+		lieut.AppInfo{Name: "smtpbridge", Version: build.Current.Version, Summary: "Bridge email to other messaging services."},
 		run(flags),
 		flags,
 		os.Stdout,
