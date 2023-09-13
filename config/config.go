@@ -55,25 +55,25 @@ type Config struct {
 }
 
 type Raw struct {
-	Debug                   bool    `koanf:"debug"`
-	TimeFormat              string  `koanf:"time_format"`
-	MaxPayloadSize          string  `koanf:"max_payload_size"`
-	DataDirectory           string  `koanf:"data_directory"`
-	PythonExecutable        string  `koanf:"python_executable"`
-	RetentionEnvelopeCount  *int    `koanf:"retention.envelope_count"`
-	RetentionEnvelopeAge    *string `koanf:"retention.envelope_age"`
-	RetentionAttachmentSize *string `koanf:"retention.attachment_size"`
-	SMTPDisable             bool    `koanf:"smtp.disable"`
-	SMTPHost                string  `koanf:"smtp.host"`
-	SMTPPort                uint16  `koanf:"smtp.port"`
-	SMTPUsername            string  `koanf:"smtp.username"`
-	SMTPPassword            string  `koanf:"smtp.password"`
-	HTTPDisable             bool    `koanf:"http.disable"`
-	HTTPHost                string  `koanf:"http.host"`
-	HTTPPort                uint16  `koanf:"http.port"`
-	HTTPUsername            string  `koanf:"http.username"`
-	HTTPPassword            string  `koanf:"http.password"`
-	HTTPURL                 string  `koanf:"http.url"`
+	Debug                   bool   `koanf:"debug"`
+	TimeFormat              string `koanf:"time_format"`
+	MaxPayloadSize          string `koanf:"max_payload_size"`
+	DataDirectory           string `koanf:"data_directory"`
+	PythonExecutable        string `koanf:"python_executable"`
+	RetentionEnvelopeCount  string `koanf:"retention.envelope_count"`
+	RetentionEnvelopeAge    string `koanf:"retention.envelope_age"`
+	RetentionAttachmentSize string `koanf:"retention.attachment_size"`
+	SMTPDisable             bool   `koanf:"smtp.disable"`
+	SMTPHost                string `koanf:"smtp.host"`
+	SMTPPort                uint16 `koanf:"smtp.port"`
+	SMTPUsername            string `koanf:"smtp.username"`
+	SMTPPassword            string `koanf:"smtp.password"`
+	HTTPDisable             bool   `koanf:"http.disable"`
+	HTTPHost                string `koanf:"http.host"`
+	HTTPPort                uint16 `koanf:"http.port"`
+	HTTPUsername            string `koanf:"http.username"`
+	HTTPPassword            string `koanf:"http.password"`
+	HTTPURL                 string `koanf:"http.url"`
 	// IMAPDisable             bool    `koanf:"imap.disable"`
 	// IMAPHost                string  `koanf:"imap.host"`
 	// IMAPPort                uint16  `koanf:"imap.port"`
@@ -187,17 +187,26 @@ func (p Parser) Parse(raw Raw) (Config, error) {
 
 	var config *models.Config
 	{
+		var envelopeCount *int
+		if raw.RetentionEnvelopeCount != "" {
+			count, err := strconv.Atoi(raw.RetentionEnvelopeCount)
+			if err != nil {
+				return Config{}, err
+			}
+
+			envelopeCount = &count
+		}
 		var attachmentsSize *int64
-		if raw.RetentionAttachmentSize != nil {
-			size, err := bytes.Parse(*raw.RetentionAttachmentSize)
+		if raw.RetentionAttachmentSize != "" {
+			size, err := bytes.Parse(raw.RetentionAttachmentSize)
 			if err != nil {
 				return Config{}, err
 			}
 			attachmentsSize = &size
 		}
 		var envelopeAge *time.Duration
-		if raw.RetentionEnvelopeAge != nil {
-			age, err := time.ParseDuration(*raw.RetentionEnvelopeAge)
+		if raw.RetentionEnvelopeAge != "" {
+			age, err := time.ParseDuration(raw.RetentionEnvelopeAge)
 			if err != nil {
 				return Config{}, err
 			}
@@ -206,7 +215,7 @@ func (p Parser) Parse(raw Raw) (Config, error) {
 
 		config = &models.Config{
 			RetentionPolicy: models.ConfigRetentionPolicy{
-				EnvelopeCount:  raw.RetentionEnvelopeCount,
+				EnvelopeCount:  envelopeCount,
 				AttachmentSize: attachmentsSize,
 				EnvelopeAge:    envelopeAge,
 				MinAge:         5 * time.Minute,

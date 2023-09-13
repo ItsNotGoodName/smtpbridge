@@ -99,12 +99,12 @@ python_executable: python3
 
 # Retention policy for envelopes and attachment files
 retention:
-  # # Retention policy for envelopes in database
-  # envelope_count: # (0, 100, 250, ...)
-  # envelope_age: # (5m, 5h45m, ...)
+  # Retention policy for envelopes in database
+  envelope_count: # (0, 100, 250, ...)
+  envelope_age: # (5m, 5h45m, ...)
 
-  # # Retention policy for attachment files on disk
-  # attachment_size: # (100 MB, 1 GB, ...)
+  # Retention policy for attachment files on disk
+  attachment_size: # (100 MB, 1 GB, ...)
 
 # HTTP server
 http:
@@ -276,6 +276,6 @@ make dev-web
 - feat: read [mbox](https://access.redhat.com/articles/6167512) files
 - feat: CRUD endpoints
 - feat: IMAP for viewing mail
-- feat: JSON API
+- feat: OpenAPI
 - feat: Windows installer
 - fix: chrome keeps thinking some HTTP pages are French
