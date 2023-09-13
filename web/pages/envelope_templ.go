@@ -283,7 +283,15 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</li></ul></div> <div class=\"flex flex-col gap-4 p-4\"><div class=\"flex flex-col-reverse justify-between gap-4 sm:flex-row\"><form class=\"join flex\" hx-boost=\"false\">")
+			_, err = templBuffer.WriteString("</li></ul></div> <div class=\"flex flex-col gap-4 p-4\"><div class=\"flex flex-col-reverse justify-between gap-4 sm:flex-row\"><form class=\"join flex\" action=\"")
+			if err != nil {
+				return err
+			}
+			_, err = templBuffer.WriteString(templ.EscapeString(routes.EnvelopeList().URLString()))
+			if err != nil {
+				return err
+			}
+			_, err = templBuffer.WriteString("\">")
 			if err != nil {
 				return err
 			}
@@ -373,7 +381,7 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</div> <div class=\"bordery overflow-x-auto\"><table class=\"table-zebra table-pin-cols table\"><thead><tr><th>")
+			_, err = templBuffer.WriteString("</div> <div class=\"bordery overflow-x-auto\"><table class=\"table-pin-cols table\"><thead><tr><th>")
 			if err != nil {
 				return err
 			}
