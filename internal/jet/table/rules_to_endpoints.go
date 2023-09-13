@@ -20,8 +20,6 @@ type rulesToEndpointsTable struct {
 	Internal   sqlite.ColumnBool
 	RuleID     sqlite.ColumnInteger
 	EndpointID sqlite.ColumnInteger
-	UpdatedAt  sqlite.ColumnTimestamp
-	CreatedAt  sqlite.ColumnTimestamp
 
 	AllColumns     sqlite.ColumnList
 	MutableColumns sqlite.ColumnList
@@ -65,10 +63,8 @@ func newRulesToEndpointsTableImpl(schemaName, tableName, alias string) rulesToEn
 		InternalColumn   = sqlite.BoolColumn("internal")
 		RuleIDColumn     = sqlite.IntegerColumn("rule_id")
 		EndpointIDColumn = sqlite.IntegerColumn("endpoint_id")
-		UpdatedAtColumn  = sqlite.TimestampColumn("updated_at")
-		CreatedAtColumn  = sqlite.TimestampColumn("created_at")
-		allColumns       = sqlite.ColumnList{InternalColumn, RuleIDColumn, EndpointIDColumn, UpdatedAtColumn, CreatedAtColumn}
-		mutableColumns   = sqlite.ColumnList{InternalColumn, RuleIDColumn, EndpointIDColumn, UpdatedAtColumn, CreatedAtColumn}
+		allColumns       = sqlite.ColumnList{InternalColumn, RuleIDColumn, EndpointIDColumn}
+		mutableColumns   = sqlite.ColumnList{InternalColumn, RuleIDColumn, EndpointIDColumn}
 	)
 
 	return rulesToEndpointsTable{
@@ -78,8 +74,6 @@ func newRulesToEndpointsTableImpl(schemaName, tableName, alias string) rulesToEn
 		Internal:   InternalColumn,
 		RuleID:     RuleIDColumn,
 		EndpointID: EndpointIDColumn,
-		UpdatedAt:  UpdatedAtColumn,
-		CreatedAt:  CreatedAtColumn,
 
 		AllColumns:     allColumns,
 		MutableColumns: mutableColumns,

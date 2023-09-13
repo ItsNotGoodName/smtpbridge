@@ -186,14 +186,6 @@ table "rules_to_endpoints" {
     null = false
     type = integer
   }
-  column "updated_at" {
-    null = false
-    type = datetime
-  }
-  column "created_at" {
-    null    = false
-    type    = datetime
-  }
   foreign_key "endpoint_id" {
     columns     = [column.endpoint_id]
     ref_columns = [table.endpoints.column.id]

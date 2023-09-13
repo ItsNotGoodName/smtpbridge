@@ -12,7 +12,7 @@ CREATE TABLE `rules` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `internal
 -- create index "rules_internal_id_idx" to table: "rules"
 CREATE UNIQUE INDEX `rules_internal_id_idx` ON `rules` (`internal_id`);
 -- create "rules_to_endpoints" table
-CREATE TABLE `rules_to_endpoints` (`internal` boolean NOT NULL, `rule_id` integer NOT NULL, `endpoint_id` integer NOT NULL, `updated_at` datetime NOT NULL, `created_at` datetime NOT NULL, CONSTRAINT `endpoint_id` FOREIGN KEY (`endpoint_id`) REFERENCES `endpoints` (`id`) ON UPDATE NO ACTION ON DELETE CASCADE, CONSTRAINT `rule_id` FOREIGN KEY (`rule_id`) REFERENCES `rules` (`id`) ON UPDATE NO ACTION ON DELETE CASCADE);
+CREATE TABLE `rules_to_endpoints` (`internal` boolean NOT NULL, `rule_id` integer NOT NULL, `endpoint_id` integer NOT NULL, CONSTRAINT `endpoint_id` FOREIGN KEY (`endpoint_id`) REFERENCES `endpoints` (`id`) ON UPDATE NO ACTION ON DELETE CASCADE, CONSTRAINT `rule_id` FOREIGN KEY (`rule_id`) REFERENCES `rules` (`id`) ON UPDATE NO ACTION ON DELETE CASCADE);
 -- create index "rules_to_endpoints_rule_id_endpoint_id_idx" to table: "rules_to_endpoints"
 CREATE UNIQUE INDEX `rules_to_endpoints_rule_id_endpoint_id_idx` ON `rules_to_endpoints` (`rule_id`, `endpoint_id`);
 -- create "traces" table

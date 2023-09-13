@@ -56,7 +56,7 @@ func RuleCreate(ctx context.Context, db database.Querier, rule models.Rule, endp
 		return 0, err
 	}
 
-	err = ruleEndpointsSet(ctx, tx, now, ruleID, endpoints)
+	err = ruleEndpointsSet(ctx, tx, ruleID, endpoints)
 	if err != nil {
 		return 0, err
 	}
@@ -143,9 +143,7 @@ func RuleEndpointsSet(ctx context.Context, db database.Querier, ruleID int64, en
 		return err
 	}
 
-	now := models.NewTime(time.Now())
-
-	err = ruleEndpointsSet(ctx, tx, now, ruleID, endpointIDs)
+	err = ruleEndpointsSet(ctx, tx, ruleID, endpointIDs)
 	if err != nil {
 		return err
 	}
@@ -153,7 +151,7 @@ func RuleEndpointsSet(ctx context.Context, db database.Querier, ruleID int64, en
 	return tx.Commit()
 }
 
-func ruleEndpointsSet(ctx context.Context, db database.QuerierTx, now models.Time, ruleID int64, endpointIDs []int64) error {
+func ruleEndpointsSet(ctx context.Context, db database.QuerierTx, ruleID int64, endpointIDs []int64) error {
 	if len(endpointIDs) == 0 {
 		return nil
 	}
@@ -163,11 +161,9 @@ func ruleEndpointsSet(ctx context.Context, db database.QuerierTx, now models.Tim
 			RulesToEndpoints.Internal,
 			RulesToEndpoints.RuleID,
 			RulesToEndpoints.EndpointID,
-			RulesToEndpoints.UpdatedAt,
-			RulesToEndpoints.CreatedAt,
 		)
 	for _, v := range endpointIDs {
-		stmt = stmt.VALUES(false, ruleID, v, now, now)
+		stmt = stmt.VALUES(false, ruleID, v)
 	}
 
 	_, err := stmt.ExecContext(ctx, db)
