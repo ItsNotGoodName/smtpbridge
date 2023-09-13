@@ -57,7 +57,7 @@ func (src EndpointConfig) Value() (driver.Value, error) {
 	return string(data), nil
 }
 
-func (dst *StringSlice) Scan(src any) error {
+func (dst *MessageTo) Scan(src any) error {
 	if src == nil {
 		return fmt.Errorf("cannot scan nil")
 	}
@@ -70,7 +70,7 @@ func (dst *StringSlice) Scan(src any) error {
 	return fmt.Errorf("cannot scan %T", src)
 }
 
-func (src StringSlice) Value() (driver.Value, error) {
+func (src MessageTo) Value() (driver.Value, error) {
 	if src == nil {
 		return "[]", nil
 	}

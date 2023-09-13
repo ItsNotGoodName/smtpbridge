@@ -181,7 +181,7 @@ rules:
 
 See [`text/template`](https://pkg.go.dev/text/template) on how to template.
 
-Each `*_template` config variable has access to the [Envelope](./internal/models/models.go) model via the `.` operator.
+Each `*_template` config variable has access to the [Envelope](./internal/models/envelope.go) model via the `.` operator.
 
 The following custom functions are available in endpoint templates.
 
