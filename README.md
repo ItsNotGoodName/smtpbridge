@@ -88,9 +88,6 @@ debug: false
 # Used by HTTP, ...
 time_format: 12h # (12h, 24h)
 
-# Maximum message size for envelopes
-max_payload_size: 25 MB
-
 # Directory for storing data
 data_directory: smtpbridge_data
 
@@ -128,6 +125,9 @@ smtp:
   # Authentication is disabled if both username and password are empty
   username: ""
   password: ""
+
+  # Maximum payload size
+  max_payload_size: 25 MB
 
 # Endpoints for envelopes
 endpoints:

@@ -40,7 +40,6 @@ type Config struct {
 	HTTPDisable          bool
 	HTTPAddress          string
 	HTTPPort             uint16
-	HTTPBodyLimit        int64
 	HTTPURL              string
 	SMTPDisable          bool
 	SMTPAddress          string
@@ -57,7 +56,6 @@ type Config struct {
 type Raw struct {
 	Debug                   bool   `koanf:"debug"`
 	TimeFormat              string `koanf:"time_format"`
-	MaxPayloadSize          string `koanf:"max_payload_size"`
 	DataDirectory           string `koanf:"data_directory"`
 	PythonExecutable        string `koanf:"python_executable"`
 	RetentionEnvelopeCount  string `koanf:"retention.envelope_count"`
@@ -68,6 +66,7 @@ type Raw struct {
 	SMTPPort                uint16 `koanf:"smtp.port"`
 	SMTPUsername            string `koanf:"smtp.username"`
 	SMTPPassword            string `koanf:"smtp.password"`
+	SMTPMaxPayloadSize      string `koanf:"smtp.max_payload_size"`
 	HTTPDisable             bool   `koanf:"http.disable"`
 	HTTPHost                string `koanf:"http.host"`
 	HTTPPort                uint16 `koanf:"http.port"`
@@ -98,20 +97,21 @@ type RawRule struct {
 }
 
 var RawDefault = struct {
-	TimeFormat       string `koanf:"time_format"`
-	MaxPayloadSize   string `koanf:"max_payload_size"`
-	DataDirectory    string `koanf:"data_directory"`
-	PythonExecutable string `koanf:"python_executable"`
-	SMTPPort         uint16 `koanf:"smtp.port"`
-	HTTPPort         uint16 `koanf:"http.port"`
+	TimeFormat         string `koanf:"time_format"`
+	MaxPayloadSize     string `koanf:"max_payload_size"`
+	DataDirectory      string `koanf:"data_directory"`
+	PythonExecutable   string `koanf:"python_executable"`
+	SMTPPort           uint16 `koanf:"smtp.port"`
+	SMTPMaxPayloadSize string `koanf:"smtp.max_payload_size"`
+	HTTPPort           uint16 `koanf:"http.port"`
 	// IMAPPort         uint16 `koanf:"imap.port"`
 }{
-	TimeFormat:       TimeFormat12H,
-	MaxPayloadSize:   "25 MB",
-	DataDirectory:    "smtpbridge_data",
-	PythonExecutable: "python3",
-	SMTPPort:         1025,
-	HTTPPort:         8080,
+	TimeFormat:         TimeFormat12H,
+	SMTPMaxPayloadSize: "25 MB",
+	DataDirectory:      "smtpbridge_data",
+	PythonExecutable:   "python3",
+	SMTPPort:           1025,
+	HTTPPort:           8080,
 	// IMAPPort:         10143,
 }
 
@@ -135,7 +135,7 @@ func WithFlagSet(flags *flag.FlagSet) *flag.FlagSet {
 	flags.Bool("http-disable", false, flagUsageBool(false, "Disable HTTP server."))
 	flags.String("http-host", "", flagUsageString("", "HTTP host address to listen on."))
 	flags.Int("http-port", 0, flagUsageInt(int(RawDefault.HTTPPort), "HTTP port to listen on."))
-	flags.Int("http-url", 0, flagUsageString("", "HTTP public URL (e.g. http://127.0.0.1:8080)."))
+	flags.String("http-url", "", flagUsageString("", "HTTP public URL (e.g. http://127.0.0.1:8080)."))
 
 	// flags.Bool("imap-disable", false, flagUsageBool(false, "Disable IMAP server."))
 	// flags.String("imap-host", "", flagUsageString("", "IMAP host address to listen on."))
@@ -180,7 +180,7 @@ func (p Parser) Parse(raw Raw) (Config, error) {
 		return Config{}, err
 	}
 
-	maxBytesForEachPayload, err := bytes.Parse(raw.MaxPayloadSize)
+	smtpMaxMessageSize, err := bytes.Parse(raw.SMTPMaxPayloadSize)
 	if err != nil {
 		return Config{}, err
 	}
@@ -315,11 +315,10 @@ func (p Parser) Parse(raw Raw) (Config, error) {
 		HTTPDisable:          raw.HTTPDisable,
 		HTTPAddress:          httpAddress,
 		HTTPPort:             raw.HTTPPort,
-		HTTPBodyLimit:        maxBytesForEachPayload,
 		HTTPURL:              raw.HTTPURL,
 		SMTPDisable:          raw.SMTPDisable,
 		SMTPAddress:          smtpAddress,
-		SMTPMaxMessageBytes:  maxBytesForEachPayload,
+		SMTPMaxMessageBytes:  smtpMaxMessageSize,
 		// IMAPDisable:            raw.IMAPDisable,
 		// IMAPAddress:            imapAddress,
 		Config:                 config,
