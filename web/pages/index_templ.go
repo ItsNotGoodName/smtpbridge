@@ -289,8 +289,7 @@ func indexView(m meta.Meta, props indexViewProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			var var_20 string = build.Current.Date
-			_, err = templBuffer.WriteString(templ.EscapeString(var_20))
+			err = c.FormatDateString(m, build.Current.Date).Render(ctx, templBuffer)
 			if err != nil {
 				return err
 			}
@@ -298,8 +297,8 @@ func indexView(m meta.Meta, props indexViewProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			var_21 := `Version`
-			_, err = templBuffer.WriteString(var_21)
+			var_20 := `Version`
+			_, err = templBuffer.WriteString(var_20)
 			if err != nil {
 				return err
 			}
@@ -307,8 +306,8 @@ func indexView(m meta.Meta, props indexViewProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			var var_22 templ.SafeURL = templ.URL(build.Current.ReleaseURL)
-			_, err = templBuffer.WriteString(templ.EscapeString(string(var_22)))
+			var var_21 templ.SafeURL = templ.URL(build.Current.ReleaseURL)
+			_, err = templBuffer.WriteString(templ.EscapeString(string(var_21)))
 			if err != nil {
 				return err
 			}
@@ -316,8 +315,8 @@ func indexView(m meta.Meta, props indexViewProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			var var_23 string = build.Current.Version
-			_, err = templBuffer.WriteString(templ.EscapeString(var_23))
+			var var_22 string = build.Current.Version
+			_, err = templBuffer.WriteString(templ.EscapeString(var_22))
 			if err != nil {
 				return err
 			}

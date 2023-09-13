@@ -88,7 +88,7 @@ templ indexView(m meta.Meta, props indexViewProps) {
                   </tr>
                   <tr>
                     <th>Date</th>
-                    <td>{ build.Current.Date }</td>
+                    <td>@c.FormatDateString(m, build.Current.Date)</td>
                   </tr>
                   <tr>
                     <th>Version</th>

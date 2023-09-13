@@ -561,24 +561,7 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 						return err
 					}
 				}
-				_, err = templBuffer.WriteString("</td><th class=\"w-0 whitespace-nowrap\"><div class=\"join flex items-center\"><a href=\"")
-				if err != nil {
-					return err
-				}
-				var var_33 templ.SafeURL = routes.Envelope(env.Message.ID).URL()
-				_, err = templBuffer.WriteString(templ.EscapeString(string(var_33)))
-				if err != nil {
-					return err
-				}
-				_, err = templBuffer.WriteString("\" class=\"btn btn-primary btn-xs join-item\">")
-				if err != nil {
-					return err
-				}
-				err = icons.Eye("h-4 w-4").Render(ctx, templBuffer)
-				if err != nil {
-					return err
-				}
-				_, err = templBuffer.WriteString("</a><button class=\"btn btn-error btn-xs join-item\" hx-delete=\"")
+				_, err = templBuffer.WriteString("</td><th class=\"w-0 whitespace-nowrap\"><button class=\"btn btn-error btn-xs join-item\" hx-delete=\"")
 				if err != nil {
 					return err
 				}
@@ -594,7 +577,7 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 				if err != nil {
 					return err
 				}
-				_, err = templBuffer.WriteString("</button></div></th></tr>")
+				_, err = templBuffer.WriteString("</button></th></tr>")
 				if err != nil {
 					return err
 				}
@@ -640,12 +623,12 @@ func envelopeCreateView(m meta.Meta, props envelopeCreateViewProps) templ.Compon
 			defer templ.ReleaseBuffer(templBuffer)
 		}
 		ctx = templ.InitializeContext(ctx)
-		var_34 := templ.GetChildren(ctx)
-		if var_34 == nil {
-			var_34 = templ.NopComponent
+		var_33 := templ.GetChildren(ctx)
+		if var_33 == nil {
+			var_33 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var_35 := templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
+		var_34 := templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
 			templBuffer, templIsBuffer := w.(*bytes.Buffer)
 			if !templIsBuffer {
 				templBuffer = templ.GetBuffer()
@@ -655,8 +638,8 @@ func envelopeCreateView(m meta.Meta, props envelopeCreateViewProps) templ.Compon
 			if err != nil {
 				return err
 			}
-			var var_36 templ.SafeURL = routes.EnvelopeList().URL()
-			_, err = templBuffer.WriteString(templ.EscapeString(string(var_36)))
+			var var_35 templ.SafeURL = routes.EnvelopeList().URL()
+			_, err = templBuffer.WriteString(templ.EscapeString(string(var_35)))
 			if err != nil {
 				return err
 			}
@@ -664,8 +647,8 @@ func envelopeCreateView(m meta.Meta, props envelopeCreateViewProps) templ.Compon
 			if err != nil {
 				return err
 			}
-			var_37 := `Envelopes`
-			_, err = templBuffer.WriteString(var_37)
+			var_36 := `Envelopes`
+			_, err = templBuffer.WriteString(var_36)
 			if err != nil {
 				return err
 			}
@@ -673,8 +656,8 @@ func envelopeCreateView(m meta.Meta, props envelopeCreateViewProps) templ.Compon
 			if err != nil {
 				return err
 			}
-			var_38 := `Create`
-			_, err = templBuffer.WriteString(var_38)
+			var_37 := `Create`
+			_, err = templBuffer.WriteString(var_37)
 			if err != nil {
 				return err
 			}
@@ -695,7 +678,7 @@ func envelopeCreateView(m meta.Meta, props envelopeCreateViewProps) templ.Compon
 			}
 			return err
 		})
-		err = c.LayoutDefault(m).Render(templ.WithChildren(ctx, var_35), templBuffer)
+		err = c.LayoutDefault(m).Render(templ.WithChildren(ctx, var_34), templBuffer)
 		if err != nil {
 			return err
 		}

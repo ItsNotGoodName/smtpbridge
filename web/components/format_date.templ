@@ -6,3 +6,7 @@ import "github.com/ItsNotGoodName/smtpbridge/web/meta"
 templ FormatDate(m meta.Meta, t time.Time) {
   <sl-format-date month="numeric" day="numeric" year="numeric" hour="numeric" minute="numeric" hour-format={ m.TimeHourFormat } date={ t.Format(time.RFC3339) }></sl-format-date>
 }
+
+templ FormatDateString(m meta.Meta, t string) {
+  <sl-format-date month="numeric" day="numeric" year="numeric" hour="numeric" minute="numeric" hour-format={ m.TimeHourFormat } date={ t }></sl-format-date>
+}

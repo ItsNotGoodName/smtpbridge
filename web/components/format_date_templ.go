@@ -51,3 +51,43 @@ func FormatDate(m meta.Meta, t time.Time) templ.Component {
 		return err
 	})
 }
+
+func FormatDateString(m meta.Meta, t string) templ.Component {
+	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
+		templBuffer, templIsBuffer := w.(*bytes.Buffer)
+		if !templIsBuffer {
+			templBuffer = templ.GetBuffer()
+			defer templ.ReleaseBuffer(templBuffer)
+		}
+		ctx = templ.InitializeContext(ctx)
+		var_2 := templ.GetChildren(ctx)
+		if var_2 == nil {
+			var_2 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		_, err = templBuffer.WriteString("<sl-format-date month=\"numeric\" day=\"numeric\" year=\"numeric\" hour=\"numeric\" minute=\"numeric\" hour-format=\"")
+		if err != nil {
+			return err
+		}
+		_, err = templBuffer.WriteString(templ.EscapeString(m.TimeHourFormat))
+		if err != nil {
+			return err
+		}
+		_, err = templBuffer.WriteString("\" date=\"")
+		if err != nil {
+			return err
+		}
+		_, err = templBuffer.WriteString(templ.EscapeString(t))
+		if err != nil {
+			return err
+		}
+		_, err = templBuffer.WriteString("\"></sl-format-date>")
+		if err != nil {
+			return err
+		}
+		if !templIsBuffer {
+			_, err = templBuffer.WriteTo(w)
+		}
+		return err
+	})
+}

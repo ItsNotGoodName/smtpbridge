@@ -23,7 +23,7 @@ func NewRouter(ct pages.Controller, app core.App, fileFS fs.FS, csrfSecret []byt
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
-	r.Use(csrf.Protect(csrfSecret, csrf.Secure(false)))
+	r.Use(csrf.Protect(csrfSecret, csrf.Secure(false), csrf.Path("/")))
 
 	mountWebFS(r, web.FS)
 

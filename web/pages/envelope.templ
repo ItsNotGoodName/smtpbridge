@@ -180,14 +180,9 @@ templ envelopeListView(m meta.Meta, props envelopeListViewProps) {
             }
             </td>
             <th class="w-0 whitespace-nowrap">
-              <div class="join flex items-center">
-                <a href={ routes.Envelope(env.Message.ID).URL() } class="btn btn-primary btn-xs join-item">
-                  @icons.Eye("h-4 w-4")
-                </a>
-                <button class="btn btn-error btn-xs join-item" hx-delete={ routes.Envelope(env.Message.ID).URLString() } hx-target="closest tr" hx-confirm="Are you sure you wish to delete this envelope?" >
-                  @icons.Trash("h-4 w-4")
-                </button>
-              </div>
+              <button class="btn btn-error btn-xs join-item" hx-delete={ routes.Envelope(env.Message.ID).URLString() } hx-target="closest tr" hx-confirm="Are you sure you wish to delete this envelope?" >
+                @icons.Trash("h-4 w-4")
+              </button>
             </th>
           </tr>
           }
