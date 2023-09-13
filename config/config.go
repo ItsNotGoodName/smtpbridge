@@ -85,8 +85,8 @@ type RawEndpoint struct {
 	Name              string            `koanf:"name"`
 	Kind              string            `koanf:"kind"`
 	TextDisable       bool              `koanf:"text_disable"`
-	TitleTemplate     string            `koanf:"title_template"`
-	BodyTemplate      string            `koanf:"body_template"`
+	TitleTemplate     *string           `koanf:"title_template"`
+	BodyTemplate      *string           `koanf:"body_template"`
 	AttachmentDisable bool              `koanf:"attachment_disable"`
 	Config            map[string]string `koanf:"config"`
 }
@@ -237,12 +237,20 @@ func (p Parser) Parse(raw Raw) (Config, error) {
 	var endpoints []models.Endpoint
 	{
 		for key, value := range raw.Endpoints {
+			titleTemplate := endpoint.DefaultTitleTemplate
+			if value.TitleTemplate != nil {
+				titleTemplate = *value.TitleTemplate
+			}
+			bodyTemplate := endpoint.DefaultBodyTemplate
+			if value.BodyTemplate != nil {
+				bodyTemplate = *value.BodyTemplate
+			}
 			e, err := endpoint.NewInternal(endpointFactory, endpoint.CreateEndpoint{
 				Name:              value.Name,
 				AttachmentDisable: value.AttachmentDisable,
 				TextDisable:       value.TextDisable,
-				TitleTemplate:     value.TitleTemplate,
-				BodyTemplate:      value.BodyTemplate,
+				TitleTemplate:     titleTemplate,
+				BodyTemplate:      bodyTemplate,
 				Kind:              value.Kind,
 				Config:            value.Config,
 			}, key)

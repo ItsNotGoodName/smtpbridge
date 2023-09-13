@@ -35,15 +35,10 @@ type CreateEndpoint struct {
 	Config            models.EndpointConfig
 }
 
+const DefaultTitleTemplate = "{{ .Message.Subject }}"
+const DefaultBodyTemplate = "{{ .Message.Text }}"
+
 func new(f Factory, r CreateEndpoint) models.Endpoint {
-	if r.TitleTemplate == "" {
-		r.TitleTemplate = "{{ .Message.Subject }}"
-	}
-
-	if r.BodyTemplate == "" {
-		r.BodyTemplate = "{{ .Message.Text }}"
-	}
-
 	return models.Endpoint{
 		Internal:          false,
 		InternalID:        sql.NullString{},
