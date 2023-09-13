@@ -66,7 +66,7 @@ table "attachments" {
   foreign_key "message_id" {
     columns     = [column.message_id]
     ref_columns = [table.messages.column.id]
-    on_update   = NO_ACTION
+    on_update   = CASCADE
     on_delete   = SET_NULL
   }
 }
@@ -189,13 +189,13 @@ table "rules_to_endpoints" {
   foreign_key "endpoint_id" {
     columns     = [column.endpoint_id]
     ref_columns = [table.endpoints.column.id]
-    on_update   = NO_ACTION
+    on_update   = CASCADE
     on_delete   = CASCADE
   }
   foreign_key "rule_id" {
     columns     = [column.rule_id]
     ref_columns = [table.rules.column.id]
-    on_update   = NO_ACTION
+    on_update   = CASCADE
     on_delete   = CASCADE
   }
   index "rules_to_endpoints_rule_id_endpoint_id_idx" {
