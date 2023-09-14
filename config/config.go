@@ -416,7 +416,7 @@ func NewParser(flags *flag.FlagSet) (Parser, error) {
 			return "", nil
 		}
 		if remap, ok := flagFlatKeys[key]; ok {
-			return remap, ok
+			return remap, value
 		}
 		return key, value
 	}), nil)
