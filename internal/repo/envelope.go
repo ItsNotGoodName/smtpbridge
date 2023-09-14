@@ -189,12 +189,16 @@ func EnvelopeDelete(ctx context.Context, db database.Querier, id int64) error {
 	return oneRowAffected(res)
 }
 
-func EnvelopeDrop(ctx context.Context, db database.Querier) error {
-	_, err := Messages.
+func EnvelopeDrop(ctx context.Context, db database.Querier) (int64, error) {
+	res, err := Messages.
 		DELETE().
 		WHERE(RawBool("1=1")).
 		ExecContext(ctx, db)
-	return err
+	if err != nil {
+		return 0, err
+	}
+
+	return res.RowsAffected()
 }
 
 func EnvelopeTrim(ctx context.Context, db database.Querier, age time.Time, keep int) (int64, error) {

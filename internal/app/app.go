@@ -214,7 +214,16 @@ func (a App) EnvelopeList(ctx context.Context, page pagination.Page, req models.
 }
 
 func (a App) EnvelopeDrop(ctx context.Context) error {
-	return repo.EnvelopeDrop(ctx, a.db)
+	count, err := repo.EnvelopeDrop(ctx, a.db)
+	if err != nil {
+		return err
+	}
+
+	if count > 0 {
+		a.bus.EnvelopeDeleted(ctx)
+	}
+
+	return nil
 }
 
 func (a App) MessageHTMLGet(ctx context.Context, id int64) (string, error) {
@@ -322,7 +331,7 @@ func (a App) EndpointTest(ctx context.Context, id int64) error {
 	}
 	defer file.Close()
 
-	datt, err := envelope.NewDataAttachment("apple-touch-icon.png", file)
+	datt, err := envelope.NewDataAttachment("Test Attachment", file)
 	if err != nil {
 		return err
 	}
