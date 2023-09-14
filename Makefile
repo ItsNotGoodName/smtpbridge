@@ -45,7 +45,7 @@ db-migration:
 	atlas migrate diff $(name) --env local
 
 db-migrate:
-	goose -dir migrations sqlite3 "$(DB_PATH)" up
+	goose -dir migrations/sql sqlite3 "$(DB_PATH)" up
 
 # Generation
 

@@ -14,7 +14,7 @@ env "local" {
 
   migration {
     // URL where the migration directory resides.
-    dir = "file://migrations"
+    dir = "file://migrations/sql"
     // An optional format of the migration directory:
     // atlas (default) | flyway | liquibase | goose | golang-migrate | dbmate
     format = goose

@@ -10,7 +10,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-//go:embed *.sql
+//go:embed sql/*.sql
 var migrations embed.FS
 
 func Migrate(db database.Querier) error {
@@ -20,7 +20,7 @@ func Migrate(db database.Querier) error {
 		return err
 	}
 
-	if err := goose.Up(db.Conn(), "."); err != nil {
+	if err := goose.Up(db.Conn(), "sql"); err != nil {
 		return err
 	}
 
