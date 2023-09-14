@@ -174,7 +174,7 @@ templ envelopeListView(m meta.Meta, props envelopeListViewProps) {
             </td>
             <td class="w-0 whitespace-nowrap">
             if len(env.Attachments) != 0 {
-              <a href={ routes.Envelope(env.Message.ID).URLQuery("tab=" + routes.EnvelopeTabAttachments.String()) } class="tooltip tooltip-left fill-current" data-tip={ strconv.Itoa(len(env.Attachments)) + " Attachment(s)"  }>
+              <a href={ routes.Envelope(env.Message.ID).URLQuery("tab=" + routes.EnvelopeTabAttachments.String()) } class="tooltip tooltip-left fill-current flex items-center" data-tip={ strconv.Itoa(len(env.Attachments)) + " Attachment(s)"  }>
                 @icons.Attachment("h-4 w-4")
               </a>
             }

@@ -548,7 +548,7 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 					if err != nil {
 						return err
 					}
-					_, err = templBuffer.WriteString("\" class=\"tooltip tooltip-left fill-current\" data-tip=\"")
+					_, err = templBuffer.WriteString("\" class=\"tooltip tooltip-left fill-current flex items-center\" data-tip=\"")
 					if err != nil {
 						return err
 					}
