@@ -76,6 +76,7 @@ const (
 	SourceSMTP    = "smtp"
 	SourceMailman = "mailman"
 	SourceCron    = "cron"
+	SourceApp     = "app"
 )
 
 const (

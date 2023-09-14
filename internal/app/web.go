@@ -10,27 +10,28 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/web"
 )
 
-type WebFileStore struct {
+// WebTestFileStore is used for testing endpoints.
+type WebTestFileStore struct {
 	name string
 	url  string
 }
 
-func NewWebFileStore(name, url string) WebFileStore {
-	return WebFileStore{
+func NewWebTestFileStore(name, url string) WebTestFileStore {
+	return WebTestFileStore{
 		name: name,
 		url:  url,
 	}
 }
 
-func (w WebFileStore) File() (fs.File, error) {
+func (w WebTestFileStore) File() (fs.File, error) {
 	return web.FS.Open(w.name)
 }
 
-func (w WebFileStore) Reader(ctx context.Context, att models.Attachment) (io.ReadCloser, error) {
+func (w WebTestFileStore) Reader(ctx context.Context, att models.Attachment) (io.ReadCloser, error) {
 	return w.File()
 }
 
-func (w WebFileStore) Path(ctx context.Context, att models.Attachment) (string, error) {
+func (w WebTestFileStore) Path(ctx context.Context, att models.Attachment) (string, error) {
 	if w.url == "" {
 		return "", fmt.Errorf("app: url is empty")
 	}

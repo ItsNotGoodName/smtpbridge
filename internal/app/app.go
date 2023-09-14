@@ -30,12 +30,12 @@ type FileStore interface {
 }
 
 type App struct {
-	db              database.Querier
-	fileStore       FileStore
-	bus             core.Bus
-	config          *models.Config
-	endpointFactory endpoint.Factory
-	webFileStore    WebFileStore
+	db               database.Querier
+	fileStore        FileStore
+	bus              core.Bus
+	config           *models.Config
+	endpointFactory  endpoint.Factory
+	webTestFileStore WebTestFileStore
 }
 
 func (a App) RuleEndpointsGet(ctx context.Context, id int64) (models.RuleEndpoints, error) {
@@ -103,16 +103,29 @@ func New(
 	bus core.Bus,
 	config *models.Config,
 	endpointFactory endpoint.Factory,
-	webFileStore WebFileStore,
-) App {
-	return App{
-		db:              db,
-		fileStore:       fileStore,
-		bus:             bus,
-		config:          config,
-		endpointFactory: endpointFactory,
-		webFileStore:    webFileStore,
+	webTestFileStore WebTestFileStore,
+) (App, func()) {
+	a := App{
+		db:               db,
+		fileStore:        fileStore,
+		bus:              bus,
+		config:           config,
+		endpointFactory:  endpointFactory,
+		webTestFileStore: webTestFileStore,
 	}
+
+	return a, a.init()
+}
+
+func (a App) init() func() {
+	return closers(
+		a.bus.OnEnvelopeCreated(func(ctx context.Context, evt models.EventEnvelopeCreated) error {
+			return a.MailmanEnqueue(ctx, evt.ID)
+		}),
+		a.bus.OnEnvelopeDeleted(func(ctx context.Context, evt models.EventEnvelopeDeleted) error {
+			return a.AttachmentOrphanDelete(ctx, a.Tracer(trace.SourceApp))
+		}),
+	)
 }
 
 var ErrorLogin = fmt.Errorf("login invalid")
@@ -186,6 +199,8 @@ func (a App) EnvelopeDelete(ctx context.Context, id int64) error {
 	if err := repo.EnvelopeDelete(ctx, a.db, id); err != nil {
 		return err
 	}
+
+	a.bus.EnvelopeDeleted(ctx)
 
 	return nil
 }
@@ -301,7 +316,7 @@ func (a App) EndpointTest(ctx context.Context, id int64) error {
 		return err
 	}
 
-	file, err := a.webFileStore.File()
+	file, err := a.webTestFileStore.File()
 	if err != nil {
 		return err
 	}
@@ -318,7 +333,7 @@ func (a App) EndpointTest(ctx context.Context, id int64) error {
 		Text:    "Test Body",
 	}), datt.Attachment)
 
-	return end.Send(ctx, a.webFileStore, env)
+	return end.Send(ctx, a.webTestFileStore, env)
 }
 
 func (a App) Tracer(source string) trace.Tracer {

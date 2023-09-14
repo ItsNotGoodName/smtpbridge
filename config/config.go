@@ -25,8 +25,8 @@ import (
 )
 
 const (
-	TimeFormat12H = "12h"
-	TimeFormat24H = "24h"
+	timeFormat12H = "12h"
+	timeFormat24H = "24h"
 )
 
 type Config struct {
@@ -106,7 +106,7 @@ var RawDefault = struct {
 	HTTPPort           uint16 `koanf:"http.port"`
 	// IMAPPort         uint16 `koanf:"imap.port"`
 }{
-	TimeFormat:         TimeFormat12H,
+	TimeFormat:         timeFormat12H,
 	SMTPMaxPayloadSize: "25 MB",
 	DataDirectory:      "smtpbridge_data",
 	PythonExecutable:   "python3",
@@ -115,15 +115,17 @@ var RawDefault = struct {
 	// IMAPPort:         10143,
 }
 
+// flagFlatKeys are remaps of CLI flag keys to work with koanf's parsing.
 var flagFlatKeys map[string]string = map[string]string{
 	"time-format":       "time_format",
 	"data-directory":    "data_directory",
 	"python-executable": "python_executable",
 }
 
+// WithFlagSet includes CLI flags with the config reading.
 func WithFlagSet(flags *flag.FlagSet) *flag.FlagSet {
 	flags.String("config", "", flagUsageString("", "Path to config file."))
-	flags.String("time-format", "", flagUsageString(TimeFormat12H, fmt.Sprintf("Format for time display (%s/%s).", TimeFormat12H, TimeFormat24H)))
+	flags.String("time-format", "", flagUsageString(timeFormat12H, fmt.Sprintf("Format for time display (%s/%s).", timeFormat12H, timeFormat24H)))
 	flags.String("data-directory", "", flagUsageString(RawDefault.DataDirectory, "Path to data directory."))
 	flags.String("python-executable", "", flagUsageString(RawDefault.PythonExecutable, "Python executable."))
 	flags.Bool("debug", false, flagUsageBool(false, "Run in debug mode."))
@@ -290,9 +292,9 @@ func (p Parser) Parse(raw Raw) (Config, error) {
 
 	var timeHourFormat string
 	switch raw.TimeFormat {
-	case TimeFormat12H:
+	case timeFormat12H:
 		timeHourFormat = helpers.TimeHourFormat12
-	case TimeFormat24H:
+	case timeFormat24H:
 		timeHourFormat = helpers.TimeHourFormat24
 	default:
 		return Config{}, fmt.Errorf("invalid time format: %s", raw.TimeFormat)

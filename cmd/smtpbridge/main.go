@@ -15,7 +15,6 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/internal/database"
 	"github.com/ItsNotGoodName/smtpbridge/internal/file"
 	"github.com/ItsNotGoodName/smtpbridge/internal/mailman"
-	"github.com/ItsNotGoodName/smtpbridge/internal/models"
 	"github.com/ItsNotGoodName/smtpbridge/internal/repo"
 	"github.com/ItsNotGoodName/smtpbridge/migrations"
 	"github.com/ItsNotGoodName/smtpbridge/pkg/secret"
@@ -38,7 +37,11 @@ func main() {
 	flags := config.WithFlagSet(flag.NewFlagSet(os.Args[0], flag.ExitOnError))
 
 	app := lieut.NewSingleCommandApp(
-		lieut.AppInfo{Name: "smtpbridge", Version: build.Current.Version, Summary: "Bridge email to other messaging services."},
+		lieut.AppInfo{
+			Name:    "smtpbridge",
+			Version: build.Current.Version,
+			Summary: "Bridge email to other messaging services.",
+		},
 		run(flags),
 		flags,
 		os.Stdout,
@@ -94,16 +97,9 @@ func run(flags *flag.FlagSet) lieut.Executor {
 		}
 
 		// App
-		webFileStore := app.NewWebFileStore("apple-touch-icon.png", fmt.Sprintf("http://127.0.0.1:%d", cfg.HTTPPort))
-		app := app.New(db, fileStore, bus, cfg.Config, cfg.EndpointFactory, webFileStore)
-
-		// TODO: move this somewhere else
-		{
-			release := bus.OnEnvelopeCreated(func(ctx context.Context, evt models.EventEnvelopeCreated) error {
-				return app.MailmanEnqueue(ctx, evt.ID)
-			})
-			defer release()
-		}
+		webTestFileStore := app.NewWebTestFileStore("apple-touch-icon.png", fmt.Sprintf("http://127.0.0.1:%d", cfg.HTTPPort))
+		app, release := app.New(db, fileStore, bus, cfg.Config, cfg.EndpointFactory, webTestFileStore)
+		defer release()
 
 		// Supervisor
 		super := suture.New("root", suture.Spec{
