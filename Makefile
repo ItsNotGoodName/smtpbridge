@@ -19,7 +19,7 @@ clean:
 
 gen: db-migrate gen-jet gen-templ
 
-dep: dep-air dep-jet dep-goose dep-atlas dep-templ dep-goreleaser
+tooling: tooling-air tooling-jet tooling-goose tooling-atlas tooling-templ tooling-goreleaser
 
 # Development
 
@@ -56,22 +56,22 @@ gen-jet:
 gen-templ:
 	cd web && templ generate
 
-# Dependencies
+# Tooling
 
-dep-air:
+tooling-air:
 	go install github.com/cosmtrek/air@latest
 
-dep-jet:
+tooling-jet:
 	go install github.com/go-jet/jet/v2/cmd/jet@latest
 
-dep-goose:
+tooling-goose:
 	go install github.com/pressly/goose/v3/cmd/goose@latest
 
-dep-atlas:
+tooling-atlas:
 	go install ariga.io/atlas/cmd/atlas@latest
 
-dep-templ:
+tooling-templ:
 	go install github.com/a-h/templ/cmd/templ@latest
 
-dep-goreleaser:
+tooling-goreleaser:
 	go install github.com/goreleaser/goreleaser@latest

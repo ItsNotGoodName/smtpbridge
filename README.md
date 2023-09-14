@@ -265,10 +265,10 @@ The following programs are required.
 
 **You should look at the [Makefile](./Makefile) before running any of the following commands.**
 
-Install dependencies.
+Install tooling.
 
 ```
-make dep
+make tooling
 ```
 
 Start the Go server.
