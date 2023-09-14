@@ -354,7 +354,8 @@ func (a App) TraceList(ctx context.Context, page pagination.Page, req models.DTO
 }
 
 func (a App) TraceDrop(ctx context.Context) error {
-	return repo.TraceDrop(ctx, a.db)
+	_, err := repo.TraceDrop(ctx, a.db)
+	return err
 }
 
 func (a App) RetentionPolicyGet(ctx context.Context) models.ConfigRetentionPolicy {
@@ -381,6 +382,11 @@ func (a App) RetentionPolicyRun(ctx context.Context, tracer trace.Tracer) error 
 	}
 
 	_, err = retention.DeleteAttachmentBySize(ctx, tracer, a.fileStore, a.config.RetentionPolicy)
+	if err != nil {
+		return err
+	}
+
+	_, err = retention.DeleteTraceByAge(ctx, tracer, a.db, a.config.RetentionPolicy)
 	if err != nil {
 		return err
 	}

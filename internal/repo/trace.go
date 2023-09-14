@@ -3,6 +3,7 @@ package repo
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/ItsNotGoodName/smtpbridge/internal/database"
 	. "github.com/ItsNotGoodName/smtpbridge/internal/jet/table"
@@ -103,10 +104,25 @@ func TraceList(ctx context.Context, db database.Querier, page pagination.Page, r
 	}, nil
 }
 
-func TraceDrop(ctx context.Context, db database.Querier) error {
-	_, err := Traces.
+func TraceDrop(ctx context.Context, db database.Querier) (int64, error) {
+	res, err := Traces.
 		DELETE().
 		WHERE(RawBool("1=1")).
 		ExecContext(ctx, db)
-	return err
+	if err != nil {
+		return 0, err
+	}
+
+	return res.RowsAffected()
+}
+
+func TraceTrim(ctx context.Context, db database.Querier, age time.Time) (int64, error) {
+	res, err := Traces.
+		DELETE().
+		WHERE(Traces.CreatedAt.LT(RawTimestamp(muhTypeAffinity(models.NewTime(age))))).
+		ExecContext(ctx, db)
+	if err != nil {
+		return 0, err
+	}
+	return res.RowsAffected()
 }

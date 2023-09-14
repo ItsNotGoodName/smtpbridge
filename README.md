@@ -106,14 +106,17 @@ healthcheck:
   # Run on startup
   startup: false
 
-# Retention policy for envelopes and attachment files
+# Retention policy will delete resources that match the configured policy
 retention:
-  # Retention policy for envelopes in database
+  # Envelopes in database
   envelope_count: # (0, 100, 250, ...)
   envelope_age: # (5m, 5h45m, ...)
 
-  # Retention policy for attachment files on disk
+  # Attachment files in file store
   attachment_size: # (100 MB, 1 GB, ...)
+
+  # Traces in database
+  trace_age: 168h # 7 days (5m, 5h45m, ...)
 
 # HTTP server
 http:

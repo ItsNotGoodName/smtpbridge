@@ -64,6 +64,7 @@ type Raw struct {
 	RetentionEnvelopeCount  string `koanf:"retention.envelope_count"`
 	RetentionEnvelopeAge    string `koanf:"retention.envelope_age"`
 	RetentionAttachmentSize string `koanf:"retention.attachment_size"`
+	RetentionTraceAge       string `koanf:"retention.trace_age"`
 	HealthcheckURL          string `koanf:"healthcheck.url"`
 	HealthcheckInterval     string `koanf:"healthcheck.interval"`
 	HealthcheckStartup      bool   `koanf:"healthcheck.startup"`
@@ -111,6 +112,7 @@ var RawDefault = struct {
 	SMTPPort            uint16 `koanf:"smtp.port"`
 	SMTPMaxPayloadSize  string `koanf:"smtp.max_payload_size"`
 	HTTPPort            uint16 `koanf:"http.port"`
+	RetentionTraceAge   string `koanf:"retention.trace_age"`
 	// IMAPPort         uint16 `koanf:"imap.port"`
 }{
 	HealthcheckInterval: "5m",
@@ -118,6 +120,7 @@ var RawDefault = struct {
 	SMTPMaxPayloadSize:  "25 MB",
 	DataDirectory:       "smtpbridge_data",
 	PythonExecutable:    "python3",
+	RetentionTraceAge:   "168h",
 	SMTPPort:            1025,
 	HTTPPort:            8080,
 	// IMAPPort:         10143,
@@ -226,13 +229,22 @@ func (p Parser) Parse(raw Raw) (Config, error) {
 			}
 			envelopeAge = &age
 		}
+		var traceAge *time.Duration
+		if raw.RetentionTraceAge != "" {
+			age, err := time.ParseDuration(raw.RetentionTraceAge)
+			if err != nil {
+				return Config{}, err
+			}
+			traceAge = &age
+		}
 
 		config = &models.Config{
 			RetentionPolicy: models.ConfigRetentionPolicy{
+				MinAge:         5 * time.Minute,
 				EnvelopeCount:  envelopeCount,
 				AttachmentSize: attachmentsSize,
 				EnvelopeAge:    envelopeAge,
-				MinAge:         5 * time.Minute,
+				TraceAge:       traceAge,
 			},
 			AuthSMTP: auth.New(
 				raw.SMTPUsername,

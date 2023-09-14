@@ -222,12 +222,36 @@ func indexView(m meta.Meta, props indexViewProps) templ.Component {
 					return err
 				}
 			}
+			if props.RetentionPolicy.TraceAge != nil {
+				_, err = templBuffer.WriteString("<tr><th>")
+				if err != nil {
+					return err
+				}
+				var_13 := `Maximum Trace Age`
+				_, err = templBuffer.WriteString(var_13)
+				if err != nil {
+					return err
+				}
+				_, err = templBuffer.WriteString("</th><td>")
+				if err != nil {
+					return err
+				}
+				var var_14 string = props.RetentionPolicy.TraceAge.String()
+				_, err = templBuffer.WriteString(templ.EscapeString(var_14))
+				if err != nil {
+					return err
+				}
+				_, err = templBuffer.WriteString("</td></tr>")
+				if err != nil {
+					return err
+				}
+			}
 			_, err = templBuffer.WriteString("</tbody></table></div></div></div><div class=\"flex-1\"><div class=\"border-base-200 rounded border\"><h1 class=\"border-base-200 border-b p-4 text-xl font-bold\">")
 			if err != nil {
 				return err
 			}
-			var_13 := `Build`
-			_, err = templBuffer.WriteString(var_13)
+			var_15 := `Build`
+			_, err = templBuffer.WriteString(var_15)
 			if err != nil {
 				return err
 			}
@@ -235,8 +259,8 @@ func indexView(m meta.Meta, props indexViewProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			var_14 := `Built By`
-			_, err = templBuffer.WriteString(var_14)
+			var_16 := `Built By`
+			_, err = templBuffer.WriteString(var_16)
 			if err != nil {
 				return err
 			}
@@ -244,8 +268,8 @@ func indexView(m meta.Meta, props indexViewProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			var var_15 string = build.Current.BuiltBy
-			_, err = templBuffer.WriteString(templ.EscapeString(var_15))
+			var var_17 string = build.Current.BuiltBy
+			_, err = templBuffer.WriteString(templ.EscapeString(var_17))
 			if err != nil {
 				return err
 			}
@@ -253,8 +277,8 @@ func indexView(m meta.Meta, props indexViewProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			var_16 := `Commit`
-			_, err = templBuffer.WriteString(var_16)
+			var_18 := `Commit`
+			_, err = templBuffer.WriteString(var_18)
 			if err != nil {
 				return err
 			}
@@ -262,8 +286,8 @@ func indexView(m meta.Meta, props indexViewProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			var var_17 templ.SafeURL = templ.URL(build.Current.CommitURL())
-			_, err = templBuffer.WriteString(templ.EscapeString(string(var_17)))
+			var var_19 templ.SafeURL = templ.URL(build.Current.CommitURL())
+			_, err = templBuffer.WriteString(templ.EscapeString(string(var_19)))
 			if err != nil {
 				return err
 			}
@@ -271,8 +295,8 @@ func indexView(m meta.Meta, props indexViewProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			var var_18 string = build.Current.Commit
-			_, err = templBuffer.WriteString(templ.EscapeString(var_18))
+			var var_20 string = build.Current.Commit
+			_, err = templBuffer.WriteString(templ.EscapeString(var_20))
 			if err != nil {
 				return err
 			}
@@ -280,8 +304,8 @@ func indexView(m meta.Meta, props indexViewProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			var_19 := `Date`
-			_, err = templBuffer.WriteString(var_19)
+			var_21 := `Date`
+			_, err = templBuffer.WriteString(var_21)
 			if err != nil {
 				return err
 			}
@@ -297,8 +321,8 @@ func indexView(m meta.Meta, props indexViewProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			var_20 := `Version`
-			_, err = templBuffer.WriteString(var_20)
+			var_22 := `Version`
+			_, err = templBuffer.WriteString(var_22)
 			if err != nil {
 				return err
 			}
@@ -306,8 +330,8 @@ func indexView(m meta.Meta, props indexViewProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			var var_21 templ.SafeURL = templ.URL(build.Current.ReleaseURL)
-			_, err = templBuffer.WriteString(templ.EscapeString(string(var_21)))
+			var var_23 templ.SafeURL = templ.URL(build.Current.ReleaseURL)
+			_, err = templBuffer.WriteString(templ.EscapeString(string(var_23)))
 			if err != nil {
 				return err
 			}
@@ -315,8 +339,8 @@ func indexView(m meta.Meta, props indexViewProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			var var_22 string = build.Current.Version
-			_, err = templBuffer.WriteString(templ.EscapeString(var_22))
+			var var_24 string = build.Current.Version
+			_, err = templBuffer.WriteString(templ.EscapeString(var_24))
 			if err != nil {
 				return err
 			}

@@ -115,3 +115,19 @@ func DeleteOrphanAttachments(ctx context.Context, tracer trace.Tracer, db databa
 		tracer.Trace(ctx, "retention.attachment.orphan.delete", trace.WithKV("count", len(atts)))
 	}
 }
+
+func DeleteTraceByAge(ctx context.Context, tracer trace.Tracer, db database.Querier, policy models.ConfigRetentionPolicy) (int64, error) {
+	if policy.TraceAge == nil {
+		return 0, nil
+	}
+
+	age := time.Now().Add(-*policy.TraceAge)
+	count, err := repo.TraceTrim(ctx, db, age)
+	if err != nil {
+		return 0, err
+	}
+
+	tracer.Trace(ctx, "retention.trace.age.delete", trace.WithKV("count", count))
+
+	return count, nil
+}

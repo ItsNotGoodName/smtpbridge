@@ -66,6 +66,12 @@ templ indexView(m meta.Meta, props indexViewProps) {
                       <td>{ helpers.BytesHumanize(*props.RetentionPolicy.AttachmentSize)  }</td>
                     </tr>
                   }
+                  if props.RetentionPolicy.TraceAge != nil {
+                    <tr>
+                      <th>Maximum Trace Age</th>
+                      <td>{ props.RetentionPolicy.TraceAge.String() }</td>
+                    </tr>
+                  }
                 </tbody>
               </table>
             </div>

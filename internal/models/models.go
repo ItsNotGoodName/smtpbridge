@@ -21,6 +21,7 @@ type ConfigRetentionPolicy struct {
 	EnvelopeCount  *int
 	EnvelopeAge    *time.Duration
 	AttachmentSize *int64
+	TraceAge       *time.Duration
 }
 
 func (p ConfigRetentionPolicy) EnvelopeAgeTime() time.Time {
