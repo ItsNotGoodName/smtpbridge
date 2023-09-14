@@ -19,7 +19,7 @@ templ Base(head, body templ.Component, csrfToken string) {
       <meta name="gorilla.csrf.Token" content={ csrfToken } />
       {! head }
     </head>
-    <body hx-boost="true">
+    <body hx-boost="true" hx-ext="loading-states">
       {! body }
     </body>
   </html>

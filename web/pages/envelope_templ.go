@@ -172,7 +172,7 @@ func envelopeView(m meta.Meta, props envelopeViewProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</td></tr></tbody></table></div> <div class=\"flex flex-col gap-4 p-4\"><form class=\"join\" hx-post=\"")
+			_, err = templBuffer.WriteString("</td></tr></tbody></table></div> <div class=\"flex flex-col gap-4 p-4\" data-loading-states><form class=\"join\" hx-post=\"")
 			if err != nil {
 				return err
 			}
@@ -216,7 +216,7 @@ func envelopeView(m meta.Meta, props envelopeViewProps) templ.Component {
 					return err
 				}
 			}
-			_, err = templBuffer.WriteString("</select><button type=\"submit\" class=\"btn-sm btn btn-primary join-item\">")
+			_, err = templBuffer.WriteString("</select><button type=\"submit\" class=\"btn-sm btn btn-primary join-item\" data-loading-disable><span data-loading-class=\"loading loading-spinner loading-sm\">")
 			if err != nil {
 				return err
 			}
@@ -225,7 +225,7 @@ func envelopeView(m meta.Meta, props envelopeViewProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</button></form><div class=\"hidden\"></div></div> ")
+			_, err = templBuffer.WriteString("</span></button></form><div class=\"hidden\"></div></div> ")
 			if err != nil {
 				return err
 			}
@@ -335,7 +335,7 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</button></form><div class=\"join flex items-center justify-end\"><a class=\"btn btn-sm btn-success join-item\" href=\"")
+			_, err = templBuffer.WriteString("</button></form><div class=\"join flex items-center justify-end\" data-loading-states><a class=\"btn btn-sm btn-success join-item\" href=\"")
 			if err != nil {
 				return err
 			}
@@ -344,7 +344,7 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("\">")
+			_, err = templBuffer.WriteString("\" data-loading-states>")
 			if err != nil {
 				return err
 			}
@@ -360,7 +360,7 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("\" hx-confirm=\"Are you sure you wish to delete all envelopes?\">")
+			_, err = templBuffer.WriteString("\" hx-confirm=\"Are you sure you wish to delete all envelopes?\" data-loading-disable><span data-loading-class=\"loading loading-spinner loading-sm\">")
 			if err != nil {
 				return err
 			}
@@ -368,7 +368,7 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</button></div></div>")
+			_, err = templBuffer.WriteString("</span></button></div></div>")
 			if err != nil {
 				return err
 			}

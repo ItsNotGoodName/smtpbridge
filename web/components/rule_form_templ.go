@@ -48,7 +48,7 @@ func RuleFormCreate(props RuleFormCreateProps) templ.Component {
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("\" class=\"flex flex-col gap-4\"><div class=\"form-control\"><label class=\"label\"><span class=\"label-text\">")
+		_, err = templBuffer.WriteString("\" class=\"flex flex-col gap-4\" data-loading-states><div class=\"form-control\"><label class=\"label\"><span class=\"label-text\">")
 		if err != nil {
 			return err
 		}
@@ -183,7 +183,7 @@ func RuleFormCreate(props RuleFormCreateProps) templ.Component {
 				return err
 			}
 		}
-		_, err = templBuffer.WriteString("</fieldset><button type=\"submit\" class=\"btn btn-primary btn-block\">")
+		_, err = templBuffer.WriteString("</fieldset><button type=\"submit\" class=\"btn btn-primary btn-block\" data-loading-disable><span data-loading-class=\"loading loading-spinner loading-xs\">")
 		if err != nil {
 			return err
 		}
@@ -192,7 +192,7 @@ func RuleFormCreate(props RuleFormCreateProps) templ.Component {
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("</button>")
+		_, err = templBuffer.WriteString("</span></button>")
 		if err != nil {
 			return err
 		}
@@ -245,7 +245,7 @@ func RuleFormUpdate(props RuleFormUpdateProps) templ.Component {
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("\" class=\"flex flex-col gap-4\"><div class=\"form-control\"><label class=\"label\"><span class=\"label-text\">")
+		_, err = templBuffer.WriteString("\" class=\"flex flex-col gap-4\" data-loading-states><div class=\"form-control\"><label class=\"label\"><span class=\"label-text\">")
 		if err != nil {
 			return err
 		}
@@ -428,7 +428,7 @@ func RuleFormUpdate(props RuleFormUpdateProps) templ.Component {
 				return err
 			}
 		}
-		_, err = templBuffer.WriteString(" type=\"submit\" class=\"btn btn-primary btn-block\">")
+		_, err = templBuffer.WriteString(" type=\"submit\" class=\"btn btn-primary btn-block\" data-loading-disable><span data-loading-class=\"loading loading-spinner loading-xs\">")
 		if err != nil {
 			return err
 		}
@@ -437,7 +437,7 @@ func RuleFormUpdate(props RuleFormUpdateProps) templ.Component {
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("</button>")
+		_, err = templBuffer.WriteString("</span></button>")
 		if err != nil {
 			return err
 		}

@@ -19,7 +19,7 @@ type RuleFormCreateProps struct {
 }
 
 templ RuleFormCreate(props RuleFormCreateProps) {
-  <form hx-post={ routes.RuleCreate().URLString() } class="flex flex-col gap-4">
+  <form hx-post={ routes.RuleCreate().URLString() } class="flex flex-col gap-4" data-loading-states>
     <div class="form-control">
       <label class="label">
         <span class="label-text">Name</span>
@@ -55,7 +55,11 @@ templ RuleFormCreate(props RuleFormCreateProps) {
         </div>
       }
     </fieldset>
-    <button type="submit" class="btn btn-primary btn-block">Create Rule</button>
+    <button type="submit" class="btn btn-primary btn-block" data-loading-disable>
+      <span data-loading-class="loading loading-spinner loading-xs">
+        Create Rule
+      </span>
+    </button>
     if props.Flash != nil {
       {! props.Flash }
     }
@@ -74,7 +78,7 @@ type RuleFormUpdateProps struct {
 }
 
 templ RuleFormUpdate(props RuleFormUpdateProps) {
-  <form hx-post={ routes.Rule(props.Rule.ID).URLString() } class="flex flex-col gap-4">
+  <form hx-post={ routes.Rule(props.Rule.ID).URLString() } class="flex flex-col gap-4" data-loading-states>
     <div class="form-control">
       <label class="label">
         <span class="label-text">Name</span>
@@ -114,7 +118,11 @@ templ RuleFormUpdate(props RuleFormUpdateProps) {
         <span>Rule cannot be edited because it is internal.</span>
       </div>
     }
-    <button disabled?={ props.Rule.Internal } type="submit" class="btn btn-primary btn-block">Update Rule</button>
+    <button disabled?={ props.Rule.Internal } type="submit" class="btn btn-primary btn-block" data-loading-disable>
+      <span data-loading-class="loading loading-spinner loading-xs">
+        Update Rule
+      </span>
+    </button>
     if props.Flash != nil {
       {! props.Flash }
     }

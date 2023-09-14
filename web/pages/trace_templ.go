@@ -55,7 +55,7 @@ func traceListView(m meta.Meta, props traceListViewProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</li></ul></div> <div class=\"flex flex-col gap-4 p-4\"><div class=\"join flex items-center justify-end\"><button class=\"btn btn-sm btn-error\" hx-delete=\"")
+			_, err = templBuffer.WriteString("</li></ul></div> <div class=\"flex flex-col gap-4 p-4\"><div class=\"join flex items-center justify-end\" data-loading-states><button class=\"btn btn-sm btn-error\" hx-delete=\"")
 			if err != nil {
 				return err
 			}
@@ -63,7 +63,7 @@ func traceListView(m meta.Meta, props traceListViewProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("\" hx-confirm=\"Are you sure you wish to delete all traces?\">")
+			_, err = templBuffer.WriteString("\" hx-confirm=\"Are you sure you wish to delete all traces?\" data-loading-disable><span data-loading-class=\"loading loading-spinner loading-sm\">")
 			if err != nil {
 				return err
 			}
@@ -71,7 +71,7 @@ func traceListView(m meta.Meta, props traceListViewProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</button></div>")
+			_, err = templBuffer.WriteString("</span></button></div>")
 			if err != nil {
 				return err
 			}

@@ -53,7 +53,7 @@ func endpointListView(m meta.Meta, props endpointListViewProps) templ.Component 
 				return err
 			}
 			for _, end := range props.Endpoints {
-				_, err = templBuffer.WriteString("<div class=\"card card-compact bg-base-100 border-base-200 w-full border sm:w-96\"><div class=\"card-body\"><h2 class=\"card-title\">")
+				_, err = templBuffer.WriteString("<div class=\"w-full sm:w-96\"><div class=\"card card-compact bg-base-100 border-base-200 border\"><div class=\"card-body\"><h2 class=\"card-title\">")
 				if err != nil {
 					return err
 				}
@@ -205,7 +205,7 @@ func endpointListView(m meta.Meta, props endpointListViewProps) templ.Component 
 				if err != nil {
 					return err
 				}
-				_, err = templBuffer.WriteString("</textarea></div></div><div class=\"card-actions justify-end\"><button class=\"btn btn-success\" hx-post=\"")
+				_, err = templBuffer.WriteString("</textarea></div></div><div class=\"flex flex-col gap-2\" data-loading-states><div class=\"card-actions justify-end\"><button class=\"btn btn-success\" hx-post=\"")
 				if err != nil {
 					return err
 				}
@@ -213,7 +213,7 @@ func endpointListView(m meta.Meta, props endpointListViewProps) templ.Component 
 				if err != nil {
 					return err
 				}
-				_, err = templBuffer.WriteString("\" hx-target=\"next div\">")
+				_, err = templBuffer.WriteString("\" hx-target=\"next div\" data-loading-disable><span data-loading-class=\"loading loading-spinner loading-sm\">")
 				if err != nil {
 					return err
 				}
@@ -222,7 +222,7 @@ func endpointListView(m meta.Meta, props endpointListViewProps) templ.Component 
 				if err != nil {
 					return err
 				}
-				_, err = templBuffer.WriteString("</button></div><div></div></div></div>")
+				_, err = templBuffer.WriteString("</span></button></div><div></div></div></div></div></div>")
 				if err != nil {
 					return err
 				}

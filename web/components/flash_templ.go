@@ -39,7 +39,7 @@ func Flash(t FlashType, c templ.Component) templ.Component {
 			var_1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, err = templBuffer.WriteString("<div lass=\"flash\">")
+		_, err = templBuffer.WriteString("<div class=\"flash\" data-loading-hide-class=\"absolute hidden\">")
 		if err != nil {
 			return err
 		}

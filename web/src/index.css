@@ -49,3 +49,8 @@
     @apply left-0 right-0 max-w-fit mx-auto;
   }
 }
+
+/* https://htmx.org/extensions/loading-states/ */
+[data-loading] {
+  display: none;
+}

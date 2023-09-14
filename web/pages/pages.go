@@ -291,20 +291,31 @@ func LoginView(ct Controller, app core.App) http.HandlerFunc {
 }
 
 func Login(ct Controller, app core.App, ss sessions.Store) http.HandlerFunc {
+	handleErr := func(w http.ResponseWriter, r *http.Request, err error, form forms.Login) {
+		ct.Component(w, r, c.LoginForm(c.LoginFormProps{
+			Flash:    c.Flash(c.FlashTypeError, c.FlashMessage(err.Error())),
+			Username: form.Username,
+			Password: form.Password,
+		}))
+	}
 	return func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
-		username := r.FormValue("username")
-		password := r.FormValue("password")
+		var form forms.Login
+		if err := helpers.DecodeForm(w, r, &form); err != nil {
+			ct.Error(w, r, err, http.StatusBadRequest)
+			return
+		}
 
-		user, err := app.AuthHTTPLogin(ctx, username, password)
+		ctx := r.Context()
+
+		user, err := app.AuthHTTPLogin(ctx, form.Username, form.Password)
 		if err != nil {
-			ct.Error(w, r, err, http.StatusInternalServerError)
+			handleErr(w, r, err, form)
 			return
 		}
 
 		err = sessions.AuthLogin(w, r, ss, user.ID)
 		if err != nil {
-			ct.Error(w, r, err, http.StatusInternalServerError)
+			handleErr(w, r, err, form)
 			return
 		}
 

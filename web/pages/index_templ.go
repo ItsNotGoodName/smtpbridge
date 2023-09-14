@@ -113,7 +113,7 @@ func indexView(m meta.Meta, props indexViewProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("\">")
+			_, err = templBuffer.WriteString("\"><span data-loading-class=\"loading loading-spinner loading-xs\">")
 			if err != nil {
 				return err
 			}
@@ -122,7 +122,7 @@ func indexView(m meta.Meta, props indexViewProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</button></div><div class=\"overflow-x-auto\"><table class=\"table\"><tbody>")
+			_, err = templBuffer.WriteString("</span></button></div><div class=\"overflow-x-auto\"><table class=\"table\"><tbody>")
 			if err != nil {
 				return err
 			}

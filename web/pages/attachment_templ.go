@@ -53,7 +53,7 @@ func attachmentListView(m meta.Meta, props attachmentListViewProps) templ.Compon
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</li></ul></div> <div class=\"flex flex-col gap-4 p-4\"><div class=\"join flex items-center justify-end\"><button class=\"btn btn-sm btn-info join-item tooltip-left tooltip\" data-tip=\"delete orphan attachments\" hx-post=\"")
+			_, err = templBuffer.WriteString("</li></ul></div> <div class=\"flex flex-col gap-4 p-4\"><div class=\"join flex items-center justify-end\" data-loading-states><button class=\"btn btn-sm btn-info join-item tooltip-left tooltip\" data-tip=\"delete orphan attachments\" hx-post=\"")
 			if err != nil {
 				return err
 			}
@@ -61,7 +61,7 @@ func attachmentListView(m meta.Meta, props attachmentListViewProps) templ.Compon
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("\">")
+			_, err = templBuffer.WriteString("\" data-loading-disable><span data-loading-class=\"loading loading-spinner loading-sm\">")
 			if err != nil {
 				return err
 			}
@@ -69,7 +69,7 @@ func attachmentListView(m meta.Meta, props attachmentListViewProps) templ.Compon
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</button></div>")
+			_, err = templBuffer.WriteString("</span></button></div>")
 			if err != nil {
 				return err
 			}

@@ -35,9 +35,13 @@ templ indexView(m meta.Meta, props indexViewProps) {
       <div class="flex flex-col gap-4 lg:flex-row">
         <div class="flex-1">
           <div class="border-base-200 rounded border">
-            <div class="border-base-200 flex items-center justify-between gap-4 border-b p-4">
+            <div class="border-base-200 flex items-center justify-between gap-4 border-b p-4" >
               <h1 class="text-xl font-bold">Retention Policy</h1>
-              <button class="btn btn-xs" hx-post={ routes.RetentionPolicyRun().URLString() }>Run</button>
+              <button class="btn btn-xs" hx-post={ routes.RetentionPolicyRun().URLString() }>
+                <span data-loading-class="loading loading-spinner loading-xs">
+                  Run
+                </span>
+              </button>
             </div>
             <div class="overflow-x-auto">
               <table class="table">

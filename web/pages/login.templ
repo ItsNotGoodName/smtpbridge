@@ -2,30 +2,16 @@ package pages
 
 import (
   "github.com/ItsNotGoodName/smtpbridge/web/meta"
-  "github.com/ItsNotGoodName/smtpbridge/web/routes"
+  c "github.com/ItsNotGoodName/smtpbridge/web/components"
 )
 
 templ loginView(m meta.Meta) {
   <div class="flex w-screen justify-center px-4 py-16">
     <div class="card bg-base-100 card-compact border-base-200 w-full max-w-sm border">
-      <form class="card-body" hx-post={ routes.Login().URLString() }>
+      <div class="card-body">
         <h1 class="card-title justify-center">SMTPBridge</h1>
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text">Username</span>
-          </label>
-          <input name="username" type="text" placeholder="Username" autocomplete="username" class="input input-bordered" />
-        </div>
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text">Password</span>
-          </label>
-          <input name="password" type="password" placeholder="Password" autocomplete="current-password" class="input input-bordered" />
-        </div>
-        <div class="form-control mt-6">
-          <button type="submit" class="btn btn-primary">Login</button>
-        </div>
-      </form>
+        @c.LoginForm(c.LoginFormProps{})
+      </div>
     </div>
   </div>
 }

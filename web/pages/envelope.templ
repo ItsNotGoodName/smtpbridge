@@ -59,7 +59,7 @@ templ envelopeView(m meta.Meta, props envelopeViewProps) {
         </tbody>
       </table>
     </div>
-    <div class="flex flex-col gap-4 p-4">
+    <div class="flex flex-col gap-4 p-4" data-loading-states>
       <form class="join" hx-post={ routes.EnvelopeEndpointSend(props.Envelope.Message.ID).URLString() } hx-target="next div" hx-swap="outerHTML">
         <select name="endpoint" id="endpoint" class="select select-bordered select-sm join-item w-full">
           <option disabled selected>Select Endpoint</option>
@@ -67,7 +67,11 @@ templ envelopeView(m meta.Meta, props envelopeViewProps) {
             <option value={ strconv.FormatInt(end.ID, 10) }>{ end.Name }</option>
           }
         </select>
-        <button type="submit" class="btn-sm btn btn-primary join-item">Send</button>
+        <button type="submit" class="btn-sm btn btn-primary join-item" data-loading-disable>
+          <span data-loading-class="loading loading-spinner loading-sm">
+            Send
+          </span>
+        </button>
       </form>
       <div class="hidden"></div>
     </div>
@@ -99,12 +103,14 @@ templ envelopeListView(m meta.Meta, props envelopeListViewProps) {
           <input name="search" type="text" placeholder="Search" class="input input-sm input-bordered join-item w-full max-w-xs" value={ props.EnvelopeRequestRequest.Search } />
           <button type="submit" class="btn btn-sm btn-primary join-item">@icons.Search("w-5 h-5")</button>
         </form>
-        <div class="join flex items-center justify-end">
-          <a class="btn btn-sm btn-success join-item" href={ routes.EnvelopeCreate().URL() }>
+        <div class="join flex items-center justify-end" data-loading-states>
+          <a class="btn btn-sm btn-success join-item" href={ routes.EnvelopeCreate().URL() } data-loading-states>
             @icons.Add("w-5 h-5")
           </a>
-          <button class="btn btn-sm btn-error join-item" hx-delete={ routes.EnvelopeList().URLString() } hx-confirm="Are you sure you wish to delete all envelopes?">
-            @icons.Trash("w-5 h-5")
+          <button class="btn btn-sm btn-error join-item" hx-delete={ routes.EnvelopeList().URLString() } hx-confirm="Are you sure you wish to delete all envelopes?" data-loading-disable>
+            <span data-loading-class="loading loading-spinner loading-sm">
+              @icons.Trash("w-5 h-5")
+            </span>
           </button>
         </div>
       </div>

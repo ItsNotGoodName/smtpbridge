@@ -18,7 +18,7 @@ type FlashProps struct {
 }
 
 templ Flash(t FlashType, c templ.Component) {
-  <div lass="flash">
+  <div class="flash" data-loading-hide-class="absolute hidden">
     switch t {
     case FlashTypeSuccess:
       <div class="alert alert-success">

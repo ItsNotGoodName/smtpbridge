@@ -32,11 +32,15 @@ templ ruleListView(m meta.Meta, props ruleListViewProps) {
       for _, rule := range props.Rules {
         <div class="hover:bg-base-200 border-base-200 flex items-center justify-between gap-2 border-b first:border-t" id="rule-row">
           <a class="flex-1 truncate py-4 pl-4" href={ routes.Rule(rule.ID).URL() }>{ rule.Name }</a>
-          <div class="flex items-center gap-4 pr-4">
+          <div class="flex items-center gap-2 pr-4">
             if !rule.Internal {
-              <button class="btn btn-error btn-sm" hx-delete={ routes.Rule(rule.ID).URLString() } hx-confirm="Are you sure you wish to delete this rule?"  hx-target="closest #rule-row" hx-swap="outerHTML">
-                @icons.Trash("h-4 w-4")
-              </button>
+              <div data-loading-states>
+                <button class="btn btn-error btn-sm" hx-delete={ routes.Rule(rule.ID).URLString() } hx-confirm="Are you sure you wish to delete this rule?"  hx-target="closest #rule-row" hx-swap="outerHTML" data-loading-disable>
+                  <span data-loading-class="loading loading-spinner loading-xs">
+                    @icons.Trash("h-4 w-4")
+                  </span>
+                </button>
+              </div>
             }
             <div>
               @c.RuleToggleButton(c.RuleToggleButtonProps{Enable: rule.Enable, ID: rule.ID})

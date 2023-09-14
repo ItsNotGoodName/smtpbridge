@@ -19,3 +19,8 @@ type RuleUpdate struct {
 	Expression string
 	Endpoints  []int64
 }
+
+type Login struct {
+	Username string
+	Password string
+}

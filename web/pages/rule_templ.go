@@ -91,12 +91,12 @@ func ruleListView(m meta.Meta, props ruleListViewProps) templ.Component {
 				if err != nil {
 					return err
 				}
-				_, err = templBuffer.WriteString("</a><div class=\"flex items-center gap-4 pr-4\">")
+				_, err = templBuffer.WriteString("</a><div class=\"flex items-center gap-2 pr-4\">")
 				if err != nil {
 					return err
 				}
 				if !rule.Internal {
-					_, err = templBuffer.WriteString("<button class=\"btn btn-error btn-sm\" hx-delete=\"")
+					_, err = templBuffer.WriteString("<div data-loading-states><button class=\"btn btn-error btn-sm\" hx-delete=\"")
 					if err != nil {
 						return err
 					}
@@ -104,7 +104,7 @@ func ruleListView(m meta.Meta, props ruleListViewProps) templ.Component {
 					if err != nil {
 						return err
 					}
-					_, err = templBuffer.WriteString("\" hx-confirm=\"Are you sure you wish to delete this rule?\" hx-target=\"closest #rule-row\" hx-swap=\"outerHTML\">")
+					_, err = templBuffer.WriteString("\" hx-confirm=\"Are you sure you wish to delete this rule?\" hx-target=\"closest #rule-row\" hx-swap=\"outerHTML\" data-loading-disable><span data-loading-class=\"loading loading-spinner loading-xs\">")
 					if err != nil {
 						return err
 					}
@@ -112,7 +112,7 @@ func ruleListView(m meta.Meta, props ruleListViewProps) templ.Component {
 					if err != nil {
 						return err
 					}
-					_, err = templBuffer.WriteString("</button>")
+					_, err = templBuffer.WriteString("</span></button></div>")
 					if err != nil {
 						return err
 					}

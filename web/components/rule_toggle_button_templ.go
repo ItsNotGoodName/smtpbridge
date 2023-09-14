@@ -29,6 +29,10 @@ func RuleToggleButton(props RuleToggleButtonProps) templ.Component {
 			var_1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
+		_, err = templBuffer.WriteString("<div data-loading-states>")
+		if err != nil {
+			return err
+		}
 		if props.Enable {
 			_, err = templBuffer.WriteString("<button class=\"btn btn-sm btn-success w-full\" hx-post=\"")
 			if err != nil {
@@ -38,7 +42,7 @@ func RuleToggleButton(props RuleToggleButtonProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("\" hx-target=\"this\" hx-swap=\"outerHTML\">")
+			_, err = templBuffer.WriteString("\" hx-target=\"this\" hx-swap=\"outerHTML\" data-loading-disable><span data-loading-class=\"loading loading-spinner loading-sm\">")
 			if err != nil {
 				return err
 			}
@@ -47,7 +51,7 @@ func RuleToggleButton(props RuleToggleButtonProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</button>")
+			_, err = templBuffer.WriteString("</span></button>")
 			if err != nil {
 				return err
 			}
@@ -60,7 +64,7 @@ func RuleToggleButton(props RuleToggleButtonProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("\" hx-target=\"this\" hx-swap=\"outerHTML\">")
+			_, err = templBuffer.WriteString("\" hx-target=\"this\" hx-swap=\"outerHTML\" data-loading-disable><span data-loading-class=\"loading loading-spinner loading-sm\">")
 			if err != nil {
 				return err
 			}
@@ -69,10 +73,14 @@ func RuleToggleButton(props RuleToggleButtonProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</button>")
+			_, err = templBuffer.WriteString("</span></button>")
 			if err != nil {
 				return err
 			}
+		}
+		_, err = templBuffer.WriteString("</div>")
+		if err != nil {
+			return err
 		}
 		if !templIsBuffer {
 			_, err = templBuffer.WriteTo(w)

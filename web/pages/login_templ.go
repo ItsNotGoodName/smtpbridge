@@ -10,8 +10,8 @@ import "io"
 import "bytes"
 
 import (
+	c "github.com/ItsNotGoodName/smtpbridge/web/components"
 	"github.com/ItsNotGoodName/smtpbridge/web/meta"
-	"github.com/ItsNotGoodName/smtpbridge/web/routes"
 )
 
 func loginView(m meta.Meta) templ.Component {
@@ -27,15 +27,7 @@ func loginView(m meta.Meta) templ.Component {
 			var_1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, err = templBuffer.WriteString("<div class=\"flex w-screen justify-center px-4 py-16\"><div class=\"card bg-base-100 card-compact border-base-200 w-full max-w-sm border\"><form class=\"card-body\" hx-post=\"")
-		if err != nil {
-			return err
-		}
-		_, err = templBuffer.WriteString(templ.EscapeString(routes.Login().URLString()))
-		if err != nil {
-			return err
-		}
-		_, err = templBuffer.WriteString("\"><h1 class=\"card-title justify-center\">")
+		_, err = templBuffer.WriteString("<div class=\"flex w-screen justify-center px-4 py-16\"><div class=\"card bg-base-100 card-compact border-base-200 w-full max-w-sm border\"><div class=\"card-body\"><h1 class=\"card-title justify-center\">")
 		if err != nil {
 			return err
 		}
@@ -44,34 +36,15 @@ func loginView(m meta.Meta) templ.Component {
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("</h1><div class=\"form-control\"><label class=\"label\"><span class=\"label-text\">")
+		_, err = templBuffer.WriteString("</h1>")
 		if err != nil {
 			return err
 		}
-		var_3 := `Username`
-		_, err = templBuffer.WriteString(var_3)
+		err = c.LoginForm(c.LoginFormProps{}).Render(ctx, templBuffer)
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("</span></label><input name=\"username\" type=\"text\" placeholder=\"Username\" autocomplete=\"username\" class=\"input input-bordered\"></div><div class=\"form-control\"><label class=\"label\"><span class=\"label-text\">")
-		if err != nil {
-			return err
-		}
-		var_4 := `Password`
-		_, err = templBuffer.WriteString(var_4)
-		if err != nil {
-			return err
-		}
-		_, err = templBuffer.WriteString("</span></label><input name=\"password\" type=\"password\" placeholder=\"Password\" autocomplete=\"current-password\" class=\"input input-bordered\"></div><div class=\"form-control mt-6\"><button type=\"submit\" class=\"btn btn-primary\">")
-		if err != nil {
-			return err
-		}
-		var_5 := `Login`
-		_, err = templBuffer.WriteString(var_5)
-		if err != nil {
-			return err
-		}
-		_, err = templBuffer.WriteString("</button></div></form></div></div>")
+		_, err = templBuffer.WriteString("</div></div></div>")
 		if err != nil {
 			return err
 		}

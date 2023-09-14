@@ -24,9 +24,11 @@ templ attachmentListView(m meta.Meta, props attachmentListViewProps) {
       </ul>
     </div>
     <div class="flex flex-col gap-4 p-4">
-      <div class="join flex items-center justify-end">
-        <button class="btn btn-sm btn-info join-item tooltip-left tooltip" data-tip="delete orphan attachments" hx-post={ routes.AttachmentTrim().URLString() }>
-          @icons.Recycle("w-5 h-5")
+      <div class="join flex items-center justify-end" data-loading-states>
+        <button class="btn btn-sm btn-info join-item tooltip-left tooltip" data-tip="delete orphan attachments" hx-post={ routes.AttachmentTrim().URLString() } data-loading-disable>
+          <span data-loading-class="loading loading-spinner loading-sm">
+            @icons.Recycle("w-5 h-5")
+          </span>
         </button>
       </div>
       @c.PaginateHeader(c.PaginateHeaderProps{

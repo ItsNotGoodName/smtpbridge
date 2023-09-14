@@ -3,6 +3,7 @@ import "./index.css"
 // ------------- htmx
 
 import "htmx.org"
+import "./loading-states.js"
 
 // csrfToken is first loaded from meta tag and then is updated through HX-Trigger HTTP response headers.
 // This allows HX-Boost to happen without invalidating previous csrfToken.
