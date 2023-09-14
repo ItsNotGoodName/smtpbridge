@@ -408,7 +408,7 @@ func RuleFormUpdate(props RuleFormUpdateProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			var_17 := `Cannot be edited because it is an internal rule.`
+			var_17 := `Rule cannot be edited because it is internal.`
 			_, err = templBuffer.WriteString(var_17)
 			if err != nil {
 				return err

@@ -111,7 +111,7 @@ templ RuleFormUpdate(props RuleFormUpdateProps) {
     if props.Rule.Internal {
       <div class="alert alert-warning">
         @icons.Alert("h-6 w-6")
-        <span>Cannot be edited because it is an internal rule.</span>
+        <span>Rule cannot be edited because it is internal.</span>
       </div>
     }
     <button disabled?={ props.Rule.Internal } type="submit" class="btn btn-primary btn-block">Update Rule</button>

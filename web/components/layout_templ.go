@@ -28,7 +28,7 @@ func LayoutDefault(m meta.Meta) templ.Component {
 			var_1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, err = templBuffer.WriteString("<div class=\"drawer lg:drawer-open\"><input id=\"my-drawer-2\" type=\"checkbox\" class=\"drawer-toggle\"><div class=\"drawer-content\"><div class=\"max-w-[100vw]\">")
+		_, err = templBuffer.WriteString("<div class=\"drawer lg:drawer-open\"><input id=\"my-drawer-2\" type=\"checkbox\" class=\"drawer-toggle\"><div class=\"drawer-content overflow-x-auto\">")
 		if err != nil {
 			return err
 		}
@@ -52,7 +52,7 @@ func LayoutDefault(m meta.Meta) templ.Component {
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("</div></div><div class=\"drawer-side z-20\"><label for=\"my-drawer-2\" class=\"drawer-overlay\"></label><ul class=\"menu bg-base-200 text-base-content h-full w-60 p-4\"><li>")
+		_, err = templBuffer.WriteString("</div><div class=\"drawer-side z-20\"><label for=\"my-drawer-2\" class=\"drawer-overlay\"></label><ul class=\"menu bg-base-200 text-base-content h-full w-60 p-4\"><li>")
 		if err != nil {
 			return err
 		}

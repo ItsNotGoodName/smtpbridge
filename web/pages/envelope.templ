@@ -40,7 +40,7 @@ templ envelopeView(m meta.Meta, props envelopeViewProps) {
           </tr>
           <tr>
             <th class="w-0 whitespace-nowrap">To</th>
-            <td>
+            <td class="flex items-center gap-2">
             for _, to := range props.Envelope.Message.To { 
               <span class="badge">
                 { to }
@@ -62,7 +62,7 @@ templ envelopeView(m meta.Meta, props envelopeViewProps) {
     <div class="flex flex-col gap-4 p-4">
       <form class="join" hx-post={ routes.EnvelopeEndpointSend(props.Envelope.Message.ID).URLString() } hx-target="next div" hx-swap="outerHTML">
         <select name="endpoint" id="endpoint" class="select select-bordered select-sm join-item w-full">
-          <option disabled selected>Endpoint</option>
+          <option disabled selected>Select Endpoint</option>
           for _, end := range props.Endpoints {
             <option value={ strconv.FormatInt(end.ID, 10) }>{ end.Name }</option>
           }
@@ -115,11 +115,12 @@ templ envelopeListView(m meta.Meta, props envelopeListViewProps) {
         Ascending: props.EnvelopeRequestRequest.Ascending,
       })
     </div>
-    <div class="bordery overflow-x-auto">
-      <table class="table-pin-cols table">
+    <div class="overflow-x-auto">
+      <table class="table table-pin-cols">
         <thead>
           <tr>
-            <th>
+            <th></th>
+            <td>
               @c.TableOrderTH(c.TableOrderTHProps{
                 Query     : props.Query,
                 Ascending : props.EnvelopeRequestRequest.Ascending,
@@ -128,8 +129,8 @@ templ envelopeListView(m meta.Meta, props envelopeListViewProps) {
               }) {
                 Created At
               }
-            </th>
-            <th>
+            </td>
+            <td>
               @c.TableOrderTH(c.TableOrderTHProps{
                 Query     : props.Query,
                 Ascending : props.EnvelopeRequestRequest.Ascending,
@@ -138,8 +139,8 @@ templ envelopeListView(m meta.Meta, props envelopeListViewProps) {
               }) {
                 From
               }
-            </th>
-            <th>
+            </td>
+            <td>
               @c.TableOrderTH(c.TableOrderTHProps{
                 Query     : props.Query,
                 Ascending : props.EnvelopeRequestRequest.Ascending,
@@ -148,43 +149,46 @@ templ envelopeListView(m meta.Meta, props envelopeListViewProps) {
               }) {
                 Subject
               }
-            </th>
+            </td>
             <th></th>
           </tr>
         </thead>
         <tbody>
           for _, env := range props.EnvelopeRequestResult.Envelopes {
-          <tr>
-            <td class="w-0 whitespace-nowrap">
-              <div class="tooltip tooltip-right" data-tip={ helpers.TimeHumanize(env.Message.CreatedAt.Time()) }>
+            <tr>
+              <th class="w-0 whitespace-nowrap z-10">
+                { strconv.FormatInt(env.Message.ID, 10) }
+              </th>
+              <td class="w-0 whitespace-nowrap">
+                <div class="tooltip tooltip-right" data-tip={ helpers.TimeHumanize(env.Message.CreatedAt.Time()) }>
+                  <a href={ routes.Envelope(env.Message.ID).URL() }>
+                    @c.FormatDate(m, time.Time(env.Message.CreatedAt))
+                  </a>
+                </div>
+              </td>
+              <td class="w-0 whitespace-nowrap">
                 <a href={ routes.Envelope(env.Message.ID).URL() }>
-                  @c.FormatDate(m, time.Time(env.Message.CreatedAt))
+                  { env.Message.From }
                 </a>
-              </div>
-            </td>
-            <td class="w-0 whitespace-nowrap">
-              <a href={ routes.Envelope(env.Message.ID).URL() }>
-                { env.Message.From }
-              </a>
-            </td>
-            <td class="whitespace-nowrap">
-              <a href={ routes.Envelope(env.Message.ID).URL() }>
-                { env.Message.Subject }
-              </a>
-            </td>
-            <td class="w-0 whitespace-nowrap">
-            if len(env.Attachments) != 0 {
-              <a href={ routes.Envelope(env.Message.ID).URLQuery("tab=" + routes.EnvelopeTabAttachments.String()) } class="tooltip tooltip-left fill-current flex items-center" data-tip={ strconv.Itoa(len(env.Attachments)) + " Attachment(s)"  }>
-                @icons.Attachment("h-4 w-4")
-              </a>
-            }
-            </td>
-            <th class="w-0 whitespace-nowrap">
-              <button class="btn btn-error btn-xs join-item" hx-delete={ routes.Envelope(env.Message.ID).URLString() } hx-target="closest tr" hx-confirm="Are you sure you wish to delete this envelope?" >
-                @icons.Trash("h-4 w-4")
-              </button>
-            </th>
-          </tr>
+              </td>
+              <td class="whitespace-nowrap">
+                <a href={ routes.Envelope(env.Message.ID).URL() }>
+                  { env.Message.Subject }
+                </a>
+              </td>
+              <th class="w-0 whitespace-nowrap">
+                <div class="flex flex-row justify-end gap-2">
+                  if len(env.Attachments) != 0 {
+                    <a href={ routes.Envelope(env.Message.ID).URLQuery("tab=" + routes.EnvelopeTabAttachments.String()) } class="tooltip tooltip-left fill-current flex items-center" data-tip={ strconv.Itoa(len(env.Attachments)) + " Attachment(s)"  }>
+                      @icons.Attachment("h-4 w-4")
+                    </a>
+                  }
+                  <button class="btn btn-error btn-xs join-item" hx-delete={ routes.Envelope(env.Message.ID).URLString() } hx-target="closest tr" hx-confirm="Are you sure you wish to delete this envelope?" >
+                    @icons.Trash("h-4 w-4")
+                  </button>
+                </div>
+              </th>
+            </tr>
           }
         </tbody>
       </table>

@@ -9,14 +9,12 @@ import (
 templ LayoutDefault(m meta.Meta) {
   <div class="drawer lg:drawer-open">
     <input id="my-drawer-2" type="checkbox" class="drawer-toggle"/>
-    <div class="drawer-content">
-    <div class="max-w-[100vw]">
+    <div class="drawer-content overflow-x-auto">
       @Header(m)
       <div class="min-h-screen">
         { children... }
       </div>
       @Footer()
-    </div>
     </div>
     <div class="drawer-side z-20">
       <label for="my-drawer-2" class="drawer-overlay"></label>

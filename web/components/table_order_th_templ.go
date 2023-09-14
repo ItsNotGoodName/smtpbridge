@@ -59,17 +59,57 @@ func TableOrderTH(props TableOrderTHProps) templ.Component {
 		if err != nil {
 			return err
 		}
-		if props.Order == props.Field {
-			if props.Ascending {
-				err = icons.ArrowUpS("h-4 w-4").Render(ctx, templBuffer)
-				if err != nil {
-					return err
-				}
-			} else {
-				err = icons.ArrowDownS("h-4 w-4").Render(ctx, templBuffer)
-				if err != nil {
-					return err
-				}
+		if props.Ascending {
+			var var_3 = []any{templ.KV("opacity-0", props.Order != props.Field)}
+			err = templ.RenderCSSItems(ctx, templBuffer, var_3...)
+			if err != nil {
+				return err
+			}
+			_, err = templBuffer.WriteString("<div class=\"")
+			if err != nil {
+				return err
+			}
+			_, err = templBuffer.WriteString(templ.EscapeString(templ.CSSClasses(var_3).String()))
+			if err != nil {
+				return err
+			}
+			_, err = templBuffer.WriteString("\">")
+			if err != nil {
+				return err
+			}
+			err = icons.ArrowUpS("h-4 w-4").Render(ctx, templBuffer)
+			if err != nil {
+				return err
+			}
+			_, err = templBuffer.WriteString("</div>")
+			if err != nil {
+				return err
+			}
+		} else {
+			var var_4 = []any{templ.KV("opacity-0", props.Order != props.Field)}
+			err = templ.RenderCSSItems(ctx, templBuffer, var_4...)
+			if err != nil {
+				return err
+			}
+			_, err = templBuffer.WriteString("<div class=\"")
+			if err != nil {
+				return err
+			}
+			_, err = templBuffer.WriteString(templ.EscapeString(templ.CSSClasses(var_4).String()))
+			if err != nil {
+				return err
+			}
+			_, err = templBuffer.WriteString("\">")
+			if err != nil {
+				return err
+			}
+			err = icons.ArrowDownS("h-4 w-4").Render(ctx, templBuffer)
+			if err != nil {
+				return err
+			}
+			_, err = templBuffer.WriteString("</div>")
+			if err != nil {
+				return err
 			}
 		}
 		_, err = templBuffer.WriteString("</a>")
