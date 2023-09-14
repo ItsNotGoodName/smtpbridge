@@ -6,10 +6,10 @@ import "github.com/ItsNotGoodName/smtpbridge/web/helpers"
 import "net/url"
 
 type TableOrderTHProps struct {
-  Query         url.Values
-	Ascending     bool
-	Order         string
-  Field         string
+  Query url.Values
+  Ascending bool
+  Order string
+  Field string
 }
 
 func tableOrderTHAscending(enable, ascending bool) string {

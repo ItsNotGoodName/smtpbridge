@@ -38,9 +38,9 @@ templ PaginateHeader(props PaginateHeaderProps) {
           ASC
         </a>
       } else {
-      <a class="btn btn-sm btn-outline" href={ props.Route.URLQuery(helpers.Query(props.Query, "ascending", "1")) }>
-        DESC
-      </a>
+        <a class="btn btn-sm btn-outline" href={ props.Route.URLQuery(helpers.Query(props.Query, "ascending", "1")) }>
+          DESC
+        </a>
       }
     </div>
     <div class="ml-auto flex flex-row items-center justify-between gap-4">
