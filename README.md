@@ -19,6 +19,7 @@ Bridge email to other messaging services.
 # Migration
 
 Until `1.X.X`, every `0.X.0` release may break something or everything.
+It is recommended to delete `smtpbridge_data` on every minor release and also check the [Full Config](#full-config) example for changes.
 
 # Usage
 
