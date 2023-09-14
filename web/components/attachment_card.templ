@@ -3,6 +3,7 @@ package components
 import (
   "github.com/ItsNotGoodName/smtpbridge/web/routes"
   "github.com/ItsNotGoodName/smtpbridge/internal/models"
+  "github.com/ItsNotGoodName/smtpbridge/web/icons"
 )
 
 type AttachmentCardProps struct {
@@ -10,16 +11,26 @@ type AttachmentCardProps struct {
 }
 
 templ AttachmentCard(props AttachmentCardProps) {
-	<div class="card card-compact bg-base-100 border-base-200 w-full border sm:w-80">
-		if props.Attachment.IsImage() {
-			<figure><img src={ routes.AttachmentFile(props.Attachment.FileName()).URLString() } alt={ props.Attachment.Name }/></figure>
-		}
-		<div class="card-body">
-			<h2 class="card-title break-all">{ props.Attachment.Name }</h2>
-			<div class="card-actions justify-end">
-        <a hx-boost="false" href={ routes.AttachmentFile(props.Attachment.FileName()).URLQuery("download=1") } class="btn btn-primary">Download</a>
+  <div class="w-full sm:w-80">
+    <div class="card card-compact bg-base-100 border-base-200 border">
+      if props.Attachment.IsImage() {
+        <figure class="bg-base-content"><img src={ routes.AttachmentFile(props.Attachment.FileName()).URLString() } alt={ props.Attachment.Name }/></figure>
+      }
+      <div class="flex-1 p-2 flex flex-col justify-end gap-2">
+        <p class="break-all font-bold">{ props.Attachment.Name }</p>
+        <div class="join flex justify-end">
+          <a class="join-item btn tooltip flex items-center" data-tip="Envelope" href={ routes.Envelope(props.Attachment.MessageID).URLQuery("tab=" + routes.EnvelopeTabAttachments.String()) }>
+            @icons.Mail("h-5 w-5")
+          </a>
+          <a class="join-item btn tooltip flex items-center" data-tip="View" hx-boost="false" href={ routes.AttachmentFile(props.Attachment.FileName()).URL() }>
+            @icons.Eye("h-5 w-5")
+          </a>
+          <a class="join-item btn tooltip flex items-center" data-tip="Download" hx-boost="false" href={ routes.AttachmentFile(props.Attachment.FileName()).URLQuery("download=1") }>
+            @icons.Download("h-5 w-5")
+          </a>
+        </div>
       </div>
-		</div>
+    </div>
 	</div>
 }
 

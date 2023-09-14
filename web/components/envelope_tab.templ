@@ -13,20 +13,20 @@ type EnvelopeTabProps struct {
 }
 
 templ EnvelopeTab(props EnvelopeTabProps) {
-  <div id="tabs" hx-target="#tabs" hx-swap="innerHTML">
+  <div id="tabs">
     <div class="flex">
       <div class="border-base-200 w-4 border-b"></div>
       <div class="tabs" role="tablist">
-        <a class={ "tab tab-lifted", templ.KV("tab-active", props.Tab == routes.EnvelopeTabText) } hx-get={ routes.EnvelopeTabComponent(props.Envelope.Message.ID, routes.EnvelopeTabText).URLString() } aria-controls="tab-content" role="tab">
+        <a class={ "tab tab-lifted", templ.KV("tab-active", props.Tab == routes.EnvelopeTabText) } hx-get={ routes.EnvelopeTabComponent(props.Envelope.Message.ID, routes.EnvelopeTabText).URLString() } aria-controls="tab-content" role="tab" hx-target="#tabs" hx-swap="innerHTML">
           Text
         </a> 
         if props.Envelope.Message.HTML != "" {
-          <a class={ "tab tab-lifted", templ.KV("tab-active", props.Tab == routes.EnvelopeTabHTML) } hx-get={ routes.EnvelopeTabComponent(props.Envelope.Message.ID, routes.EnvelopeTabHTML).URLString() } aria-controls="tab-content" role="tab">
+          <a class={ "tab tab-lifted", templ.KV("tab-active", props.Tab == routes.EnvelopeTabHTML) } hx-get={ routes.EnvelopeTabComponent(props.Envelope.Message.ID, routes.EnvelopeTabHTML).URLString() } aria-controls="tab-content" role="tab" hx-target="#tabs" hx-swap="innerHTML">
             HTML
           </a> 
         }
         if len(props.Envelope.Attachments) != 0 {
-          <a class={ "tab tab-lifted flex gap-2", templ.KV("tab-active", props.Tab == routes.EnvelopeTabAttachments) } hx-get={ routes.EnvelopeTabComponent(props.Envelope.Message.ID, routes.EnvelopeTabAttachments).URLString() } aria-controls="tab-content" role="tab">
+          <a class={ "tab tab-lifted flex gap-2", templ.KV("tab-active", props.Tab == routes.EnvelopeTabAttachments) } hx-get={ routes.EnvelopeTabComponent(props.Envelope.Message.ID, routes.EnvelopeTabAttachments).URLString() } aria-controls="tab-content" role="tab" hx-target="#tabs" hx-swap="innerHTML">
             Attachments
             <div class="badge badge-primary">
               <td>{ strconv.Itoa(len(props.Envelope.Attachments)) }</td>

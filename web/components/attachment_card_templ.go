@@ -11,6 +11,7 @@ import "bytes"
 
 import (
 	"github.com/ItsNotGoodName/smtpbridge/internal/models"
+	"github.com/ItsNotGoodName/smtpbridge/web/icons"
 	"github.com/ItsNotGoodName/smtpbridge/web/routes"
 )
 
@@ -31,12 +32,12 @@ func AttachmentCard(props AttachmentCardProps) templ.Component {
 			var_1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, err = templBuffer.WriteString("<div class=\"card card-compact bg-base-100 border-base-200 w-full border sm:w-80\">")
+		_, err = templBuffer.WriteString("<div class=\"w-full sm:w-80\"><div class=\"card card-compact bg-base-100 border-base-200 border\">")
 		if err != nil {
 			return err
 		}
 		if props.Attachment.IsImage() {
-			_, err = templBuffer.WriteString("<figure><img src=\"")
+			_, err = templBuffer.WriteString("<figure class=\"bg-base-content\"><img src=\"")
 			if err != nil {
 				return err
 			}
@@ -57,7 +58,7 @@ func AttachmentCard(props AttachmentCardProps) templ.Component {
 				return err
 			}
 		}
-		_, err = templBuffer.WriteString("<div class=\"card-body\"><h2 class=\"card-title break-all\">")
+		_, err = templBuffer.WriteString("<div class=\"flex-1 p-2 flex flex-col justify-end gap-2\"><p class=\"break-all font-bold\">")
 		if err != nil {
 			return err
 		}
@@ -66,25 +67,58 @@ func AttachmentCard(props AttachmentCardProps) templ.Component {
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("</h2><div class=\"card-actions justify-end\"><a hx-boost=\"false\" href=\"")
+		_, err = templBuffer.WriteString("</p><div class=\"join flex justify-end\"><a class=\"join-item btn tooltip flex items-center\" data-tip=\"Envelope\" href=\"")
 		if err != nil {
 			return err
 		}
-		var var_3 templ.SafeURL = routes.AttachmentFile(props.Attachment.FileName()).URLQuery("download=1")
+		var var_3 templ.SafeURL = routes.Envelope(props.Attachment.MessageID).URLQuery("tab=" + routes.EnvelopeTabAttachments.String())
 		_, err = templBuffer.WriteString(templ.EscapeString(string(var_3)))
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("\" class=\"btn btn-primary\">")
+		_, err = templBuffer.WriteString("\">")
 		if err != nil {
 			return err
 		}
-		var_4 := `Download`
-		_, err = templBuffer.WriteString(var_4)
+		err = icons.Mail("h-5 w-5").Render(ctx, templBuffer)
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("</a></div></div></div>")
+		_, err = templBuffer.WriteString("</a><a class=\"join-item btn tooltip flex items-center\" data-tip=\"View\" hx-boost=\"false\" href=\"")
+		if err != nil {
+			return err
+		}
+		var var_4 templ.SafeURL = routes.AttachmentFile(props.Attachment.FileName()).URL()
+		_, err = templBuffer.WriteString(templ.EscapeString(string(var_4)))
+		if err != nil {
+			return err
+		}
+		_, err = templBuffer.WriteString("\">")
+		if err != nil {
+			return err
+		}
+		err = icons.Eye("h-5 w-5").Render(ctx, templBuffer)
+		if err != nil {
+			return err
+		}
+		_, err = templBuffer.WriteString("</a><a class=\"join-item btn tooltip flex items-center\" data-tip=\"Download\" hx-boost=\"false\" href=\"")
+		if err != nil {
+			return err
+		}
+		var var_5 templ.SafeURL = routes.AttachmentFile(props.Attachment.FileName()).URLQuery("download=1")
+		_, err = templBuffer.WriteString(templ.EscapeString(string(var_5)))
+		if err != nil {
+			return err
+		}
+		_, err = templBuffer.WriteString("\">")
+		if err != nil {
+			return err
+		}
+		err = icons.Download("h-5 w-5").Render(ctx, templBuffer)
+		if err != nil {
+			return err
+		}
+		_, err = templBuffer.WriteString("</a></div></div></div></div>")
 		if err != nil {
 			return err
 		}

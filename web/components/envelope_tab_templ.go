@@ -34,7 +34,7 @@ func EnvelopeTab(props EnvelopeTabProps) templ.Component {
 			var_1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, err = templBuffer.WriteString("<div id=\"tabs\" hx-target=\"#tabs\" hx-swap=\"innerHTML\"><div class=\"flex\"><div class=\"border-base-200 w-4 border-b\"></div><div class=\"tabs\" role=\"tablist\">")
+		_, err = templBuffer.WriteString("<div id=\"tabs\"><div class=\"flex\"><div class=\"border-base-200 w-4 border-b\"></div><div class=\"tabs\" role=\"tablist\">")
 		if err != nil {
 			return err
 		}
@@ -59,7 +59,7 @@ func EnvelopeTab(props EnvelopeTabProps) templ.Component {
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("\" aria-controls=\"tab-content\" role=\"tab\">")
+		_, err = templBuffer.WriteString("\" aria-controls=\"tab-content\" role=\"tab\" hx-target=\"#tabs\" hx-swap=\"innerHTML\">")
 		if err != nil {
 			return err
 		}
@@ -94,7 +94,7 @@ func EnvelopeTab(props EnvelopeTabProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("\" aria-controls=\"tab-content\" role=\"tab\">")
+			_, err = templBuffer.WriteString("\" aria-controls=\"tab-content\" role=\"tab\" hx-target=\"#tabs\" hx-swap=\"innerHTML\">")
 			if err != nil {
 				return err
 			}
@@ -130,7 +130,7 @@ func EnvelopeTab(props EnvelopeTabProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("\" aria-controls=\"tab-content\" role=\"tab\">")
+			_, err = templBuffer.WriteString("\" aria-controls=\"tab-content\" role=\"tab\" hx-target=\"#tabs\" hx-swap=\"innerHTML\">")
 			if err != nil {
 				return err
 			}

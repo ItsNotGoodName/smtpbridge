@@ -691,3 +691,42 @@ func ArrowDownS(class any) templ.Component {
 		return err
 	})
 }
+
+// https://remixicon.com/icon/download-line
+
+func Download(class any) templ.Component {
+	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
+		templBuffer, templIsBuffer := w.(*bytes.Buffer)
+		if !templIsBuffer {
+			templBuffer = templ.GetBuffer()
+			defer templ.ReleaseBuffer(templBuffer)
+		}
+		ctx = templ.InitializeContext(ctx)
+		var_36 := templ.GetChildren(ctx)
+		if var_36 == nil {
+			var_36 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		var var_37 = []any{class, "fill-current"}
+		err = templ.RenderCSSItems(ctx, templBuffer, var_37...)
+		if err != nil {
+			return err
+		}
+		_, err = templBuffer.WriteString("<svg class=\"")
+		if err != nil {
+			return err
+		}
+		_, err = templBuffer.WriteString(templ.EscapeString(templ.CSSClasses(var_37).String()))
+		if err != nil {
+			return err
+		}
+		_, err = templBuffer.WriteString("\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\"><path d=\"M3 19H21V21H3V19ZM13 13.1716L19.0711 7.1005L20.4853 8.51472L12 17L3.51472 8.51472L4.92893 7.1005L11 13.1716V2H13V13.1716Z\"></path></svg>")
+		if err != nil {
+			return err
+		}
+		if !templIsBuffer {
+			_, err = templBuffer.WriteTo(w)
+		}
+		return err
+	})
+}
