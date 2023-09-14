@@ -38,7 +38,9 @@ func DeleteAttachmentBySize(ctx context.Context, tracer trace.Tracer, fileStore 
 		return 0, err
 	}
 
-	tracer.Trace(ctx, "retention.attachment.size.delete", trace.WithKV("count", count))
+	if count > 0 {
+		tracer.Trace(ctx, "retention.attachment.size.delete", trace.WithKV("count", count))
+	}
 
 	return count, nil
 }
@@ -64,7 +66,9 @@ func DeleteEnvelopeByCount(ctx context.Context, tracer trace.Tracer, db database
 		return 0, err
 	}
 
-	tracer.Trace(ctx, "retention.envelope.count.delete", trace.WithKV("count", count))
+	if count > 0 {
+		tracer.Trace(ctx, "retention.envelope.count.delete", trace.WithKV("count", count))
+	}
 
 	return count, nil
 }
@@ -80,7 +84,9 @@ func DeleteEnvelopeByAge(ctx context.Context, tracer trace.Tracer, db database.Q
 		return 0, err
 	}
 
-	tracer.Trace(ctx, "retention.envelope.age.delete", trace.WithKV("count", count))
+	if count > 0 {
+		tracer.Trace(ctx, "retention.envelope.age.delete", trace.WithKV("count", count))
+	}
 
 	return count, nil
 }
@@ -112,7 +118,10 @@ func DeleteOrphanAttachments(ctx context.Context, tracer trace.Tracer, db databa
 			}
 		}
 
-		tracer.Trace(ctx, "retention.attachment.orphan.delete", trace.WithKV("count", len(atts)))
+		count := len(atts)
+		if count > 0 {
+			tracer.Trace(ctx, "retention.attachment.orphan.delete", trace.WithKV("count", count))
+		}
 	}
 }
 
@@ -127,7 +136,9 @@ func DeleteTraceByAge(ctx context.Context, tracer trace.Tracer, db database.Quer
 		return 0, err
 	}
 
-	tracer.Trace(ctx, "retention.trace.age.delete", trace.WithKV("count", count))
+	if count > 0 {
+		tracer.Trace(ctx, "retention.trace.age.delete", trace.WithKV("count", count))
+	}
 
 	return count, nil
 }
