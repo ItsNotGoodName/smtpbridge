@@ -95,3 +95,30 @@ func (r Healthcheck) Execute(ctx context.Context) {
 func (r Healthcheck) Key() int {
 	return quartz.HashCode(r.Description())
 }
+
+// DatabaseVacuum
+type DatabaseVacuum struct {
+	app core.App
+}
+
+func NewDatabaseVacuum(app core.App) DatabaseVacuum {
+	return DatabaseVacuum{
+		app: app,
+	}
+}
+
+func (DatabaseVacuum) Description() string {
+	return "database-vacuum"
+}
+
+func (r DatabaseVacuum) Execute(ctx context.Context) {
+	err := r.app.DatabaseVacuum(ctx)
+	if err != nil {
+		log.Err(err).Msg("Failed to vacuum database")
+		return
+	}
+}
+
+func (r DatabaseVacuum) Key() int {
+	return quartz.HashCode(r.Description())
+}

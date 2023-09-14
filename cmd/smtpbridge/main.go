@@ -144,6 +144,16 @@ func run(flags *flag.FlagSet) lieut.Executor {
 				}
 			}
 
+			{
+				job := cron.NewDatabaseVacuum(app)
+				trigger := quartz.NewSimpleTrigger(24 * time.Hour)
+				if err := scheduler.ScheduleJob(ctx, job, trigger); err != nil {
+					return err
+				}
+
+				job.Execute(ctx)
+			}
+
 			return nil
 		}))
 

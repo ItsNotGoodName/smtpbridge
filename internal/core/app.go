@@ -51,4 +51,5 @@ type App interface {
 	TraceDrop(ctx context.Context) error
 	TraceList(ctx context.Context, page pagination.Page, req models.DTOTraceListRequest) (models.DTOTraceListResult, error)
 	Tracer(source string) trace.Tracer
+	DatabaseVacuum(ctx context.Context) error
 }

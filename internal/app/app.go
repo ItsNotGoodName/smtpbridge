@@ -38,6 +38,11 @@ type App struct {
 	webTestFileStore WebTestFileStore
 }
 
+// DatabaseVacuum implements core.App.
+func (a App) DatabaseVacuum(ctx context.Context) error {
+	return repo.Vacuum(ctx, a.db)
+}
+
 func (a App) RuleEndpointsGet(ctx context.Context, id int64) (models.RuleEndpoints, error) {
 	return repo.RuleEndpointsGet(ctx, a.db, id)
 }
