@@ -38,7 +38,7 @@ func PaginateHeader(props PaginateHeaderProps) templ.Component {
 			var_1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, err = templBuffer.WriteString("<div class=\"flex flex-col items-center justify-between gap-4 sm:flex-row\"><div class=\"mr-auto flex flex-row items-center gap-2\"><details class=\"dropdown\"><summary class=\"btn btn-sm btn-outline\">")
+		_, err = templBuffer.WriteString("<div class=\"flex flex-col items-center justify-between gap-4 sm:flex-row\"><div class=\"mr-auto flex flex-row items-center gap-2\"><div class=\"dropdown\"><label tabindex=\"0\" class=\"btn btn-sm btn-outline\">")
 		if err != nil {
 			return err
 		}
@@ -47,7 +47,7 @@ func PaginateHeader(props PaginateHeaderProps) templ.Component {
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("</summary><ul class=\"menu dropdown-content bg-base-100 rounded-box z-50 w-52 p-2 shadow-lg\">")
+		_, err = templBuffer.WriteString("</label><ul tabindex=\"0\" class=\"menu dropdown-content bg-base-100 rounded-box z-50 w-52 p-2 shadow-lg\">")
 		if err != nil {
 			return err
 		}
@@ -75,7 +75,7 @@ func PaginateHeader(props PaginateHeaderProps) templ.Component {
 				return err
 			}
 		}
-		_, err = templBuffer.WriteString("</ul></details>")
+		_, err = templBuffer.WriteString("</ul></div>")
 		if err != nil {
 			return err
 		}

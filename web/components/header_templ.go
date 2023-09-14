@@ -59,7 +59,7 @@ func Header(m meta.Meta) templ.Component {
 			return err
 		}
 		if !m.Anonymous {
-			_, err = templBuffer.WriteString("<div class=\"flex-none\"><details class=\"dropdown dropdown-end\"><summary class=\"btn btn-square btn-ghost\">")
+			_, err = templBuffer.WriteString("<div class=\"flex-none\"><div class=\"dropdown dropdown-end\"><label tabindex=\"0\" class=\"btn btn-square btn-ghost\">")
 			if err != nil {
 				return err
 			}
@@ -67,7 +67,7 @@ func Header(m meta.Meta) templ.Component {
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</summary><ul class=\"menu dropdown-content bg-base-100 rounded-box z-50 w-52 p-2 shadow-lg\"><li><a href=\"#\" hx-delete=\"")
+			_, err = templBuffer.WriteString("</label><ul class=\"menu dropdown-content bg-base-100 rounded-box z-50 w-52 p-2 shadow-lg\"><li><a href=\"#\" hx-delete=\"")
 			if err != nil {
 				return err
 			}
@@ -92,7 +92,7 @@ func Header(m meta.Meta) templ.Component {
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</a></li></ul></details></div>")
+			_, err = templBuffer.WriteString("</a></li></ul></div></div>")
 			if err != nil {
 				return err
 			}

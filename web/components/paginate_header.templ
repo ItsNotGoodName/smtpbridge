@@ -19,20 +19,20 @@ type PaginateHeaderProps struct {
 templ PaginateHeader(props PaginateHeaderProps) {
   <div class="flex flex-col items-center justify-between gap-4 sm:flex-row">
     <div class="mr-auto flex flex-row items-center gap-2">
-      <details class="dropdown">
-        <summary class="btn btn-sm btn-outline">
+      <div class="dropdown">
+        <label tabindex="0" class="btn btn-sm btn-outline">
           { strconv.Itoa(props.PageResult.PerPage) }
-        </summary>
-        <ul class="menu dropdown-content bg-base-100 rounded-box z-50 w-52 p-2 shadow-lg">
-        for _, option := range limits {
-          <li>
-            <a href={ props.Route.URLQuery(helpers.Query(props.Query, "perPage", option)) }>
-              { strconv.Itoa(option) }
-            </a>
-          </li>
-        }
+        </label>
+        <ul tabindex="0" class="menu dropdown-content bg-base-100 rounded-box z-50 w-52 p-2 shadow-lg">
+          for _, option := range limits {
+            <li>
+              <a href={ props.Route.URLQuery(helpers.Query(props.Query, "perPage", option)) }>
+                { strconv.Itoa(option) }
+              </a>
+            </li>
+          }
         </ul>
-      </details>
+      </div>
       if props.Ascending {
         <a class="btn btn-sm btn-outline" href={ props.Route.URLQuery(helpers.Query(props.Query, "ascending", "")) }>
           ASC

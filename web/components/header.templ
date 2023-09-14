@@ -18,10 +18,10 @@ templ Header(m meta.Meta) {
     </div>
     if !m.Anonymous {
       <div class="flex-none">
-        <details class="dropdown dropdown-end">
-          <summary class="btn btn-square btn-ghost">
+        <div class="dropdown dropdown-end">
+          <label tabindex="0" class="btn btn-square btn-ghost">
             @icons.More("h-5 w-5")
-          </summary>
+          </label>
           <ul class="menu dropdown-content bg-base-100 rounded-box z-50 w-52 p-2 shadow-lg">
             <li>
               <a href="#" hx-delete={ routes.Logout().URLString() }>
@@ -30,9 +30,8 @@ templ Header(m meta.Meta) {
               </a>
             </li>
           </ul>
-        </details>
+        </div>
       </div>
     }
   </div>
 }
-
