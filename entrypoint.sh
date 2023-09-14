@@ -10,4 +10,4 @@ if [ -n "$APPRISE_ENABLE" ]; then
 	fi
 fi
 
-/usr/bin/smtpbridge --data-directory=/data
+/usr/bin/smtpbridge -data-directory=/data

@@ -11,6 +11,20 @@ Bridge email to other messaging services.
 
 [![Screenshot](https://static.gurnain.com/github/smtpbridge/demo-small.png)](https://static.gurnain.com/github/smtpbridge/demo.png)
 
+# Features
+
+- Envelopes that contain subject, from, to, text, html, and attachments of an email
+- Endpoints for sending envelopes
+- Rules for matching envelopes
+- SMTP server that creates envelopes
+- HTTP server
+  - Create, view, and delete envelopes
+  - View and test endpoints
+  - Create, view, update, and delete rules
+- Authentication for HTTP and SMTP servers
+- Retention policy for deleting old envelopes
+- Healthcheck for monitoring
+
 # Use Cases
 
 - Pictures from IP cameras
@@ -25,6 +39,12 @@ It is recommended to delete `smtpbridge_data` on every minor release and also ch
 
 ```
 smtpbridge
+```
+
+## Show Help
+
+```
+smtpbridge -help
 ```
 
 ## Show Version
@@ -93,7 +113,7 @@ rules:
 debug: false
 
 # Used by HTTP, ...
-time_format: 12h # (12h, 24h)
+time_format: 12h # [12h, 24h]
 
 # Directory for storing data
 data_directory: smtpbridge_data
@@ -105,10 +125,10 @@ python_executable: python3
 # You can use a third party service such as healthchecks.io
 healthcheck:
   # URL to fetch, empty means health checking is disabled
-  url: "" # (https://hc-ping.com/cb8bcf81-d3c4-4c98-85a6-734c3b7ddb2b, ...)
+  url: "" # [https://hc-ping.com/cb8bcf81-d3c4-4c98-85a6-734c3b7ddb2b, ...]
 
   # Interval between each fetch
-  interval: 5m # (5m, 5h45m, ...)
+  interval: 5m # [5m, 5h45m, ...]
 
   # Run on startup
   startup: false
@@ -116,19 +136,19 @@ healthcheck:
 # Retention policy will delete resources that pass the configured policy
 retention:
   # Envelopes in database
-  envelope_count: # (0, 100, 250, ...)
-  envelope_age: # (5m, 5h45m, ...)
+  envelope_count: # [0, 100, 250, ...]
+  envelope_age: # [5m, 5h45m, ...]
 
   # Attachment files in file store
-  attachment_size: # (100 MB, 1 GB, ...)
+  attachment_size: # [100 MB, 1 GB, ...]
 
   # Traces in database
-  trace_age: 168h # 7 days (5m, 5h45m, ...)
+  trace_age: 168h # 7 days [5m, 5h45m, ...]
 
 # HTTP server
 http:
   disable: false
-  host: "" # (127.0.0.1, ...)
+  host: "" # [127.0.0.1, ...]
   port: 8080
 
   # Authentication is disabled if both username and password are empty
@@ -136,12 +156,12 @@ http:
   password: ""
 
   # Public URL
-  url: "" # (http://127.0.0.1:8080, ...)
+  url: "" # [http://127.0.0.1:8080, ...]
 
 # SMTP server
 smtp:
   disable: false
-  host: "" # (127.0.0.1, ...)
+  host: "" # [127.0.0.1, ...]
   port: 1025
 
   # Authentication is disabled if both username and password are empty
@@ -149,7 +169,7 @@ smtp:
   password: ""
 
   # Maximum payload size
-  max_payload_size: 25 MB
+  max_payload_size: 25 MB # [100 MB, 1 GB, ...]
 
 # Endpoints for envelopes
 endpoints:
