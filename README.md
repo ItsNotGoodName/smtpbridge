@@ -16,6 +16,10 @@ Bridge email to other messaging services.
 - Pictures from IP cameras
 - System messages from servers
 
+# Migration
+
+Until `1.X.X`, every `0.X.0` release may break something or everything.
+
 # Usage
 
 ```
@@ -66,6 +70,8 @@ Config file is loaded from one of the following locations in order.
 - `/etc/smtpbridge.yaml`
 - `/etc/smtpbridge.yml`
 
+CLI flags take priority over config files and environment.
+
 ## Simple Config
 
 This config prints emails received via SMTP to console.
@@ -91,7 +97,7 @@ time_format: 12h # (12h, 24h)
 # Directory for storing data
 data_directory: smtpbridge_data
 
-# Python executable
+# Python executable used by Apprise, ...
 python_executable: python3
 
 # Healthcheck enables verification that the program has not crashed or lost network access
@@ -106,7 +112,7 @@ healthcheck:
   # Run on startup
   startup: false
 
-# Retention policy will delete resources that match the configured policy
+# Retention policy will delete resources that pass the configured policy
 retention:
   # Envelopes in database
   envelope_count: # (0, 100, 250, ...)
@@ -120,8 +126,8 @@ retention:
 
 # HTTP server
 http:
-  disable: false # (false, true)
-  host: ""
+  disable: false
+  host: "" # (127.0.0.1, ...)
   port: 8080
 
   # Authentication is disabled if both username and password are empty
@@ -129,12 +135,12 @@ http:
   password: ""
 
   # Public URL
-  url: "" # (http://127.0.0.1:8080)
+  url: "" # (http://127.0.0.1:8080, ...)
 
 # SMTP server
 smtp:
-  disable: false # (false, true)
-  host: ""
+  disable: false
+  host: "" # (127.0.0.1, ...)
   port: 1025
 
   # Authentication is disabled if both username and password are empty
@@ -154,7 +160,9 @@ endpoints:
   telegram_endpoint:
     kind: telegram
     config:
+      # https://core.telegram.org/bots/features#creating-a-new-bot
       token: 2222222222222222222222
+      # https://stackoverflow.com/a/32572159
       chat_id: 111111111111111111111
 
   # Shoutrrr (can only send text)
