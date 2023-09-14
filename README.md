@@ -94,6 +94,18 @@ data_directory: smtpbridge_data
 # Python executable
 python_executable: python3
 
+# Healthcheck enables verification that the program has not crashed or lost network access
+# You can use a third party service such as healthchecks.io
+healthcheck:
+  # URL to fetch, empty means health checking is disabled
+  url: "" # (https://hc-ping.com/cb8bcf81-d3c4-4c98-85a6-734c3b7ddb2b, ...)
+
+  # Interval between each fetch
+  interval: 5m # (5m, 5h45m, ...)
+
+  # Run on startup
+  startup: false
+
 # Retention policy for envelopes and attachment files
 retention:
   # Retention policy for envelopes in database

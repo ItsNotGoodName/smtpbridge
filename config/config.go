@@ -37,6 +37,9 @@ type Config struct {
 	CSRFSecretPath       string
 	SessionSecretPath    string
 	SessionsDirectory    string
+	HealthcheckURL       string
+	HealthcheckInterval  time.Duration
+	HealthcheckStartup   bool
 	HTTPDisable          bool
 	HTTPAddress          string
 	HTTPPort             uint16
@@ -61,6 +64,9 @@ type Raw struct {
 	RetentionEnvelopeCount  string `koanf:"retention.envelope_count"`
 	RetentionEnvelopeAge    string `koanf:"retention.envelope_age"`
 	RetentionAttachmentSize string `koanf:"retention.attachment_size"`
+	HealthcheckURL          string `koanf:"healthcheck.url"`
+	HealthcheckInterval     string `koanf:"healthcheck.interval"`
+	HealthcheckStartup      bool   `koanf:"healthcheck.startup"`
 	SMTPDisable             bool   `koanf:"smtp.disable"`
 	SMTPHost                string `koanf:"smtp.host"`
 	SMTPPort                uint16 `koanf:"smtp.port"`
@@ -97,21 +103,23 @@ type RawRule struct {
 }
 
 var RawDefault = struct {
-	TimeFormat         string `koanf:"time_format"`
-	MaxPayloadSize     string `koanf:"max_payload_size"`
-	DataDirectory      string `koanf:"data_directory"`
-	PythonExecutable   string `koanf:"python_executable"`
-	SMTPPort           uint16 `koanf:"smtp.port"`
-	SMTPMaxPayloadSize string `koanf:"smtp.max_payload_size"`
-	HTTPPort           uint16 `koanf:"http.port"`
+	HealthcheckInterval string `koanf:"healthcheck.interval"`
+	TimeFormat          string `koanf:"time_format"`
+	MaxPayloadSize      string `koanf:"max_payload_size"`
+	DataDirectory       string `koanf:"data_directory"`
+	PythonExecutable    string `koanf:"python_executable"`
+	SMTPPort            uint16 `koanf:"smtp.port"`
+	SMTPMaxPayloadSize  string `koanf:"smtp.max_payload_size"`
+	HTTPPort            uint16 `koanf:"http.port"`
 	// IMAPPort         uint16 `koanf:"imap.port"`
 }{
-	TimeFormat:         timeFormat12H,
-	SMTPMaxPayloadSize: "25 MB",
-	DataDirectory:      "smtpbridge_data",
-	PythonExecutable:   "python3",
-	SMTPPort:           1025,
-	HTTPPort:           8080,
+	HealthcheckInterval: "5m",
+	TimeFormat:          timeFormat12H,
+	SMTPMaxPayloadSize:  "25 MB",
+	DataDirectory:       "smtpbridge_data",
+	PythonExecutable:    "python3",
+	SMTPPort:            1025,
+	HTTPPort:            8080,
 	// IMAPPort:         10143,
 }
 
@@ -129,6 +137,10 @@ func WithFlagSet(flags *flag.FlagSet) *flag.FlagSet {
 	flags.String("data-directory", "", flagUsageString(RawDefault.DataDirectory, "Path to data directory."))
 	flags.String("python-executable", "", flagUsageString(RawDefault.PythonExecutable, "Python executable."))
 	flags.Bool("debug", false, flagUsageBool(false, "Run in debug mode."))
+
+	flags.String("healthcheck-url", "", flagUsageString("", "Healthcheck URL to fetch."))
+	flags.String("healthcheck-interval", "", flagUsageString(RawDefault.HealthcheckInterval, "Healthcheck interval between each fetch."))
+	flags.Bool("healthcheck-startup", false, flagUsageBool(false, "Healthcheck fetch on startup."))
 
 	flags.Bool("smtp-disable", false, flagUsageBool(false, "Disable SMTP server."))
 	flags.String("smtp-host", "", flagUsageString("", "SMTP host address to listen on."))
@@ -306,7 +318,15 @@ func (p Parser) Parse(raw Raw) (Config, error) {
 
 	// imapAddress := raw.IMAPHost + ":" + strconv.Itoa(int(raw.IMAPPort))
 
+	healthcheckInterval, err := time.ParseDuration(raw.HealthcheckInterval)
+	if err != nil {
+		return Config{}, err
+	}
+
 	return Config{
+		HealthcheckURL:       raw.HealthcheckURL,
+		HealthcheckInterval:  healthcheckInterval,
+		HealthcheckStartup:   raw.HealthcheckStartup,
 		Debug:                raw.Debug,
 		TimeHourFormat:       timeHourFormat,
 		DatabasePath:         databasePath,
