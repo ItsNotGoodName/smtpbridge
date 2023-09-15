@@ -43,7 +43,7 @@ templ EnvelopeTab(props EnvelopeTabProps) {
             { props.Envelope.Message.Text }
           </pre>
         case routes.EnvelopeTabHTML:
-          <iframe src={ routes.EnvelopeHTML(props.Envelope.Message.ID).URLString() } sandbox="" class="h-screen w-full rounded border-base-200 border"></iframe>
+          <iframe src={ routes.EnvelopeHTML(props.Envelope.Message.ID).URLString() } sandbox="" class="border-base-200 h-screen w-full rounded border"></iframe>
         case routes.EnvelopeTabAttachments:
           <div class="flex flex-wrap gap-4">
             for _, att := range props.Envelope.Attachments {

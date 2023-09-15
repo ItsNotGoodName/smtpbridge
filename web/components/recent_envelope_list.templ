@@ -21,13 +21,13 @@ templ RecentEnvelopeList(m meta.Meta, props RecentEnvelopeListProps) {
       <div>
         for _, env := range props.Envelopes {
           <a href={ routes.Envelope(env.Message.ID).URL() } class="hover:bg-base-200 border-base-200 flex flex-col gap-2 border-b p-2 first:border-t sm:flex-row">
-            <div class="font-bold w-40">
+            <div class="w-40 font-bold">
               { helpers.TimeHumanize(env.Message.CreatedAt.Time()) }
             </div>
-            <div class="flex-1 flex gap-2 justify-between items-center">
+            <div class="flex flex-1 items-center justify-between gap-2">
               <div class="truncate">{ env.Message.Subject }</div>
               if len(env.Attachments) != 0 {
-                <div class="flex items-center tooltip tooltip-left fill-current" data-tip={ strconv.Itoa(len(env.Attachments)) + " Attachment(s)"  }>
+                <div class="tooltip tooltip-left flex items-center fill-current" data-tip={ strconv.Itoa(len(env.Attachments)) + " Attachment(s)"  }>
                   @icons.Attachment("h-4 w-4")
                 </div>
               }

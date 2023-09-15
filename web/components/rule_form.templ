@@ -48,7 +48,7 @@ templ RuleFormCreate(props RuleFormCreateProps) {
       <legend>Endpoints</legend>
       for i, end := range props.Endpoints {
         <div class="form-control">
-          <label class="cursor-pointer label">
+          <label class="label cursor-pointer">
             <span class="label-text">{ end.Name }</span> 
             <input type="checkbox" class="toggle" name="endpoints" value={ strconv.FormatInt(end.ID, 10) } checked?={ props.EndpointsSelections[i] } />
           </label>
@@ -105,7 +105,7 @@ templ RuleFormUpdate(props RuleFormUpdateProps) {
       <legend class="label-text">Endpoints</legend>
       for i, end := range props.Endpoints {
         <div class="form-control">
-          <label class="cursor-pointer label">
+          <label class="label cursor-pointer">
             <span class="label-text">{ end.Name }</span> 
             <input disabled?={ props.Rule.Internal } type="checkbox" class="toggle" name="endpoints" value={ strconv.FormatInt(end.ID, 10) } checked?={ props.EndpointsSelections[i] } />
           </label>

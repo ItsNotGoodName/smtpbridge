@@ -122,7 +122,7 @@ templ envelopeListView(m meta.Meta, props envelopeListViewProps) {
       })
     </div>
     <div class="overflow-x-auto">
-      <table class="table table-pin-cols">
+      <table class="table-pin-cols table">
         <thead>
           <tr>
             <th></th>
@@ -162,7 +162,7 @@ templ envelopeListView(m meta.Meta, props envelopeListViewProps) {
         <tbody>
           for _, env := range props.EnvelopeRequestResult.Envelopes {
             <tr>
-              <th class="w-0 whitespace-nowrap z-10">
+              <th class="z-10 w-0 whitespace-nowrap">
                 { strconv.FormatInt(env.Message.ID, 10) }
               </th>
               <td class="w-0 whitespace-nowrap">
@@ -185,7 +185,7 @@ templ envelopeListView(m meta.Meta, props envelopeListViewProps) {
               <th class="w-0 whitespace-nowrap">
                 <div class="flex flex-row justify-end gap-2">
                   if len(env.Attachments) != 0 {
-                    <a href={ routes.Envelope(env.Message.ID).URLQuery("tab=" + routes.EnvelopeTabAttachments.String()) } class="tooltip tooltip-left fill-current flex items-center" data-tip={ strconv.Itoa(len(env.Attachments)) + " Attachment(s)"  }>
+                    <a href={ routes.Envelope(env.Message.ID).URLQuery("tab=" + routes.EnvelopeTabAttachments.String()) } class="tooltip tooltip-left flex items-center fill-current" data-tip={ strconv.Itoa(len(env.Attachments)) + " Attachment(s)"  }>
                       @icons.Attachment("h-4 w-4")
                     </a>
                   }

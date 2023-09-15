@@ -42,7 +42,7 @@ func TableOrderTH(props TableOrderTHProps) templ.Component {
 			var_1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, err = templBuffer.WriteString("<a class=\"w-full flex gap-2 items-center\" href=\"")
+		_, err = templBuffer.WriteString("<a class=\"flex w-full items-center gap-2\" href=\"")
 		if err != nil {
 			return err
 		}

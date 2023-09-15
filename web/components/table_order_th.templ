@@ -21,7 +21,7 @@ func tableOrderTHAscending(enable, ascending bool) string {
 }
 
 templ TableOrderTH(props TableOrderTHProps) {
-  <a class="w-full flex gap-2 items-center" href={ routes.EnvelopeList().URLQuery(helpers.Query(props.Query, "order", props.Field, "ascending", tableOrderTHAscending(props.Order == props.Field, props.Ascending))) }>
+  <a class="flex w-full items-center gap-2" href={ routes.EnvelopeList().URLQuery(helpers.Query(props.Query, "order", props.Field, "ascending", tableOrderTHAscending(props.Order == props.Field, props.Ascending))) }>
     { children... }
     if props.Ascending {
       <div class={ templ.KV("opacity-0", props.Order != props.Field) }>

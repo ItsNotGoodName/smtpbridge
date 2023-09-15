@@ -58,7 +58,7 @@ func AttachmentCard(props AttachmentCardProps) templ.Component {
 				return err
 			}
 		}
-		_, err = templBuffer.WriteString("<div class=\"flex-1 p-2 flex flex-col justify-end gap-2\"><p class=\"break-all font-bold\">")
+		_, err = templBuffer.WriteString("<div class=\"flex flex-1 flex-col justify-end gap-2 p-2\"><p class=\"break-all font-bold\">")
 		if err != nil {
 			return err
 		}
@@ -67,7 +67,7 @@ func AttachmentCard(props AttachmentCardProps) templ.Component {
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("</p><div class=\"join flex\"><a class=\"join-item btn tooltip flex-1 flex items-center\" data-tip=\"Envelope\" href=\"")
+		_, err = templBuffer.WriteString("</p><div class=\"join flex\"><a class=\"join-item btn tooltip flex flex-1 items-center\" data-tip=\"Envelope\" href=\"")
 		if err != nil {
 			return err
 		}
@@ -84,7 +84,7 @@ func AttachmentCard(props AttachmentCardProps) templ.Component {
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("</a><a class=\"join-item btn tooltip flex-1 flex items-center\" data-tip=\"View\" hx-boost=\"false\" href=\"")
+		_, err = templBuffer.WriteString("</a><a class=\"join-item btn tooltip flex flex-1 items-center\" data-tip=\"View\" hx-boost=\"false\" href=\"")
 		if err != nil {
 			return err
 		}
@@ -101,7 +101,7 @@ func AttachmentCard(props AttachmentCardProps) templ.Component {
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("</a><a class=\"join-item btn tooltip flex-1 flex items-center\" data-tip=\"Download\" hx-boost=\"false\" href=\"")
+		_, err = templBuffer.WriteString("</a><a class=\"join-item btn tooltip flex flex-1 items-center\" data-tip=\"Download\" hx-boost=\"false\" href=\"")
 		if err != nil {
 			return err
 		}

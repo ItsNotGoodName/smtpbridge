@@ -26,7 +26,7 @@ func Footer() templ.Component {
 			var_1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, err = templBuffer.WriteString("<footer class=\"footer p-10 bg-base-100 text-base-content border-t border-t-base-200\"><div><a href=\"")
+		_, err = templBuffer.WriteString("<footer class=\"footer bg-base-100 text-base-content border-t-base-200 border-t p-10\"><div><a href=\"")
 		if err != nil {
 			return err
 		}

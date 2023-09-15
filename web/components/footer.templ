@@ -5,7 +5,7 @@ import (
 )
 
 templ Footer() {
-  <footer class="footer p-10 bg-base-100 text-base-content border-t border-t-base-200">
+  <footer class="footer bg-base-100 text-base-content border-t-base-200 border-t p-10">
     <div>
       <a href={ templ.URL(build.Current.RepoURL) } class="link link-hover">Source code</a> 
       <a href={ templ.URL(build.Current.LicenseURL()) } class="link link-hover">License</a> 

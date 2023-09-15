@@ -151,7 +151,7 @@ func RuleFormCreate(props RuleFormCreateProps) templ.Component {
 			return err
 		}
 		for i, end := range props.Endpoints {
-			_, err = templBuffer.WriteString("<div class=\"form-control\"><label class=\"cursor-pointer label\"><span class=\"label-text\">")
+			_, err = templBuffer.WriteString("<div class=\"form-control\"><label class=\"label cursor-pointer\"><span class=\"label-text\">")
 			if err != nil {
 				return err
 			}
@@ -349,7 +349,7 @@ func RuleFormUpdate(props RuleFormUpdateProps) templ.Component {
 			return err
 		}
 		for i, end := range props.Endpoints {
-			_, err = templBuffer.WriteString("<div class=\"form-control\"><label class=\"cursor-pointer label\"><span class=\"label-text\">")
+			_, err = templBuffer.WriteString("<div class=\"form-control\"><label class=\"label cursor-pointer\"><span class=\"label-text\">")
 			if err != nil {
 				return err
 			}

@@ -381,7 +381,7 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</div> <div class=\"overflow-x-auto\"><table class=\"table table-pin-cols\"><thead><tr><th></th><td>")
+			_, err = templBuffer.WriteString("</div> <div class=\"overflow-x-auto\"><table class=\"table-pin-cols table\"><thead><tr><th></th><td>")
 			if err != nil {
 				return err
 			}
@@ -473,7 +473,7 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 				return err
 			}
 			for _, env := range props.EnvelopeRequestResult.Envelopes {
-				_, err = templBuffer.WriteString("<tr><th class=\"w-0 whitespace-nowrap z-10\">")
+				_, err = templBuffer.WriteString("<tr><th class=\"z-10 w-0 whitespace-nowrap\">")
 				if err != nil {
 					return err
 				}
@@ -557,7 +557,7 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 					if err != nil {
 						return err
 					}
-					_, err = templBuffer.WriteString("\" class=\"tooltip tooltip-left fill-current flex items-center\" data-tip=\"")
+					_, err = templBuffer.WriteString("\" class=\"tooltip tooltip-left flex items-center fill-current\" data-tip=\"")
 					if err != nil {
 						return err
 					}

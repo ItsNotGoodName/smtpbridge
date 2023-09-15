@@ -59,7 +59,7 @@ func RecentEnvelopeList(m meta.Meta, props RecentEnvelopeListProps) templ.Compon
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("\" class=\"hover:bg-base-200 border-base-200 flex flex-col gap-2 border-b p-2 first:border-t sm:flex-row\"><div class=\"font-bold w-40\">")
+			_, err = templBuffer.WriteString("\" class=\"hover:bg-base-200 border-base-200 flex flex-col gap-2 border-b p-2 first:border-t sm:flex-row\"><div class=\"w-40 font-bold\">")
 			if err != nil {
 				return err
 			}
@@ -68,7 +68,7 @@ func RecentEnvelopeList(m meta.Meta, props RecentEnvelopeListProps) templ.Compon
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</div><div class=\"flex-1 flex gap-2 justify-between items-center\"><div class=\"truncate\">")
+			_, err = templBuffer.WriteString("</div><div class=\"flex flex-1 items-center justify-between gap-2\"><div class=\"truncate\">")
 			if err != nil {
 				return err
 			}
@@ -82,7 +82,7 @@ func RecentEnvelopeList(m meta.Meta, props RecentEnvelopeListProps) templ.Compon
 				return err
 			}
 			if len(env.Attachments) != 0 {
-				_, err = templBuffer.WriteString("<div class=\"flex items-center tooltip tooltip-left fill-current\" data-tip=\"")
+				_, err = templBuffer.WriteString("<div class=\"tooltip tooltip-left flex items-center fill-current\" data-tip=\"")
 				if err != nil {
 					return err
 				}

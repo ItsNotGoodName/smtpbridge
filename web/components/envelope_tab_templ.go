@@ -181,7 +181,7 @@ func EnvelopeTab(props EnvelopeTabProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("\" sandbox=\"\" class=\"h-screen w-full rounded border-base-200 border\"></iframe>")
+			_, err = templBuffer.WriteString("\" sandbox=\"\" class=\"border-base-200 h-screen w-full rounded border\"></iframe>")
 			if err != nil {
 				return err
 			}
