@@ -68,7 +68,7 @@ func RecentEnvelopeList(m meta.Meta, props RecentEnvelopeListProps) templ.Compon
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</div><div class=\"flex-1 truncate\">")
+			_, err = templBuffer.WriteString("</div><div class=\"flex-1 flex gap-2 justify-between items-center\"><div class=\"truncate\">")
 			if err != nil {
 				return err
 			}
@@ -103,7 +103,7 @@ func RecentEnvelopeList(m meta.Meta, props RecentEnvelopeListProps) templ.Compon
 					return err
 				}
 			}
-			_, err = templBuffer.WriteString("</a>")
+			_, err = templBuffer.WriteString("</div></a>")
 			if err != nil {
 				return err
 			}

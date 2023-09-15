@@ -24,12 +24,14 @@ templ RecentEnvelopeList(m meta.Meta, props RecentEnvelopeListProps) {
             <div class="font-bold w-40">
               { helpers.TimeHumanize(env.Message.CreatedAt.Time()) }
             </div>
-            <div class="flex-1 truncate">{ env.Message.Subject }</div>
-            if len(env.Attachments) != 0 {
-              <div class="flex items-center tooltip tooltip-left fill-current" data-tip={ strconv.Itoa(len(env.Attachments)) + " Attachment(s)"  }>
-                @icons.Attachment("h-4 w-4")
-              </div>
-            }
+            <div class="flex-1 flex gap-2 justify-between items-center">
+              <div class="truncate">{ env.Message.Subject }</div>
+              if len(env.Attachments) != 0 {
+                <div class="flex items-center tooltip tooltip-left fill-current" data-tip={ strconv.Itoa(len(env.Attachments)) + " Attachment(s)"  }>
+                  @icons.Attachment("h-4 w-4")
+                </div>
+              }
+            </div>
           </a>
         }
       </div>
