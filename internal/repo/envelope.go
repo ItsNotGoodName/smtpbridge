@@ -88,71 +88,24 @@ func EnvelopeList(ctx context.Context, db database.Querier, page pagination.Page
 	var res []models.Envelope
 
 	subQuery := Messages.SELECT(Messages.ID)
-	// This is what peak performance looks like
-	if req.Ascending {
-		if req.Order == models.DTOEnvelopeFieldSubject {
-			subQuery = subQuery.ORDER_BY(Messages.Subject.ASC())
-		} else if req.Order == models.DTOEnvelopeFieldFrom {
-			subQuery = subQuery.ORDER_BY(Messages.From.ASC())
-		} else {
-			subQuery = subQuery.ORDER_BY(Messages.ID.ASC())
-		}
-	} else {
-		if req.Order == models.DTOEnvelopeFieldSubject {
-			subQuery = subQuery.ORDER_BY(Messages.Subject.DESC())
-		} else if req.Order == models.DTOEnvelopeFieldFrom {
-			subQuery = subQuery.ORDER_BY(Messages.From.DESC())
-		} else {
-			subQuery = subQuery.ORDER_BY(Messages.ID.DESC())
-		}
-	}
-	if req.Search != "" {
-		var exp []BoolExpression
-		if req.SearchText {
-			exp = append(exp, Messages.Text.LIKE(RawString("?", map[string]interface{}{"?": "%" + req.Search + "%"})))
-		}
-		if req.SearchSubject {
-			exp = append(exp, Messages.Subject.LIKE(RawString("?", map[string]interface{}{"?": "%" + req.Search + "%"})))
-		}
-		if len(exp) > 0 {
-			subQuery = subQuery.WHERE(OR(exp...))
-		} else {
-			// Invalid state where the caller wants to search but has defined no fields to search
-			subQuery = subQuery.WHERE(RawBool("1=0"))
-		}
-	}
+	subQuery = envelopeListOrder(subQuery, req)
+	subQuery = envelopeListWhere(subQuery, req)
 
 	query := SELECT(messagePJ, attachmentPJ).
 		FROM(Messages.LEFT_JOIN(Attachments, Attachments.MessageID.EQ(Messages.ID))).
 		WHERE(Messages.ID.IN(subQuery.LIMIT(int64(page.Limit())).OFFSET(int64(page.Offset()))))
-	// s/subQuery/query/g
-	if req.Ascending {
-		if req.Order == models.DTOEnvelopeFieldSubject {
-			query = query.ORDER_BY(Messages.Subject.ASC())
-		} else if req.Order == models.DTOEnvelopeFieldFrom {
-			query = query.ORDER_BY(Messages.From.ASC())
-		} else {
-			query = query.ORDER_BY(Messages.ID.ASC())
-		}
-	} else {
-		if req.Order == models.DTOEnvelopeFieldSubject {
-			query = query.ORDER_BY(Messages.Subject.DESC())
-		} else if req.Order == models.DTOEnvelopeFieldFrom {
-			query = query.ORDER_BY(Messages.From.DESC())
-		} else {
-			query = query.ORDER_BY(Messages.ID.DESC())
-		}
-	}
+	query = envelopeListOrder(query, req)
 
 	err := query.QueryContext(ctx, db, &res)
 	if err != nil {
 		return models.DTOEnvelopeListResult{}, err
 	}
 
+	countQuery := Messages.SELECT(COUNT(Raw("*")).AS("count"))
+	countQuery = envelopeListWhere(countQuery, req)
+
 	var resCount struct{ Count int }
-	err = Messages.
-		SELECT(COUNT(Raw("*")).AS("count")).
-		QueryContext(ctx, db, &resCount)
+	err = countQuery.QueryContext(ctx, db, &resCount)
 	if err != nil {
 		return models.DTOEnvelopeListResult{}, err
 	}
@@ -162,6 +115,49 @@ func EnvelopeList(ctx context.Context, db database.Querier, page pagination.Page
 		PageResult: pageResult,
 		Envelopes:  res,
 	}, nil
+}
+
+func envelopeListWhere(s SelectStatement, req models.DTOEnvelopeListRequest) SelectStatement {
+	if req.Search != "" {
+		var exp []BoolExpression
+		if req.SearchText {
+			exp = append(exp, Messages.Text.LIKE(RawString("?", map[string]interface{}{"?": "%" + req.Search + "%"})))
+		}
+		if req.SearchSubject {
+			exp = append(exp, Messages.Subject.LIKE(RawString("?", map[string]interface{}{"?": "%" + req.Search + "%"})))
+		}
+		if len(exp) > 0 {
+			s = s.WHERE(OR(exp...))
+		} else {
+			// Invalid state where the caller wants to search but has defined no fields to search
+			s = s.WHERE(RawBool("1=0"))
+		}
+	}
+
+	return s
+}
+
+func envelopeListOrder(s SelectStatement, req models.DTOEnvelopeListRequest) SelectStatement {
+	// This is what peak performance looks like
+	if req.Ascending {
+		if req.Order == models.DTOEnvelopeFieldSubject {
+			s = s.ORDER_BY(Messages.Subject.ASC())
+		} else if req.Order == models.DTOEnvelopeFieldFrom {
+			s = s.ORDER_BY(Messages.From.ASC())
+		} else {
+			s = s.ORDER_BY(Messages.ID.ASC())
+		}
+	} else {
+		if req.Order == models.DTOEnvelopeFieldSubject {
+			s = s.ORDER_BY(Messages.Subject.DESC())
+		} else if req.Order == models.DTOEnvelopeFieldFrom {
+			s = s.ORDER_BY(Messages.From.DESC())
+		} else {
+			s = s.ORDER_BY(Messages.ID.DESC())
+		}
+	}
+
+	return s
 }
 
 func EnvelopeGet(ctx context.Context, db database.Querier, id int64) (models.Envelope, error) {
