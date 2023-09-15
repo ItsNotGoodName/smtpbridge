@@ -51,6 +51,10 @@ func NewPageResult(p Page, totalItems int) PageResult {
 	}
 }
 
+func (p PageResult) Overflow() bool {
+	return p.Page > p.TotalPages
+}
+
 func (p PageResult) HasNext() bool {
 	return p.Page < p.TotalPages
 }

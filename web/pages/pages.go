@@ -43,6 +43,13 @@ func withID(ct Controller, fn func(w http.ResponseWriter, r *http.Request, id in
 	}
 }
 
+func getCode(err error) int {
+	if errors.Is(err, models.ErrNotFound) {
+		return http.StatusNotFound
+	}
+	return http.StatusInternalServerError
+}
+
 // Controller
 
 type Controller interface {
@@ -56,7 +63,7 @@ type Controller interface {
 	Error(w http.ResponseWriter, r *http.Request, err error, code int)
 }
 
-// Pages
+// Pages / Components
 
 func NullComponent() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -70,13 +77,13 @@ func IndexView(ct Controller, app core.App) http.HandlerFunc {
 
 		storage, err := app.StorageGet(ctx)
 		if err != nil {
-			ct.Error(w, r, err, http.StatusInternalServerError)
+			ct.Error(w, r, err, getCode(err))
 			return
 		}
 
 		envelopeList, err := app.EnvelopeList(ctx, pagination.NewPage(1, 5), models.DTOEnvelopeListRequest{})
 		if err != nil {
-			ct.Error(w, r, err, http.StatusInternalServerError)
+			ct.Error(w, r, err, getCode(err))
 			return
 		}
 
@@ -98,7 +105,7 @@ func RecentEnvelopeListComponent(ct Controller, app core.App) http.HandlerFunc {
 
 		envelopeList, err := app.EnvelopeList(ctx, pagination.NewPage(1, 5), models.DTOEnvelopeListRequest{})
 		if err != nil {
-			ct.Error(w, r, err, http.StatusInternalServerError)
+			ct.Error(w, r, err, getCode(err))
 			return
 		}
 
@@ -114,7 +121,7 @@ func StorageStatsComponent(ct Controller, app core.App) http.HandlerFunc {
 
 		storage, err := app.StorageGet(ctx)
 		if err != nil {
-			ct.Error(w, r, err, http.StatusInternalServerError)
+			ct.Error(w, r, err, getCode(err))
 			return
 		}
 
@@ -135,7 +142,7 @@ func EnvelopeListView(ct Controller, app core.App) http.HandlerFunc {
 			return
 		}
 
-		listRequest := models.DTOEnvelopeListRequest{
+		req := models.DTOEnvelopeListRequest{
 			Ascending:     query.Get("ascending") != "",
 			Search:        query.Get("search"),
 			SearchSubject: helpers.Checkbox(r, "search-subject"),
@@ -143,23 +150,23 @@ func EnvelopeListView(ct Controller, app core.App) http.HandlerFunc {
 			Order:         models.NewDTOEnvelopeField(query.Get("order")),
 		}
 
-		listResult, err := app.EnvelopeList(ctx, pagination, listRequest)
+		res, err := app.EnvelopeList(ctx, pagination, req)
 		if err != nil {
-			ct.Error(w, r, err, http.StatusInternalServerError)
+			ct.Error(w, r, err, getCode(err))
 			return
 		}
 
-		if listResult.PageResult.Page > listResult.PageResult.TotalPages {
+		if res.PageResult.Overflow() {
 			// Page does not exist
-			url := routes.EnvelopeList().URLQueryString(helpers.Query(query, "page", listResult.PageResult.TotalPages))
+			url := routes.EnvelopeList().URLQueryString(helpers.Query(query, "page", res.PageResult.TotalPages))
 			http.Redirect(w, r, url, http.StatusFound)
 			return
 		}
 
 		ct.Page(w, r, envelopeListView(ct.Meta(r), envelopeListViewProps{
 			Query:                  query,
-			EnvelopeRequestRequest: listRequest,
-			EnvelopeRequestResult:  listResult,
+			EnvelopeRequestRequest: req,
+			EnvelopeRequestResult:  res,
 		}))
 	}
 }
@@ -170,7 +177,7 @@ func EnvelopeListDrop(ct Controller, app core.App, view http.Handler) http.Handl
 
 		err := app.EnvelopeDrop(ctx)
 		if err != nil {
-			ct.Error(w, r, err, http.StatusInternalServerError)
+			ct.Error(w, r, err, getCode(err))
 			return
 		}
 
@@ -190,27 +197,27 @@ func AttachmentListView(ct Controller, app core.App) http.HandlerFunc {
 			return
 		}
 
-		listRequest := models.DTOAttachmentListRequest{
+		req := models.DTOAttachmentListRequest{
 			Ascending: query.Get("ascending") != "",
 		}
 
-		listResult, err := app.AttachmentList(ctx, page, listRequest)
+		res, err := app.AttachmentList(ctx, page, req)
 		if err != nil {
-			ct.Error(w, r, err, http.StatusInsufficientStorage)
+			ct.Error(w, r, err, getCode(err))
 			return
 		}
 
-		if listResult.PageResult.Page > listResult.PageResult.TotalPages {
+		if res.PageResult.Overflow() {
 			// Page does not exist
-			url := routes.AttachmentList().URLQueryString(helpers.Query(query, "page", listResult.PageResult.TotalPages))
+			url := routes.AttachmentList().URLQueryString(helpers.Query(query, "page", res.PageResult.TotalPages))
 			http.Redirect(w, r, url, http.StatusFound)
 			return
 		}
 
 		ct.Page(w, r, attachmentListView(ct.Meta(r), attachmentListViewProps{
 			Query:             query,
-			AttachmentRequest: listRequest,
-			AttachmentResult:  listResult,
+			AttachmentRequest: req,
+			AttachmentResult:  res,
 		}))
 	}
 }
@@ -231,9 +238,8 @@ func EnvelopeCreate(ct Controller, app core.App) http.HandlerFunc {
 			Flash:   c.Flash(c.FlashTypeError, c.FlashMessage(err.Error())),
 		}))
 	}
-
 	return func(w http.ResponseWriter, r *http.Request) {
-		err := r.ParseMultipartForm(32 << 20)
+		err := helpers.ParseMultipartForm(r)
 		if err != nil {
 			ct.Error(w, r, err, http.StatusBadRequest)
 			return
@@ -327,7 +333,7 @@ func Logout(ct Controller, app core.App, ss sessions.Store) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := session.AuthLogout(w, r, ss)
 		if err != nil {
-			ct.Error(w, r, err, http.StatusInternalServerError)
+			ct.Error(w, r, err, getCode(err))
 			return
 		}
 
@@ -341,17 +347,13 @@ func EnvelopeView(ct Controller, app core.App) http.HandlerFunc {
 
 		env, err := app.EnvelopeGet(ctx, id)
 		if err != nil {
-			c := http.StatusInternalServerError
-			if errors.Is(err, models.ErrNotFound) {
-				c = http.StatusNotFound
-			}
-			ct.Error(w, r, err, c)
+			ct.Error(w, r, err, getCode(err))
 			return
 		}
 
 		ends, err := app.EndpointList(ctx)
 		if err != nil {
-			ct.Error(w, r, err, http.StatusInternalServerError)
+			ct.Error(w, r, err, getCode(err))
 			return
 		}
 
@@ -371,11 +373,7 @@ func EnvelopeDelete(ct Controller, app core.App) http.HandlerFunc {
 
 		err := app.EnvelopeDelete(ctx, id)
 		if err != nil {
-			c := http.StatusInternalServerError
-			if errors.Is(err, models.ErrNotFound) {
-				c = http.StatusNotFound
-			}
-			ct.Error(w, r, err, c)
+			ct.Error(w, r, err, getCode(err))
 			return
 		}
 
@@ -389,7 +387,7 @@ func EnvelopeHTMLView(ct Controller, app core.App) http.HandlerFunc {
 
 		html, err := app.MessageHTMLGet(ctx, id)
 		if err != nil {
-			ct.Error(w, r, err, http.StatusInternalServerError)
+			ct.Error(w, r, err, getCode(err))
 			return
 		}
 
@@ -405,7 +403,7 @@ func EnvelopeTabComponent(ct Controller, app core.App, tab routes.EnvelopeTab) h
 
 		env, err := app.EnvelopeGet(ctx, id)
 		if err != nil {
-			ct.Error(w, r, err, http.StatusInternalServerError)
+			ct.Error(w, r, err, getCode(err))
 			return
 		}
 
@@ -423,7 +421,7 @@ func EndpointListView(ct Controller, app core.App) http.HandlerFunc {
 
 		ends, err := app.EndpointList(ctx)
 		if err != nil {
-			ct.Error(w, r, err, http.StatusInternalServerError)
+			ct.Error(w, r, err, getCode(err))
 			return
 		}
 
@@ -464,12 +462,12 @@ func TraceListView(ct Controller, app core.App) http.HandlerFunc {
 
 		listResult, err := app.TraceList(ctx, page, listRequest)
 		if err != nil {
-			ct.Error(w, r, err, http.StatusInternalServerError)
+			ct.Error(w, r, err, getCode(err))
 			return
 		}
 
 		// Page requested does not exist
-		if listResult.PageResult.Page > listResult.PageResult.TotalPages {
+		if listResult.PageResult.Overflow() {
 			url := routes.TraceList().URLQueryString(helpers.Query(query, "page", listResult.PageResult.TotalPages))
 			http.Redirect(w, r, url, http.StatusFound)
 			return
@@ -489,7 +487,7 @@ func TraceListDrop(ct Controller, app core.App, view http.Handler) http.HandlerF
 
 		err := app.TraceDrop(ctx)
 		if err != nil {
-			ct.Error(w, r, err, http.StatusInternalServerError)
+			ct.Error(w, r, err, getCode(err))
 			return
 		}
 
@@ -503,7 +501,7 @@ func RuleListView(ct Controller, app core.App) http.HandlerFunc {
 
 		rules, err := app.RuleList(ctx)
 		if err != nil {
-			ct.Error(w, r, err, http.StatusInternalServerError)
+			ct.Error(w, r, err, getCode(err))
 			return
 		}
 
@@ -520,7 +518,7 @@ func AttachmentTrim(ct Controller, app core.App, view http.Handler) http.Handler
 
 		err := app.AttachmentOrphanDelete(ctx, tracer)
 		if err != nil {
-			ct.Error(w, r, err, http.StatusInternalServerError)
+			ct.Error(w, r, err, getCode(err))
 			return
 		}
 
@@ -536,7 +534,7 @@ func RetentionPolicyRun(ct Controller, app core.App) http.HandlerFunc {
 
 		err := app.RetentionPolicyRun(ctx, tracer)
 		if err != nil {
-			ct.Error(w, r, err, http.StatusInternalServerError)
+			ct.Error(w, r, err, getCode(err))
 			return
 		}
 
@@ -589,11 +587,7 @@ func Files(ct Controller, app core.App, fs fs.FS) http.HandlerFunc {
 		ctx := r.Context()
 		att, err := app.AttachmentGet(ctx, id)
 		if err != nil {
-			code := http.StatusInternalServerError
-			if errors.Is(err, models.ErrNotFound) {
-				code = http.StatusNotFound
-			}
-			ct.Error(w, r, err, code)
+			ct.Error(w, r, err, getCode(err))
 			return
 		}
 
@@ -626,11 +620,7 @@ func RuleView(ct Controller, app core.App) http.HandlerFunc {
 
 		ruleEndpoints, err := app.RuleEndpointsGet(ctx, id)
 		if err != nil {
-			code := http.StatusInternalServerError
-			if errors.Is(err, models.ErrNotFound) {
-				code = http.StatusNotFound
-			}
-			ct.Error(w, r, err, code)
+			ct.Error(w, r, err, getCode(err))
 			return
 		}
 
@@ -638,7 +628,7 @@ func RuleView(ct Controller, app core.App) http.HandlerFunc {
 
 		endpoints, err := app.EndpointList(ctx)
 		if err != nil {
-			ct.Error(w, r, err, http.StatusInternalServerError)
+			ct.Error(w, r, err, getCode(err))
 			return
 		}
 
@@ -686,17 +676,13 @@ func RuleUpdate(ct Controller, app core.App) http.HandlerFunc {
 			Endpoints:  &form.Endpoints,
 		})
 		if err != nil {
-			ct.Error(w, r, err, http.StatusInternalServerError)
+			ct.Error(w, r, err, getCode(err))
 			return
 		}
 
 		ruleEndpoints, err := app.RuleEndpointsGet(ctx, id)
 		if err != nil {
-			code := http.StatusInternalServerError
-			if errors.Is(err, models.ErrNotFound) {
-				code = http.StatusNotFound
-			}
-			ct.Error(w, r, err, code)
+			ct.Error(w, r, err, getCode(err))
 			return
 		}
 
@@ -704,7 +690,7 @@ func RuleUpdate(ct Controller, app core.App) http.HandlerFunc {
 
 		endpoints, err := app.EndpointList(ctx)
 		if err != nil {
-			ct.Error(w, r, err, http.StatusInternalServerError)
+			ct.Error(w, r, err, getCode(err))
 			return
 		}
 
@@ -728,7 +714,7 @@ func RuleCreateView(ct Controller, app core.App) http.HandlerFunc {
 
 		endpoints, err := app.EndpointList(ctx)
 		if err != nil {
-			ct.Error(w, r, err, http.StatusInternalServerError)
+			ct.Error(w, r, err, getCode(err))
 			return
 		}
 		endpointsSelections := make([]bool, len(endpoints))
@@ -746,7 +732,7 @@ func RuleCreate(ct Controller, app core.App) http.HandlerFunc {
 	handleErr := func(w http.ResponseWriter, r *http.Request, ctx context.Context, err error, form forms.RuleCreate) {
 		endpoints, endpointsErr := app.EndpointList(ctx)
 		if endpointsErr != nil {
-			ct.Error(w, r, endpointsErr, http.StatusInternalServerError)
+			ct.Error(w, r, err, getCode(err))
 			return
 		}
 
@@ -797,11 +783,7 @@ func RuleDelete(ct Controller, app core.App) http.HandlerFunc {
 		ctx := r.Context()
 		err := app.RuleDelete(ctx, id)
 		if err != nil {
-			code := http.StatusInternalServerError
-			if errors.Is(err, models.ErrNotFound) {
-				code = http.StatusNotFound
-			}
-			ct.Error(w, r, err, code)
+			ct.Error(w, r, err, getCode(err))
 			return
 		}
 
@@ -819,11 +801,7 @@ func RuleToggle(ct Controller, app core.App) http.HandlerFunc {
 			Enable: &enable,
 		})
 		if err != nil {
-			code := http.StatusInternalServerError
-			if errors.Is(err, models.ErrNotFound) {
-				code = http.StatusNotFound
-			}
-			ct.Error(w, r, err, code)
+			ct.Error(w, r, err, getCode(err))
 			return
 		}
 

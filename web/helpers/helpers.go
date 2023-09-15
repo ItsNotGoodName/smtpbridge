@@ -133,3 +133,7 @@ func DecodeForm(w http.ResponseWriter, r *http.Request, form any) error {
 
 	return nil
 }
+
+func ParseMultipartForm(r *http.Request) error {
+	return r.ParseMultipartForm(32 << 20)
+}

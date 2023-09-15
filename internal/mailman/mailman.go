@@ -47,14 +47,17 @@ func (m Mailman) Serve(ctx context.Context) error {
 		case <-ctx.Done():
 			return nil
 		case <-checkC:
-			for {
-				tracer := m.app.
-					Tracer(trace.SourceMailman).
-					Sticky(trace.WithKV("mailman", m.id))
+			tracer := m.app.
+				Tracer(trace.SourceMailman).
+				Sticky(trace.WithKV("mailman", m.id))
 
+			tracer.Trace(ctx, "mailman.wake")
+
+			for {
 				maybeEnv, err := m.app.MailmanDequeue(ctx)
 				if err != nil {
 					tracer.Trace(ctx, "mailman.dequeue", trace.WithError(err))
+					log.Err(err).Msg("Mailman failed to dequeue envelope")
 					break
 				}
 				if maybeEnv == nil {
@@ -64,13 +67,13 @@ func (m Mailman) Serve(ctx context.Context) error {
 
 				tracer = tracer.Sticky(trace.WithEnvelope(env.Message.ID))
 
-				tracer.Trace(ctx, "mailman.wake")
 				if err := m.send(ctx, tracer, env); err != nil {
 					tracer.Trace(ctx, "mailman.error", trace.WithError(err))
-					log.Err(err).Int64("envelope-id", env.Message.ID).Msg("Failed to send envelope")
+					log.Err(err).Int64("envelope-id", env.Message.ID).Msg("Mailman failed to send envelope")
 				}
-				tracer.Trace(ctx, "mailman.sleep")
 			}
+
+			tracer.Trace(ctx, "mailman.sleep")
 		}
 	}
 }

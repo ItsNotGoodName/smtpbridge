@@ -26,12 +26,12 @@ type DTOEnvelopeListRequest struct {
 	SearchSubject bool
 	SearchText    bool
 	Ascending     bool
-	Order         DTOEnvelopeField
+	Order         dtoEnvelopeField
 }
 
-type DTOEnvelopeField string
+type dtoEnvelopeField string
 
-func NewDTOEnvelopeField(s string) DTOEnvelopeField {
+func NewDTOEnvelopeField(s string) dtoEnvelopeField {
 	switch s {
 	case DTOEnvelopeFieldFrom:
 		return DTOEnvelopeFieldFrom

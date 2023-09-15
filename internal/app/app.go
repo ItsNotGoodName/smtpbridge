@@ -75,7 +75,7 @@ func (a App) DatabaseVacuum(ctx context.Context) error {
 
 func (a App) RuleEndpointsGet(ctx context.Context, id int64) (models.RuleEndpoints, error) {
 	res, err := repo.RuleEndpointsGet(ctx, a.db, id)
-	return res, checkErr(err)
+	return res, convertErr(err)
 }
 
 func (a App) EnvelopeCount(ctx context.Context) (int, error) {
@@ -85,7 +85,7 @@ func (a App) EnvelopeCount(ctx context.Context) (int, error) {
 func (a App) RuleDelete(ctx context.Context, id int64) error {
 	r, err := repo.RuleGet(ctx, a.db, id)
 	if err != nil {
-		return checkErr(err)
+		return convertErr(err)
 	}
 
 	err = rule.Delete(r)
@@ -93,7 +93,7 @@ func (a App) RuleDelete(ctx context.Context, id int64) error {
 		return err
 	}
 
-	return checkErr(repo.RuleDelete(ctx, a.db, id))
+	return convertErr(repo.RuleDelete(ctx, a.db, id))
 }
 
 func (App) RuleExpressionCheck(ctx context.Context, expression string) error {
@@ -112,18 +112,18 @@ func (App) RuleExpressionCheck(ctx context.Context, expression string) error {
 
 func (a App) AttachmentGet(ctx context.Context, id int64) (models.Attachment, error) {
 	res, err := repo.AttachmentGet(ctx, a.db, id)
-	return res, checkErr(err)
+	return res, convertErr(err)
 }
 
 func (a App) EnvelopeSend(ctx context.Context, envelopeID int64, endpointID int64) error {
 	env, err := repo.EnvelopeGet(ctx, a.db, envelopeID)
 	if err != nil {
-		return checkErr(err)
+		return convertErr(err)
 	}
 
 	endModel, err := repo.EndpointGet(ctx, a.db, endpointID)
 	if err != nil {
-		return checkErr(err)
+		return convertErr(err)
 	}
 
 	end, err := a.endpointFactory.Build(endModel)
@@ -201,7 +201,7 @@ func (a App) EnvelopeCreate(ctx context.Context, dtoMsg models.DTOMessageCreate,
 
 func (a App) EnvelopeDelete(ctx context.Context, id int64) error {
 	if err := repo.EnvelopeDelete(ctx, a.db, id); err != nil {
-		return checkErr(err)
+		return convertErr(err)
 	}
 
 	a.bus.EnvelopeDeleted(ctx)
@@ -211,7 +211,7 @@ func (a App) EnvelopeDelete(ctx context.Context, id int64) error {
 
 func (a App) EnvelopeGet(ctx context.Context, id int64) (models.Envelope, error) {
 	res, err := repo.EnvelopeGet(ctx, a.db, id)
-	return res, checkErr(err)
+	return res, convertErr(err)
 }
 
 func (a App) EnvelopeList(ctx context.Context, page pagination.Page, req models.DTOEnvelopeListRequest) (models.DTOEnvelopeListResult, error) {
@@ -233,7 +233,7 @@ func (a App) EnvelopeDrop(ctx context.Context) error {
 
 func (a App) MessageHTMLGet(ctx context.Context, id int64) (string, error) {
 	res, err := repo.MessageHTMLGet(ctx, a.db, id)
-	return res, checkErr(err)
+	return res, convertErr(err)
 }
 
 func (a App) AttachmentList(ctx context.Context, page pagination.Page, req models.DTOAttachmentListRequest) (models.DTOAttachmentListResult, error) {
@@ -285,7 +285,7 @@ func (a App) RuleCreate(ctx context.Context, req models.DTORuleCreate) (int64, e
 func (a App) RuleUpdate(ctx context.Context, req models.DTORuleUpdate) error {
 	r, err := repo.RuleGet(ctx, a.db, req.ID)
 	if err != nil {
-		return checkErr(err)
+		return convertErr(err)
 	}
 
 	r, err = rule.Update(r, req)
@@ -295,13 +295,13 @@ func (a App) RuleUpdate(ctx context.Context, req models.DTORuleUpdate) error {
 
 	err = repo.RuleUpdate(ctx, a.db, r)
 	if err != nil {
-		return checkErr(err)
+		return convertErr(err)
 	}
 
 	if req.Endpoints != nil {
 		err := repo.RuleEndpointsSet(ctx, a.db, r.ID, *req.Endpoints)
 		if err != nil {
-			return checkErr(err)
+			return convertErr(err)
 		}
 	}
 
@@ -310,7 +310,7 @@ func (a App) RuleUpdate(ctx context.Context, req models.DTORuleUpdate) error {
 
 func (a App) RuleGet(ctx context.Context, id int64) (models.Rule, error) {
 	res, err := repo.RuleGet(ctx, a.db, id)
-	return res, checkErr(err)
+	return res, convertErr(err)
 }
 
 func (a App) RuleList(ctx context.Context) ([]models.Rule, error) {
@@ -324,7 +324,7 @@ func (a App) RuleEndpointsList(ctx context.Context) ([]models.RuleEndpoints, err
 func (a App) EndpointTest(ctx context.Context, id int64) error {
 	e, err := repo.EndpointGet(ctx, a.db, id)
 	if err != nil {
-		return checkErr(err)
+		return convertErr(err)
 	}
 
 	end, err := a.endpointFactory.Build(e)

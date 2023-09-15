@@ -7,7 +7,7 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/internal/repo"
 )
 
-func checkErr(err error) error {
+func convertErr(err error) error {
 	if err == nil {
 		return nil
 	}
