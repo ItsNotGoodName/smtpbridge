@@ -13,14 +13,16 @@ import (
 )
 
 type Mailman struct {
+	id              int
 	bus             core.Bus
 	app             core.App
 	fileStore       endpoint.FileStore
 	endpointFactory endpoint.Factory
 }
 
-func New(app core.App, bus core.Bus, fileStore endpoint.FileStore, endpointFactory endpoint.Factory) Mailman {
+func New(id int, app core.App, bus core.Bus, fileStore endpoint.FileStore, endpointFactory endpoint.Factory) Mailman {
 	return Mailman{
+		id:              id,
 		app:             app,
 		bus:             bus,
 		fileStore:       fileStore,
@@ -46,7 +48,9 @@ func (m Mailman) Serve(ctx context.Context) error {
 			return nil
 		case <-checkC:
 			for {
-				tracer := m.app.Tracer(trace.SourceMailman)
+				tracer := m.app.
+					Tracer(trace.SourceMailman).
+					Sticky(trace.WithKV("mailman", m.id))
 
 				maybeEnv, err := m.app.MailmanDequeue(ctx)
 				if err != nil {
@@ -60,12 +64,12 @@ func (m Mailman) Serve(ctx context.Context) error {
 
 				tracer = tracer.Sticky(trace.WithEnvelope(env.Message.ID))
 
-				tracer.Trace(ctx, "mailman.start")
+				tracer.Trace(ctx, "mailman.wake")
 				if err := m.send(ctx, tracer, env); err != nil {
 					tracer.Trace(ctx, "mailman.error", trace.WithError(err))
 					log.Err(err).Int64("envelope-id", env.Message.ID).Msg("Failed to send envelope")
 				}
-				tracer.Trace(ctx, "mailman.end")
+				tracer.Trace(ctx, "mailman.sleep")
 			}
 		}
 	}

@@ -40,6 +40,7 @@ type Config struct {
 	HealthcheckURL       string
 	HealthcheckInterval  time.Duration
 	HealthcheckStartup   bool
+	MailmanCount         int
 	HTTPDisable          bool
 	HTTPAddress          string
 	HTTPPort             uint16
@@ -339,6 +340,7 @@ func (p Parser) Parse(raw Raw) (Config, error) {
 		HealthcheckURL:       raw.HealthcheckURL,
 		HealthcheckInterval:  healthcheckInterval,
 		HealthcheckStartup:   raw.HealthcheckStartup,
+		MailmanCount:         1,
 		Debug:                raw.Debug,
 		TimeHourFormat:       timeHourFormat,
 		DatabasePath:         databasePath,

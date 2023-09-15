@@ -158,9 +158,11 @@ func run(flags *flag.FlagSet) lieut.Executor {
 			return nil
 		}))
 
-		// Mailman
-		mailman := mailman.New(app, bus, fileStore, cfg.EndpointFactory)
-		super.Add(mailman)
+		for i := 1; i <= cfg.MailmanCount; i++ {
+			// Mailman
+			mailman := mailman.New(i, app, bus, fileStore, cfg.EndpointFactory)
+			super.Add(mailman)
+		}
 
 		// SMTP
 		if !cfg.SMTPDisable {
