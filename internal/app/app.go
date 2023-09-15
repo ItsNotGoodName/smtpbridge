@@ -38,70 +38,6 @@ type App struct {
 	webTestFileStore WebTestFileStore
 }
 
-// DatabaseVacuum implements core.App.
-func (a App) DatabaseVacuum(ctx context.Context) error {
-	return repo.Vacuum(ctx, a.db)
-}
-
-func (a App) RuleEndpointsGet(ctx context.Context, id int64) (models.RuleEndpoints, error) {
-	return repo.RuleEndpointsGet(ctx, a.db, id)
-}
-
-func (a App) EnvelopeCount(ctx context.Context) (int, error) {
-	return repo.EnvelopeCount(ctx, a.db)
-}
-
-func (a App) RuleDelete(ctx context.Context, id int64) error {
-	r, err := repo.RuleGet(ctx, a.db, id)
-	if err != nil {
-		return err
-	}
-
-	err = rule.Delete(r)
-	if err != nil {
-		return err
-	}
-
-	return repo.RuleDelete(ctx, a.db, id)
-}
-
-func (App) RuleExpressionCheck(ctx context.Context, expression string) error {
-	tmpl, err := rule.TemplateBuild(expression)
-	if err != nil {
-		return err
-	}
-
-	_, err = rule.TemplateRun(tmpl, models.Envelope{Message: models.Message{}, Attachments: []models.Attachment{}})
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (a App) AttachmentGet(ctx context.Context, id int64) (models.Attachment, error) {
-	return repo.AttachmentGet(ctx, a.db, id)
-}
-
-func (a App) EnvelopeSend(ctx context.Context, envelopeID int64, endpointID int64) error {
-	env, err := repo.EnvelopeGet(ctx, a.db, envelopeID)
-	if err != nil {
-		return err
-	}
-
-	endModel, err := repo.EndpointGet(ctx, a.db, endpointID)
-	if err != nil {
-		return err
-	}
-
-	end, err := a.endpointFactory.Build(endModel)
-	if err != nil {
-		return err
-	}
-
-	return end.Send(ctx, a.fileStore, env)
-}
-
 func New(
 	db database.Querier,
 	fileStore FileStore,
@@ -133,7 +69,70 @@ func (a App) init() func() {
 	)
 }
 
-var ErrorLogin = fmt.Errorf("login invalid")
+func (a App) DatabaseVacuum(ctx context.Context) error {
+	return repo.Vacuum(ctx, a.db)
+}
+
+func (a App) RuleEndpointsGet(ctx context.Context, id int64) (models.RuleEndpoints, error) {
+	res, err := repo.RuleEndpointsGet(ctx, a.db, id)
+	return res, checkErr(err)
+}
+
+func (a App) EnvelopeCount(ctx context.Context) (int, error) {
+	return repo.EnvelopeCount(ctx, a.db)
+}
+
+func (a App) RuleDelete(ctx context.Context, id int64) error {
+	r, err := repo.RuleGet(ctx, a.db, id)
+	if err != nil {
+		return checkErr(err)
+	}
+
+	err = rule.Delete(r)
+	if err != nil {
+		return err
+	}
+
+	return checkErr(repo.RuleDelete(ctx, a.db, id))
+}
+
+func (App) RuleExpressionCheck(ctx context.Context, expression string) error {
+	tmpl, err := rule.TemplateBuild(expression)
+	if err != nil {
+		return err
+	}
+
+	_, err = rule.TemplateRun(tmpl, models.Envelope{Message: models.Message{}, Attachments: []models.Attachment{}})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a App) AttachmentGet(ctx context.Context, id int64) (models.Attachment, error) {
+	res, err := repo.AttachmentGet(ctx, a.db, id)
+	return res, checkErr(err)
+}
+
+func (a App) EnvelopeSend(ctx context.Context, envelopeID int64, endpointID int64) error {
+	env, err := repo.EnvelopeGet(ctx, a.db, envelopeID)
+	if err != nil {
+		return checkErr(err)
+	}
+
+	endModel, err := repo.EndpointGet(ctx, a.db, endpointID)
+	if err != nil {
+		return checkErr(err)
+	}
+
+	end, err := a.endpointFactory.Build(endModel)
+	if err != nil {
+		return err
+	}
+
+	return end.Send(ctx, a.fileStore, env)
+}
 
 func (a App) AuthSMTPAnonymous() bool {
 	return a.config.AuthSMTP.Anonymous
@@ -149,7 +148,7 @@ func (a App) AuthHTTPLogin(ctx context.Context, username, password string) (mode
 		return models.User{}, nil
 	}
 
-	return models.User{}, ErrorLogin
+	return models.User{}, models.ErrAuthInvalid
 }
 
 func (a App) AuthSMTPLogin(ctx context.Context, username, password string) error {
@@ -157,7 +156,7 @@ func (a App) AuthSMTPLogin(ctx context.Context, username, password string) error
 		return nil
 	}
 
-	return ErrorLogin
+	return models.ErrAuthInvalid
 }
 
 func (a App) EnvelopeCreate(ctx context.Context, dtoMsg models.DTOMessageCreate, dtoDatts []models.DTOAttachmentCreate) (int64, error) {
@@ -202,7 +201,7 @@ func (a App) EnvelopeCreate(ctx context.Context, dtoMsg models.DTOMessageCreate,
 
 func (a App) EnvelopeDelete(ctx context.Context, id int64) error {
 	if err := repo.EnvelopeDelete(ctx, a.db, id); err != nil {
-		return err
+		return checkErr(err)
 	}
 
 	a.bus.EnvelopeDeleted(ctx)
@@ -211,7 +210,8 @@ func (a App) EnvelopeDelete(ctx context.Context, id int64) error {
 }
 
 func (a App) EnvelopeGet(ctx context.Context, id int64) (models.Envelope, error) {
-	return repo.EnvelopeGet(ctx, a.db, id)
+	res, err := repo.EnvelopeGet(ctx, a.db, id)
+	return res, checkErr(err)
 }
 
 func (a App) EnvelopeList(ctx context.Context, page pagination.Page, req models.DTOEnvelopeListRequest) (models.DTOEnvelopeListResult, error) {
@@ -232,7 +232,8 @@ func (a App) EnvelopeDrop(ctx context.Context) error {
 }
 
 func (a App) MessageHTMLGet(ctx context.Context, id int64) (string, error) {
-	return repo.MessageHTMLGet(ctx, a.db, id)
+	res, err := repo.MessageHTMLGet(ctx, a.db, id)
+	return res, checkErr(err)
 }
 
 func (a App) AttachmentList(ctx context.Context, page pagination.Page, req models.DTOAttachmentListRequest) (models.DTOAttachmentListResult, error) {
@@ -284,7 +285,7 @@ func (a App) RuleCreate(ctx context.Context, req models.DTORuleCreate) (int64, e
 func (a App) RuleUpdate(ctx context.Context, req models.DTORuleUpdate) error {
 	r, err := repo.RuleGet(ctx, a.db, req.ID)
 	if err != nil {
-		return err
+		return checkErr(err)
 	}
 
 	r, err = rule.Update(r, req)
@@ -294,13 +295,13 @@ func (a App) RuleUpdate(ctx context.Context, req models.DTORuleUpdate) error {
 
 	err = repo.RuleUpdate(ctx, a.db, r)
 	if err != nil {
-		return err
+		return checkErr(err)
 	}
 
 	if req.Endpoints != nil {
 		err := repo.RuleEndpointsSet(ctx, a.db, r.ID, *req.Endpoints)
 		if err != nil {
-			return err
+			return checkErr(err)
 		}
 	}
 
@@ -308,7 +309,8 @@ func (a App) RuleUpdate(ctx context.Context, req models.DTORuleUpdate) error {
 }
 
 func (a App) RuleGet(ctx context.Context, id int64) (models.Rule, error) {
-	return repo.RuleGet(ctx, a.db, id)
+	res, err := repo.RuleGet(ctx, a.db, id)
+	return res, checkErr(err)
 }
 
 func (a App) RuleList(ctx context.Context) ([]models.Rule, error) {
@@ -322,7 +324,7 @@ func (a App) RuleEndpointsList(ctx context.Context) ([]models.RuleEndpoints, err
 func (a App) EndpointTest(ctx context.Context, id int64) error {
 	e, err := repo.EndpointGet(ctx, a.db, id)
 	if err != nil {
-		return err
+		return checkErr(err)
 	}
 
 	end, err := a.endpointFactory.Build(e)

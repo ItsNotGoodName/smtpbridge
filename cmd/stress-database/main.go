@@ -41,7 +41,7 @@ func main() {
 	for {
 		id, err := repo.MailmanDequeue(ctx, db)
 		if err != nil {
-			if !errors.Is(err, repo.ErrNoRows) {
+			if !errors.Is(err, models.ErrNotFound) {
 				log.Fatalln(err)
 			}
 

@@ -48,5 +48,5 @@ func EndpointDelete(ctx context.Context, db database.Querier, id int64) error {
 	if err != nil {
 		return err
 	}
-	return oneRowAffected(res)
+	return one(res)
 }

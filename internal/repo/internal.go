@@ -11,8 +11,6 @@ import (
 	. "github.com/go-jet/jet/v2/sqlite"
 )
 
-// TODO: instead of doing INSERT ... ON CONFLICT DO UPDATE SET ..., run in a transaction
-
 func InternalSync(
 	ctx context.Context,
 	db database.Querier,
@@ -89,6 +87,9 @@ func internalEndpointUpsert(ctx context.Context, tx database.QuerierTx, r models
 	}
 
 	count, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
 	if count == 0 {
 		_, err := Endpoints.
 			INSERT(
@@ -141,6 +142,9 @@ func internalRuleUpsert(ctx context.Context, tx database.QuerierTx, r models.Rul
 	}
 
 	count, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
 	if count == 0 {
 		_, err := Rules.
 			INSERT(

@@ -13,7 +13,6 @@ import (
 
 	"github.com/ItsNotGoodName/smtpbridge/internal/core"
 	"github.com/ItsNotGoodName/smtpbridge/internal/models"
-	"github.com/ItsNotGoodName/smtpbridge/internal/repo"
 	"github.com/ItsNotGoodName/smtpbridge/internal/trace"
 	"github.com/ItsNotGoodName/smtpbridge/pkg/htmx"
 	"github.com/ItsNotGoodName/smtpbridge/pkg/pagination"
@@ -343,7 +342,7 @@ func EnvelopeView(ct Controller, app core.App) http.HandlerFunc {
 		env, err := app.EnvelopeGet(ctx, id)
 		if err != nil {
 			c := http.StatusInternalServerError
-			if errors.Is(err, repo.ErrNoRows) {
+			if errors.Is(err, models.ErrNotFound) {
 				c = http.StatusNotFound
 			}
 			ct.Error(w, r, err, c)
@@ -373,7 +372,7 @@ func EnvelopeDelete(ct Controller, app core.App) http.HandlerFunc {
 		err := app.EnvelopeDelete(ctx, id)
 		if err != nil {
 			c := http.StatusInternalServerError
-			if errors.Is(err, repo.ErrNoRows) {
+			if errors.Is(err, models.ErrNotFound) {
 				c = http.StatusNotFound
 			}
 			ct.Error(w, r, err, c)
@@ -591,7 +590,7 @@ func Files(ct Controller, app core.App, fs fs.FS) http.HandlerFunc {
 		att, err := app.AttachmentGet(ctx, id)
 		if err != nil {
 			code := http.StatusInternalServerError
-			if errors.Is(err, repo.ErrNoRows) {
+			if errors.Is(err, models.ErrNotFound) {
 				code = http.StatusNotFound
 			}
 			ct.Error(w, r, err, code)
@@ -628,7 +627,7 @@ func RuleView(ct Controller, app core.App) http.HandlerFunc {
 		ruleEndpoints, err := app.RuleEndpointsGet(ctx, id)
 		if err != nil {
 			code := http.StatusInternalServerError
-			if errors.Is(err, repo.ErrNoRows) {
+			if errors.Is(err, models.ErrNotFound) {
 				code = http.StatusNotFound
 			}
 			ct.Error(w, r, err, code)
@@ -694,7 +693,7 @@ func RuleUpdate(ct Controller, app core.App) http.HandlerFunc {
 		ruleEndpoints, err := app.RuleEndpointsGet(ctx, id)
 		if err != nil {
 			code := http.StatusInternalServerError
-			if errors.Is(err, repo.ErrNoRows) {
+			if errors.Is(err, models.ErrNotFound) {
 				code = http.StatusNotFound
 			}
 			ct.Error(w, r, err, code)
@@ -799,7 +798,7 @@ func RuleDelete(ct Controller, app core.App) http.HandlerFunc {
 		err := app.RuleDelete(ctx, id)
 		if err != nil {
 			code := http.StatusInternalServerError
-			if errors.Is(err, repo.ErrNoRows) {
+			if errors.Is(err, models.ErrNotFound) {
 				code = http.StatusNotFound
 			}
 			ct.Error(w, r, err, code)
@@ -821,7 +820,7 @@ func RuleToggle(ct Controller, app core.App) http.HandlerFunc {
 		})
 		if err != nil {
 			code := http.StatusInternalServerError
-			if errors.Is(err, repo.ErrNoRows) {
+			if errors.Is(err, models.ErrNotFound) {
 				code = http.StatusNotFound
 			}
 			ct.Error(w, r, err, code)

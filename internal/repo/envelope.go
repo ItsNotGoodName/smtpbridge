@@ -182,7 +182,7 @@ func EnvelopeDelete(ctx context.Context, db database.Querier, id int64) error {
 	if err != nil {
 		return err
 	}
-	return oneRowAffected(res)
+	return one(res)
 }
 
 func EnvelopeDrop(ctx context.Context, db database.Querier) (int64, error) {
@@ -198,16 +198,16 @@ func EnvelopeDrop(ctx context.Context, db database.Querier) (int64, error) {
 }
 
 func EnvelopeTrim(ctx context.Context, db database.Querier, age time.Time, keep int) (int64, error) {
-	q := Messages.CreatedAt.LT(RawTimestamp(muhTypeAffinity(models.NewTime(age))))
+	query := Messages.CreatedAt.LT(RawTimestamp(muhTypeAffinity(models.NewTime(age))))
 	if keep != 0 {
-		q = q.AND(
+		query = query.AND(
 			Messages.ID.NOT_IN(Messages.SELECT(Messages.ID).ORDER_BY(Messages.ID.DESC()).LIMIT(int64(keep))),
 		)
 	}
 
 	res, err := Messages.
 		DELETE().
-		WHERE(q).
+		WHERE(query).
 		ExecContext(ctx, db)
 	if err != nil {
 		return 0, err
@@ -244,32 +244,25 @@ func AttachmentGet(ctx context.Context, db database.Querier, id int64) (models.A
 }
 
 func AttachmentList(ctx context.Context, db database.Querier, page pagination.Page, req models.DTOAttachmentListRequest) (models.DTOAttachmentListResult, error) {
-	withFilter := func(stmt SelectStatement) SelectStatement {
-		return stmt
-	}
-	withOrder := func(stmt SelectStatement) SelectStatement {
-		if req.Ascending {
-			return stmt.ORDER_BY(Attachments.ID.ASC())
-		}
-		return stmt.ORDER_BY(Attachments.ID.DESC())
-	}
-
 	var res []models.Attachment
 
-	query := withOrder(withFilter(Attachments.
+	query := Attachments.
 		SELECT(attachmentPJ).
 		LIMIT(int64(page.Limit())).
-		OFFSET(int64(page.Offset()))))
+		OFFSET(int64(page.Offset()))
+	query = attachmentListWithWhere(query)
+	query = attachmentListWithOrder(query, req)
 
 	err := query.QueryContext(ctx, db, &res)
 	if err != nil {
 		return models.DTOAttachmentListResult{}, err
 	}
 
+	countQuery := Attachments.SELECT(COUNT(Raw("*")).AS("count"))
+	countQuery = attachmentListWithWhere(countQuery)
+
 	var resCount struct{ Count int }
-	err = withFilter(Attachments.
-		SELECT(COUNT(Raw("*")).AS("count"))).
-		QueryContext(ctx, db, &resCount)
+	err = countQuery.QueryContext(ctx, db, &resCount)
 	if err != nil {
 		return models.DTOAttachmentListResult{}, err
 	}
@@ -279,6 +272,17 @@ func AttachmentList(ctx context.Context, db database.Querier, page pagination.Pa
 		PageResult:  pageResult,
 		Attachments: res,
 	}, nil
+}
+
+func attachmentListWithWhere(stmt SelectStatement) SelectStatement {
+	return stmt
+}
+
+func attachmentListWithOrder(stmt SelectStatement, req models.DTOAttachmentListRequest) SelectStatement {
+	if req.Ascending {
+		return stmt.ORDER_BY(Attachments.ID.ASC())
+	}
+	return stmt.ORDER_BY(Attachments.ID.DESC())
 }
 
 func AttachmentListByMessage(ctx context.Context, db database.Querier, messageID int64) ([]models.Attachment, error) {
