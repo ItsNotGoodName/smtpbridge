@@ -27,7 +27,7 @@ templ traceListView(m meta.Meta, props traceListViewProps) {
     </div>
     <div class="flex flex-col gap-4 p-4">
       <div class="join flex items-center justify-end" data-loading-states>
-        <button class="btn btn-sm btn-error" hx-delete={ routes.TraceList().URLString() } hx-confirm="Are you sure you wish to delete all traces?" data-loading-disable>
+        <button title="Delete All" class="btn btn-sm btn-error" hx-delete={ routes.TraceList().URLString() } hx-confirm="Are you sure you wish to delete all traces?" data-loading-disable>
           <span data-loading-class="loading loading-spinner loading-sm">
             @icons.Trash("w-5 h-5")
           </span>

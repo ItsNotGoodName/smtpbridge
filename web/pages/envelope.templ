@@ -101,13 +101,13 @@ templ envelopeListView(m meta.Meta, props envelopeListViewProps) {
             }
           }
           <input name="search" type="text" placeholder="Search" class="input input-sm input-bordered join-item w-full max-w-xs" value={ props.EnvelopeRequestRequest.Search } />
-          <button type="submit" class="btn btn-sm btn-primary join-item">@icons.Search("w-5 h-5")</button>
+          <button title="Search" type="submit" class="btn btn-sm btn-primary join-item">@icons.Search("w-5 h-5")</button>
         </form>
         <div class="join flex items-center justify-end" data-loading-states>
-          <a class="btn btn-sm btn-success join-item" href={ routes.EnvelopeCreate().URL() } data-loading-states>
+          <a title="Add" class="btn btn-sm join-item btn-success" href={ routes.EnvelopeCreate().URL() } data-loading-states>
             @icons.Add("w-5 h-5")
           </a>
-          <button class="btn btn-sm btn-error join-item" hx-delete={ routes.EnvelopeList().URLString() } hx-confirm="Are you sure you wish to delete all envelopes?" data-loading-disable>
+          <button title="Delete All" class="btn btn-sm btn-error join-item" hx-delete={ routes.EnvelopeList().URLString() } hx-confirm="Are you sure you wish to delete all envelopes?" data-loading-disable>
             <span data-loading-class="loading loading-spinner loading-sm">
               @icons.Trash("w-5 h-5")
             </span>
@@ -185,11 +185,11 @@ templ envelopeListView(m meta.Meta, props envelopeListViewProps) {
               <th class="w-0 whitespace-nowrap">
                 <div class="flex flex-row justify-end gap-2">
                   if len(env.Attachments) != 0 {
-                    <a href={ routes.Envelope(env.Message.ID).URLQuery("tab=" + routes.EnvelopeTabAttachments.String()) } class="tooltip tooltip-left flex items-center fill-current" data-tip={ strconv.Itoa(len(env.Attachments)) + " Attachment(s)"  }>
+                    <a title="Attachments" href={ routes.Envelope(env.Message.ID).URLQuery("tab=" + routes.EnvelopeTabAttachments.String()) } class="tooltip tooltip-left flex items-center fill-current" data-tip={ strconv.Itoa(len(env.Attachments)) + " Attachment(s)"  }>
                       @icons.Attachment("h-4 w-4")
                     </a>
                   }
-                  <button class="btn btn-error btn-xs join-item" hx-delete={ routes.Envelope(env.Message.ID).URLString() } hx-target="closest tr" hx-confirm="Are you sure you wish to delete this envelope?" >
+                  <button title="Delete" class="btn btn-error btn-xs join-item" hx-delete={ routes.Envelope(env.Message.ID).URLString() } hx-target="closest tr" hx-confirm="Are you sure you wish to delete this envelope?" >
                     @icons.Trash("h-4 w-4")
                   </button>
                 </div>

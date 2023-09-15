@@ -23,7 +23,7 @@ templ ruleListView(m meta.Meta, props ruleListViewProps) {
     </div>
     <div class="flex flex-col gap-4 p-4">
       <div class="join flex items-center justify-end">
-        <a class="btn btn-sm btn-success" href={ routes.RuleCreate().URL() }>
+        <a title="Add" class="btn btn-sm btn-success" href={ routes.RuleCreate().URL() }>
           @icons.Add("w-5 h-5")
         </a>
       </div>
@@ -35,7 +35,7 @@ templ ruleListView(m meta.Meta, props ruleListViewProps) {
           <div class="flex items-center gap-2 pr-4">
             if !rule.Internal {
               <div data-loading-states>
-                <button class="btn btn-error btn-sm" hx-delete={ routes.Rule(rule.ID).URLString() } hx-confirm="Are you sure you wish to delete this rule?"  hx-target="closest #rule-row" hx-swap="outerHTML" data-loading-disable>
+                <button title="Delete" class="btn btn-error btn-sm" hx-delete={ routes.Rule(rule.ID).URLString() } hx-confirm="Are you sure you wish to delete this rule?"  hx-target="closest #rule-row" hx-swap="outerHTML" data-loading-disable>
                   <span data-loading-class="loading loading-spinner loading-xs">
                     @icons.Trash("h-4 w-4")
                   </span>

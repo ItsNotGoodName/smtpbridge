@@ -327,7 +327,7 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("\"><button type=\"submit\" class=\"btn btn-sm btn-primary join-item\">")
+			_, err = templBuffer.WriteString("\"><button title=\"Search\" type=\"submit\" class=\"btn btn-sm btn-primary join-item\">")
 			if err != nil {
 				return err
 			}
@@ -335,7 +335,7 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</button></form><div class=\"join flex items-center justify-end\" data-loading-states><a class=\"btn btn-sm btn-success join-item\" href=\"")
+			_, err = templBuffer.WriteString("</button></form><div class=\"join flex items-center justify-end\" data-loading-states><a title=\"Add\" class=\"btn btn-sm join-item btn-success\" href=\"")
 			if err != nil {
 				return err
 			}
@@ -352,7 +352,7 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</a><button class=\"btn btn-sm btn-error join-item\" hx-delete=\"")
+			_, err = templBuffer.WriteString("</a><button title=\"Delete All\" class=\"btn btn-sm btn-error join-item\" hx-delete=\"")
 			if err != nil {
 				return err
 			}
@@ -548,7 +548,7 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 					return err
 				}
 				if len(env.Attachments) != 0 {
-					_, err = templBuffer.WriteString("<a href=\"")
+					_, err = templBuffer.WriteString("<a title=\"Attachments\" href=\"")
 					if err != nil {
 						return err
 					}
@@ -578,7 +578,7 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 						return err
 					}
 				}
-				_, err = templBuffer.WriteString("<button class=\"btn btn-error btn-xs join-item\" hx-delete=\"")
+				_, err = templBuffer.WriteString("<button title=\"Delete\" class=\"btn btn-error btn-xs join-item\" hx-delete=\"")
 				if err != nil {
 					return err
 				}
