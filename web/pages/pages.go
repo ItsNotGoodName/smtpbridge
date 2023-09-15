@@ -23,9 +23,10 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/web/helpers"
 	"github.com/ItsNotGoodName/smtpbridge/web/meta"
 	"github.com/ItsNotGoodName/smtpbridge/web/routes"
-	"github.com/ItsNotGoodName/smtpbridge/web/sessions"
+	"github.com/ItsNotGoodName/smtpbridge/web/session"
 	"github.com/a-h/templ"
 	"github.com/go-chi/chi/v5"
+	"github.com/gorilla/sessions"
 	"github.com/kballard/go-shellquote"
 	"github.com/samber/lo"
 )
@@ -313,7 +314,7 @@ func Login(ct Controller, app core.App, ss sessions.Store) http.HandlerFunc {
 			return
 		}
 
-		err = sessions.AuthLogin(w, r, ss, user.ID)
+		err = session.AuthLogin(w, r, ss, user.ID)
 		if err != nil {
 			handleErr(w, r, err, form)
 			return
@@ -325,7 +326,7 @@ func Login(ct Controller, app core.App, ss sessions.Store) http.HandlerFunc {
 
 func Logout(ct Controller, app core.App, ss sessions.Store) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		err := sessions.AuthLogout(w, r, ss)
+		err := session.AuthLogout(w, r, ss)
 		if err != nil {
 			ct.Error(w, r, err, http.StatusInternalServerError)
 			return

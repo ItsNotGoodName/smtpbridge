@@ -1,4 +1,4 @@
-package sessions
+package session
 
 import (
 	"net/http"
@@ -9,9 +9,7 @@ import (
 	"github.com/gorilla/sessions"
 )
 
-type Store = sessions.Store
-
-func AuthLogin(w http.ResponseWriter, r *http.Request, ss Store, id int64) error {
+func AuthLogin(w http.ResponseWriter, r *http.Request, ss sessions.Store, id int64) error {
 	session, _ := ss.New(r, "auth")
 
 	session.Values["id"] = id
@@ -19,7 +17,7 @@ func AuthLogin(w http.ResponseWriter, r *http.Request, ss Store, id int64) error
 	return ss.Save(r, w, session)
 }
 
-func AuthLogout(w http.ResponseWriter, r *http.Request, ss Store) error {
+func AuthLogout(w http.ResponseWriter, r *http.Request, ss sessions.Store) error {
 	session, _ := ss.Get(r, "auth")
 
 	delete(session.Values, "id")
@@ -49,7 +47,7 @@ func AuthRequire(app core.App, ss sessions.Store) func(http.Handler) http.Handle
 	}
 }
 
-func AuthRestrict(app core.App, ss Store) func(http.Handler) http.Handler {
+func AuthRestrict(app core.App, ss sessions.Store) func(http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if app.AuthHTTPAnonymous() {

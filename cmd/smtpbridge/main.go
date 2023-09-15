@@ -23,6 +23,7 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/web"
 	"github.com/ItsNotGoodName/smtpbridge/web/helpers"
 	"github.com/ItsNotGoodName/smtpbridge/web/http"
+	"github.com/ItsNotGoodName/smtpbridge/web/session"
 	"github.com/Rican7/lieut"
 	"github.com/gorilla/sessions"
 	"github.com/reugn/go-quartz/quartz"
@@ -170,18 +171,21 @@ func run(flags *flag.FlagSet) lieut.Executor {
 
 		// HTTP
 		if !cfg.HTTPDisable {
+			// HTTP CSRF
 			csrfSecret, err := secret.GetOrCreate(cfg.CSRFSecretPath)
 			if err != nil {
 				return err
 			}
 
+			// HTTP session
 			sessionSecret, err := secret.GetOrCreate(cfg.SessionSecretPath)
 			if err != nil {
 				return err
 			}
+			sessionStore := sessions.NewFilesystemStore(cfg.SessionsDirectory, sessionSecret)
+			session.ConfigureOptions(sessionStore.Options)
 
 			controller := http.NewController(app, cfg.TimeHourFormat)
-			sessionStore := sessions.NewFilesystemStore(cfg.SessionsDirectory, sessionSecret)
 			router := http.NewRouter(controller, app, fileStore, csrfSecret, sessionStore)
 			server := http.NewServer(router, cfg.HTTPAddress)
 			super.Add(server)

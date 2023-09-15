@@ -5,7 +5,9 @@ import (
 	"context"
 	"io/fs"
 	"mime"
+	"net/http"
 	"path/filepath"
+	"strings"
 
 	"github.com/thejerf/suture/v4"
 )
@@ -42,4 +44,17 @@ func (r Refresher) String() string {
 func (r Refresher) Serve(ctx context.Context) error {
 	reloadVite()
 	return suture.ErrDoNotRestart
+}
+
+func CacheControl(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasPrefix(r.RequestURI, "/assets") {
+			// Files in assets have a hash associated with them
+			w.Header().Set("Cache-Control", "max-age=31536000,immutable")
+		} else {
+			w.Header().Set("Cache-Control", "max-age=3600")
+		}
+
+		h.ServeHTTP(w, r)
+	})
 }
