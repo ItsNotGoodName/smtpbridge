@@ -50,7 +50,7 @@ db-migrate:
 # Generation
 
 gen-jet:
-	jet -source=sqlite -dsn="$(DB_PATH)" -path=./internal/jet -ignore-tables goose_db_version
+	jet -source=sqlite -dsn="$(DB_PATH)" -path=./internal/jet -ignore-tables goose_db_version,_dummy
 	rm -rf ./internal/jet/model
 
 gen-templ:

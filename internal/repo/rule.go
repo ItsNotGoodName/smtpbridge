@@ -22,7 +22,7 @@ var rulePJ ProjectionList = ProjectionList{
 var ruleCreatePJ ProjectionList = rulePJ.Except(Rules.ID)
 
 func RuleCreate(ctx context.Context, db database.Querier, rule models.Rule, endpoints []int64) (int64, error) {
-	tx, err := db.BeginTx(ctx, nil)
+	tx, err := db.BeginTx(ctx, true)
 	if err != nil {
 		return 0, err
 	}
@@ -129,7 +129,7 @@ func RuleEndpointsList(ctx context.Context, db database.Querier) ([]models.RuleE
 }
 
 func RuleEndpointsSet(ctx context.Context, db database.Querier, ruleID int64, endpointIDs []int64) error {
-	tx, err := db.BeginTx(ctx, nil)
+	tx, err := db.BeginTx(ctx, true)
 	if err != nil {
 		return err
 	}

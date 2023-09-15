@@ -20,7 +20,7 @@ func InternalSync(
 	rules []models.Rule,
 	ruleToEndpoints map[string][]string,
 ) error {
-	tx, err := db.BeginTx(ctx, nil)
+	tx, err := db.BeginTx(ctx, true)
 	if err != nil {
 		return err
 	}

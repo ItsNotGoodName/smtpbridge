@@ -25,7 +25,7 @@ func MailmanEnqueue(ctx context.Context, db database.Querier, envelopeID int64) 
 }
 
 func MailmanDequeue(ctx context.Context, db database.Querier) (int64, error) {
-	tx, err := db.BeginTx(ctx, nil)
+	tx, err := db.BeginTx(ctx, true)
 	if err != nil {
 		return 0, err
 	}

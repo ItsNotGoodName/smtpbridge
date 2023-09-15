@@ -31,7 +31,7 @@ var attachmentPJ ProjectionList = ProjectionList{
 }
 
 func EnvelopeCreate(ctx context.Context, db database.Querier, msg models.Message, atts []models.Attachment) (int64, error) {
-	tx, err := db.BeginTx(ctx, nil)
+	tx, err := db.BeginTx(ctx, true)
 	if err != nil {
 		return 0, err
 	}

@@ -12,7 +12,7 @@ type Querier interface {
 	Conn() *sql.DB
 	ExecContext(ctx context.Context, query string, args ...any) (sql.Result, error)
 	QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error)
-	BeginTx(ctx context.Context, opts *sql.TxOptions) (QuerierTx, error)
+	BeginTx(ctx context.Context, write bool) (QuerierTx, error)
 }
 
 type QuerierTx interface {
@@ -34,6 +34,10 @@ func New(dbPath string, debug bool) (Querier, error) {
 		return nil, err
 	}
 
+	if err := dummyCreate(db); err != nil {
+		return nil, err
+	}
+
 	if debug {
 		return DebugDB{DB: db}, nil
 	}
@@ -45,8 +49,8 @@ type DB struct {
 	*sql.DB
 }
 
-func (db DB) BeginTx(ctx context.Context, opts *sql.TxOptions) (QuerierTx, error) {
-	return db.DB.BeginTx(ctx, opts)
+func (db DB) BeginTx(ctx context.Context, write bool) (QuerierTx, error) {
+	return dummyBeginTx(ctx, db.DB, write)
 }
 
 func (db DB) Conn() *sql.DB {
@@ -97,18 +101,14 @@ func (tx DebugTx) QueryContext(ctx context.Context, query string, args ...any) (
 	return tx.Tx.QueryContext(ctx, query, args...)
 }
 
-func (db DebugDB) BeginTx(ctx context.Context, opts *sql.TxOptions) (QuerierTx, error) {
+func (db DebugDB) BeginTx(ctx context.Context, write bool) (QuerierTx, error) {
 	log.Debug().
 		Msg("BeginTx (Tx)")
-	tx, err := db.DB.BeginTx(ctx, opts)
+	tx, err := dummyBeginTx(ctx, db.DB, write)
 	if err != nil {
 		return DebugTx{}, err
 	}
 	return DebugTx{Tx: tx}, nil
-}
-
-type DebugTx struct {
-	*sql.Tx
 }
 
 func (tx DebugTx) Commit() error {
@@ -123,4 +123,8 @@ func (tx DebugTx) Rollback() error {
 		Str("func", "Rollback (Tx)").
 		Msg("")
 	return tx.Tx.Rollback()
+}
+
+type DebugTx struct {
+	*sql.Tx
 }
