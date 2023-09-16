@@ -32,6 +32,8 @@ func New(id int, app core.App, bus core.Bus, fileStore endpoint.FileStore, endpo
 
 func (m Mailman) Serve(ctx context.Context) error {
 	checkC := make(chan struct{}, 1)
+	checkC <- struct{}{}
+
 	release := m.bus.OnMailmanEnqueued(func(ctx context.Context, evt models.EventMailmanEnqueued) error {
 		select {
 		case checkC <- struct{}{}:
@@ -65,7 +67,7 @@ func (m Mailman) Serve(ctx context.Context) error {
 				}
 				env := *maybeEnv
 
-				tracer = tracer.Sticky(trace.WithEnvelope(env.Message.ID))
+				tracer := tracer.Sticky(trace.WithEnvelope(env.Message.ID))
 
 				if err := m.send(ctx, tracer, env); err != nil {
 					tracer.Trace(ctx, "mailman.error", trace.WithError(err))
