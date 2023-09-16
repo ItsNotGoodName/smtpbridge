@@ -38,15 +38,17 @@ func RuleCreate(ctx context.Context, db database.Querier, rule models.Rule, endp
 		UpdatedAt: now,
 		CreatedAt: now,
 	}
-	res, err := Rules.INSERT(
-		Rules.Name,
-		Rules.Internal,
-		Rules.InternalID,
-		Rules.Expression,
-		Rules.Enable,
-		Rules.UpdatedAt,
-		Rules.CreatedAt,
-	).MODEL(m).
+	res, err := Rules.
+		INSERT(
+			Rules.Name,
+			Rules.Internal,
+			Rules.InternalID,
+			Rules.Expression,
+			Rules.Enable,
+			Rules.UpdatedAt,
+			Rules.CreatedAt,
+		).
+		MODEL(m).
 		ExecContext(ctx, tx)
 	if err != nil {
 		return 0, err
@@ -65,21 +67,24 @@ func RuleCreate(ctx context.Context, db database.Querier, rule models.Rule, endp
 }
 
 func RuleUpdate(ctx context.Context, db database.Querier, rule models.Rule) error {
+	now := models.NewTime(time.Now())
 	m := struct {
 		models.Rule
 		UpdatedAt models.Time
 	}{
 		Rule:      rule,
-		UpdatedAt: models.NewTime(time.Now()),
+		UpdatedAt: now,
 	}
-	_, err := Rules.UPDATE(
-		Rules.Name,
-		Rules.Internal,
-		Rules.InternalID,
-		Rules.Expression,
-		Rules.Enable,
-		Rules.UpdatedAt,
-	).MODEL(m).
+	_, err := Rules.
+		UPDATE(
+			Rules.Name,
+			Rules.Internal,
+			Rules.InternalID,
+			Rules.Expression,
+			Rules.Enable,
+			Rules.UpdatedAt,
+		).
+		MODEL(m).
 		WHERE(Rules.ID.EQ(Int64(rule.ID))).
 		ExecContext(ctx, db)
 	return err
@@ -87,18 +92,27 @@ func RuleUpdate(ctx context.Context, db database.Querier, rule models.Rule) erro
 
 func RuleGet(ctx context.Context, db database.Querier, id int64) (models.Rule, error) {
 	var res models.Rule
-	err := Rules.SELECT(rulePJ).WHERE(Rules.ID.EQ(Int64(id))).QueryContext(ctx, db, &res)
+	err := Rules.
+		SELECT(rulePJ).
+		WHERE(Rules.ID.EQ(Int64(id))).
+		QueryContext(ctx, db, &res)
 	return res, err
 }
 
 func RuleList(ctx context.Context, db database.Querier) ([]models.Rule, error) {
 	var res []models.Rule
-	err := Rules.SELECT(rulePJ).WHERE(RawBool("1=1")).QueryContext(ctx, db, &res)
+	err := Rules.
+		SELECT(rulePJ).
+		WHERE(RawBool("1=1")).
+		QueryContext(ctx, db, &res)
 	return res, err
 }
 
 func RuleDelete(ctx context.Context, db database.Querier, id int64) error {
-	res, err := Rules.DELETE().WHERE(Rules.ID.EQ(Int64(id))).ExecContext(ctx, db)
+	res, err := Rules.
+		DELETE().
+		WHERE(Rules.ID.EQ(Int64(id))).
+		ExecContext(ctx, db)
 	if err != nil {
 		return err
 	}
@@ -162,8 +176,8 @@ func ruleEndpointsSet(ctx context.Context, db database.QuerierTx, ruleID int64, 
 			RulesToEndpoints.RuleID,
 			RulesToEndpoints.EndpointID,
 		)
-	for _, v := range endpointIDs {
-		stmt = stmt.VALUES(false, ruleID, v)
+	for _, endpointID := range endpointIDs {
+		stmt = stmt.VALUES(false, ruleID, endpointID)
 	}
 
 	_, err := stmt.ExecContext(ctx, db)

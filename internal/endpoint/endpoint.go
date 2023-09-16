@@ -25,20 +25,10 @@ func validate(f Factory, end models.Endpoint) error {
 	return nil
 }
 
-type CreateEndpoint struct {
-	Name              string
-	AttachmentDisable bool
-	TextDisable       bool
-	TitleTemplate     string
-	BodyTemplate      string
-	Kind              string
-	Config            models.EndpointConfig
-}
-
 const DefaultTitleTemplate = "{{ .Message.Subject }}"
 const DefaultBodyTemplate = "{{ .Message.Text }}"
 
-func new(f Factory, r CreateEndpoint) models.Endpoint {
+func new(f Factory, r models.DTOEndpointCreate) models.Endpoint {
 	return models.Endpoint{
 		Internal:          false,
 		InternalID:        sql.NullString{},
@@ -52,12 +42,12 @@ func new(f Factory, r CreateEndpoint) models.Endpoint {
 	}
 }
 
-func New(f Factory, r CreateEndpoint) (models.Endpoint, error) {
+func New(f Factory, r models.DTOEndpointCreate) (models.Endpoint, error) {
 	end := new(f, r)
 	return end, validate(f, end)
 }
 
-func NewInternal(f Factory, r CreateEndpoint, internalID string) (models.Endpoint, error) {
+func NewInternal(f Factory, r models.DTOEndpointCreate, internalID string) (models.Endpoint, error) {
 	if r.Name == "" {
 		r.Name = internalID
 	}

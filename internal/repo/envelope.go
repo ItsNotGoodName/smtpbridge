@@ -2,25 +2,29 @@ package repo
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/ItsNotGoodName/smtpbridge/internal/database"
 	. "github.com/ItsNotGoodName/smtpbridge/internal/jet/table"
 	"github.com/ItsNotGoodName/smtpbridge/internal/models"
+	"github.com/ItsNotGoodName/smtpbridge/internal/repo/orm"
 	"github.com/ItsNotGoodName/smtpbridge/pkg/pagination"
 	. "github.com/go-jet/jet/v2/sqlite"
 )
 
-var messagePJ ProjectionList = ProjectionList{
-	Messages.ID.AS("message.id"),
-	Messages.From.AS("message.from"),
-	Messages.To.AS("message.to"),
-	Messages.Subject.AS("message.subject"),
-	Messages.Text.AS("message.text"),
-	Messages.HTML.AS("message.html"),
-	Messages.Date.AS("message.date"),
-	Messages.CreatedAt.AS("message.created_at"),
+var messagesPJRaw ProjectionList = ProjectionList{
+	Messages.ID.AS("id"),
+	Messages.From.AS("from"),
+	Messages.To.AS("to"),
+	Messages.Subject.AS("subject"),
+	Messages.Text.AS("text"),
+	Messages.HTML.AS("html"),
+	Messages.Date.AS("date"),
+	Messages.CreatedAt.AS("created_at"),
 }
+
+var messagePJ ProjectionList = messagesPJRaw.As("message")
 
 var attachmentPJ ProjectionList = ProjectionList{
 	Attachments.ID.AS("attachment.id"),
@@ -85,39 +89,29 @@ func EnvelopeCreate(ctx context.Context, db database.Querier, msg models.Message
 }
 
 func EnvelopeList(ctx context.Context, db database.Querier, page pagination.Page, req models.DTOEnvelopeListRequest) (models.DTOEnvelopeListResult, error) {
-	var res []models.Envelope
-
-	subQuery := Messages.SELECT(Messages.ID)
-	subQuery = envelopeListOrder(subQuery, req)
-	subQuery = envelopeListWhere(subQuery, req)
-
-	query := SELECT(messagePJ, attachmentPJ).
-		FROM(Messages.LEFT_JOIN(Attachments, Attachments.MessageID.EQ(Messages.ID))).
-		WHERE(Messages.ID.IN(subQuery.LIMIT(int64(page.Limit())).OFFSET(int64(page.Offset()))))
-	query = envelopeListOrder(query, req)
-
-	err := query.QueryContext(ctx, db, &res)
-	if err != nil {
-		return models.DTOEnvelopeListResult{}, err
+	subQuery := Messages.SELECT(
+		messagesPJRaw,
+		COUNT(Raw("*")).OVER().AS("count"),
+	)
+	// Order
+	if req.Ascending {
+		if req.Order == models.DTOEnvelopeFieldSubject {
+			subQuery = subQuery.ORDER_BY(Messages.Subject.ASC())
+		} else if req.Order == models.DTOEnvelopeFieldFrom {
+			subQuery = subQuery.ORDER_BY(Messages.From.ASC())
+		} else {
+			subQuery = subQuery.ORDER_BY(Messages.ID.ASC())
+		}
+	} else {
+		if req.Order == models.DTOEnvelopeFieldSubject {
+			subQuery = subQuery.ORDER_BY(Messages.Subject.DESC())
+		} else if req.Order == models.DTOEnvelopeFieldFrom {
+			subQuery = subQuery.ORDER_BY(Messages.From.DESC())
+		} else {
+			subQuery = subQuery.ORDER_BY(Messages.ID.DESC())
+		}
 	}
-
-	countQuery := Messages.SELECT(COUNT(Raw("*")).AS("count"))
-	countQuery = envelopeListWhere(countQuery, req)
-
-	var resCount struct{ Count int }
-	err = countQuery.QueryContext(ctx, db, &resCount)
-	if err != nil {
-		return models.DTOEnvelopeListResult{}, err
-	}
-	pageResult := pagination.NewPageResult(page, resCount.Count)
-
-	return models.DTOEnvelopeListResult{
-		PageResult: pageResult,
-		Envelopes:  res,
-	}, nil
-}
-
-func envelopeListWhere(s SelectStatement, req models.DTOEnvelopeListRequest) SelectStatement {
+	// Filter
 	if req.Search != "" {
 		var exp []BoolExpression
 		if req.SearchText {
@@ -127,51 +121,48 @@ func envelopeListWhere(s SelectStatement, req models.DTOEnvelopeListRequest) Sel
 			exp = append(exp, Messages.Subject.LIKE(RawString("?", map[string]interface{}{"?": "%" + req.Search + "%"})))
 		}
 		if len(exp) > 0 {
-			s = s.WHERE(OR(exp...))
+			subQuery = subQuery.WHERE(OR(exp...))
 		} else {
 			// Invalid state where the caller wants to search but has defined no fields to search
-			s = s.WHERE(RawBool("1=0"))
+			subQuery = subQuery.WHERE(RawBool("1=0"))
 		}
 	}
+	// Paginate
+	subQuery = subQuery.
+		LIMIT(int64(page.Limit())).
+		OFFSET(int64(page.Offset()))
 
-	return s
-}
-
-func envelopeListOrder(s SelectStatement, req models.DTOEnvelopeListRequest) SelectStatement {
-	// This is what peak performance looks like
-	if req.Ascending {
-		if req.Order == models.DTOEnvelopeFieldSubject {
-			s = s.ORDER_BY(Messages.Subject.ASC())
-		} else if req.Order == models.DTOEnvelopeFieldFrom {
-			s = s.ORDER_BY(Messages.From.ASC())
-		} else {
-			s = s.ORDER_BY(Messages.ID.ASC())
-		}
-	} else {
-		if req.Order == models.DTOEnvelopeFieldSubject {
-			s = s.ORDER_BY(Messages.Subject.DESC())
-		} else if req.Order == models.DTOEnvelopeFieldFrom {
-			s = s.ORDER_BY(Messages.From.DESC())
-		} else {
-			s = s.ORDER_BY(Messages.ID.DESC())
-		}
+	var res struct {
+		Count     int `sql:"primary_key"`
+		Envelopes []models.Envelope
 	}
 
-	return s
+	err := SELECT(messagePJ, attachmentPJ, Raw("messages.count")).
+		FROM(subQuery.AsTable("messages").LEFT_JOIN(Attachments, Attachments.MessageID.EQ(Messages.ID))).
+		QueryContext(ctx, db, &res)
+	if err != nil && !errors.Is(err, ErrNoRows) {
+		return models.DTOEnvelopeListResult{}, err
+	}
+
+	pageResult := pagination.NewPageResult(page, res.Count)
+	return models.DTOEnvelopeListResult{
+		PageResult: pageResult,
+		Envelopes:  res.Envelopes,
+	}, nil
 }
 
 func EnvelopeGet(ctx context.Context, db database.Querier, id int64) (models.Envelope, error) {
 	var env models.Envelope
-	err := SELECT(messagePJ, attachmentPJ).FROM(Messages.LEFT_JOIN(Attachments, Attachments.MessageID.EQ(Int64(id)))).WHERE(Messages.ID.EQ(Int64(id))).QueryContext(ctx, db, &env)
+	err := SELECT(messagePJ, attachmentPJ).
+		FROM(Messages.LEFT_JOIN(Attachments, Attachments.MessageID.EQ(Int64(id)))).
+		WHERE(Messages.ID.EQ(Int64(id))).
+		QueryContext(ctx, db, &env)
 	return env, err
 }
 
 func EnvelopeCount(ctx context.Context, db database.Querier) (int, error) {
-	var res struct{ Count int }
-	err := Messages.
-		SELECT(COUNT(Raw("*")).AS("count")).
-		QueryContext(ctx, db, &res)
-	return res.Count, err
+	s := orm.CountSelect(Messages)
+	return orm.CountQuery(ctx, db, s)
 }
 
 func EnvelopeDelete(ctx context.Context, db database.Querier, id int64) error {
@@ -193,21 +184,23 @@ func EnvelopeDrop(ctx context.Context, db database.Querier) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-
 	return res.RowsAffected()
 }
 
 func EnvelopeTrim(ctx context.Context, db database.Querier, age time.Time, keep int) (int64, error) {
-	query := Messages.CreatedAt.LT(RawTimestamp(muhTypeAffinity(models.NewTime(age))))
+	where := Messages.CreatedAt.LT(RawTimestamp(muhTypeAffinity(models.NewTime(age))))
 	if keep != 0 {
-		query = query.AND(
-			Messages.ID.NOT_IN(Messages.SELECT(Messages.ID).ORDER_BY(Messages.ID.DESC()).LIMIT(int64(keep))),
-		)
+		where = where.AND(Messages.ID.NOT_IN(
+			Messages.
+				SELECT(Messages.ID).
+				ORDER_BY(Messages.ID.DESC()).
+				LIMIT(int64(keep)),
+		))
 	}
 
 	res, err := Messages.
 		DELETE().
-		WHERE(query).
+		WHERE(where).
 		ExecContext(ctx, db)
 	if err != nil {
 		return 0, err
@@ -244,45 +237,33 @@ func AttachmentGet(ctx context.Context, db database.Querier, id int64) (models.A
 }
 
 func AttachmentList(ctx context.Context, db database.Querier, page pagination.Page, req models.DTOAttachmentListRequest) (models.DTOAttachmentListResult, error) {
-	var res []models.Attachment
-
 	query := Attachments.
-		SELECT(attachmentPJ).
+		SELECT(attachmentPJ, COUNT(Raw("*")).OVER().AS("count")).
 		LIMIT(int64(page.Limit())).
 		OFFSET(int64(page.Offset()))
-	query = attachmentListWithWhere(query)
-	query = attachmentListWithOrder(query, req)
+	// Order
+	if req.Ascending {
+		query = query.ORDER_BY(Attachments.ID.ASC())
+	} else {
+		query = query.ORDER_BY(Attachments.ID.DESC())
+	}
+
+	var res struct {
+		Count       int `sql:"primary_key"`
+		Attachments []models.Attachment
+	}
 
 	err := query.QueryContext(ctx, db, &res)
-	if err != nil {
+	if err != nil && !errors.Is(err, ErrNoRows) {
 		return models.DTOAttachmentListResult{}, err
 	}
 
-	countQuery := Attachments.SELECT(COUNT(Raw("*")).AS("count"))
-	countQuery = attachmentListWithWhere(countQuery)
-
-	var resCount struct{ Count int }
-	err = countQuery.QueryContext(ctx, db, &resCount)
-	if err != nil {
-		return models.DTOAttachmentListResult{}, err
-	}
-	pageResult := pagination.NewPageResult(page, resCount.Count)
+	pageResult := pagination.NewPageResult(page, res.Count)
 
 	return models.DTOAttachmentListResult{
 		PageResult:  pageResult,
-		Attachments: res,
+		Attachments: res.Attachments,
 	}, nil
-}
-
-func attachmentListWithWhere(stmt SelectStatement) SelectStatement {
-	return stmt
-}
-
-func attachmentListWithOrder(stmt SelectStatement, req models.DTOAttachmentListRequest) SelectStatement {
-	if req.Ascending {
-		return stmt.ORDER_BY(Attachments.ID.ASC())
-	}
-	return stmt.ORDER_BY(Attachments.ID.DESC())
 }
 
 func AttachmentListByMessage(ctx context.Context, db database.Querier, messageID int64) ([]models.Attachment, error) {
@@ -305,18 +286,18 @@ func AttachmentListOrphan(ctx context.Context, db database.Querier, limit int) (
 }
 
 func AttachmentCount(ctx context.Context, db database.Querier) (int, error) {
-	var res struct{ Count int }
-	err := Attachments.
-		SELECT(COUNT(Raw("*")).AS("count")).
-		QueryContext(ctx, db, &res)
-	return res.Count, err
+	s := orm.CountSelect(Attachments)
+	return orm.CountQuery(ctx, db, s)
 }
 
-// AttachmentRemove should only be called when it's MessageID is null and the associated file has been deleted from the FileStore.
-func AttachmentRemove(ctx context.Context, db database.Querier, id int64) error {
+// AttachmentRemoveOrphan should only be called after the associated file has been deleted from the FileStore.
+func AttachmentRemoveOrphan(ctx context.Context, db database.Querier, id int64) error {
 	_, err := Attachments.
 		DELETE().
-		WHERE(Attachments.ID.EQ(Int64(id))).
+		WHERE(AND(
+			Attachments.ID.EQ(Int64(id)),
+			Attachments.MessageID.IS_NULL(),
+		)).
 		ExecContext(ctx, db)
 	return err
 }

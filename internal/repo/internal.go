@@ -216,6 +216,7 @@ func internalDeleteOlderThan(ctx context.Context, tx database.QuerierTx, date mo
 	if err != nil {
 		return err
 	}
+
 	_, err = Endpoints.
 		DELETE().
 		WHERE(AND(
@@ -223,5 +224,9 @@ func internalDeleteOlderThan(ctx context.Context, tx database.QuerierTx, date mo
 			Endpoints.UpdatedAt.LT(RawTimestamp(muhTypeAffinity(date))),
 		)).
 		ExecContext(ctx, tx)
-	return err
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

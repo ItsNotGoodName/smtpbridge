@@ -14,6 +14,7 @@ import (
 
 	"github.com/ItsNotGoodName/smtpbridge/internal/models"
 	c "github.com/ItsNotGoodName/smtpbridge/web/components"
+	"github.com/ItsNotGoodName/smtpbridge/web/helpers"
 	"github.com/ItsNotGoodName/smtpbridge/web/icons"
 	"github.com/ItsNotGoodName/smtpbridge/web/meta"
 	"github.com/ItsNotGoodName/smtpbridge/web/routes"
@@ -57,7 +58,7 @@ func attachmentListView(m meta.Meta, props attachmentListViewProps) templ.Compon
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString(templ.EscapeString(routes.AttachmentTrim().URLString()))
+			_, err = templBuffer.WriteString(templ.EscapeString(routes.AttachmentTrim().URLQueryString(helpers.Query(props.Query))))
 			if err != nil {
 				return err
 			}

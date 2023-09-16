@@ -84,3 +84,24 @@ type DTORuleUpdate struct {
 	Enable     *bool
 	Endpoints  *[]int64
 }
+
+type DTOEndpointCreate struct {
+	Name              string
+	AttachmentDisable bool
+	TextDisable       bool
+	TitleTemplate     string
+	BodyTemplate      string
+	Kind              string
+	Config            EndpointConfig
+}
+
+type DTOEndpointUpdate struct {
+	ID                int64
+	Name              *string
+	AttachmentDisable *bool
+	TextDisable       *bool
+	TitleTemplate     *string
+	BodyTemplate      *string
+	Kind              *string
+	Config            *EndpointConfig
+}

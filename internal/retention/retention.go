@@ -113,7 +113,7 @@ func DeleteOrphanAttachments(ctx context.Context, tracer trace.Tracer, db databa
 				return err
 			}
 
-			if err := repo.AttachmentRemove(ctx, db, a.ID); err != nil {
+			if err := repo.AttachmentRemoveOrphan(ctx, db, a.ID); err != nil {
 				return err
 			}
 		}

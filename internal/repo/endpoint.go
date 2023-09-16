@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+	"time"
 
 	"github.com/ItsNotGoodName/smtpbridge/internal/database"
 	. "github.com/ItsNotGoodName/smtpbridge/internal/jet/table"
@@ -22,6 +23,39 @@ var endpointPJ ProjectionList = ProjectionList{
 	Endpoints.Config.AS("endpoint.config"),
 }
 
+func EndpointCreate(ctx context.Context, db database.Querier, end models.Endpoint) (int64, error) {
+	now := models.NewTime(time.Now())
+	m := struct {
+		models.Endpoint
+		CreatedAt models.Time
+		UpdatedAt models.Time
+	}{
+		Endpoint:  end,
+		CreatedAt: now,
+		UpdatedAt: now,
+	}
+	res, err := Endpoints.
+		INSERT(
+			Endpoints.Internal,
+			Endpoints.InternalID,
+			Endpoints.Name,
+			Endpoints.AttachmentDisable,
+			Endpoints.TextDisable,
+			Endpoints.TitleTemplate,
+			Endpoints.BodyTemplate,
+			Endpoints.Kind,
+			Endpoints.Config,
+			Endpoints.UpdatedAt,
+			Endpoints.CreatedAt,
+		).
+		MODEL(m).
+		ExecContext(ctx, db)
+	if err != nil {
+		return 0, err
+	}
+	return res.LastInsertId()
+}
+
 func EndpointGet(ctx context.Context, db database.Querier, id int64) (models.Endpoint, error) {
 	var endpoint models.Endpoint
 	err := Endpoints.
@@ -38,6 +72,33 @@ func EndpointList(ctx context.Context, db database.Querier) ([]models.Endpoint, 
 		WHERE(RawBool("1=1")).
 		QueryContext(ctx, db, &endpoints)
 	return endpoints, err
+}
+
+func EndpointUpdate(ctx context.Context, db database.Querier, end models.Endpoint) error {
+	m := struct {
+		models.Endpoint
+		UpdatedAt models.Time
+	}{
+		Endpoint:  end,
+		UpdatedAt: models.NewTime(time.Now()),
+	}
+	_, err := Endpoints.
+		UPDATE(
+			Endpoints.Internal,
+			Endpoints.InternalID,
+			Endpoints.Name,
+			Endpoints.AttachmentDisable,
+			Endpoints.TextDisable,
+			Endpoints.TitleTemplate,
+			Endpoints.BodyTemplate,
+			Endpoints.Kind,
+			Endpoints.Config,
+			Endpoints.UpdatedAt,
+		).
+		MODEL(m).
+		WHERE(Endpoints.ID.EQ(Int64(end.ID))).
+		ExecContext(ctx, db)
+	return err
 }
 
 func EndpointDelete(ctx context.Context, db database.Querier, id int64) error {

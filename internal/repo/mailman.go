@@ -34,6 +34,7 @@ func MailmanDequeue(ctx context.Context, db database.Querier) (int64, error) {
 	var res struct {
 		MessageID int64
 	}
+
 	err = MailmanQueue.
 		SELECT(MailmanQueue.MessageID.AS("message_id")).
 		WHERE(RawBool("1=1")).

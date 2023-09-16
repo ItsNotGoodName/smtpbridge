@@ -272,7 +272,7 @@ func (p Parser) Parse(raw Raw) (Config, error) {
 			if value.BodyTemplate != nil {
 				bodyTemplate = *value.BodyTemplate
 			}
-			e, err := endpoint.NewInternal(endpointFactory, endpoint.CreateEndpoint{
+			e, err := endpoint.NewInternal(endpointFactory, models.DTOEndpointCreate{
 				Name:              value.Name,
 				AttachmentDisable: value.AttachmentDisable,
 				TextDisable:       value.TextDisable,

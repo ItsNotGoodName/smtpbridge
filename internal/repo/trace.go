@@ -2,7 +2,7 @@ package repo
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"time"
 
 	"github.com/ItsNotGoodName/smtpbridge/internal/database"
@@ -12,6 +12,17 @@ import (
 	. "github.com/go-jet/jet/v2/sqlite"
 	"github.com/samber/lo"
 )
+
+var tracePJ ProjectionList = ProjectionList{
+	Traces.ID.AS("trace.id"),
+	Traces.RequestID.AS("trace.request_id"),
+	Traces.Source.AS("trace.source"),
+	Traces.Seq.AS("trace.seq"),
+	Traces.Action.AS("trace.action"),
+	Traces.Data.AS("trace.data"),
+	Traces.Level.AS("trace.level"),
+	Traces.CreatedAt.AS("trace.created_at"),
+}
 
 type TraceStore struct {
 	db database.Querier
@@ -26,17 +37,6 @@ func NewTraceStore(db database.Querier) TraceStore {
 func (r TraceStore) Save(ctx context.Context, trace models.Trace) error {
 	_, err := TraceCreate(ctx, r.db, trace)
 	return err
-}
-
-var tracePJ ProjectionList = ProjectionList{
-	Traces.ID.AS("trace.id"),
-	Traces.RequestID.AS("trace.request_id"),
-	Traces.Source.AS("trace.source"),
-	Traces.Seq.AS("trace.seq"),
-	Traces.Action.AS("trace.action"),
-	Traces.Data.AS("trace.data"),
-	Traces.Level.AS("trace.level"),
-	Traces.CreatedAt.AS("trace.created_at"),
 }
 
 func TraceCreate(ctx context.Context, db database.Querier, r models.Trace) (int64, error) {
@@ -59,45 +59,38 @@ func TraceCreate(ctx context.Context, db database.Querier, r models.Trace) (int6
 }
 
 func TraceList(ctx context.Context, db database.Querier, page pagination.Page, req models.DTOTraceListRequest) (models.DTOTraceListResult, error) {
-	sub := Traces.
-		SELECT(Traces.RequestID).
+	subQuery := Traces.
+		SELECT(
+			Traces.RequestID.AS("request_id"),
+			COUNT(Raw("*")).OVER().AS("count"),
+		).
 		DISTINCT()
+	// Order
 	if req.Ascending {
-		sub = sub.ORDER_BY(Traces.ID.ASC())
+		subQuery = subQuery.ORDER_BY(Traces.ID.ASC())
 	} else {
-		sub = sub.ORDER_BY(Traces.ID.DESC())
+		subQuery = subQuery.ORDER_BY(Traces.ID.DESC())
 	}
-	sub = sub.
+	// Pagination
+	subQuery = subQuery.
 		LIMIT(int64(page.Limit())).
 		OFFSET(int64(page.Offset()))
 
-	query := Traces.
-		SELECT(tracePJ).
-		WHERE(Traces.RequestID.IN(sub))
-	if req.Ascending {
-		query = query.ORDER_BY(Traces.ID.ASC())
-	} else {
-		query = query.ORDER_BY(Traces.ID.DESC())
+	var res struct {
+		Count int `sql:"primary_key"`
+		Trace []models.Trace
 	}
-
-	var res []models.Trace
-	err := query.QueryContext(ctx, db, &res)
-	if err != nil {
+	err := SELECT(tracePJ, Raw("t.count").AS("count")).
+		FROM(subQuery.AsTable("t").
+			LEFT_JOIN(Traces, RawString("t.request_id").EQ(Traces.RequestID))).
+		QueryContext(ctx, db, &res)
+	if err != nil && !errors.Is(err, ErrNoRows) {
 		return models.DTOTraceListResult{}, err
 	}
 
-	var resCount struct{ Count int }
-	err = Traces.
-		SELECT(COUNT(Raw(fmt.Sprintf("DISTINCT %s.%s", Traces.RequestID.TableName(), Traces.RequestID.Name()))).AS("count")).
-		DISTINCT().
-		QueryContext(ctx, db, &resCount)
-	if err != nil {
-		return models.DTOTraceListResult{}, err
-	}
-	pageResult := pagination.NewPageResult(page, resCount.Count)
+	traces := lo.PartitionBy(res.Trace, func(t models.Trace) string { return t.RequestID })
 
-	traces := lo.PartitionBy(res, func(t models.Trace) string { return t.RequestID })
-
+	pageResult := pagination.NewPageResult(page, res.Count)
 	return models.DTOTraceListResult{
 		PageResult: pageResult,
 		Traces:     traces,
@@ -112,7 +105,6 @@ func TraceDrop(ctx context.Context, db database.Querier) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-
 	return res.RowsAffected()
 }
 
