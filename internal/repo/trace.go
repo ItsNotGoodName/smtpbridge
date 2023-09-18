@@ -80,10 +80,16 @@ func TraceList(ctx context.Context, db database.Querier, page pagination.Page, r
 		Count int `sql:"primary_key"`
 		Trace []models.Trace
 	}
-	err := SELECT(tracePJ, Raw("t.count").AS("count")).
+	query := SELECT(tracePJ, Raw("t.count").AS("count")).
 		FROM(subQuery.AsTable("t").
-			LEFT_JOIN(Traces, RawString("t.request_id").EQ(Traces.RequestID))).
-		QueryContext(ctx, db, &res)
+			LEFT_JOIN(Traces, RawString("t.request_id").EQ(Traces.RequestID)))
+	// Order
+	if req.Ascending {
+		query = query.ORDER_BY(Traces.Seq.ASC())
+	} else {
+		query = query.ORDER_BY(Traces.Seq.DESC())
+	}
+	err := query.QueryContext(ctx, db, &res)
 	if err != nil && !errors.Is(err, ErrNoRows) {
 		return models.DTOTraceListResult{}, err
 	}
