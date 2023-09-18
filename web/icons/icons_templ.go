@@ -925,3 +925,42 @@ func Alert(class any) templ.Component {
 		return err
 	})
 }
+
+// https://remixicon.com/icon/filter-3-line
+
+func Filter(class any) templ.Component {
+	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
+		templBuffer, templIsBuffer := w.(*bytes.Buffer)
+		if !templIsBuffer {
+			templBuffer = templ.GetBuffer()
+			defer templ.ReleaseBuffer(templBuffer)
+		}
+		ctx = templ.InitializeContext(ctx)
+		var_48 := templ.GetChildren(ctx)
+		if var_48 == nil {
+			var_48 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		var var_49 = []any{class, "fill-current"}
+		err = templ.RenderCSSItems(ctx, templBuffer, var_49...)
+		if err != nil {
+			return err
+		}
+		_, err = templBuffer.WriteString("<svg class=\"")
+		if err != nil {
+			return err
+		}
+		_, err = templBuffer.WriteString(templ.EscapeString(templ.CSSClasses(var_49).String()))
+		if err != nil {
+			return err
+		}
+		_, err = templBuffer.WriteString("\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\"><path d=\"M10 18H14V16H10V18ZM3 6V8H21V6H3ZM6 13H18V11H6V13Z\"></path></svg>")
+		if err != nil {
+			return err
+		}
+		if !templIsBuffer {
+			_, err = templBuffer.WriteTo(w)
+		}
+		return err
+	})
+}
