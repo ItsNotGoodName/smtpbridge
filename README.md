@@ -219,6 +219,11 @@ rules:
     expression: or (eq .Message.Subject "cam-1") (eq .Message.Subject "cam-2")
     endpoints:
       - console_endpoint
+
+# Mailman sends envelopes to endpoints by matching rules
+mailman:
+  # Number of concurrent workers
+  workers: 1
 ```
 
 ## Templates

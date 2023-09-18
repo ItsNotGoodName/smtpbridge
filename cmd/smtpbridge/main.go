@@ -158,7 +158,7 @@ func run(flags *flag.FlagSet) lieut.Executor {
 			return nil
 		}))
 
-		for i := 1; i <= cfg.MailmanCount; i++ {
+		for i := 1; i <= cfg.MailmanWorkers; i++ {
 			// Mailman
 			mailman := mailman.New(i, app, bus, fileStore, cfg.EndpointFactory)
 			super.Add(mailman)

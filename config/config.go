@@ -40,7 +40,7 @@ type Config struct {
 	HealthcheckURL       string
 	HealthcheckInterval  time.Duration
 	HealthcheckStartup   bool
-	MailmanCount         int
+	MailmanWorkers       int
 	HTTPDisable          bool
 	HTTPAddress          string
 	HTTPPort             uint16
@@ -69,6 +69,7 @@ type Raw struct {
 	HealthcheckURL          string `koanf:"healthcheck.url"`
 	HealthcheckInterval     string `koanf:"healthcheck.interval"`
 	HealthcheckStartup      bool   `koanf:"healthcheck.startup"`
+	MailmanWorkers          uint   `koanf:"mailman.workers"`
 	SMTPDisable             bool   `koanf:"smtp.disable"`
 	SMTPHost                string `koanf:"smtp.host"`
 	SMTPPort                uint16 `koanf:"smtp.port"`
@@ -114,6 +115,7 @@ var RawDefault = struct {
 	SMTPMaxPayloadSize  string `koanf:"smtp.max_payload_size"`
 	HTTPPort            uint16 `koanf:"http.port"`
 	RetentionTraceAge   string `koanf:"retention.trace_age"`
+	MailmanWorkers      int    `koanf:"mailman.workers"`
 	// IMAPPort         uint16 `koanf:"imap.port"`
 }{
 	HealthcheckInterval: "5m",
@@ -124,6 +126,7 @@ var RawDefault = struct {
 	RetentionTraceAge:   "168h",
 	SMTPPort:            1025,
 	HTTPPort:            8080,
+	MailmanWorkers:      1,
 	// IMAPPort:         10143,
 }
 
@@ -145,6 +148,8 @@ func WithFlagSet(flags *flag.FlagSet) *flag.FlagSet {
 	flags.String("healthcheck-url", "", flagUsageString("", "Healthcheck URL to fetch."))
 	flags.String("healthcheck-interval", "", flagUsageString(RawDefault.HealthcheckInterval, "Healthcheck interval between each fetch."))
 	flags.Bool("healthcheck-startup", false, flagUsageBool(false, "Healthcheck fetch on startup."))
+
+	flags.Int("mailman-workers", 0, flagUsageInt(int(RawDefault.MailmanWorkers), "Number of mailman workers."))
 
 	flags.Bool("smtp-disable", false, flagUsageBool(false, "Disable SMTP server."))
 	flags.String("smtp-host", "", flagUsageString("", "SMTP host address to listen on."))
@@ -340,7 +345,7 @@ func (p Parser) Parse(raw Raw) (Config, error) {
 		HealthcheckURL:       raw.HealthcheckURL,
 		HealthcheckInterval:  healthcheckInterval,
 		HealthcheckStartup:   raw.HealthcheckStartup,
-		MailmanCount:         1,
+		MailmanWorkers:       int(raw.MailmanWorkers),
 		Debug:                raw.Debug,
 		TimeHourFormat:       timeHourFormat,
 		DatabasePath:         databasePath,
