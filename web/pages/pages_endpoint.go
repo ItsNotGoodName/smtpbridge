@@ -7,6 +7,7 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/internal/models"
 	"github.com/ItsNotGoodName/smtpbridge/pkg/htmx"
 	c "github.com/ItsNotGoodName/smtpbridge/web/components"
+	"github.com/ItsNotGoodName/smtpbridge/web/events"
 	"github.com/ItsNotGoodName/smtpbridge/web/forms"
 	"github.com/ItsNotGoodName/smtpbridge/web/helpers"
 	"github.com/ItsNotGoodName/smtpbridge/web/routes"
@@ -262,6 +263,7 @@ func EndpointTest(ct Controller, app core.App) http.HandlerFunc {
 			return
 		}
 
+		events.ToastSuccess("Sent test envelope.").SetTrigger(w)
 		w.WriteHeader(http.StatusNoContent)
 	})
 }

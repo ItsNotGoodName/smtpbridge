@@ -282,7 +282,6 @@ func EnvelopeCreate(ct Controller, app core.App) http.HandlerFunc {
 			handleErr(w, r, err, form)
 			return
 		}
-
 		helpers.Tracer(app, r).Trace(ctx, trace.ActionEnvelopeCreated, trace.WithEnvelope(id))
 
 		events.EnvelopeCreated.SetTrigger(w)

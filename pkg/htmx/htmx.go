@@ -93,21 +93,9 @@ func SetReselect(w http.ResponseWriter) {
 	w.Header().Set("HX-Reselect", "true")
 }
 
-type Event string
-
-// FromBody is used on the client side in the hx-trigger HTML attribute.
-func (e Event) FromBody() string {
-	return string(e) + " from:body"
-}
-
 // SetTrigger events as soon as the response is received.
 func SetTrigger(w http.ResponseWriter, event string) {
 	w.Header().Set("HX-Trigger", event)
-}
-
-// SetTrigger events as soon as the response is received.
-func (e Event) SetTrigger(w http.ResponseWriter) {
-	SetTrigger(w, string(e))
 }
 
 // SetTriggerAfterSettle events after the settling step.
@@ -115,17 +103,7 @@ func SetTriggerAfterSettle(w http.ResponseWriter, event string) {
 	w.Header().Set("HX-Trigger-After-Settle", event)
 }
 
-// SetTriggerAfterSettle events after the settling step.
-func (e Event) SetTriggerAfterSettle(w http.ResponseWriter) {
-	SetTriggerAfterSettle(w, string(e))
-}
-
 // SetTriggerAfterSwap events after the swap step.
 func SetTriggerAfterSwap(w http.ResponseWriter, event string) {
 	w.Header().Set("HX-Trigger-After-Swap", event)
-}
-
-// SetTriggerAfterSwap events after the swap step.
-func (e Event) SetTriggerAfterSwap(w http.ResponseWriter) {
-	SetTriggerAfterSwap(w, string(e))
 }

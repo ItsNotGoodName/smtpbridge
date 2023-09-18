@@ -43,6 +43,22 @@ document.body.addEventListener('htmx:afterRequest', function(evt: any) {
   }
 })
 
+document.body.addEventListener("toast", function(evt: any) {
+  const content = document.createElement("div")
+  content.textContent = evt.detail.value
+  content.className = "flex-1"
+
+  Toastify({
+    node: content,
+    duration: 3000,
+    close: true,
+    className: "alert alert-success flex flex-row",
+    gravity: "bottom",
+    position: "center",
+    stopOnFocus: true,
+  }).showToast();
+})
+
 // ------------- Shoelace
 
 // 24 Kb to format dates in local time
