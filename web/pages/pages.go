@@ -2,7 +2,6 @@
 package pages
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -27,7 +26,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/sessions"
 	"github.com/kballard/go-shellquote"
-	"github.com/samber/lo"
 )
 
 // utils
@@ -437,11 +435,11 @@ func EndpointTest(ct Controller, app core.App) http.HandlerFunc {
 
 		err := app.EndpointTest(ctx, id)
 		if err != nil {
-			ct.Component(w, r, c.Flash(c.FlashTypeError, c.FlashMessage(err.Error())))
+			ct.Error(w, r, err, getCode(err))
 			return
 		}
 
-		ct.Component(w, r, c.Flash(c.FlashTypeSuccess, c.FlashMessage("Sent test envelope to endpoint.")))
+		w.WriteHeader(http.StatusNoContent)
 	})
 }
 
@@ -598,216 +596,4 @@ func Files(ct Controller, app core.App, fs fs.FS) http.HandlerFunc {
 
 		fsHandler.ServeHTTP(w, r)
 	})).ServeHTTP
-}
-
-func RuleExpressionCheck(ct Controller, app core.App) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
-
-		expression := r.FormValue("expression")
-
-		error := app.RuleExpressionCheck(ctx, expression)
-
-		ct.Component(w, r, c.RuleExpressionCheckLabel(c.RuleExpressionLabelProps{
-			Error: error,
-		}))
-	}
-}
-
-func RuleView(ct Controller, app core.App) http.HandlerFunc {
-	return withID(ct, func(w http.ResponseWriter, r *http.Request, id int64) {
-		ctx := r.Context()
-
-		ruleEndpoints, err := app.RuleEndpointsGet(ctx, id)
-		if err != nil {
-			ct.Error(w, r, err, getCode(err))
-			return
-		}
-
-		ruleExpressionError := app.RuleExpressionCheck(ctx, ruleEndpoints.Rule.Expression)
-
-		endpoints, err := app.EndpointList(ctx)
-		if err != nil {
-			ct.Error(w, r, err, getCode(err))
-			return
-		}
-
-		endpointsSelections := helpers.EndpointsSelections(ruleEndpoints.Endpoints, endpoints)
-
-		ct.Page(w, r, ruleView(ct.Meta(r), ruleViewProps{
-			Rule: ruleEndpoints.Rule,
-			RuleFormUpdate: c.RuleFormUpdate(c.RuleFormUpdateProps{
-				Rule:                ruleEndpoints.Rule,
-				Name:                ruleEndpoints.Rule.Name,
-				Expression:          ruleEndpoints.Rule.Expression,
-				ExpressionError:     ruleExpressionError,
-				Endpoints:           endpoints,
-				EndpointsSelections: endpointsSelections,
-			}),
-		}))
-	})
-}
-
-func RuleUpdate(ct Controller, app core.App) http.HandlerFunc {
-	return withID(ct, func(w http.ResponseWriter, r *http.Request, id int64) {
-		var form forms.RuleUpdate
-		if err := helpers.DecodeForm(w, r, &form); err != nil {
-			ct.Error(w, r, err, http.StatusBadRequest)
-			return
-		}
-
-		ctx := r.Context()
-
-		var endpointIDs []int64
-		for _, v := range r.Form["endpoints"] {
-			endpointID, err := strconv.Atoi(v)
-			if err != nil {
-				ct.Error(w, r, err, http.StatusBadRequest)
-				return
-			}
-
-			endpointIDs = append(endpointIDs, int64(endpointID))
-		}
-
-		err := app.RuleUpdate(ctx, models.DTORuleUpdate{
-			ID:         id,
-			Name:       &form.Name,
-			Expression: &form.Expression,
-			Endpoints:  &form.Endpoints,
-		})
-		if err != nil {
-			ct.Error(w, r, err, getCode(err))
-			return
-		}
-
-		ruleEndpoints, err := app.RuleEndpointsGet(ctx, id)
-		if err != nil {
-			ct.Error(w, r, err, getCode(err))
-			return
-		}
-
-		ruleExpressionError := app.RuleExpressionCheck(ctx, ruleEndpoints.Rule.Expression)
-
-		endpoints, err := app.EndpointList(ctx)
-		if err != nil {
-			ct.Error(w, r, err, getCode(err))
-			return
-		}
-
-		endpointsSelections := helpers.EndpointsSelections(ruleEndpoints.Endpoints, endpoints)
-
-		ct.Component(w, r, c.RuleFormUpdate(c.RuleFormUpdateProps{
-			Rule:                ruleEndpoints.Rule,
-			Name:                ruleEndpoints.Rule.Name,
-			Expression:          ruleEndpoints.Rule.Expression,
-			ExpressionError:     ruleExpressionError,
-			Endpoints:           endpoints,
-			EndpointsSelections: endpointsSelections,
-			Flash:               c.Flash(c.FlashTypeSuccess, c.FlashMessage("Updated.")),
-		}))
-	})
-}
-
-func RuleCreateView(ct Controller, app core.App) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
-
-		endpoints, err := app.EndpointList(ctx)
-		if err != nil {
-			ct.Error(w, r, err, getCode(err))
-			return
-		}
-		endpointsSelections := make([]bool, len(endpoints))
-
-		ct.Page(w, r, ruleCreateView(ct.Meta(r), ruleCreateViewProps{
-			ruleFormCreateProps: c.RuleFormCreateProps{
-				Endpoints:           endpoints,
-				EndpointsSelections: endpointsSelections,
-			},
-		}))
-	}
-}
-
-func RuleCreate(ct Controller, app core.App) http.HandlerFunc {
-	handleErr := func(w http.ResponseWriter, r *http.Request, ctx context.Context, err error, form forms.RuleCreate) {
-		endpoints, endpointsErr := app.EndpointList(ctx)
-		if endpointsErr != nil {
-			ct.Error(w, r, err, getCode(err))
-			return
-		}
-
-		var endpointsSelections []bool
-		for _, end := range endpoints {
-			selection := lo.Contains(form.Endpoints, end.ID)
-			endpointsSelections = append(endpointsSelections, selection)
-		}
-
-		expressionError := app.RuleExpressionCheck(ctx, form.Expression)
-
-		ct.Component(w, r, c.RuleFormCreate(c.RuleFormCreateProps{
-			Name:                form.Name,
-			Expression:          form.Expression,
-			ExpressionError:     expressionError,
-			Endpoints:           endpoints,
-			EndpointsSelections: endpointsSelections,
-			Flash:               c.Flash(c.FlashTypeError, c.FlashMessage(err.Error())),
-		}))
-	}
-
-	return func(w http.ResponseWriter, r *http.Request) {
-		var form forms.RuleCreate
-		if err := helpers.DecodeForm(w, r, &form); err != nil {
-			ct.Error(w, r, err, http.StatusBadRequest)
-			return
-		}
-
-		ctx := r.Context()
-
-		req := models.DTORuleCreate{
-			Name:       form.Name,
-			Expression: form.Expression,
-			Endpoints:  form.Endpoints,
-		}
-		id, err := app.RuleCreate(ctx, req)
-		if err != nil {
-			handleErr(w, r, ctx, err, form)
-			return
-		}
-
-		htmx.SetRedirect(w, routes.Rule(id).URLString())
-	}
-}
-
-func RuleDelete(ct Controller, app core.App) http.HandlerFunc {
-	return withID(ct, func(w http.ResponseWriter, r *http.Request, id int64) {
-		ctx := r.Context()
-		err := app.RuleDelete(ctx, id)
-		if err != nil {
-			ct.Error(w, r, err, getCode(err))
-			return
-		}
-
-		w.WriteHeader(http.StatusOK)
-	})
-}
-
-func RuleToggle(ct Controller, app core.App) http.HandlerFunc {
-	return withID(ct, func(w http.ResponseWriter, r *http.Request, id int64) {
-		ctx := r.Context()
-
-		enable := r.FormValue("enable") == "true"
-		err := app.RuleUpdate(ctx, models.DTORuleUpdate{
-			ID:     id,
-			Enable: &enable,
-		})
-		if err != nil {
-			ct.Error(w, r, err, getCode(err))
-			return
-		}
-
-		ct.Component(w, r, c.RuleToggleButton(c.RuleToggleButtonProps{
-			Enable: enable,
-			ID:     id,
-		}))
-	})
 }

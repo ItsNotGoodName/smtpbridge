@@ -25,8 +25,13 @@ type App interface {
 	AuthHTTPLogin(ctx context.Context, username, password string) (models.User, error)
 	AuthSMTPAnonymous() bool
 	AuthSMTPLogin(ctx context.Context, username, password string) error
+	DatabaseVacuum(ctx context.Context) error
+	EndpointCreate(ctx context.Context, req models.DTOEndpointCreate) (int64, error)
+	EndpointDelete(ctx context.Context, id int64) error
+	EndpointGet(ctx context.Context, id int64) (models.Endpoint, error)
 	EndpointList(ctx context.Context) ([]models.Endpoint, error)
 	EndpointTest(ctx context.Context, id int64) error
+	EndpointUpdate(ctx context.Context, req models.DTOEndpointUpdate) error
 	EnvelopeCount(ctx context.Context) (int, error)
 	EnvelopeCreate(ctx context.Context, msg models.DTOMessageCreate, datts []models.DTOAttachmentCreate) (int64, error)
 	EnvelopeDelete(ctx context.Context, id int64) error
@@ -51,5 +56,4 @@ type App interface {
 	TraceDrop(ctx context.Context) error
 	TraceList(ctx context.Context, page pagination.Page, req models.DTOTraceListRequest) (models.DTOTraceListResult, error)
 	Tracer(source string) trace.Tracer
-	DatabaseVacuum(ctx context.Context) error
 }

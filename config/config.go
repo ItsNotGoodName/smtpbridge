@@ -264,11 +264,11 @@ func (p Parser) Parse(raw Raw) (Config, error) {
 	var endpoints []models.Endpoint
 	{
 		for key, value := range raw.Endpoints {
-			titleTemplate := endpoint.DefaultTitleTemplate
+			titleTemplate := models.EndpointTitleTemplate
 			if value.TitleTemplate != nil {
 				titleTemplate = *value.TitleTemplate
 			}
-			bodyTemplate := endpoint.DefaultBodyTemplate
+			bodyTemplate := models.EndpointBodyTemplate
 			if value.BodyTemplate != nil {
 				bodyTemplate = *value.BodyTemplate
 			}

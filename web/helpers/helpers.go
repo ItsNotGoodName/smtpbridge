@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/ItsNotGoodName/smtpbridge/internal/core"
+	"github.com/ItsNotGoodName/smtpbridge/internal/endpoint"
 	"github.com/ItsNotGoodName/smtpbridge/internal/models"
 	"github.com/ItsNotGoodName/smtpbridge/internal/trace"
 	"github.com/ItsNotGoodName/smtpbridge/pkg/pagination"
@@ -105,6 +106,10 @@ func Pagination(q url.Values) (pagination.Page, error) {
 	}
 
 	return pagination.NewPage(page, perPage), nil
+}
+
+func EndpointSchema() models.EndpointSchema {
+	return endpoint.Schema
 }
 
 func EndpointsSelections(selected []models.Endpoint, all []models.Endpoint) []bool {

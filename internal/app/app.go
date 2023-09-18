@@ -73,66 +73,7 @@ func (a App) DatabaseVacuum(ctx context.Context) error {
 	return repo.Vacuum(ctx, a.db)
 }
 
-func (a App) RuleEndpointsGet(ctx context.Context, id int64) (models.RuleEndpoints, error) {
-	res, err := repo.RuleEndpointsGet(ctx, a.db, id)
-	return res, convertErr(err)
-}
-
-func (a App) EnvelopeCount(ctx context.Context) (int, error) {
-	return repo.EnvelopeCount(ctx, a.db)
-}
-
-func (a App) RuleDelete(ctx context.Context, id int64) error {
-	r, err := repo.RuleGet(ctx, a.db, id)
-	if err != nil {
-		return convertErr(err)
-	}
-
-	err = rule.Delete(r)
-	if err != nil {
-		return err
-	}
-
-	return convertErr(repo.RuleDelete(ctx, a.db, id))
-}
-
-func (App) RuleExpressionCheck(ctx context.Context, expression string) error {
-	tmpl, err := rule.TemplateBuild(expression)
-	if err != nil {
-		return err
-	}
-
-	_, err = rule.TemplateRun(tmpl, models.Envelope{Message: models.Message{}, Attachments: []models.Attachment{}})
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (a App) AttachmentGet(ctx context.Context, id int64) (models.Attachment, error) {
-	res, err := repo.AttachmentGet(ctx, a.db, id)
-	return res, convertErr(err)
-}
-
-func (a App) EnvelopeSend(ctx context.Context, envelopeID int64, endpointID int64) error {
-	env, err := repo.EnvelopeGet(ctx, a.db, envelopeID)
-	if err != nil {
-		return convertErr(err)
-	}
-
-	endModel, err := repo.EndpointGet(ctx, a.db, endpointID)
-	if err != nil {
-		return convertErr(err)
-	}
-
-	end, err := a.endpointFactory.Build(endModel)
-	if err != nil {
-		return err
-	}
-
-	return end.Send(ctx, a.fileStore, env)
-}
+// - Auth
 
 func (a App) AuthSMTPAnonymous() bool {
 	return a.config.AuthSMTP.Anonymous
@@ -158,6 +99,90 @@ func (a App) AuthSMTPLogin(ctx context.Context, username, password string) error
 
 	return models.ErrAuthInvalid
 }
+
+// - Endpoint
+
+func (a App) EndpointCreate(ctx context.Context, req models.DTOEndpointCreate) (int64, error) {
+	end, err := endpoint.New(a.endpointFactory, req)
+	if err != nil {
+		return 0, err
+	}
+
+	id, err := repo.EndpointCreate(ctx, a.db, end)
+	return id, repoErr(err)
+}
+
+func (a App) EndpointGet(ctx context.Context, id int64) (models.Endpoint, error) {
+	end, err := repo.EndpointGet(ctx, a.db, id)
+	return end, repoErr(err)
+}
+
+func (a App) EndpointList(ctx context.Context) ([]models.Endpoint, error) {
+	return repo.EndpointList(ctx, a.db)
+}
+
+func (a App) EndpointUpdate(ctx context.Context, req models.DTOEndpointUpdate) error {
+	end, err := repo.EndpointGet(ctx, a.db, req.ID)
+	if err != nil {
+		return repoErr(err)
+	}
+
+	end, err = endpoint.Update(a.endpointFactory, end, req)
+	if err != nil {
+		return err
+	}
+
+	err = repo.EndpointUpdate(ctx, a.db, end)
+	return repoErr(err)
+}
+
+func (a App) EndpointDelete(ctx context.Context, id int64) error {
+	end, err := repo.EndpointGet(ctx, a.db, id)
+	if err != nil {
+		return repoErr(err)
+	}
+
+	err = endpoint.Delete(end)
+	if err != nil {
+		return err
+	}
+
+	err = repo.EndpointDelete(ctx, a.db, id)
+	return repoErr(err)
+}
+
+func (a App) EndpointTest(ctx context.Context, id int64) error {
+	e, err := repo.EndpointGet(ctx, a.db, id)
+	if err != nil {
+		return repoErr(err)
+	}
+
+	end, err := a.endpointFactory.Build(e)
+	if err != nil {
+		return err
+	}
+
+	file, err := a.webTestFileStore.File()
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	datt, err := envelope.NewDataAttachment("Test Attachment", file)
+	if err != nil {
+		return err
+	}
+	file.Close()
+
+	env := envelope.New(envelope.NewMessage(models.DTOMessageCreate{
+		Subject: "Test Subject",
+		Text:    "Test Body",
+	}), datt.Attachment)
+
+	return end.Send(ctx, a.webTestFileStore, env)
+}
+
+// - Envelope
 
 func (a App) EnvelopeCreate(ctx context.Context, dtoMsg models.DTOMessageCreate, dtoDatts []models.DTOAttachmentCreate) (int64, error) {
 	msg := envelope.NewMessage(dtoMsg)
@@ -199,23 +224,27 @@ func (a App) EnvelopeCreate(ctx context.Context, dtoMsg models.DTOMessageCreate,
 	return id, nil
 }
 
+func (a App) EnvelopeCount(ctx context.Context) (int, error) {
+	return repo.EnvelopeCount(ctx, a.db)
+}
+
+func (a App) EnvelopeGet(ctx context.Context, id int64) (models.Envelope, error) {
+	res, err := repo.EnvelopeGet(ctx, a.db, id)
+	return res, repoErr(err)
+}
+
+func (a App) EnvelopeList(ctx context.Context, page pagination.Page, req models.DTOEnvelopeListRequest) (models.DTOEnvelopeListResult, error) {
+	return repo.EnvelopeList(ctx, a.db, page, req)
+}
+
 func (a App) EnvelopeDelete(ctx context.Context, id int64) error {
 	if err := repo.EnvelopeDelete(ctx, a.db, id); err != nil {
-		return convertErr(err)
+		return repoErr(err)
 	}
 
 	a.bus.EnvelopeDeleted(ctx)
 
 	return nil
-}
-
-func (a App) EnvelopeGet(ctx context.Context, id int64) (models.Envelope, error) {
-	res, err := repo.EnvelopeGet(ctx, a.db, id)
-	return res, convertErr(err)
-}
-
-func (a App) EnvelopeList(ctx context.Context, page pagination.Page, req models.DTOEnvelopeListRequest) (models.DTOEnvelopeListResult, error) {
-	return repo.EnvelopeList(ctx, a.db, page, req)
 }
 
 func (a App) EnvelopeDrop(ctx context.Context) error {
@@ -231,14 +260,132 @@ func (a App) EnvelopeDrop(ctx context.Context) error {
 	return nil
 }
 
-func (a App) MessageHTMLGet(ctx context.Context, id int64) (string, error) {
-	res, err := repo.MessageHTMLGet(ctx, a.db, id)
-	return res, convertErr(err)
+func (a App) EnvelopeSend(ctx context.Context, envelopeID int64, endpointID int64) error {
+	env, err := repo.EnvelopeGet(ctx, a.db, envelopeID)
+	if err != nil {
+		return repoErr(err)
+	}
+
+	endModel, err := repo.EndpointGet(ctx, a.db, endpointID)
+	if err != nil {
+		return repoErr(err)
+	}
+
+	end, err := a.endpointFactory.Build(endModel)
+	if err != nil {
+		return err
+	}
+
+	return end.Send(ctx, a.fileStore, env)
+}
+
+// - Rule
+
+func (a App) RuleCreate(ctx context.Context, req models.DTORuleCreate) (int64, error) {
+	r, err := rule.New(req)
+	if err != nil {
+		return 0, err
+	}
+
+	return repo.RuleCreate(ctx, a.db, r, req.Endpoints)
+}
+
+func (a App) RuleUpdate(ctx context.Context, req models.DTORuleUpdate) error {
+	r, err := repo.RuleGet(ctx, a.db, req.ID)
+	if err != nil {
+		return repoErr(err)
+	}
+
+	r, err = rule.Update(r, req)
+	if err != nil {
+		return err
+	}
+
+	err = repo.RuleUpdate(ctx, a.db, r)
+	if err != nil {
+		return repoErr(err)
+	}
+
+	if req.Endpoints != nil {
+		err := repo.RuleEndpointsSet(ctx, a.db, r.ID, *req.Endpoints)
+		if err != nil {
+			return repoErr(err)
+		}
+	}
+
+	return nil
+}
+
+func (a App) RuleGet(ctx context.Context, id int64) (models.Rule, error) {
+	res, err := repo.RuleGet(ctx, a.db, id)
+	return res, repoErr(err)
+}
+
+func (a App) RuleList(ctx context.Context) ([]models.Rule, error) {
+	return repo.RuleList(ctx, a.db)
+}
+
+func (a App) RuleDelete(ctx context.Context, id int64) error {
+	r, err := repo.RuleGet(ctx, a.db, id)
+	if err != nil {
+		return repoErr(err)
+	}
+
+	err = rule.Delete(r)
+	if err != nil {
+		return err
+	}
+
+	err = repo.RuleDelete(ctx, a.db, id)
+	return repoErr(err)
+}
+
+func (App) RuleExpressionCheck(ctx context.Context, expression string) error {
+	tmpl, err := rule.TemplateBuild(expression)
+	if err != nil {
+		return err
+	}
+
+	_, err = rule.TemplateRun(tmpl, models.Envelope{Message: models.Message{}, Attachments: []models.Attachment{}})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a App) RuleEndpointsGet(ctx context.Context, id int64) (models.RuleEndpoints, error) {
+	res, err := repo.RuleEndpointsGet(ctx, a.db, id)
+	return res, repoErr(err)
+}
+
+func (a App) RuleEndpointsList(ctx context.Context) ([]models.RuleEndpoints, error) {
+	return repo.RuleEndpointsList(ctx, a.db)
+}
+
+// - Attachment
+
+func (a App) AttachmentGet(ctx context.Context, id int64) (models.Attachment, error) {
+	res, err := repo.AttachmentGet(ctx, a.db, id)
+	return res, repoErr(err)
 }
 
 func (a App) AttachmentList(ctx context.Context, page pagination.Page, req models.DTOAttachmentListRequest) (models.DTOAttachmentListResult, error) {
 	return repo.AttachmentList(ctx, a.db, page, req)
 }
+
+func (a App) AttachmentOrphanDelete(ctx context.Context, tracer trace.Tracer) error {
+	return retention.DeleteOrphanAttachments(ctx, tracer, a.db, a.fileStore)
+}
+
+// - Message
+
+func (a App) MessageHTMLGet(ctx context.Context, id int64) (string, error) {
+	res, err := repo.MessageHTMLGet(ctx, a.db, id)
+	return res, repoErr(err)
+}
+
+// - Storage
 
 func (a App) StorageGet(ctx context.Context) (models.Storage, error) {
 	attachmentCount, err := repo.AttachmentCount(ctx, a.db)
@@ -269,88 +416,7 @@ func (a App) StorageGet(ctx context.Context) (models.Storage, error) {
 	}, nil
 }
 
-func (a App) EndpointList(ctx context.Context) ([]models.Endpoint, error) {
-	return repo.EndpointList(ctx, a.db)
-}
-
-func (a App) RuleCreate(ctx context.Context, req models.DTORuleCreate) (int64, error) {
-	r, err := rule.New(req)
-	if err != nil {
-		return 0, err
-	}
-
-	return repo.RuleCreate(ctx, a.db, r, req.Endpoints)
-}
-
-func (a App) RuleUpdate(ctx context.Context, req models.DTORuleUpdate) error {
-	r, err := repo.RuleGet(ctx, a.db, req.ID)
-	if err != nil {
-		return convertErr(err)
-	}
-
-	r, err = rule.Update(r, req)
-	if err != nil {
-		return err
-	}
-
-	err = repo.RuleUpdate(ctx, a.db, r)
-	if err != nil {
-		return convertErr(err)
-	}
-
-	if req.Endpoints != nil {
-		err := repo.RuleEndpointsSet(ctx, a.db, r.ID, *req.Endpoints)
-		if err != nil {
-			return convertErr(err)
-		}
-	}
-
-	return nil
-}
-
-func (a App) RuleGet(ctx context.Context, id int64) (models.Rule, error) {
-	res, err := repo.RuleGet(ctx, a.db, id)
-	return res, convertErr(err)
-}
-
-func (a App) RuleList(ctx context.Context) ([]models.Rule, error) {
-	return repo.RuleList(ctx, a.db)
-}
-
-func (a App) RuleEndpointsList(ctx context.Context) ([]models.RuleEndpoints, error) {
-	return repo.RuleEndpointsList(ctx, a.db)
-}
-
-func (a App) EndpointTest(ctx context.Context, id int64) error {
-	e, err := repo.EndpointGet(ctx, a.db, id)
-	if err != nil {
-		return convertErr(err)
-	}
-
-	end, err := a.endpointFactory.Build(e)
-	if err != nil {
-		return err
-	}
-
-	file, err := a.webTestFileStore.File()
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	datt, err := envelope.NewDataAttachment("Test Attachment", file)
-	if err != nil {
-		return err
-	}
-	file.Close()
-
-	env := envelope.New(envelope.NewMessage(models.DTOMessageCreate{
-		Subject: "Test Subject",
-		Text:    "Test Body",
-	}), datt.Attachment)
-
-	return end.Send(ctx, a.webTestFileStore, env)
-}
+// - Tracer
 
 func (a App) Tracer(source string) trace.Tracer {
 	return trace.NewTracer(repo.NewTraceStore(a.db), source)
@@ -365,12 +431,10 @@ func (a App) TraceDrop(ctx context.Context) error {
 	return err
 }
 
+// - RetentionPolicy
+
 func (a App) RetentionPolicyGet(ctx context.Context) models.ConfigRetentionPolicy {
 	return a.config.RetentionPolicy
-}
-
-func (a App) AttachmentOrphanDelete(ctx context.Context, tracer trace.Tracer) error {
-	return retention.DeleteOrphanAttachments(ctx, tracer, a.db, a.fileStore)
 }
 
 func (a App) RetentionPolicyRun(ctx context.Context, tracer trace.Tracer) error {
@@ -401,6 +465,19 @@ func (a App) RetentionPolicyRun(ctx context.Context, tracer trace.Tracer) error 
 	return nil
 }
 
+// - Mailman
+
+func (a App) MailmanEnqueue(ctx context.Context, envelopeID int64) error {
+	err := repo.MailmanEnqueue(ctx, a.db, envelopeID)
+	if err != nil {
+		return err
+	}
+
+	a.bus.MailmanEnqueued(ctx)
+
+	return nil
+}
+
 func (a App) MailmanDequeue(ctx context.Context) (*models.Envelope, error) {
 	envelopeID, err := repo.MailmanDequeue(ctx, a.db)
 	if err != nil {
@@ -419,17 +496,6 @@ func (a App) MailmanDequeue(ctx context.Context) (*models.Envelope, error) {
 	}
 
 	return &env, nil
-}
-
-func (a App) MailmanEnqueue(ctx context.Context, envelopeID int64) error {
-	err := repo.MailmanEnqueue(ctx, a.db, envelopeID)
-	if err != nil {
-		return err
-	}
-
-	a.bus.MailmanEnqueued(ctx)
-
-	return nil
 }
 
 var _ core.App = App{}

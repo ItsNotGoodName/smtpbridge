@@ -10,55 +10,23 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/internal/models"
 )
 
-func Delete(r models.Rule) error {
-	if r.Internal {
-		return fmt.Errorf("internal resource")
-	}
-	return nil
-}
-
-func Update(r models.Rule, req models.DTORuleUpdate) (models.Rule, error) {
-	if r.Internal {
-		if req.Name == nil && req.Expression == nil && req.Enable != nil {
-			r.Enable = *req.Enable
-			return r, validate(r)
-		}
-
-		return models.Rule{}, fmt.Errorf("internal resource")
-	}
-
-	if req.Name != nil {
-		r.Name = *req.Name
-	}
-
-	if req.Expression != nil {
-		r.Expression = *req.Expression
-	}
-
-	if req.Enable != nil {
-		r.Enable = *req.Enable
-	}
-
-	return r, validate(r)
-}
-
 func validate(r models.Rule) error {
 	if r.Internal && !r.InternalID.Valid {
 		return fmt.Errorf("internal id is empty")
 	}
 
 	if r.Name == "" {
-		return fmt.Errorf("name is empty")
+		return models.FieldError{Field: models.FieldName, Err: fmt.Errorf("cannot be empty")}
 	}
 
 	t, err := TemplateBuild(r.Expression)
 	if err != nil {
-		return err
+		return models.FieldError{Field: models.FieldExpression, Err: err}
 	}
 
 	_, err = TemplateRun(t, models.Envelope{})
 	if err != nil {
-		return err
+		return models.FieldError{Field: models.FieldExpression, Err: err}
 	}
 
 	return nil
@@ -92,6 +60,38 @@ func NewInternal(r models.DTORuleCreate, internalID string) (models.Rule, error)
 	}
 
 	return rule, validate(rule)
+}
+
+func Update(r models.Rule, req models.DTORuleUpdate) (models.Rule, error) {
+	if r.Internal {
+		if req.Name == nil && req.Expression == nil && req.Enable != nil {
+			r.Enable = *req.Enable
+			return r, validate(r)
+		}
+
+		return models.Rule{}, models.ErrInternalResource
+	}
+
+	if req.Name != nil {
+		r.Name = *req.Name
+	}
+
+	if req.Expression != nil {
+		r.Expression = *req.Expression
+	}
+
+	if req.Enable != nil {
+		r.Enable = *req.Enable
+	}
+
+	return r, validate(r)
+}
+
+func Delete(r models.Rule) error {
+	if r.Internal {
+		return models.ErrInternalResource
+	}
+	return nil
 }
 
 func TemplateBuild(expression string) (*template.Template, error) {

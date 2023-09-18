@@ -92,7 +92,7 @@ type DTOEndpointCreate struct {
 	TitleTemplate     string
 	BodyTemplate      string
 	Kind              string
-	Config            EndpointConfig
+	Config            map[string]string
 }
 
 type DTOEndpointUpdate struct {
@@ -103,5 +103,5 @@ type DTOEndpointUpdate struct {
 	TitleTemplate     *string
 	BodyTemplate      *string
 	Kind              *string
-	Config            *EndpointConfig
+	Config            *map[string]string
 }

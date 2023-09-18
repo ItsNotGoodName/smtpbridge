@@ -318,7 +318,6 @@ make dev-web
 # To Do
 
 - feat: read [mbox](https://access.redhat.com/articles/6167512) files
-- feat: CRUD endpoints
 - feat: IMAP for viewing mail
 - feat: OpenAPI
 - feat: Windows installer

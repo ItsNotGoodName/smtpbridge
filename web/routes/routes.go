@@ -158,6 +158,10 @@ func Endpoint(id any) Route {
 	return Route(endpoint(str(id)))
 }
 
+func EndpointCreate() Route {
+	return "/endpoints/create"
+}
+
 func EndpointTest(id any) Route {
 	return Route(endpoint(str(id), "test"))
 }
@@ -196,4 +200,8 @@ func RuleCreate() Route {
 
 func RuleExpressionCheck() Route {
 	return "/rules/expression-check"
+}
+
+func EndpointFormConfigComponent() Route {
+	return "/c/endpoint-form-config"
 }

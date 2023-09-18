@@ -90,10 +90,20 @@ func NewRouter(ct pages.Controller, app core.App, fileFS fs.FS, csrfSecret []byt
 		}
 
 		// Endpoint
+		r.Get(routes.Endpoint(paramID).String(),
+			pages.EndpointView(ct, app))
+		r.Post(routes.Endpoint(paramID).String(),
+			pages.EndpointUpdate(ct, app))
 		r.Get(routes.EndpointList().String(),
 			pages.EndpointListView(ct, app))
 		r.Post(routes.EndpointTest(paramID).String(),
 			pages.EndpointTest(ct, app))
+		r.Get(routes.EndpointCreate().String(),
+			pages.EndpointCreateView(ct, app))
+		r.Post(routes.EndpointCreate().String(),
+			pages.EndpointCreate(ct, app))
+		r.Delete(routes.Endpoint(paramID).String(),
+			pages.EndpointDelete(ct, app))
 
 		// Traces
 		{
@@ -127,6 +137,8 @@ func NewRouter(ct pages.Controller, app core.App, fileFS fs.FS, csrfSecret []byt
 			pages.RetentionPolicyRun(ct, app))
 
 		// Components
+		r.Get(routes.EndpointFormConfigComponent().String(),
+			pages.EndpointFormConfigComponent(ct, app))
 		r.Get(routes.StorageStatsComponent().String(),
 			pages.StorageStatsComponent(ct, app))
 		r.Get(routes.EnvelopeTabComponent(paramID, routes.EnvelopeTabText).String(),

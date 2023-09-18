@@ -24,3 +24,28 @@ type Login struct {
 	Username string
 	Password string
 }
+
+type EndpointCreate struct {
+	Name              string
+	TextDisable       bool
+	AttachmentDisable bool
+	TitleTemplate     string
+	BodyTemplate      string
+	Kind              string
+	Config            []endpointConfig
+}
+
+type EndpointUpdate struct {
+	Name              string
+	TextDisable       bool
+	AttachmentDisable bool
+	TitleTemplate     string
+	BodyTemplate      string
+	Kind              string
+	Config            []endpointConfig
+}
+
+type endpointConfig struct {
+	Key   string
+	Value string
+}

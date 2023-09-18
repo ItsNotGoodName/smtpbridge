@@ -45,6 +45,13 @@ func (t Telegram) Send(ctx context.Context, env models.Envelope, tr Transformer)
 	if err != nil {
 		return err
 	}
+	// Telegrams's body cannot be empty
+	if body == "" {
+		body, err = tr.Title(ctx, env)
+		if err != nil {
+			return err
+		}
+	}
 
 	// Send with 0 attachments
 	if len(images) == 0 {

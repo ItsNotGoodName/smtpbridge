@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"html/template"
 	"io"
@@ -12,21 +13,22 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/internal/senders"
 )
 
-func validate(f Factory, end models.Endpoint) error {
-	if end.Internal && !end.InternalID.Valid {
+func validate(f Factory, r models.Endpoint) error {
+	if r.Internal && !r.InternalID.Valid {
 		return fmt.Errorf("internal id is empty")
 	}
 
-	_, err := f.Build(end)
+	if r.Name == "" {
+		return models.FieldError{Field: models.FieldName, Err: fmt.Errorf("cannot be empty")}
+	}
+
+	_, err := f.Build(r)
 	if err != nil {
 		return err
 	}
 
 	return nil
 }
-
-const DefaultTitleTemplate = "{{ .Message.Subject }}"
-const DefaultBodyTemplate = "{{ .Message.Text }}"
 
 func new(f Factory, r models.DTOEndpointCreate) models.Endpoint {
 	return models.Endpoint{
@@ -38,7 +40,7 @@ func new(f Factory, r models.DTOEndpointCreate) models.Endpoint {
 		TitleTemplate:     r.TitleTemplate,
 		BodyTemplate:      r.BodyTemplate,
 		Kind:              r.Kind,
-		Config:            r.Config,
+		Config:            Schema.Filter(r.Kind, r.Config),
 	}
 }
 
@@ -61,6 +63,43 @@ func NewInternal(f Factory, r models.DTOEndpointCreate, internalID string) (mode
 	}
 
 	return end, validate(f, end)
+}
+
+func Update(f Factory, m models.Endpoint, req models.DTOEndpointUpdate) (models.Endpoint, error) {
+	if m.Internal {
+		return models.Endpoint{}, models.ErrInternalResource
+	}
+
+	if req.Name != nil {
+		m.Name = *req.Name
+	}
+	if req.AttachmentDisable != nil {
+		m.AttachmentDisable = *req.AttachmentDisable
+	}
+	if req.TextDisable != nil {
+		m.TextDisable = *req.TextDisable
+	}
+	if req.TitleTemplate != nil {
+		m.TitleTemplate = *req.TitleTemplate
+	}
+	if req.BodyTemplate != nil {
+		m.BodyTemplate = *req.BodyTemplate
+	}
+	if req.Kind != nil {
+		m.Kind = *req.Kind
+	}
+	if req.Config != nil {
+		m.Config = Schema.Filter(m.Kind, *req.Config)
+	}
+
+	return m, validate(f, m)
+}
+
+func Delete(r models.Endpoint) error {
+	if r.Internal {
+		return models.ErrInternalResource
+	}
+	return nil
 }
 
 type Sender interface {
@@ -125,4 +164,49 @@ func (p payload) Title(ctx context.Context, env models.Envelope) (string, error)
 	}
 
 	return buffer.String(), nil
+}
+
+type Factory struct {
+	pythonExecutable  string
+	appriseScriptPath string
+	funcMap           template.FuncMap
+}
+
+func NewFactory(pythonExecutable string, appriseScriptPath string, funcMap template.FuncMap) Factory {
+	return Factory{
+		pythonExecutable:  pythonExecutable,
+		appriseScriptPath: appriseScriptPath,
+		funcMap:           funcMap,
+	}
+}
+
+func (s Factory) Build(e models.Endpoint) (Endpoint, error) {
+	sender, err := s.build(e.Kind, e.Config)
+	if err != nil {
+		if errors.Is(err, errInvalidSenderKind) {
+			return Endpoint{}, models.FieldError{Field: models.FieldKind, Err: err}
+		}
+		return Endpoint{}, models.FieldError{Field: models.FieldConfig, Err: err}
+	}
+
+	titleTemplate, err := template.New("").Funcs(s.funcMap).Parse(e.TitleTemplate)
+	if err != nil {
+		return Endpoint{}, models.FieldError{Field: models.FieldTitleTemplate, Err: err}
+	}
+
+	bodyTemplate, err := template.New("").Funcs(s.funcMap).Parse(e.BodyTemplate)
+	if err != nil {
+		return Endpoint{}, models.FieldError{Field: models.FieldBodyTemplate, Err: err}
+	}
+
+	return Endpoint{
+		ID:     e.ID,
+		sender: sender,
+		config: config{
+			TextDisable:        e.TextDisable,
+			TitleTemplate:      titleTemplate,
+			BodyTemplate:       bodyTemplate,
+			AttachmentsDisable: e.AttachmentDisable,
+		},
+	}, nil
 }

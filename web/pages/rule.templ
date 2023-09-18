@@ -54,7 +54,7 @@ templ ruleListView(m meta.Meta, props ruleListViewProps) {
 
 type ruleViewProps struct {
   Rule models.Rule
-  RuleFormUpdate templ.Component
+  RuleFormProps c.RuleFormProps
 }
 
 templ ruleView(m meta.Meta, props ruleViewProps) {
@@ -66,14 +66,14 @@ templ ruleView(m meta.Meta, props ruleViewProps) {
       </ul>
     </div>
     <div class="mx-auto flex max-w-lg flex-col gap-4 p-4">
-      {! props.RuleFormUpdate }
+      @c.RuleForm(props.RuleFormProps)
       @c.RuleToggleButton(c.RuleToggleButtonProps{ID: props.Rule.ID, Enable: props.Rule.Enable})
     </div>
 	}
 }
 
 type ruleCreateViewProps struct {
-  ruleFormCreateProps c.RuleFormCreateProps
+  RuleFormProps c.RuleFormProps
 }
 
 templ ruleCreateView(m meta.Meta, props ruleCreateViewProps) {
@@ -85,7 +85,7 @@ templ ruleCreateView(m meta.Meta, props ruleCreateViewProps) {
       </ul>
     </div>
     <div class="mx-auto max-w-lg p-4">
-      @c.RuleFormCreate(props.ruleFormCreateProps)
+      @c.RuleForm(props.RuleFormProps)
     </div>
 	}
 }

@@ -5,6 +5,8 @@ import (
   "github.com/ItsNotGoodName/smtpbridge/web/routes"
   "github.com/ItsNotGoodName/smtpbridge/internal/models"
   "github.com/ItsNotGoodName/smtpbridge/web/meta"
+	"github.com/ItsNotGoodName/smtpbridge/web/icons"
+	"strconv"
 )
 
 
@@ -14,57 +16,38 @@ type endpointListViewProps struct {
 
 templ endpointListView(m meta.Meta, props endpointListViewProps) {
 	@c.LayoutDefault(m) {
-      <div class="border-base-200 breadcrumbs border-b p-4 text-xl font-bold">
-        <ul>
-          <li>Endpoints</li>
-        </ul>
+    <div class="border-base-200 breadcrumbs border-b p-4 text-xl font-bold">
+      <ul>
+        <li>Endpoints</li>
+      </ul>
+    </div>
+    <div class="flex flex-col gap-4 p-4">
+      <div class="join flex items-center justify-end">
+        <a title="Add" class="btn btn-sm btn-success" href={ routes.EndpointCreate().URL() }>
+          @icons.Add("w-5 h-5")
+        </a>
       </div>
-    <div class="flex flex-wrap gap-4 p-4">
+    </div>
+    <div class="mx-auto flex flex-col">
       for _, end := range props.Endpoints {
-        <div class="w-full sm:w-96">
-          <div class="card card-compact bg-base-100 border-base-200 border">
-            <div class="card-body">
-              <h2 class="card-title">{ end.Name }</h2>
-              <div class="flex flex-col gap-2">
-                <div class="flex items-center justify-between">
-                  <div>Kind</div>
-                  <div>{ end.Kind }</div>
-                </div>
-                <div class="flex items-center justify-between">
-                  <div>Internal</div>
-                  <div><input type="checkbox" class="toggle" checked?={ end.Internal } disabled /></div>
-                </div>
-                <div class="flex items-center justify-between">
-                  <div>Text Disable</div>
-                  <div><input type="checkbox" class="toggle" checked?={ end.TextDisable } disabled?={ end.Internal } /></div>
-                </div>
-                <div class="flex items-center justify-between">
-                  <div>Attachment Disable</div>
-                  <div><input type="checkbox" class="toggle" checked?={ end.AttachmentDisable } disabled?={ end.Internal } /></div>
-                </div>
-                <div class="form-control">
-                  <label class="label">
-                    <span class="label-text">Title Template</span>
-                  </label>
-                  <textarea disabled?={ end.Internal } class="textarea textarea-bordered h-24">{ end.TitleTemplate }</textarea>
-                </div>
-                <div class="form-control">
-                  <label class="label">
-                    <span class="label-text">Body Template</span>
-                  </label>
-                  <textarea disabled?={ end.Internal } class="textarea textarea-bordered h-24">{ end.BodyTemplate }</textarea>
-                </div>
+        <div class="hover:bg-base-200 border-base-200 flex items-center justify-between gap-2 border-b first:border-t" id="rule-row">
+          <a class="flex-1 truncate py-4 pl-4" href={ routes.Endpoint(end.ID).URL() }>{ end.Name }</a>
+          <div class="flex items-center gap-2 pr-4">
+            if !end.Internal {
+              <div data-loading-states>
+                <button title="Delete" class="btn btn-error btn-sm" hx-delete={ routes.Endpoint(end.ID).URLString() } hx-confirm="Are you sure you wish to delete this endpoint?"  hx-target="closest #rule-row" hx-swap="outerHTML" data-loading-disable>
+                  <span data-loading-class="loading loading-spinner loading-xs">
+                    @icons.Trash("h-4 w-4")
+                  </span>
+                </button>
               </div>
-              <div class="flex flex-col gap-2" data-loading-states>
-                <div class="card-actions justify-end">
-                  <button class="btn btn-success" hx-post={ routes.EndpointTest(end.ID).URLString() } hx-target="next div" data-loading-disable>
-                    <span data-loading-class="loading loading-spinner loading-sm">
-                      Test
-                    </span>
-                  </button>
-                </div>
-                <div></div>
-              </div>
+            }
+            <div data-loading-states>
+              <button class="btn btn-sm btn-success" hx-post={ routes.EndpointTest(end.ID).URLString() } data-loading-disable>
+                <span data-loading-class="loading loading-spinner loading-sm">
+                  Test
+                </span>
+              </button>
             </div>
           </div>
         </div>
@@ -73,3 +56,39 @@ templ endpointListView(m meta.Meta, props endpointListViewProps) {
 	}
 }
 
+type endpointCreateProps struct {
+  EndpointFormProps c.EndpointFormProps
+}
+
+templ endpointCreate(m meta.Meta, props endpointCreateProps) {
+	@c.LayoutDefault(m) {
+    <div class="border-base-200 breadcrumbs border-b p-4 text-xl font-bold">
+      <ul>
+        <li><a href={ routes.EndpointList().URL() }>Endpoints</a></li>
+        <li>Create</li>
+      </ul>
+    </div>
+    <div class="mx-auto max-w-lg p-4">
+      @c.EndpointForm(props.EndpointFormProps)
+    </div>
+	}
+}
+
+type endpointViewProps struct {
+  Endpoint models.Endpoint
+  EndpointFormProps c.EndpointFormProps
+}
+
+templ endpointView(m meta.Meta, props endpointViewProps) {
+	@c.LayoutDefault(m) {
+    <div class="border-base-200 breadcrumbs border-b p-4 text-xl font-bold">
+      <ul>
+        <li><a href={ routes.EndpointList().URL() }>Rules</a></li>
+        <li>{ strconv.FormatInt(props.Endpoint.ID, 10) }</li>
+      </ul>
+    </div>
+    <div class="mx-auto flex max-w-lg flex-col gap-4 p-4">
+      @c.EndpointForm(props.EndpointFormProps)
+    </div>
+	}
+}

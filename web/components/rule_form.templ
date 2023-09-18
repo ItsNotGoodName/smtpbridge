@@ -8,123 +8,92 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/web/icons"
 )
 
-type RuleFormCreateProps struct {
+type RuleFormProps struct {
   Flash templ.Component
+  Create bool
+  Data RuleFormData
+}
+
+type RuleFormData struct {
+  ID int64
+  Internal bool
   Name string
   NameError string
   Expression string
-  ExpressionError error
+  ExpressionErr error
   Endpoints []models.Endpoint
   EndpointsSelections []bool
 }
 
-templ RuleFormCreate(props RuleFormCreateProps) {
-  <form hx-post={ routes.RuleCreate().URLString() } class="flex flex-col gap-4" data-loading-states>
+templ RuleForm(props RuleFormProps) {
+  <form hx-post={ props.Route().URLString() } class="flex flex-col gap-4" data-loading-states>
     <div class="form-control">
       <label class="label">
         <span class="label-text">Name</span>
       </label>
-      <input name="name" type="text" placeholder="Name" class={ "input input-bordered", templ.KV("input-error", props.NameError != "" )} value={ props.Name } />
-      if props.NameError != "" {
+      <input disabled?={ props.Data.Internal } name="name" type="text" placeholder="Name" class="input input-bordered" value={ props.Data.Name } />
+      if props.Data.NameError != "" {
         <label class="label">
-          <span class="label-text-alt text-error">{ props.NameError }</span>
+          <span class="label-text-alt text-error">{ props.Data.NameError }</span>
         </label>
       }
     </div>
-    <div class="form-control">
+    <div class="form-control" data-loading-states data-loading-path={ routes.RuleExpressionCheck().URLString() }>
       <label class="label">
         <span class="label-text">Expression</span>
+        <span class="label-text-alt">
+          <span data-loading-class="loading loading-spinner loading-xs"></span>
+        </span>
       </label>
-      <textarea name="expression" hx-post={ routes.RuleExpressionCheck().URLString() } hx-trigger="keyup changed delay:100ms" hx-target="next label" class="textarea textarea-bordered h-24" placeholder="Expression">
-        { props.Expression }
+      <textarea disabled?={ props.Data.Internal } name="expression" hx-post={ routes.RuleExpressionCheck().URLString() } hx-trigger="keyup changed delay:100ms" hx-target="next label" class="textarea textarea-bordered h-24" placeholder="Expression">
+        { props.Data.Expression }
       </textarea>
       <label class="label">
-        @RuleExpressionCheckLabel(RuleExpressionLabelProps{
-            Error: props.ExpressionError,
+        @RuleFormExpressionLabel(RuleFormExpressionLabelProps{
+          Err: props.Data.ExpressionErr,
         })
       </label>
     </div>
     <fieldset>
       <legend>Endpoints</legend>
-      for i, end := range props.Endpoints {
+      for i, end := range props.Data.Endpoints {
         <div class="form-control">
           <label class="label cursor-pointer">
             <span class="label-text">{ end.Name }</span> 
-            <input type="checkbox" class="toggle" name="endpoints" value={ strconv.FormatInt(end.ID, 10) } checked?={ props.EndpointsSelections[i] } />
+            <input disabled?={ props.Data.Internal } type="checkbox" class="toggle" name="endpoints" value={ strconv.FormatInt(end.ID, 10) } checked?={ props.Data.EndpointsSelections[i] } />
           </label>
         </div>
       }
     </fieldset>
-    <button type="submit" class="btn btn-primary btn-block" data-loading-disable>
-      <span data-loading-class="loading loading-spinner loading-xs">
-        Create Rule
-      </span>
-    </button>
-    if props.Flash != nil {
-      {! props.Flash }
-    }
-  </form>
-}
-
-type RuleFormUpdateProps struct {
-  Flash templ.Component
-  Rule models.Rule
-  Name string
-  NameError string
-  Expression string
-  ExpressionError error
-  Endpoints []models.Endpoint
-  EndpointsSelections []bool
-}
-
-templ RuleFormUpdate(props RuleFormUpdateProps) {
-  <form hx-post={ routes.Rule(props.Rule.ID).URLString() } class="flex flex-col gap-4" data-loading-states>
-    <div class="form-control">
-      <label class="label">
-        <span class="label-text">Name</span>
-      </label>
-      <input disabled?={ props.Rule.Internal } name="name" type="text" placeholder="Type here" class="input input-bordered" value={ props.Name } />
-      if props.NameError != "" {
-        <label class="label">
-          <span class="label-text-alt text-error">{ props.NameError }</span>
-        </label>
-      }
-    </div>
-    <div class="form-control">
-      <label class="label">
-        <span class="label-text">Expression</span>
-      </label>
-      <textarea disabled?={ props.Rule.Internal } name="expression" hx-post={ routes.RuleExpressionCheck().URLString() } hx-trigger="keyup changed delay:100ms" hx-target="next label" class="textarea textarea-bordered h-24" placeholder="Expression">
-        { props.Expression }
-      </textarea>
-      <label class="label">
-        @RuleExpressionCheckLabel(RuleExpressionLabelProps{Error: props.ExpressionError})
-      </label>
-    </div>
-    <fieldset>
-      <legend class="label-text">Endpoints</legend>
-      for i, end := range props.Endpoints {
-        <div class="form-control">
-          <label class="label cursor-pointer">
-            <span class="label-text">{ end.Name }</span> 
-            <input disabled?={ props.Rule.Internal } type="checkbox" class="toggle" name="endpoints" value={ strconv.FormatInt(end.ID, 10) } checked?={ props.EndpointsSelections[i] } />
-          </label>
-        </div>
-      }
-    </fieldset>
-    if props.Rule.Internal {
+    if props.Data.Internal {
       <div class="alert alert-warning">
         @icons.Alert("h-6 w-6")
         <span>Rule cannot be edited because it is internal.</span>
       </div>
     }
-    <button disabled?={ props.Rule.Internal } type="submit" class="btn btn-primary btn-block" data-loading-disable>
+    <button disabled?={ props.Data.Internal } type="submit" class="btn btn-primary btn-block" data-loading-disable>
       <span data-loading-class="loading loading-spinner loading-xs">
-        Update Rule
+        if props.Create {
+          Create Rule
+        } else {
+          Update Rule
+        }
       </span>
     </button>
     if props.Flash != nil {
       {! props.Flash }
     }
   </form>
+}
+
+type RuleFormExpressionLabelProps struct {
+  Err error
+}
+
+templ RuleFormExpressionLabel(props RuleFormExpressionLabelProps) {
+  if props.Err != nil {
+    <span class="label-text-alt text-error">{ props.Err.Error() }</span>
+  } else {
+    <span class="label-text-alt text-success">Valid!</span>
+  }
 }

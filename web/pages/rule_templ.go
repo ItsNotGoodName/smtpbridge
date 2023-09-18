@@ -151,8 +151,8 @@ func ruleListView(m meta.Meta, props ruleListViewProps) templ.Component {
 }
 
 type ruleViewProps struct {
-	Rule           models.Rule
-	RuleFormUpdate templ.Component
+	Rule          models.Rule
+	RuleFormProps c.RuleFormProps
 }
 
 func ruleView(m meta.Meta, props ruleViewProps) templ.Component {
@@ -205,7 +205,7 @@ func ruleView(m meta.Meta, props ruleViewProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			err = props.RuleFormUpdate.Render(ctx, templBuffer)
+			err = c.RuleForm(props.RuleFormProps).Render(ctx, templBuffer)
 			if err != nil {
 				return err
 			}
@@ -234,7 +234,7 @@ func ruleView(m meta.Meta, props ruleViewProps) templ.Component {
 }
 
 type ruleCreateViewProps struct {
-	ruleFormCreateProps c.RuleFormCreateProps
+	RuleFormProps c.RuleFormProps
 }
 
 func ruleCreateView(m meta.Meta, props ruleCreateViewProps) templ.Component {
@@ -287,7 +287,7 @@ func ruleCreateView(m meta.Meta, props ruleCreateViewProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			err = c.RuleFormCreate(props.ruleFormCreateProps).Render(ctx, templBuffer)
+			err = c.RuleForm(props.RuleFormProps).Render(ctx, templBuffer)
 			if err != nil {
 				return err
 			}

@@ -47,6 +47,9 @@ type DataAttachment struct {
 	Attachment Attachment
 }
 
+const EndpointTitleTemplate = "{{ .Message.Subject }}"
+const EndpointBodyTemplate = "{{ .Message.Text }}"
+
 type Endpoint struct {
 	ID                int64 `sql:"primary_key"`
 	Internal          bool
@@ -120,4 +123,50 @@ func (t TraceDataKV) ValueInt64() int64 {
 type User struct {
 	ID       int64 `sql:"primary_key"`
 	Username string
+}
+
+type EndpointSchemaItem struct {
+	Name   string
+	Kind   string
+	Fields []EndpointSchemaField
+}
+
+type EndpointSchemaField struct {
+	Name        string
+	Description string
+	Key         string
+	Multiline   bool
+	Optional    bool
+}
+
+type EndpointSchema []EndpointSchemaItem
+
+func (e EndpointSchema) Get(kind string) EndpointSchemaItem {
+	for i := range e {
+		if e[i].Kind == kind {
+			return e[i]
+		}
+	}
+
+	return EndpointSchemaItem{}
+}
+
+func (e EndpointSchema) Filter(kind string, config EndpointConfig) EndpointConfig {
+	for _, end := range e {
+		if end.Kind == kind {
+			return end.Filter(config)
+		}
+	}
+
+	return make(EndpointConfig)
+}
+
+func (e EndpointSchemaItem) Filter(config EndpointConfig) EndpointConfig {
+	validConfig := make(EndpointConfig)
+
+	for _, field := range e.Fields {
+		validConfig[field.Key] = config[field.Key]
+	}
+
+	return validConfig
 }
