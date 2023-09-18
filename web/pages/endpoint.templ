@@ -89,6 +89,13 @@ templ endpointView(m meta.Meta, props endpointViewProps) {
     </div>
     <div class="mx-auto flex max-w-lg flex-col gap-4 p-4">
       @c.EndpointForm(props.EndpointFormProps)
+      <div data-loading-states>
+        <button class="btn btn-sm btn-success w-full" hx-post={ routes.EndpointTest(props.Endpoint.ID).URLString() } data-loading-disable>
+          <span data-loading-class="loading loading-spinner loading-sm">
+            Test
+          </span>
+        </button>
+      </div>
     </div>
 	}
 }

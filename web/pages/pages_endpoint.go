@@ -125,7 +125,8 @@ func EndpointView(ct Controller, app core.App) http.HandlerFunc {
 					BodyTemplate:      endpoint.BodyTemplate,
 					Kind:              endpoint.Kind,
 					EndpointFormConfigProps: c.EndpointFormConfigProps{
-						Fields: fields,
+						Internal: endpoint.Internal,
+						Fields:   fields,
 					},
 				},
 			},
@@ -233,4 +234,34 @@ func EndpointFormConfigComponent(ct Controller, app core.App) http.HandlerFunc {
 			Fields: fields,
 		}))
 	}
+}
+
+func EndpointListView(ct Controller, app core.App) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+
+		ends, err := app.EndpointList(ctx)
+		if err != nil {
+			ct.Error(w, r, err, getCode(err))
+			return
+		}
+
+		ct.Page(w, r, endpointListView(ct.Meta(r), endpointListViewProps{
+			Endpoints: ends,
+		}))
+	}
+}
+
+func EndpointTest(ct Controller, app core.App) http.HandlerFunc {
+	return withID(ct, func(w http.ResponseWriter, r *http.Request, id int64) {
+		ctx := r.Context()
+
+		err := app.EndpointTest(ctx, id)
+		if err != nil {
+			ct.Error(w, r, err, getCode(err))
+			return
+		}
+
+		w.WriteHeader(http.StatusNoContent)
+	})
 }

@@ -13,6 +13,7 @@ import (
 	"strconv"
 
 	"github.com/ItsNotGoodName/smtpbridge/web/helpers"
+	"github.com/ItsNotGoodName/smtpbridge/web/icons"
 	"github.com/ItsNotGoodName/smtpbridge/web/routes"
 )
 
@@ -59,16 +60,53 @@ func EndpointForm(props EndpointFormProps) templ.Component {
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("\" class=\"flex flex-col gap-4\" data-loading-states><div class=\"form-control\"><label class=\"label\"><span class=\"label-text\">")
+		_, err = templBuffer.WriteString("\" class=\"flex flex-col gap-4\" data-loading-states>")
 		if err != nil {
 			return err
 		}
-		var_2 := `Name`
-		_, err = templBuffer.WriteString(var_2)
+		if props.Data.Internal {
+			_, err = templBuffer.WriteString("<div class=\"alert alert-warning\">")
+			if err != nil {
+				return err
+			}
+			err = icons.Alert("h-6 w-6").Render(ctx, templBuffer)
+			if err != nil {
+				return err
+			}
+			_, err = templBuffer.WriteString("<span>")
+			if err != nil {
+				return err
+			}
+			var_2 := `Endpoint cannot be edited because it is internal.`
+			_, err = templBuffer.WriteString(var_2)
+			if err != nil {
+				return err
+			}
+			_, err = templBuffer.WriteString("</span></div>")
+			if err != nil {
+				return err
+			}
+		}
+		_, err = templBuffer.WriteString("<div class=\"form-control\"><label class=\"label\"><span class=\"label-text\">")
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("</span></label><input name=\"Name\" type=\"text\" placeholder=\"Name\" class=\"input input-bordered\" value=\"")
+		var_3 := `Name`
+		_, err = templBuffer.WriteString(var_3)
+		if err != nil {
+			return err
+		}
+		_, err = templBuffer.WriteString("</span></label><input")
+		if err != nil {
+			return err
+		}
+		if props.Data.Internal {
+			_, err = templBuffer.WriteString(" disabled")
+			if err != nil {
+				return err
+			}
+		}
+		_, err = templBuffer.WriteString(" name=\"Name\" type=\"text\" placeholder=\"Name\" class=\"input input-bordered\" value=\"")
 		if err != nil {
 			return err
 		}
@@ -85,8 +123,8 @@ func EndpointForm(props EndpointFormProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			var var_3 string = props.Data.NameError
-			_, err = templBuffer.WriteString(templ.EscapeString(var_3))
+			var var_4 string = props.Data.NameError
+			_, err = templBuffer.WriteString(templ.EscapeString(var_4))
 			if err != nil {
 				return err
 			}
@@ -99,12 +137,22 @@ func EndpointForm(props EndpointFormProps) templ.Component {
 		if err != nil {
 			return err
 		}
-		var_4 := `Text Disable`
-		_, err = templBuffer.WriteString(var_4)
+		var_5 := `Text Disable`
+		_, err = templBuffer.WriteString(var_5)
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("</div><div><input name=\"TextDisable\" type=\"checkbox\" class=\"toggle\"")
+		_, err = templBuffer.WriteString("</div><div><input")
+		if err != nil {
+			return err
+		}
+		if props.Data.Internal {
+			_, err = templBuffer.WriteString(" disabled")
+			if err != nil {
+				return err
+			}
+		}
+		_, err = templBuffer.WriteString(" name=\"TextDisable\" type=\"checkbox\" class=\"toggle\"")
 		if err != nil {
 			return err
 		}
@@ -124,12 +172,22 @@ func EndpointForm(props EndpointFormProps) templ.Component {
 		if err != nil {
 			return err
 		}
-		var_5 := `Attachment Disable`
-		_, err = templBuffer.WriteString(var_5)
+		var_6 := `Attachment Disable`
+		_, err = templBuffer.WriteString(var_6)
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("</div><div><input name=\"AttachmentDisable\" type=\"checkbox\" class=\"toggle\"")
+		_, err = templBuffer.WriteString("</div><div><input")
+		if err != nil {
+			return err
+		}
+		if props.Data.Internal {
+			_, err = templBuffer.WriteString(" disabled")
+			if err != nil {
+				return err
+			}
+		}
+		_, err = templBuffer.WriteString(" name=\"AttachmentDisable\" type=\"checkbox\" class=\"toggle\"")
 		if err != nil {
 			return err
 		}
@@ -149,17 +207,27 @@ func EndpointForm(props EndpointFormProps) templ.Component {
 		if err != nil {
 			return err
 		}
-		var_6 := `Title Template`
-		_, err = templBuffer.WriteString(var_6)
+		var_7 := `Title Template`
+		_, err = templBuffer.WriteString(var_7)
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("</span></label><textarea name=\"TitleTemplate\" placeholder=\"Title Template\" class=\"textarea textarea-bordered h-24\">")
+		_, err = templBuffer.WriteString("</span></label><textarea")
 		if err != nil {
 			return err
 		}
-		var var_7 string = props.Data.TitleTemplate
-		_, err = templBuffer.WriteString(templ.EscapeString(var_7))
+		if props.Data.Internal {
+			_, err = templBuffer.WriteString(" disabled")
+			if err != nil {
+				return err
+			}
+		}
+		_, err = templBuffer.WriteString(" name=\"TitleTemplate\" placeholder=\"Title Template\" class=\"textarea textarea-bordered h-24\">")
+		if err != nil {
+			return err
+		}
+		var var_8 string = props.Data.TitleTemplate
+		_, err = templBuffer.WriteString(templ.EscapeString(var_8))
 		if err != nil {
 			return err
 		}
@@ -172,8 +240,8 @@ func EndpointForm(props EndpointFormProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			var var_8 string = props.Data.TitleTemplateError
-			_, err = templBuffer.WriteString(templ.EscapeString(var_8))
+			var var_9 string = props.Data.TitleTemplateError
+			_, err = templBuffer.WriteString(templ.EscapeString(var_9))
 			if err != nil {
 				return err
 			}
@@ -186,17 +254,27 @@ func EndpointForm(props EndpointFormProps) templ.Component {
 		if err != nil {
 			return err
 		}
-		var_9 := `Body Template`
-		_, err = templBuffer.WriteString(var_9)
+		var_10 := `Body Template`
+		_, err = templBuffer.WriteString(var_10)
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("</span></label><textarea name=\"BodyTemplate\" placeholder=\"Body Template\" class=\"textarea textarea-bordered h-24\">")
+		_, err = templBuffer.WriteString("</span></label><textarea")
 		if err != nil {
 			return err
 		}
-		var var_10 string = props.Data.BodyTemplate
-		_, err = templBuffer.WriteString(templ.EscapeString(var_10))
+		if props.Data.Internal {
+			_, err = templBuffer.WriteString(" disabled")
+			if err != nil {
+				return err
+			}
+		}
+		_, err = templBuffer.WriteString(" name=\"BodyTemplate\" placeholder=\"Body Template\" class=\"textarea textarea-bordered h-24\">")
+		if err != nil {
+			return err
+		}
+		var var_11 string = props.Data.BodyTemplate
+		_, err = templBuffer.WriteString(templ.EscapeString(var_11))
 		if err != nil {
 			return err
 		}
@@ -209,8 +287,8 @@ func EndpointForm(props EndpointFormProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			var var_11 string = props.Data.BodyTemplateError
-			_, err = templBuffer.WriteString(templ.EscapeString(var_11))
+			var var_12 string = props.Data.BodyTemplateError
+			_, err = templBuffer.WriteString(templ.EscapeString(var_12))
 			if err != nil {
 				return err
 			}
@@ -223,8 +301,8 @@ func EndpointForm(props EndpointFormProps) templ.Component {
 		if err != nil {
 			return err
 		}
-		var_12 := `Kind`
-		_, err = templBuffer.WriteString(var_12)
+		var_13 := `Kind`
+		_, err = templBuffer.WriteString(var_13)
 		if err != nil {
 			return err
 		}
@@ -236,7 +314,17 @@ func EndpointForm(props EndpointFormProps) templ.Component {
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("\"></span></span></label><select name=\"Kind\" class=\"select select-bordered\" hx-get=\"")
+		_, err = templBuffer.WriteString("\"></span></span></label><select")
+		if err != nil {
+			return err
+		}
+		if props.Data.Internal {
+			_, err = templBuffer.WriteString(" disabled")
+			if err != nil {
+				return err
+			}
+		}
+		_, err = templBuffer.WriteString(" name=\"Kind\" class=\"select select-bordered\" hx-get=\"")
 		if err != nil {
 			return err
 		}
@@ -258,8 +346,8 @@ func EndpointForm(props EndpointFormProps) templ.Component {
 		if err != nil {
 			return err
 		}
-		var_13 := `Select Kind`
-		_, err = templBuffer.WriteString(var_13)
+		var_14 := `Select Kind`
+		_, err = templBuffer.WriteString(var_14)
 		if err != nil {
 			return err
 		}
@@ -290,8 +378,8 @@ func EndpointForm(props EndpointFormProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			var var_14 string = s.Name
-			_, err = templBuffer.WriteString(templ.EscapeString(var_14))
+			var var_15 string = s.Name
+			_, err = templBuffer.WriteString(templ.EscapeString(var_15))
 			if err != nil {
 				return err
 			}
@@ -309,8 +397,8 @@ func EndpointForm(props EndpointFormProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			var var_15 string = props.Data.KindError
-			_, err = templBuffer.WriteString(templ.EscapeString(var_15))
+			var var_16 string = props.Data.KindError
+			_, err = templBuffer.WriteString(templ.EscapeString(var_16))
 			if err != nil {
 				return err
 			}
@@ -327,19 +415,29 @@ func EndpointForm(props EndpointFormProps) templ.Component {
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("<button type=\"submit\" class=\"btn btn-primary btn-block\" data-loading-disable><span data-loading-class=\"loading loading-spinner loading-xs\">")
+		_, err = templBuffer.WriteString("<button")
+		if err != nil {
+			return err
+		}
+		if props.Data.Internal {
+			_, err = templBuffer.WriteString(" disabled")
+			if err != nil {
+				return err
+			}
+		}
+		_, err = templBuffer.WriteString(" type=\"submit\" class=\"btn btn-primary btn-block\" data-loading-disable><span data-loading-class=\"loading loading-spinner loading-xs\">")
 		if err != nil {
 			return err
 		}
 		if props.Create {
-			var_16 := `Create Endpoint`
-			_, err = templBuffer.WriteString(var_16)
+			var_17 := `Create Endpoint`
+			_, err = templBuffer.WriteString(var_17)
 			if err != nil {
 				return err
 			}
 		} else {
-			var_17 := `Update Endpoint`
-			_, err = templBuffer.WriteString(var_17)
+			var_18 := `Update Endpoint`
+			_, err = templBuffer.WriteString(var_18)
 			if err != nil {
 				return err
 			}
@@ -366,8 +464,9 @@ func EndpointForm(props EndpointFormProps) templ.Component {
 }
 
 type EndpointFormConfigProps struct {
-	Fields []EndpointFormConfigField
-	Error  string
+	Internal bool
+	Fields   []EndpointFormConfigField
+	Error    string
 }
 
 type EndpointFormConfigField struct {
@@ -386,121 +485,71 @@ func EndpointFormConfig(props EndpointFormConfigProps) templ.Component {
 			defer templ.ReleaseBuffer(templBuffer)
 		}
 		ctx = templ.InitializeContext(ctx)
-		var_18 := templ.GetChildren(ctx)
-		if var_18 == nil {
-			var_18 = templ.NopComponent
+		var_19 := templ.GetChildren(ctx)
+		if var_19 == nil {
+			var_19 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, err = templBuffer.WriteString("<fieldset id=\"endpoint-config\"><legend>")
+		_, err = templBuffer.WriteString("<fieldset id=\"endpoint-config\">")
 		if err != nil {
 			return err
 		}
-		var_19 := `Config`
-		_, err = templBuffer.WriteString(var_19)
-		if err != nil {
-			return err
-		}
-		_, err = templBuffer.WriteString("</legend>")
-		if err != nil {
-			return err
-		}
-		if props.Error != "" {
-			_, err = templBuffer.WriteString("<p class=\"text-error\">")
+		if len(props.Fields) > 0 {
+			_, err = templBuffer.WriteString("<legend>")
 			if err != nil {
 				return err
 			}
-			var var_20 string = props.Error
-			_, err = templBuffer.WriteString(templ.EscapeString(var_20))
+			var_20 := `Config`
+			_, err = templBuffer.WriteString(var_20)
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</p>")
+			_, err = templBuffer.WriteString("</legend> ")
 			if err != nil {
 				return err
 			}
-		}
-		for i, f := range props.Fields {
-			_, err = templBuffer.WriteString("<div class=\"form-control\"><label class=\"label\"><span class=\"label-text\">")
-			if err != nil {
-				return err
-			}
-			var var_21 string = f.Name
-			_, err = templBuffer.WriteString(templ.EscapeString(var_21))
-			if err != nil {
-				return err
-			}
-			_, err = templBuffer.WriteString("</span></label><input type=\"hidden\" name=\"")
-			if err != nil {
-				return err
-			}
-			_, err = templBuffer.WriteString(templ.EscapeString("Config." + strconv.Itoa(i) + ".Key"))
-			if err != nil {
-				return err
-			}
-			_, err = templBuffer.WriteString("\" value=\"")
-			if err != nil {
-				return err
-			}
-			_, err = templBuffer.WriteString(templ.EscapeString(f.Key))
-			if err != nil {
-				return err
-			}
-			_, err = templBuffer.WriteString("\">")
-			if err != nil {
-				return err
-			}
-			if f.Multiline {
-				_, err = templBuffer.WriteString("<textarea name=\"")
+			if props.Error != "" {
+				_, err = templBuffer.WriteString("<p class=\"text-error\">")
 				if err != nil {
 					return err
 				}
-				_, err = templBuffer.WriteString(templ.EscapeString("Config." + strconv.Itoa(i) + ".Value"))
+				var var_21 string = props.Error
+				_, err = templBuffer.WriteString(templ.EscapeString(var_21))
 				if err != nil {
 					return err
 				}
-				_, err = templBuffer.WriteString("\" placeholder=\"")
+				_, err = templBuffer.WriteString("</p>")
 				if err != nil {
 					return err
 				}
-				_, err = templBuffer.WriteString(templ.EscapeString(f.Name))
+			}
+			_, err = templBuffer.WriteString(" ")
+			if err != nil {
+				return err
+			}
+			for i, f := range props.Fields {
+				_, err = templBuffer.WriteString("<div class=\"form-control\"><label class=\"label\"><span class=\"label-text\">")
 				if err != nil {
 					return err
 				}
-				_, err = templBuffer.WriteString("\" class=\"textarea textarea-bordered h-24\">")
-				if err != nil {
-					return err
-				}
-				var var_22 string = f.Value
+				var var_22 string = f.Name
 				_, err = templBuffer.WriteString(templ.EscapeString(var_22))
 				if err != nil {
 					return err
 				}
-				_, err = templBuffer.WriteString("</textarea>")
+				_, err = templBuffer.WriteString("</span></label><input type=\"hidden\" name=\"")
 				if err != nil {
 					return err
 				}
-			} else {
-				_, err = templBuffer.WriteString("<input name=\"")
+				_, err = templBuffer.WriteString(templ.EscapeString("Config." + strconv.Itoa(i) + ".Key"))
 				if err != nil {
 					return err
 				}
-				_, err = templBuffer.WriteString(templ.EscapeString("Config." + strconv.Itoa(i) + ".Value"))
+				_, err = templBuffer.WriteString("\" value=\"")
 				if err != nil {
 					return err
 				}
-				_, err = templBuffer.WriteString("\" placeholder=\"")
-				if err != nil {
-					return err
-				}
-				_, err = templBuffer.WriteString(templ.EscapeString(f.Name))
-				if err != nil {
-					return err
-				}
-				_, err = templBuffer.WriteString("\" type=\"text\" class=\"input input-bordered\" value=\"")
-				if err != nil {
-					return err
-				}
-				_, err = templBuffer.WriteString(templ.EscapeString(f.Value))
+				_, err = templBuffer.WriteString(templ.EscapeString(f.Key))
 				if err != nil {
 					return err
 				}
@@ -508,25 +557,105 @@ func EndpointFormConfig(props EndpointFormConfigProps) templ.Component {
 				if err != nil {
 					return err
 				}
-			}
-			if f.Description != "" {
-				_, err = templBuffer.WriteString("<label class=\"label\"><span class=\"label-text-alt\">")
+				if f.Multiline {
+					_, err = templBuffer.WriteString("<textarea")
+					if err != nil {
+						return err
+					}
+					if props.Internal {
+						_, err = templBuffer.WriteString(" disabled")
+						if err != nil {
+							return err
+						}
+					}
+					_, err = templBuffer.WriteString(" name=\"")
+					if err != nil {
+						return err
+					}
+					_, err = templBuffer.WriteString(templ.EscapeString("Config." + strconv.Itoa(i) + ".Value"))
+					if err != nil {
+						return err
+					}
+					_, err = templBuffer.WriteString("\" placeholder=\"")
+					if err != nil {
+						return err
+					}
+					_, err = templBuffer.WriteString(templ.EscapeString(f.Name))
+					if err != nil {
+						return err
+					}
+					_, err = templBuffer.WriteString("\" class=\"textarea textarea-bordered h-24\">")
+					if err != nil {
+						return err
+					}
+					var var_23 string = f.Value
+					_, err = templBuffer.WriteString(templ.EscapeString(var_23))
+					if err != nil {
+						return err
+					}
+					_, err = templBuffer.WriteString("</textarea>")
+					if err != nil {
+						return err
+					}
+				} else {
+					_, err = templBuffer.WriteString("<input")
+					if err != nil {
+						return err
+					}
+					if props.Internal {
+						_, err = templBuffer.WriteString(" disabled")
+						if err != nil {
+							return err
+						}
+					}
+					_, err = templBuffer.WriteString(" name=\"")
+					if err != nil {
+						return err
+					}
+					_, err = templBuffer.WriteString(templ.EscapeString("Config." + strconv.Itoa(i) + ".Value"))
+					if err != nil {
+						return err
+					}
+					_, err = templBuffer.WriteString("\" placeholder=\"")
+					if err != nil {
+						return err
+					}
+					_, err = templBuffer.WriteString(templ.EscapeString(f.Name))
+					if err != nil {
+						return err
+					}
+					_, err = templBuffer.WriteString("\" type=\"text\" class=\"input input-bordered\" value=\"")
+					if err != nil {
+						return err
+					}
+					_, err = templBuffer.WriteString(templ.EscapeString(f.Value))
+					if err != nil {
+						return err
+					}
+					_, err = templBuffer.WriteString("\">")
+					if err != nil {
+						return err
+					}
+				}
+				if f.Description != "" {
+					_, err = templBuffer.WriteString("<label class=\"label\"><span class=\"label-text-alt\">")
+					if err != nil {
+						return err
+					}
+					var var_24 string = f.Description
+					_, err = templBuffer.WriteString(templ.EscapeString(var_24))
+					if err != nil {
+						return err
+					}
+					_, err = templBuffer.WriteString("</span></label>")
+					if err != nil {
+						return err
+					}
+				}
+				_, err = templBuffer.WriteString("</div>")
 				if err != nil {
 					return err
 				}
-				var var_23 string = f.Description
-				_, err = templBuffer.WriteString(templ.EscapeString(var_23))
-				if err != nil {
-					return err
-				}
-				_, err = templBuffer.WriteString("</span></label>")
-				if err != nil {
-					return err
-				}
-			}
-			_, err = templBuffer.WriteString("</div>")
-			if err != nil {
-				return err
 			}
 		}
 		_, err = templBuffer.WriteString("</fieldset>")

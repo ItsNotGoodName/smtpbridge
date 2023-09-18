@@ -413,36 +413,6 @@ func EnvelopeTabComponent(ct Controller, app core.App, tab routes.EnvelopeTab) h
 	})
 }
 
-func EndpointListView(ct Controller, app core.App) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
-
-		ends, err := app.EndpointList(ctx)
-		if err != nil {
-			ct.Error(w, r, err, getCode(err))
-			return
-		}
-
-		ct.Page(w, r, endpointListView(ct.Meta(r), endpointListViewProps{
-			Endpoints: ends,
-		}))
-	}
-}
-
-func EndpointTest(ct Controller, app core.App) http.HandlerFunc {
-	return withID(ct, func(w http.ResponseWriter, r *http.Request, id int64) {
-		ctx := r.Context()
-
-		err := app.EndpointTest(ctx, id)
-		if err != nil {
-			ct.Error(w, r, err, getCode(err))
-			return
-		}
-
-		w.WriteHeader(http.StatusNoContent)
-	})
-}
-
 func TraceListView(ct Controller, app core.App) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()

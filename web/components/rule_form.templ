@@ -27,6 +27,12 @@ type RuleFormData struct {
 
 templ RuleForm(props RuleFormProps) {
   <form hx-post={ props.Route().URLString() } class="flex flex-col gap-4" data-loading-states>
+    if props.Data.Internal {
+      <div class="alert alert-warning">
+        @icons.Alert("h-6 w-6")
+        <span>Rule cannot be edited because it is internal.</span>
+      </div>
+    }
     <div class="form-control">
       <label class="label">
         <span class="label-text">Name</span>
@@ -65,12 +71,6 @@ templ RuleForm(props RuleFormProps) {
         </div>
       }
     </fieldset>
-    if props.Data.Internal {
-      <div class="alert alert-warning">
-        @icons.Alert("h-6 w-6")
-        <span>Rule cannot be edited because it is internal.</span>
-      </div>
-    }
     <button disabled?={ props.Data.Internal } type="submit" class="btn btn-primary btn-block" data-loading-disable>
       <span data-loading-class="loading loading-spinner loading-xs">
         if props.Create {

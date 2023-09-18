@@ -295,7 +295,24 @@ func endpointView(m meta.Meta, props endpointViewProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</div>")
+			_, err = templBuffer.WriteString("<div data-loading-states><button class=\"btn btn-sm btn-success w-full\" hx-post=\"")
+			if err != nil {
+				return err
+			}
+			_, err = templBuffer.WriteString(templ.EscapeString(routes.EndpointTest(props.Endpoint.ID).URLString()))
+			if err != nil {
+				return err
+			}
+			_, err = templBuffer.WriteString("\" data-loading-disable><span data-loading-class=\"loading loading-spinner loading-sm\">")
+			if err != nil {
+				return err
+			}
+			var_18 := `Test`
+			_, err = templBuffer.WriteString(var_18)
+			if err != nil {
+				return err
+			}
+			_, err = templBuffer.WriteString("</span></button></div></div>")
 			if err != nil {
 				return err
 			}

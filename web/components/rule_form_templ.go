@@ -55,12 +55,39 @@ func RuleForm(props RuleFormProps) templ.Component {
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("\" class=\"flex flex-col gap-4\" data-loading-states><div class=\"form-control\"><label class=\"label\"><span class=\"label-text\">")
+		_, err = templBuffer.WriteString("\" class=\"flex flex-col gap-4\" data-loading-states>")
 		if err != nil {
 			return err
 		}
-		var_2 := `Name`
-		_, err = templBuffer.WriteString(var_2)
+		if props.Data.Internal {
+			_, err = templBuffer.WriteString("<div class=\"alert alert-warning\">")
+			if err != nil {
+				return err
+			}
+			err = icons.Alert("h-6 w-6").Render(ctx, templBuffer)
+			if err != nil {
+				return err
+			}
+			_, err = templBuffer.WriteString("<span>")
+			if err != nil {
+				return err
+			}
+			var_2 := `Rule cannot be edited because it is internal.`
+			_, err = templBuffer.WriteString(var_2)
+			if err != nil {
+				return err
+			}
+			_, err = templBuffer.WriteString("</span></div>")
+			if err != nil {
+				return err
+			}
+		}
+		_, err = templBuffer.WriteString("<div class=\"form-control\"><label class=\"label\"><span class=\"label-text\">")
+		if err != nil {
+			return err
+		}
+		var_3 := `Name`
+		_, err = templBuffer.WriteString(var_3)
 		if err != nil {
 			return err
 		}
@@ -91,8 +118,8 @@ func RuleForm(props RuleFormProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			var var_3 string = props.Data.NameError
-			_, err = templBuffer.WriteString(templ.EscapeString(var_3))
+			var var_4 string = props.Data.NameError
+			_, err = templBuffer.WriteString(templ.EscapeString(var_4))
 			if err != nil {
 				return err
 			}
@@ -113,8 +140,8 @@ func RuleForm(props RuleFormProps) templ.Component {
 		if err != nil {
 			return err
 		}
-		var_4 := `Expression`
-		_, err = templBuffer.WriteString(var_4)
+		var_5 := `Expression`
+		_, err = templBuffer.WriteString(var_5)
 		if err != nil {
 			return err
 		}
@@ -140,8 +167,8 @@ func RuleForm(props RuleFormProps) templ.Component {
 		if err != nil {
 			return err
 		}
-		var var_5 string = props.Data.Expression
-		_, err = templBuffer.WriteString(templ.EscapeString(var_5))
+		var var_6 string = props.Data.Expression
+		_, err = templBuffer.WriteString(templ.EscapeString(var_6))
 		if err != nil {
 			return err
 		}
@@ -159,8 +186,8 @@ func RuleForm(props RuleFormProps) templ.Component {
 		if err != nil {
 			return err
 		}
-		var_6 := `Endpoints`
-		_, err = templBuffer.WriteString(var_6)
+		var_7 := `Endpoints`
+		_, err = templBuffer.WriteString(var_7)
 		if err != nil {
 			return err
 		}
@@ -173,8 +200,8 @@ func RuleForm(props RuleFormProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			var var_7 string = end.Name
-			_, err = templBuffer.WriteString(templ.EscapeString(var_7))
+			var var_8 string = end.Name
+			_, err = templBuffer.WriteString(templ.EscapeString(var_8))
 			if err != nil {
 				return err
 			}
@@ -211,34 +238,7 @@ func RuleForm(props RuleFormProps) templ.Component {
 				return err
 			}
 		}
-		_, err = templBuffer.WriteString("</fieldset>")
-		if err != nil {
-			return err
-		}
-		if props.Data.Internal {
-			_, err = templBuffer.WriteString("<div class=\"alert alert-warning\">")
-			if err != nil {
-				return err
-			}
-			err = icons.Alert("h-6 w-6").Render(ctx, templBuffer)
-			if err != nil {
-				return err
-			}
-			_, err = templBuffer.WriteString("<span>")
-			if err != nil {
-				return err
-			}
-			var_8 := `Rule cannot be edited because it is internal.`
-			_, err = templBuffer.WriteString(var_8)
-			if err != nil {
-				return err
-			}
-			_, err = templBuffer.WriteString("</span></div>")
-			if err != nil {
-				return err
-			}
-		}
-		_, err = templBuffer.WriteString("<button")
+		_, err = templBuffer.WriteString("</fieldset><button")
 		if err != nil {
 			return err
 		}
