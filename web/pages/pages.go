@@ -30,6 +30,8 @@ import (
 
 // utils
 
+const ParamID = "{id}"
+
 func withID(ct Controller, fn func(w http.ResponseWriter, r *http.Request, id int64)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
@@ -459,8 +461,7 @@ func TraceListDrop(ct Controller, app core.App, view http.Handler) http.HandlerF
 			return
 		}
 
-		htmx.SetRetarget(w, "body")
-		view.ServeHTTP(w, r)
+		helpers.Reroute(w, r, view)
 	}
 }
 func RuleListView(ct Controller, app core.App) http.HandlerFunc {
@@ -490,8 +491,7 @@ func AttachmentTrim(ct Controller, app core.App, view http.Handler) http.Handler
 			return
 		}
 
-		htmx.SetRetarget(w, "body")
-		view.ServeHTTP(w, r)
+		helpers.Reroute(w, r, view)
 	}
 }
 

@@ -15,6 +15,7 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/internal/endpoint"
 	"github.com/ItsNotGoodName/smtpbridge/internal/models"
 	"github.com/ItsNotGoodName/smtpbridge/internal/trace"
+	"github.com/ItsNotGoodName/smtpbridge/pkg/htmx"
 	"github.com/ItsNotGoodName/smtpbridge/pkg/pagination"
 	"github.com/dustin/go-humanize"
 	"github.com/gorilla/schema"
@@ -141,4 +142,9 @@ func DecodeForm(w http.ResponseWriter, r *http.Request, form any) error {
 
 func ParseMultipartForm(r *http.Request) error {
 	return r.ParseMultipartForm(32 << 20)
+}
+
+func Reroute(w http.ResponseWriter, r *http.Request, view http.Handler) {
+	htmx.SetRetarget(w, "body")
+	view.ServeHTTP(w, r)
 }
