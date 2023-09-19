@@ -203,6 +203,11 @@ func (p Parser) Parse(raw Raw) (Config, error) {
 		return Config{}, err
 	}
 
+	scriptDirectory := path.Join(dataDirectory, "scripts")
+	if err := os.MkdirAll(scriptDirectory, 0755); err != nil {
+		return Config{}, err
+	}
+
 	smtpMaxMessageSize, err := bytes.Parse(raw.SMTPMaxPayloadSize)
 	if err != nil {
 		return Config{}, err
@@ -263,7 +268,7 @@ func (p Parser) Parse(raw Raw) (Config, error) {
 		}
 	}
 
-	endpointFactory := endpoint.NewFactory(raw.PythonExecutable, appriseScriptPath, endpoint.NewFuncMap(endpoint.CreateFuncMap{
+	endpointFactory := endpoint.NewFactory(raw.PythonExecutable, appriseScriptPath, scriptDirectory, endpoint.NewFuncMap(endpoint.CreateFuncMap{
 		URL: raw.HTTPURL,
 	}))
 	var endpoints []models.Endpoint

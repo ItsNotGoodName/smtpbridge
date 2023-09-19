@@ -169,13 +169,15 @@ func (p payload) Title(ctx context.Context, env models.Envelope) (string, error)
 type Factory struct {
 	pythonExecutable  string
 	appriseScriptPath string
+	scriptDirectory   string
 	funcMap           template.FuncMap
 }
 
-func NewFactory(pythonExecutable string, appriseScriptPath string, funcMap template.FuncMap) Factory {
+func NewFactory(pythonExecutable string, appriseScriptPath string, scriptDirectory string, funcMap template.FuncMap) Factory {
 	return Factory{
 		pythonExecutable:  pythonExecutable,
 		appriseScriptPath: appriseScriptPath,
+		scriptDirectory:   scriptDirectory,
 		funcMap:           funcMap,
 	}
 }

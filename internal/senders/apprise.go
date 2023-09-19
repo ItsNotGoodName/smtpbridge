@@ -54,27 +54,23 @@ func (a Apprise) Send(ctx context.Context, env models.Envelope, tr Transformer) 
 		Attachments: []apprisePayloadAttachment{},
 	}
 
+	var err error
+
 	// Title
-	title, err := tr.Title(ctx, env)
+	payload.Title, err = tr.Title(ctx, env)
 	if err != nil {
 		return err
-	}
-	if title != "" {
-		payload.Title = title
 	}
 
 	// Body
-	body, err := tr.Body(ctx, env)
+	payload.Body, err = tr.Body(ctx, env)
 	if err != nil {
 		return err
 	}
-	if body != "" {
-		payload.Body = body
-	}
 
 	// Apprise's body cannot be empty
-	if body == "" && title != "" {
-		payload.Body = title
+	if payload.Body == "" && payload.Title != "" {
+		payload.Body = payload.Title
 		payload.Title = ""
 	}
 

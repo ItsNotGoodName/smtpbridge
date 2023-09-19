@@ -59,11 +59,8 @@ func EndpointCreate(ct Controller, app core.App) http.HandlerFunc {
 			item := helpers.EndpointSchema().Get(form.Kind)
 			for _, field := range item.Fields {
 				fields = append(fields, c.EndpointFormConfigField{
-					Name:        field.Name,
-					Description: field.Description,
-					Key:         field.Key,
-					Multiline:   field.Multiline,
-					Value:       formConfig[field.Key],
+					EndpointSchemaField: field,
+					Value:               formConfig[field.Key],
 				})
 			}
 
@@ -105,11 +102,8 @@ func EndpointView(ct Controller, app core.App) http.HandlerFunc {
 		var fields []c.EndpointFormConfigField
 		for _, field := range item.Fields {
 			fields = append(fields, c.EndpointFormConfigField{
-				Name:        field.Name,
-				Description: field.Description,
-				Key:         field.Key,
-				Multiline:   field.Multiline,
-				Value:       endpoint.Config[field.Key],
+				EndpointSchemaField: field,
+				Value:               endpoint.Config[field.Key],
 			})
 		}
 
@@ -167,11 +161,8 @@ func EndpointUpdate(ct Controller, app core.App) http.HandlerFunc {
 		var fields []c.EndpointFormConfigField
 		for _, field := range item.Fields {
 			fields = append(fields, c.EndpointFormConfigField{
-				Name:        field.Name,
-				Description: field.Description,
-				Key:         field.Key,
-				Multiline:   field.Multiline,
-				Value:       formConfig[field.Key],
+				EndpointSchemaField: field,
+				Value:               formConfig[field.Key],
 			})
 		}
 
@@ -224,10 +215,7 @@ func EndpointFormConfigComponent(ct Controller, app core.App) http.HandlerFunc {
 		var fields []c.EndpointFormConfigField
 		for _, field := range item.Fields {
 			fields = append(fields, c.EndpointFormConfigField{
-				Name:        field.Name,
-				Description: field.Description,
-				Key:         field.Key,
-				Multiline:   field.Multiline,
+				EndpointSchemaField: field,
 			})
 		}
 

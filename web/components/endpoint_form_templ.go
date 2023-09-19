@@ -12,6 +12,7 @@ import "bytes"
 import (
 	"strconv"
 
+	"github.com/ItsNotGoodName/smtpbridge/internal/models"
 	"github.com/ItsNotGoodName/smtpbridge/web/helpers"
 	"github.com/ItsNotGoodName/smtpbridge/web/icons"
 	"github.com/ItsNotGoodName/smtpbridge/web/routes"
@@ -470,11 +471,8 @@ type EndpointFormConfigProps struct {
 }
 
 type EndpointFormConfigField struct {
-	Name        string
-	Description string
-	Key         string
-	Value       string
-	Multiline   bool
+	models.EndpointSchemaField
+	Value string
 }
 
 func EndpointFormConfig(props EndpointFormConfigProps) templ.Component {
@@ -580,7 +578,7 @@ func EndpointFormConfig(props EndpointFormConfigProps) templ.Component {
 					if err != nil {
 						return err
 					}
-					_, err = templBuffer.WriteString(templ.EscapeString(f.Name))
+					_, err = templBuffer.WriteString(templ.EscapeString(f.Example))
 					if err != nil {
 						return err
 					}
@@ -620,7 +618,7 @@ func EndpointFormConfig(props EndpointFormConfigProps) templ.Component {
 					if err != nil {
 						return err
 					}
-					_, err = templBuffer.WriteString(templ.EscapeString(f.Name))
+					_, err = templBuffer.WriteString(templ.EscapeString(f.Example))
 					if err != nil {
 						return err
 					}

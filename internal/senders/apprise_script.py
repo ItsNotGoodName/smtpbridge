@@ -14,8 +14,7 @@ for attachment in data['attachments']:
 
 attach = apprise.AppriseAttachment(paths=paths)
 
-apobj.notify(
-    body=data['body'],
-    title=data['title'],
-    attach=attach
-)
+with apprise.LogCapture(level=apprise.logging.INFO) as logs:
+    if not apobj.notify(body=data['body'], title=data['title'], attach=attach):
+        print(logs.getvalue(), file=sys.stderr) # type: ignore
+        sys.exit(1)

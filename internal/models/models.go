@@ -134,6 +134,7 @@ type EndpointSchemaItem struct {
 type EndpointSchemaField struct {
 	Name        string
 	Description string
+	Example     string
 	Key         string
 	Multiline   bool
 	Optional    bool

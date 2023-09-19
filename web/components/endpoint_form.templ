@@ -6,6 +6,7 @@ import (
   "github.com/ItsNotGoodName/smtpbridge/web/routes"
 	"github.com/ItsNotGoodName/smtpbridge/web/helpers"
 	"github.com/ItsNotGoodName/smtpbridge/web/icons"
+	"github.com/ItsNotGoodName/smtpbridge/internal/models"
 )
 
 
@@ -130,11 +131,8 @@ type EndpointFormConfigProps struct {
 }
 
 type EndpointFormConfigField struct {
-	Name        string
-	Description string
-	Key         string
+  models.EndpointSchemaField
   Value       string
-	Multiline   bool
 }
 
 templ EndpointFormConfig(props EndpointFormConfigProps) {
@@ -151,11 +149,11 @@ templ EndpointFormConfig(props EndpointFormConfigProps) {
           </label>
           <input type="hidden" name={ "Config." + strconv.Itoa(i) + ".Key"  } value={ f.Key } /> 
           if f.Multiline{
-            <textarea disabled?={ props.Internal } name={ "Config." + strconv.Itoa(i) + ".Value" } placeholder={ f.Name } class="textarea textarea-bordered h-24">
+            <textarea disabled?={ props.Internal } name={ "Config." + strconv.Itoa(i) + ".Value" } placeholder={ f.Example } class="textarea textarea-bordered h-24">
               { f.Value }
             </textarea>
           } else {
-            <input disabled?={ props.Internal } name={ "Config." + strconv.Itoa(i) + ".Value" } placeholder={ f.Name } type="text" class="input input-bordered" value={ f.Value } />
+            <input disabled?={ props.Internal } name={ "Config." + strconv.Itoa(i) + ".Value" } placeholder={ f.Example } type="text" class="input input-bordered" value={ f.Value } />
           }
           if f.Description != "" {
             <label class="label">

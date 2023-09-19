@@ -2,6 +2,7 @@ package endpoint
 
 import (
 	"fmt"
+	"path"
 
 	"github.com/ItsNotGoodName/smtpbridge/internal/models"
 	"github.com/ItsNotGoodName/smtpbridge/internal/senders"
@@ -18,14 +19,16 @@ var Schema models.EndpointSchema = models.EndpointSchema{
 		Kind: "telegram",
 		Fields: []models.EndpointSchemaField{
 			{
-				Name:        "Token",
-				Description: "",
 				Key:         "token",
+				Name:        "Token",
+				Description: "Bot token from BotFather.",
+				Example:     "0123456789:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
 			},
 			{
-				Name:        "Chat ID",
-				Description: "",
 				Key:         "chat_id",
+				Name:        "Chat ID",
+				Description: "Channel/chat/group ID.",
+				Example:     "1000000000",
 			},
 		},
 	},
@@ -34,9 +37,10 @@ var Schema models.EndpointSchema = models.EndpointSchema{
 		Kind: "shoutrrr",
 		Fields: []models.EndpointSchemaField{
 			{
-				Name:        "URLs",
 				Key:         "urls",
-				Description: "List of URLs.",
+				Name:        "URLs",
+				Description: "List of Shoutrrr URLs.",
+				Example:     "telegram://token@telegram?chats=channel-1[,chat-id-1,...]",
 				Multiline:   true,
 			},
 		},
@@ -48,8 +52,21 @@ var Schema models.EndpointSchema = models.EndpointSchema{
 			{
 				Name:        "URLs",
 				Key:         "urls",
-				Description: "List of URLs.",
+				Description: "List of Apprise URLs.",
+				Example:     "tgram://bottoken/ChatID",
 				Multiline:   true,
+			},
+		},
+	},
+	{
+		Name: "Script",
+		Kind: "script",
+		Fields: []models.EndpointSchemaField{
+			{
+				Key:         "file",
+				Name:        "File",
+				Description: "Name of script file located in the script directory.",
+				Example:     "my-script.py",
 			},
 		},
 	},
@@ -82,6 +99,9 @@ func (s Factory) build(kind string, config models.EndpointConfig) (Sender, error
 		return senders.NewShoutrrr(router), nil
 	case "apprise":
 		return senders.NewApprise(s.pythonExecutable, s.appriseScriptPath, config.StrSlice("urls")), nil
+	case "script":
+		scriptPath := path.Join(s.scriptDirectory, config.Str("file"))
+		return senders.NewScript(scriptPath), nil
 	default:
 		return nil, errInvalidSenderKind
 	}
