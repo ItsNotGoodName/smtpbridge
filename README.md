@@ -13,27 +13,17 @@ Bridge email to other messaging services.
 
 # Features
 
-- Envelopes that contain subject, from, to, text, html, and attachments of an email
-- Endpoints for sending envelopes
-- Rules for matching envelopes
-- SMTP server that creates envelopes
-- HTTP server
-  - Create, view, and delete envelopes
-  - View and test endpoints
-  - Create, view, update, and delete rules
-- Authentication for HTTP and SMTP servers
-- Retention policy for deleting old envelopes
-- Healthcheck for monitoring
+- Receive email from SMTP or HTTP as envelopes
+- Send envelopes to [endpoints](#supported-endpoints) with [templates](#templates)
+- Create [rules](#expressions) for matching envelopes with endpoints
+- View and manage application through the Web UI
+- Delete stale envelopes with a retention policy
+- Monitor application with healthcheck
 
 # Use Cases
 
-- Pictures from IP cameras
-- System messages from servers
-
-# Migration
-
-Until `1.X.X`, every `0.X.0` release may break something or everything.
-It is recommended to delete `smtpbridge_data` on every minor release and also check the [Full Config](#full-config) example for changes.
+- Pictures from IP cameras (e.g. AI Tripwire, ...)
+- System messages from servers and applications (e.g. Debian, Nextcloud, UniFi Network Application, ...)
 
 # Usage
 
@@ -41,24 +31,13 @@ It is recommended to delete `smtpbridge_data` on every minor release and also ch
 smtpbridge
 ```
 
-## Show Help
-
-```
-smtpbridge -help
-```
-
-## Show Version
-
-```
-smtpbridge -version
-```
-
 # Supported Endpoints
 
-- console
+- Console
 - [Telegram](https://telegram.org/)
 - [Shoutrrr](https://github.com/containrrr/shoutrrr)
 - [Apprise](https://github.com/caronc/apprise)
+- [Script](#script)
 
 ## Apprise
 
@@ -77,6 +56,28 @@ python_executable: .venv/bin/python3
 ```
 
 Make sure you install Apprise in that virtual environment.
+
+## Script
+
+This allows you to run an arbitrary script as an endpoint.
+stdin is a JSON encoded envelope such as the following.
+
+```json
+{
+  "title": "Test Subject",
+  "body": "Test Body",
+  "attachments": [
+    {
+      "path": "http://127.0.0.1:8080/apple-touch-icon.png",
+      "name": "Test Attachment"
+    }
+  ]
+}
+```
+
+The `path` of an attachment can be a URL or a file path.
+
+Please note that scripts runs concurrently.
 
 # Config
 
@@ -118,10 +119,10 @@ time_format: 12h # [12h, 24h]
 # Directory for storing data
 data_directory: smtpbridge_data
 
-# Python executable used by Apprise, ...
+# Python executable used by Apprise
 python_executable: python3
 
-# Healthcheck enables verification that the program has not crashed or lost network access
+# Healthcheck enables verification that the application has not crashed or lost network access
 # You can use a third party service such as healthchecks.io
 healthcheck:
   # URL to fetch, empty means health checking is disabled
@@ -132,6 +133,11 @@ healthcheck:
 
   # Run on startup
   startup: false
+
+# Mailman handles sending envelopes to the configured endpoints
+mailman:
+  # Number of concurrent workers
+  workers: 1
 
 # Retention policy will delete resources that pass the configured policy
 retention:
@@ -155,7 +161,7 @@ http:
   username: ""
   password: ""
 
-  # Public URL
+  # Public URL used for creating links
   url: "" # [http://127.0.0.1:8080, ...]
 
 # SMTP server
@@ -194,11 +200,17 @@ endpoints:
       urls: telegram://token@telegram?chats=@channel-1[,chat-id-1,...]
 
   # Apprise
-  shoutrrr_endpoint:
+  apprise_endpoint:
     kind: apprise
     config:
       # https://github.com/caronc/apprise#supported-notifications
       urls: tgram://bottoken/ChatID
+
+  # Script
+  script_endpoint:
+    kind: script
+    config:
+      file: my-script.py
 
   # Full example
   example_endpoint:
@@ -209,9 +221,9 @@ endpoints:
     # Do not send attachments
     attachment_disable: false
     # Custom template for title
-    title_template: {{ .Message.Subject }}
+    title_template: "{{ .Message.Subject }}"
     # Custom template for body
-    body_template: {{ .Message.Text }}
+    body_template: "{{ .Message.Text }}"
 
 rules:
   example_rule:
@@ -219,11 +231,6 @@ rules:
     expression: or (eq .Message.Subject "cam-1") (eq .Message.Subject "cam-2")
     endpoints:
       - console_endpoint
-
-# Mailman sends envelopes to endpoints by matching rules
-mailman:
-  # Number of concurrent workers
-  workers: 1
 ```
 
 ## Templates
@@ -234,13 +241,14 @@ Each `*_template` config variable has access to the [Envelope](./internal/models
 
 The following custom functions are available in endpoint templates.
 
-| Name      | Description                             | Example                                                           |
-| --------- | --------------------------------------- | ----------------------------------------------------------------- |
-| PermaLink | Permanent HTTP link to the given model. | `{{ PermaLink .Message }}` => `http://127.0.0.1:8080/envelopes/1` |
+| Name      | Description                              | Example                                                           |
+| --------- | ---------------------------------------- | ----------------------------------------------------------------- |
+| PermaLink | Permanent HTTP link for the given model. | `{{ PermaLink .Message }}` => `http://127.0.0.1:8080/envelopes/1` |
 
 ## Expressions
 
-Rule expressions are just [Templates](#templates) without `{{ }}` and without the custom functions.
+Rule expressions are just [templates](#templates) without `{{ }}` and custom functions.
+They should always evaluate to a boolean expression.
 
 # Docker
 
