@@ -5,6 +5,11 @@ table "messages" {
     type = integer
     auto_increment = true
   }
+  column "uuid" {
+    null = false
+    type = text
+    default = ""
+  }
   column "from" {
     null = false
     type = text
@@ -43,6 +48,11 @@ table "attachments" {
     null = false
     type = integer
     auto_increment = true
+  }
+  column "uuid" {
+    null = false
+    type = text
+    default = ""
   }
   column "message_id" {
     null = true

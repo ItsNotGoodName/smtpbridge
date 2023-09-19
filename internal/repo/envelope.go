@@ -15,6 +15,7 @@ import (
 
 var messagesPJRaw ProjectionList = ProjectionList{
 	Messages.ID.AS("id"),
+	Messages.UUID.AS("uuid"),
 	Messages.From.AS("from"),
 	Messages.To.AS("to"),
 	Messages.Subject.AS("subject"),
@@ -28,6 +29,7 @@ var messagePJ ProjectionList = messagesPJRaw.As("message")
 
 var attachmentPJ ProjectionList = ProjectionList{
 	Attachments.ID.AS("attachment.id"),
+	Attachments.UUID.AS("uuid"),
 	Attachments.MessageID.AS("attachment.message_id"),
 	Attachments.Name.AS("attachment.name"),
 	Attachments.Mime.AS("attachment.mime"),
@@ -43,6 +45,7 @@ func EnvelopeCreate(ctx context.Context, db database.Querier, msg models.Message
 
 	res, err := Messages.
 		INSERT(
+			Messages.UUID,
 			Messages.From,
 			Messages.To,
 			Messages.Subject,
@@ -63,6 +66,7 @@ func EnvelopeCreate(ctx context.Context, db database.Querier, msg models.Message
 
 	if len(atts) != 0 {
 		stmt := Attachments.INSERT(
+			Attachments.UUID,
 			Attachments.MessageID,
 			Attachments.Name,
 			Attachments.Mime,

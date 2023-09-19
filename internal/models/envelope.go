@@ -12,6 +12,7 @@ type Envelope struct {
 
 type Message struct {
 	ID        int64 `sql:"primary_key"`
+	UUID      string
 	CreatedAt Time
 	Date      Time
 	Subject   string
@@ -36,6 +37,7 @@ func (ss MessageTo) EQ(strs ...string) bool {
 
 type Attachment struct {
 	ID        int64 `sql:"primary_key"`
+	UUID      string
 	MessageID int64
 	Name      string
 	Mime      string

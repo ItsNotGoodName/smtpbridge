@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/ItsNotGoodName/smtpbridge/internal/models"
+	"github.com/google/uuid"
 	"github.com/jaytaylor/html2text"
 	"github.com/samber/lo"
 )
@@ -36,6 +37,7 @@ func NewMessage(r models.DTOMessageCreate) models.Message {
 	})
 
 	return models.Message{
+		UUID:      uuid.NewString(),
 		From:      r.From,
 		To:        to,
 		CreatedAt: models.NewTime(time.Now()),
@@ -58,6 +60,7 @@ func NewDataAttachment(name string, data io.Reader) (models.DataAttachment, erro
 
 	return models.DataAttachment{
 		Attachment: models.Attachment{
+			UUID:      uuid.NewString(),
 			Name:      name,
 			Mime:      mimeT,
 			Extension: extension,

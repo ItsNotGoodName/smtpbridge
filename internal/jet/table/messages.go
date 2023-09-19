@@ -18,6 +18,7 @@ type messagesTable struct {
 
 	// Columns
 	ID        sqlite.ColumnInteger
+	UUID      sqlite.ColumnString
 	From      sqlite.ColumnString
 	To        sqlite.ColumnString
 	Subject   sqlite.ColumnString
@@ -66,6 +67,7 @@ func newMessagesTable(schemaName, tableName, alias string) *MessagesTable {
 func newMessagesTableImpl(schemaName, tableName, alias string) messagesTable {
 	var (
 		IDColumn        = sqlite.IntegerColumn("id")
+		UUIDColumn      = sqlite.StringColumn("uuid")
 		FromColumn      = sqlite.StringColumn("from")
 		ToColumn        = sqlite.StringColumn("to")
 		SubjectColumn   = sqlite.StringColumn("subject")
@@ -73,8 +75,8 @@ func newMessagesTableImpl(schemaName, tableName, alias string) messagesTable {
 		HTMLColumn      = sqlite.StringColumn("html")
 		DateColumn      = sqlite.TimestampColumn("date")
 		CreatedAtColumn = sqlite.TimestampColumn("created_at")
-		allColumns      = sqlite.ColumnList{IDColumn, FromColumn, ToColumn, SubjectColumn, TextColumn, HTMLColumn, DateColumn, CreatedAtColumn}
-		mutableColumns  = sqlite.ColumnList{FromColumn, ToColumn, SubjectColumn, TextColumn, HTMLColumn, DateColumn, CreatedAtColumn}
+		allColumns      = sqlite.ColumnList{IDColumn, UUIDColumn, FromColumn, ToColumn, SubjectColumn, TextColumn, HTMLColumn, DateColumn, CreatedAtColumn}
+		mutableColumns  = sqlite.ColumnList{UUIDColumn, FromColumn, ToColumn, SubjectColumn, TextColumn, HTMLColumn, DateColumn, CreatedAtColumn}
 	)
 
 	return messagesTable{
@@ -82,6 +84,7 @@ func newMessagesTableImpl(schemaName, tableName, alias string) messagesTable {
 
 		//Columns
 		ID:        IDColumn,
+		UUID:      UUIDColumn,
 		From:      FromColumn,
 		To:        ToColumn,
 		Subject:   SubjectColumn,

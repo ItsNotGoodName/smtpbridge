@@ -18,6 +18,7 @@ type attachmentsTable struct {
 
 	// Columns
 	ID        sqlite.ColumnInteger
+	UUID      sqlite.ColumnString
 	MessageID sqlite.ColumnInteger
 	Name      sqlite.ColumnString
 	Mime      sqlite.ColumnString
@@ -63,12 +64,13 @@ func newAttachmentsTable(schemaName, tableName, alias string) *AttachmentsTable 
 func newAttachmentsTableImpl(schemaName, tableName, alias string) attachmentsTable {
 	var (
 		IDColumn        = sqlite.IntegerColumn("id")
+		UUIDColumn      = sqlite.StringColumn("uuid")
 		MessageIDColumn = sqlite.IntegerColumn("message_id")
 		NameColumn      = sqlite.StringColumn("name")
 		MimeColumn      = sqlite.StringColumn("mime")
 		ExtensionColumn = sqlite.StringColumn("extension")
-		allColumns      = sqlite.ColumnList{IDColumn, MessageIDColumn, NameColumn, MimeColumn, ExtensionColumn}
-		mutableColumns  = sqlite.ColumnList{MessageIDColumn, NameColumn, MimeColumn, ExtensionColumn}
+		allColumns      = sqlite.ColumnList{IDColumn, UUIDColumn, MessageIDColumn, NameColumn, MimeColumn, ExtensionColumn}
+		mutableColumns  = sqlite.ColumnList{UUIDColumn, MessageIDColumn, NameColumn, MimeColumn, ExtensionColumn}
 	)
 
 	return attachmentsTable{
@@ -76,6 +78,7 @@ func newAttachmentsTableImpl(schemaName, tableName, alias string) attachmentsTab
 
 		//Columns
 		ID:        IDColumn,
+		UUID:      UUIDColumn,
 		MessageID: MessageIDColumn,
 		Name:      NameColumn,
 		Mime:      MimeColumn,
