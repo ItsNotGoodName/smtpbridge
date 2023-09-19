@@ -51,7 +51,7 @@ func ruleListView(m meta.Meta, props ruleListViewProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</li></ul></div> <div class=\"flex flex-col gap-4 p-4\"><div class=\"join flex items-center justify-end\"><a title=\"Add\" class=\"btn btn-sm btn-success\" href=\"")
+			_, err = templBuffer.WriteString("</li></ul></div> <div class=\"flex flex-col gap-4 p-4\"><div class=\"join flex items-center justify-end\"><a title=\"Create Rule\" class=\"btn btn-sm btn-success\" href=\"")
 			if err != nil {
 				return err
 			}

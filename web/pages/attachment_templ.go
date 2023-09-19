@@ -54,7 +54,7 @@ func attachmentListView(m meta.Meta, props attachmentListViewProps) templ.Compon
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</li></ul></div> <div class=\"flex flex-col gap-4 p-4\"><div class=\"join flex items-center justify-end\" data-loading-states><button title=\"Delete Orphans\" class=\"btn-sm btn btn-info join-item\" hx-post=\"")
+			_, err = templBuffer.WriteString("</li></ul></div> <div class=\"flex flex-col gap-4 p-4\"><div class=\"join flex items-center justify-end\" data-loading-states><button title=\"Remove Orphan Attachments\" class=\"btn-sm btn btn-info join-item\" hx-post=\"")
 			if err != nil {
 				return err
 			}

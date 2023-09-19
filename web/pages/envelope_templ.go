@@ -337,7 +337,7 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</span><input type=\"hidden\" value=\"0\" name=\"-search-subject\"><input name=\"search-subject\" type=\"checkbox\" class=\"checkbox\"")
+			_, err = templBuffer.WriteString("</span><input type=\"hidden\" value=\"0\" name=\"-search-subject\"><input name=\"search-subject\" type=\"checkbox\" class=\"checkbox checkbox-sm\"")
 			if err != nil {
 				return err
 			}
@@ -356,7 +356,7 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</span><input type=\"hidden\" value=\"0\" name=\"-search-text\"><input name=\"search-text\" type=\"checkbox\" class=\"checkbox\"")
+			_, err = templBuffer.WriteString("</span><input type=\"hidden\" value=\"0\" name=\"-search-text\"><input name=\"search-text\" type=\"checkbox\" class=\"checkbox checkbox-sm\"")
 			if err != nil {
 				return err
 			}
@@ -374,7 +374,7 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("\"><button title=\"Search\" type=\"submit\" class=\"btn btn-sm btn-primary join-item\">")
+			_, err = templBuffer.WriteString("\"><button title=\"Search Envelopes\" type=\"submit\" class=\"btn btn-sm btn-primary join-item\">")
 			if err != nil {
 				return err
 			}
@@ -382,7 +382,7 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</button></div></form><div class=\"join flex items-center justify-end\" data-loading-states><a title=\"Add\" class=\"btn btn-sm join-item btn-success\" href=\"")
+			_, err = templBuffer.WriteString("</button></div></form><div class=\"join flex items-center justify-end\" data-loading-states><a title=\"Create Envelope\" class=\"btn btn-sm join-item btn-success\" href=\"")
 			if err != nil {
 				return err
 			}
@@ -399,7 +399,7 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</a><button title=\"Delete All\" class=\"btn btn-sm btn-error join-item\" hx-delete=\"")
+			_, err = templBuffer.WriteString("</a><button title=\"Delete All Envelopes\" class=\"btn btn-sm btn-error join-item\" hx-delete=\"")
 			if err != nil {
 				return err
 			}

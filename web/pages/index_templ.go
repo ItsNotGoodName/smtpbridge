@@ -105,7 +105,7 @@ func indexView(m meta.Meta, props indexViewProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</h1><button class=\"btn btn-xs\" hx-post=\"")
+			_, err = templBuffer.WriteString("</h1><div class=\"flex items-center gap-2\"><button class=\"btn btn-xs\" hx-post=\"")
 			if err != nil {
 				return err
 			}
@@ -122,7 +122,7 @@ func indexView(m meta.Meta, props indexViewProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</span></button></div><div class=\"overflow-x-auto\"><table class=\"table\"><tbody>")
+			_, err = templBuffer.WriteString("</span></button></div></div><div class=\"overflow-x-auto\"><table class=\"table\"><tbody>")
 			if err != nil {
 				return err
 			}

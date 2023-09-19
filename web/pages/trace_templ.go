@@ -55,7 +55,7 @@ func traceListView(m meta.Meta, props traceListViewProps) templ.Component {
 			if err != nil {
 				return err
 			}
-			_, err = templBuffer.WriteString("</li></ul></div> <div class=\"flex flex-col gap-4 p-4\"><div class=\"join flex items-center justify-end\" data-loading-states><button title=\"Delete All\" class=\"btn btn-sm btn-error\" hx-delete=\"")
+			_, err = templBuffer.WriteString("</li></ul></div> <div class=\"flex flex-col gap-4 p-4\"><div class=\"join flex items-center justify-end\" data-loading-states><button title=\"Delete All Traces\" class=\"btn btn-sm btn-error\" hx-delete=\"")
 			if err != nil {
 				return err
 			}

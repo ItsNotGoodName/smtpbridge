@@ -1,0 +1,28 @@
+package components
+
+import "github.com/ItsNotGoodName/smtpbridge/web/icons"
+
+type HelpDialogProps struct {
+  ID string
+  Size string
+}
+
+func (h HelpDialogProps) ShowModal() templ.ComponentScript {
+  return templ.ComponentScript{Call: h.ID + ".showModal()"}
+}
+
+templ HelpDialog(props HelpDialogProps) {
+  <button onClick={ props.ShowModal() } class="hover:bg-base-200 rounded-full p-1">
+    @icons.QuestionMark(props.Size)
+  </button>
+  <dialog id={ props.ID } class="modal">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg">Help</h3>
+      { children... }
+    </div>
+    <form method="dialog" class="modal-backdrop" hx-disable>
+      <button>close</button>
+    </form>
+  </dialog>
+}
+
