@@ -22,6 +22,8 @@ func (s Scheduler) Serve(ctx context.Context) error {
 
 	<-ctx.Done()
 
+	s.StdScheduler.Wait(context.Background())
+
 	return nil
 }
 

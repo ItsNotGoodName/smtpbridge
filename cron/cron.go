@@ -28,6 +28,7 @@ func (RetentionPolicy) Description() string {
 func (r RetentionPolicy) Execute(ctx context.Context) {
 	err := r.app.RetentionPolicyRun(ctx, r.app.Tracer(trace.SourceCron))
 	if err != nil {
+		r.app.Tracer(trace.SourceCron).Trace(ctx, "cron.RetentionPolicy", trace.WithError(err))
 		log.Err(err).Msg("Failed to run app.RetentionPolicyRun")
 	}
 }
@@ -64,12 +65,14 @@ func (r AttachmentOrphan) Key() int {
 
 // Healthcheck
 type Healthcheck struct {
-	URL string
+	app core.App
+	url string
 }
 
-func NewHealthcheck(url string) Healthcheck {
+func NewHealthcheck(app core.App, url string) Healthcheck {
 	return Healthcheck{
-		URL: url,
+		app: app,
+		url: url,
 	}
 }
 
@@ -78,14 +81,16 @@ func (Healthcheck) Description() string {
 }
 
 func (r Healthcheck) Execute(ctx context.Context) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, r.URL, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, r.url, nil)
 	if err != nil {
+		r.app.Tracer(trace.SourceCron).Trace(ctx, "cron.Healthcheck", trace.WithError(err))
 		log.Err(err).Msg("Failed create HTTP request")
 		return
 	}
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
+		r.app.Tracer(trace.SourceCron).Trace(ctx, "cron.Healthcheck", trace.WithError(err))
 		log.Err(err).Msg("Failed send HTTP request")
 		return
 	}
@@ -114,6 +119,7 @@ func (DatabaseVacuum) Description() string {
 func (r DatabaseVacuum) Execute(ctx context.Context) {
 	err := r.app.DatabaseVacuum(ctx)
 	if err != nil {
+		r.app.Tracer(trace.SourceCron).Trace(ctx, "cron.DatabaseVacuum", trace.WithError(err))
 		log.Err(err).Msg("Failed to vacuum database")
 		return
 	}

@@ -134,7 +134,7 @@ func run(flags *flag.FlagSet) lieut.Executor {
 			}
 
 			if cfg.HealthcheckURL != "" {
-				job := cron.NewHealthcheck(cfg.HealthcheckURL)
+				job := cron.NewHealthcheck(app, cfg.HealthcheckURL)
 				trigger := quartz.NewSimpleTrigger(cfg.HealthcheckInterval)
 				if err := scheduler.ScheduleJob(ctx, job, trigger); err != nil {
 					return err
