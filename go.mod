@@ -6,6 +6,7 @@ require (
 	github.com/Rican7/lieut v0.1.1
 	github.com/a-h/templ v0.2.334
 	github.com/containrrr/shoutrrr v0.8.0
+	github.com/cyphar/filepath-securejoin v0.2.4
 	github.com/dustin/go-humanize v1.0.1
 	github.com/emersion/go-sasl v0.0.0-20220912192320-0145f2c60ead
 	github.com/emersion/go-smtp v0.18.1

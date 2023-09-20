@@ -2,11 +2,11 @@ package endpoint
 
 import (
 	"fmt"
-	"path"
 
 	"github.com/ItsNotGoodName/smtpbridge/internal/models"
 	"github.com/ItsNotGoodName/smtpbridge/internal/senders"
 	"github.com/containrrr/shoutrrr"
+	securejoin "github.com/cyphar/filepath-securejoin"
 )
 
 var Schema models.EndpointSchema = models.EndpointSchema{
@@ -100,7 +100,11 @@ func (s Factory) build(kind string, config models.EndpointConfig) (Sender, error
 	case "apprise":
 		return senders.NewApprise(s.pythonExecutable, s.appriseScriptPath, config.StrSlice("urls")), nil
 	case "script":
-		scriptPath := path.Join(s.scriptDirectory, config.Str("file"))
+		scriptPath, err := securejoin.SecureJoin(s.scriptDirectory, config.Str("file"))
+		if err != nil {
+			return nil, err
+		}
+
 		return senders.NewScript(scriptPath), nil
 	default:
 		return nil, errInvalidSenderKind
