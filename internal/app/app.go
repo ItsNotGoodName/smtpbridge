@@ -177,6 +177,9 @@ func (a App) EndpointTest(ctx context.Context, id int64) error {
 	env := envelope.New(envelope.NewMessage(models.DTOMessageCreate{
 		Subject: "Test Subject",
 		Text:    "Test Body",
+		From:    "from-test@example.com",
+		To:      []string{"to-test@example.com"},
+		Date:    time.Now(),
 	}), datt.Attachment)
 
 	return end.Send(ctx, a.webTestFileStore, env)

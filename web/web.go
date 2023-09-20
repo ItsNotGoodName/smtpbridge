@@ -30,18 +30,18 @@ func mustSubFS(currentFs fs.FS, fsRoot string) fs.FS {
 	return subFs
 }
 
-type Refresher struct {
+type ViteHotReload struct {
 }
 
-func NewRefresher() Refresher {
-	return Refresher{}
+func NewViteHotReload() ViteHotReload {
+	return ViteHotReload{}
 }
 
-func (r Refresher) String() string {
-	return "web.Refresher"
+func (r ViteHotReload) String() string {
+	return "web.ViteHotReloader"
 }
 
-func (r Refresher) Serve(ctx context.Context) error {
+func (r ViteHotReload) Serve(ctx context.Context) error {
 	reloadVite()
 	return suture.ErrDoNotRestart
 }

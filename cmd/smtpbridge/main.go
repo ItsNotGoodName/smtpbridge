@@ -101,6 +101,7 @@ func run(flags *flag.FlagSet) lieut.Executor {
 		webTestFileStore := app.NewWebTestFileStore("apple-touch-icon.png", fmt.Sprintf("http://127.0.0.1:%d", cfg.HTTPPort))
 		app, release := app.New(db, fileStore, bus, cfg.Config, cfg.EndpointFactory, webTestFileStore)
 		defer release()
+		app.Tracer("boot").Trace(ctx, "boot")
 
 		// Supervisor
 		super := suture.New("root", suture.Spec{
@@ -202,8 +203,8 @@ func run(flags *flag.FlagSet) lieut.Executor {
 
 		// Web
 		if web.DevMode {
-			web := web.NewRefresher()
-			super.Add(web)
+			viteHotReload := web.NewViteHotReload()
+			super.Add(viteHotReload)
 		}
 
 		return super.Serve(ctx)
