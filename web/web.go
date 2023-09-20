@@ -38,7 +38,7 @@ func NewViteHotReload() ViteHotReload {
 }
 
 func (r ViteHotReload) String() string {
-	return "web.ViteHotReloader"
+	return "web.ViteHotReload"
 }
 
 func (r ViteHotReload) Serve(ctx context.Context) error {
