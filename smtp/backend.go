@@ -3,7 +3,6 @@ package smtp
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io"
 	"net/mail"
 
@@ -65,7 +64,6 @@ func (s *session) AuthPlain(username, password string) error {
 	}
 
 	s.auth = true
-	fmt.Println("1.1", s.auth)
 
 	return nil
 }
@@ -75,8 +73,9 @@ func (s *session) Mail(from string, opts *smtp.MailOptions) error {
 	if !s.auth {
 		return smtp.ErrAuthRequired
 	}
-	// log.Println("Mail from:", from)
+
 	s.from = from
+
 	return nil
 }
 
@@ -85,8 +84,9 @@ func (s *session) Rcpt(to string, opts *smtp.RcptOptions) error {
 	if !s.auth {
 		return smtp.ErrAuthRequired
 	}
-	// log.Println("Rcpt to:", to)
+
 	s.to = to
+
 	return nil
 }
 
@@ -98,31 +98,22 @@ func (s *session) Data(r io.Reader) error {
 
 	e, err := enmime.ReadEnvelope(r)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to read envelope")
+		s.log.Error().Err(err).Msg("Failed to read envelope")
 		return err
 	}
 
-	//log.Println("SUBJECT:", e.GetHeader("Subject"))
-	//log.Println("TEXT:", e.Text)
-	//log.Println("HTML:", e.HTML)
-	//log.Println("ATTACHMENTS:", len(e.Attachments))
-	//for e := range e.Errors {
-	//	log.Println("ERROR:", e)
-	//}
-	//log.Println("FROM:", e.GetHeader("From"))
 	to := []string{s.to}
 	if addresses, err := e.AddressList("To"); err == nil {
 		for _, t := range addresses {
 			to = append(to, t.Address)
-			//log.Println("TO:", t.Address)
 		}
 	} else {
-		log.Warn().Err(err).Msg("Failed to get 'To' from address list")
+		s.log.Warn().Err(err).Msg("Failed to get 'To' from address list")
 	}
 
 	date, err := e.Date()
 	if err != nil && err != mail.ErrHeaderNotPresent {
-		log.Warn().Err(err).Str("data", e.GetHeader("Date")).Msg("Failed to parse date")
+		s.log.Warn().Err(err).Str("data", e.GetHeader("Date")).Msg("Failed to parse date")
 	}
 
 	datts := []models.DTOAttachmentCreate{}
@@ -145,11 +136,12 @@ func (s *session) Data(r io.Reader) error {
 	ctx := context.Background()
 	id, err := s.app.EnvelopeCreate(ctx, msg, datts)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to create envelope")
+		s.log.Error().Err(err).Msg("Failed to create envelope")
 		return err
 	}
 
 	s.tracer.Trace(ctx, trace.ActionEnvelopeCreated, trace.WithEnvelope(id))
+	s.log.Info().Int64("envelope-id", id).Msg("Envelope created")
 
 	return nil
 }
