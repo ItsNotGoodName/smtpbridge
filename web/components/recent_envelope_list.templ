@@ -24,7 +24,7 @@ templ RecentEnvelopeList(m meta.Meta, props RecentEnvelopeListProps) {
             <div class="w-40 font-bold">
               { helpers.TimeHumanize(env.Message.CreatedAt.Time()) }
             </div>
-            <div class="flex flex-1 items-center justify-between gap-2">
+            <div class="flex flex-1 items-center justify-between gap-2 truncate">
               <div class="truncate">{ env.Message.Subject }</div>
               if len(env.Attachments) != 0 {
                 <div class="tooltip tooltip-left flex items-center fill-current" data-tip={ strconv.Itoa(len(env.Attachments)) + " Attachment(s)"  }>
