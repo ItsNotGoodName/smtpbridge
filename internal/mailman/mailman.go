@@ -96,6 +96,11 @@ func (m Mailman) send(ctx context.Context, tracer trace.Tracer, env models.Envel
 	for _, r := range rules {
 		tracer := tracer.Sticky(trace.WithRule(r.Rule.ID))
 
+		if !r.Rule.Enable {
+			tracer.Trace(ctx, "mailman.rule.skip(disabled)")
+			continue
+		}
+
 		if len(r.Endpoints) == 0 {
 			tracer.Trace(ctx, "mailman.rule.endpoints.skip(empty)")
 			continue
