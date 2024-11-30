@@ -237,7 +237,7 @@ rules:
 
 See [`text/template`](https://pkg.go.dev/text/template) on how to template.
 
-Each `*_template` config variable has access to the [Envelope](./internal/models/envelope.go) model via the `.` operator.
+Each `*_template` has access to the [Envelope](./internal/models/envelope.go) model via the `.` operator.
 
 The following custom functions are available in endpoint templates.
 
@@ -247,8 +247,24 @@ The following custom functions are available in endpoint templates.
 
 ## Expressions
 
-Rule expressions are just [templates](#templates) without `{{ }}` and custom functions.
+Rule expressions are just [`text/template`](https://pkg.go.dev/text/template) without `{{ }}`.
+The [Envelope](./internal/models/envelope.go) model can be accessed via the `.` operator.
 They should always evaluate to a boolean expression.
+
+Example:
+
+```
+or
+  (eq .Message.Subject "cam-1")
+  (.Message.To.EQ "my-name@example.com")
+  (eq .Message.From "unleashed@example.com")
+```
+
+This expression will pass if one of the following is true.
+
+- The message's subject equals "cam-1"
+- The message is to "<my-name@example.com>"
+- The message is from "<unleashed@example.com>"
 
 # Docker
 
@@ -330,6 +346,7 @@ make dev-web
 
 # To Do
 
+- refactor: WAY TOO MANY TOOLS TO BUILD THE PROGRAM, REMOVE SOME
 - feat: read [mbox](https://access.redhat.com/articles/6167512) files
 - feat: IMAP for viewing mail
 - feat: OpenAPI
