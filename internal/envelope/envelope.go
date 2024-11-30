@@ -48,10 +48,7 @@ func NewMessage(r models.DTOMessageCreate) models.Message {
 
 func NewDataAttachment(name string, data io.Reader) (models.DataAttachment, error) {
 	rd := bufio.NewReaderSize(data, 512)
-	b, err := rd.Peek(512)
-	if err != nil {
-		return models.DataAttachment{}, err
-	}
+	b, _ := rd.Peek(512)
 
 	mimeT := http.DetectContentType(b)
 	extension := fileExtension(name, mimeT)
