@@ -51,19 +51,21 @@ templ envelopeView(m meta.Meta, props envelopeViewProps) {
 					</tr>
 					<tr>
 						<th class="w-0 whitespace-nowrap">Date</th>
-						<td>@c.FormatDate(m, props.Envelope.Message.Date.Time())
-</td>
+						<td>
+							@c.FormatDate(m, props.Envelope.Message.Date.Time())
+						</td>
 					</tr>
 					<tr>
 						<th class="w-0 whitespace-nowrap">Created At</th>
-						<td>@c.FormatDate(m, props.Envelope.Message.CreatedAt.Time())
-</td>
+						<td>
+							@c.FormatDate(m, props.Envelope.Message.CreatedAt.Time())
+						</td>
 					</tr>
 				</tbody>
 			</table>
 		</div>
 		<div class="flex flex-col gap-4 p-4" data-loading-states>
-			<form class="join" hx-post={ routes.EnvelopeEndpointSend(props.Envelope.Message.ID).URL() } hx-target="next div" hx-swap="outerHTML">
+			<form class="join" hx-post={ routes.EnvelopeEndpointSend(props.Envelope.Message.ID).URLString() } hx-target="next div" hx-swap="outerHTML">
 				<select name="endpoint" id="endpoint" class="select select-bordered select-sm join-item w-full">
 					<option disabled selected>Select Endpoint</option>
 					for _, end := range props.Endpoints {
@@ -130,15 +132,16 @@ templ envelopeListView(m meta.Meta, props envelopeListViewProps) {
 							</ul>
 						</div>
 						<input name="search" type="text" placeholder="Search" class="input input-sm input-bordered join-item w-full max-w-xs" value={ props.EnvelopeRequestRequest.Search }/>
-						<button title="Search Envelopes" type="submit" class="btn btn-sm btn-primary join-item">@icons.Search("w-5 h-5")
-</button>
+						<button title="Search Envelopes" type="submit" class="btn btn-sm btn-primary join-item">
+							@icons.Search("w-5 h-5")
+						</button>
 					</div>
 				</form>
 				<div class="join flex items-center justify-end" data-loading-states>
 					<a title="Create Envelope" class="btn btn-sm join-item btn-success" href={ routes.EnvelopeCreate().URL() } data-loading-states>
 						@icons.Add("w-5 h-5")
 					</a>
-					<button title="Delete All Envelopes" class="btn btn-sm btn-error join-item" hx-delete={ routes.EnvelopeList().URL() } hx-confirm="Are you sure you wish to delete all envelopes?" data-loading-disable>
+					<button title="Delete All Envelopes" class="btn btn-sm btn-error join-item" hx-delete={ routes.EnvelopeList().URLString() } hx-confirm="Are you sure you wish to delete all envelopes?" data-loading-disable>
 						<span data-loading-class="loading loading-spinner loading-sm">
 							@icons.Trash("w-5 h-5")
 						</span>
@@ -220,7 +223,7 @@ templ envelopeListView(m meta.Meta, props envelopeListViewProps) {
 											@icons.Attachment("h-4 w-4")
 										</a>
 									}
-									<button title="Delete" class="btn btn-error btn-xs join-item" hx-delete={ routes.Envelope(env.Message.ID).URL() } hx-target="closest tr" hx-confirm="Are you sure you wish to delete this envelope?">
+									<button title="Delete" class="btn btn-error btn-xs join-item" hx-delete={ routes.Envelope(env.Message.ID).URLString() } hx-target="closest tr" hx-confirm="Are you sure you wish to delete this envelope?">
 										@icons.Trash("h-4 w-4")
 									</button>
 								</div>

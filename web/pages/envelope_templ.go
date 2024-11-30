@@ -5,6 +5,9 @@ package pages
 
 //lint:file-ignore SA4006 This context is only used if a nested component is present.
 
+import "github.com/a-h/templ"
+import templruntime "github.com/a-h/templ/runtime"
+
 import (
 	"net/url"
 	"strconv"
@@ -12,9 +15,6 @@ import (
 	"time"
 
 	"github.com/ItsNotGoodName/smtpbridge/internal/models"
-	"github.com/a-h/templ"
-	templruntime "github.com/a-h/templ/runtime"
-
 	c "github.com/ItsNotGoodName/smtpbridge/web/components"
 	"github.com/ItsNotGoodName/smtpbridge/web/helpers"
 	"github.com/ItsNotGoodName/smtpbridge/web/icons"
@@ -155,7 +155,7 @@ func envelopeView(m meta.Meta, props envelopeViewProps) templ.Component {
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(routes.EnvelopeEndpointSend(props.Envelope.Message.ID).URLString())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/envelope.templ`, Line: 66, Col: 92}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/envelope.templ`, Line: 68, Col: 98}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
@@ -173,7 +173,7 @@ func envelopeView(m meta.Meta, props envelopeViewProps) templ.Component {
 				var templ_7745c5c3_Var9 string
 				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatInt(end.ID, 10))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/envelope.templ`, Line: 70, Col: 51}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/envelope.templ`, Line: 72, Col: 51}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 				if templ_7745c5c3_Err != nil {
@@ -186,7 +186,7 @@ func envelopeView(m meta.Meta, props envelopeViewProps) templ.Component {
 				var templ_7745c5c3_Var10 string
 				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(end.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/envelope.templ`, Line: 70, Col: 64}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/envelope.templ`, Line: 72, Col: 64}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 				if templ_7745c5c3_Err != nil {
@@ -276,7 +276,7 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 					var templ_7745c5c3_Var14 string
 					templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(k)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/envelope.templ`, Line: 103, Col: 36}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/envelope.templ`, Line: 105, Col: 36}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 					if templ_7745c5c3_Err != nil {
@@ -289,7 +289,7 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 					var templ_7745c5c3_Var15 string
 					templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(props.Query.Get(k))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/envelope.templ`, Line: 103, Col: 65}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/envelope.templ`, Line: 105, Col: 65}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 					if templ_7745c5c3_Err != nil {
@@ -336,7 +336,7 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 			var templ_7745c5c3_Var16 string
 			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(props.EnvelopeRequestRequest.Search)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/envelope.templ`, Line: 132, Col: 167}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/envelope.templ`, Line: 134, Col: 167}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 			if templ_7745c5c3_Err != nil {
@@ -372,9 +372,9 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var18 string
-			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(routes.EnvelopeList().URL())
+			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(routes.EnvelopeList().URLString())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/envelope.templ`, Line: 141, Col: 120}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/envelope.templ`, Line: 144, Col: 126}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 			if templ_7745c5c3_Err != nil {
@@ -506,7 +506,7 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 				var templ_7745c5c3_Var22 string
 				templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatInt(env.Message.ID, 10))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/envelope.templ`, Line: 197, Col: 47}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/envelope.templ`, Line: 200, Col: 47}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 				if templ_7745c5c3_Err != nil {
@@ -519,7 +519,7 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 				var templ_7745c5c3_Var23 string
 				templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(helpers.TimeHumanize(env.Message.CreatedAt.Time()))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/envelope.templ`, Line: 200, Col: 104}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/envelope.templ`, Line: 203, Col: 104}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 				if templ_7745c5c3_Err != nil {
@@ -558,7 +558,7 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 				var templ_7745c5c3_Var26 string
 				templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(env.Message.From)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/envelope.templ`, Line: 208, Col: 27}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/envelope.templ`, Line: 211, Col: 27}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 				if templ_7745c5c3_Err != nil {
@@ -580,7 +580,7 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 				var templ_7745c5c3_Var28 string
 				templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(env.Message.Subject)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/envelope.templ`, Line: 213, Col: 30}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/envelope.templ`, Line: 216, Col: 30}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 				if templ_7745c5c3_Err != nil {
@@ -607,7 +607,7 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 					var templ_7745c5c3_Var30 string
 					templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(len(env.Attachments)) + " Attachment(s)")
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/envelope.templ`, Line: 219, Col: 256}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/envelope.templ`, Line: 222, Col: 256}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 					if templ_7745c5c3_Err != nil {
@@ -631,9 +631,9 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var31 string
-				templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(routes.Envelope(env.Message.ID).URL())
+				templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(routes.Envelope(env.Message.ID).URLString())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/envelope.templ`, Line: 223, Col: 120}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/envelope.templ`, Line: 226, Col: 126}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 				if templ_7745c5c3_Err != nil {
@@ -676,7 +676,8 @@ func envelopeListView(m meta.Meta, props envelopeListViewProps) templ.Component 
 	})
 }
 
-type envelopeCreateViewProps struct{}
+type envelopeCreateViewProps struct {
+}
 
 func envelopeCreateView(m meta.Meta, props envelopeCreateViewProps) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
