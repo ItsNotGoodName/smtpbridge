@@ -1,36 +1,34 @@
 package components
 
-import (
-  "github.com/ItsNotGoodName/smtpbridge/web/routes"
-)
+import "github.com/ItsNotGoodName/smtpbridge/web/routes"
 
 type LoginFormProps struct {
-  Flash templ.Component
-  Username string
-  Password string
+	Flash    templ.Component
+	Username string
+	Password string
 }
 
 templ LoginForm(props LoginFormProps) {
-  <form class="flex flex-col gap-4" hx-post={ routes.Login().URLString() } data-loading-states>
-    <div class="form-control">
-      <label class="label">
-        <span class="label-text">Username</span>
-      </label>
-      <input name="username" type="text" placeholder="Username" autocomplete="username" class="input input-bordered" value={ props.Username } />
-    </div>
-    <div class="form-control">
-      <label class="label">
-        <span class="label-text">Password</span>
-      </label>
-      <input name="password" type="password" placeholder="Password" autocomplete="current-password" class="input input-bordered" value={ props.Password } />
-    </div>
-    <button type="submit" class="btn btn-primary" data-loading-disable>
-      <span data-loading-class="loading loading-spinner loading-sm">
-        Login
-      </span>
-    </button>
-    if props.Flash != nil {
-      {! props.Flash }
-    }
-  </form>
+	<form class="flex flex-col gap-4" hx-post={ routes.Login().URLString() } data-loading-states>
+		<div class="form-control">
+			<label class="label">
+				<span class="label-text">Username</span>
+			</label>
+			<input name="username" type="text" placeholder="Username" autocomplete="username" class="input input-bordered" value={ props.Username }/>
+		</div>
+		<div class="form-control">
+			<label class="label">
+				<span class="label-text">Password</span>
+			</label>
+			<input name="password" type="password" placeholder="Password" autocomplete="current-password" class="input input-bordered" value={ props.Password }/>
+		</div>
+		<button type="submit" class="btn btn-primary" data-loading-disable>
+			<span data-loading-class="loading loading-spinner loading-sm">
+				Login
+			</span>
+		</button>
+		if props.Flash != nil {
+			@props.Flash
+		}
+	</form>
 }

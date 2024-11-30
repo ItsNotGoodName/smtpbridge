@@ -1,62 +1,61 @@
 package components
 
 import (
-  "github.com/ItsNotGoodName/smtpbridge/web/routes"
-  "github.com/ItsNotGoodName/smtpbridge/web/icons"
-  "github.com/ItsNotGoodName/smtpbridge/web/meta"
+	"github.com/ItsNotGoodName/smtpbridge/web/icons"
+	"github.com/ItsNotGoodName/smtpbridge/web/meta"
+	"github.com/ItsNotGoodName/smtpbridge/web/routes"
 )
 
 templ LayoutDefault(m meta.Meta) {
-  <div class="drawer lg:drawer-open">
-    <input id="my-drawer-2" type="checkbox" class="drawer-toggle"/>
-    <div class="drawer-content overflow-x-auto">
-      @Header(m)
-      <div class="min-h-screen">
-        { children... }
-      </div>
-      @Footer()
-    </div>
-    <div class="drawer-side z-20">
-      <label for="my-drawer-2" class="drawer-overlay"></label>
-      <ul class="menu bg-base-200 text-base-content h-full w-60 p-4">
-        <li>
-          <a class={ templ.KV("active", m.Route.ChildOf(routes.Index())) } href={ routes.Index().URL() }>
-            @icons.Home("h-4 w-4")
-            Home
-          </a>
-        </li>
-        <li>
-          <a class={ templ.KV("active", m.Route.ChildOf(routes.EnvelopeList())) } href={ routes.EnvelopeList().URL() }>
-            @icons.Mail("h-4 w-4")
-            Envelopes
-          </a>
-        </li>
-        <li>
-          <a class={ templ.KV("active", m.Route.ChildOf(routes.AttachmentList())) } href={ routes.AttachmentList().URL() }>
-            @icons.Attachment("h-4 w-4")
-            Attachments
-          </a>
-        </li>
-        <li>
-          <a class={ templ.KV("active", m.Route.ChildOf(routes.EndpointList())) } href={ routes.EndpointList().URL() }>
-            @icons.SendPlane("h-4 w-4")
-            Endpoints
-          </a>
-        </li>
-        <li>
-          <a class={ templ.KV("active", m.Route.ChildOf(routes.RuleList())) } href={ routes.RuleList().URL() }>
-            @icons.Ruler("h-4 w-4")
-            Rules
-          </a>
-        </li>
-        <li>
-          <a class={ templ.KV("active", m.Route.ChildOf(routes.TraceList())) } href={ routes.TraceList().URL() }>
-            @icons.Sketching("h-4 w-4")
-            Traces
-          </a>
-        </li>
-      </ul>
-    </div>
-  </div>
+	<div class="drawer lg:drawer-open">
+		<input id="my-drawer-2" type="checkbox" class="drawer-toggle"/>
+		<div class="drawer-content overflow-x-auto">
+			@Header(m)
+			<div class="min-h-screen">
+				{ children... }
+			</div>
+			@Footer()
+		</div>
+		<div class="drawer-side z-20">
+			<label for="my-drawer-2" class="drawer-overlay"></label>
+			<ul class="menu bg-base-200 text-base-content h-full w-60 p-4">
+				<li>
+					<a class={ templ.KV("active", m.Route.ChildOf(routes.Index())) } href={ routes.Index().URL() }>
+						@icons.Home("h-4 w-4")
+						Home
+					</a>
+				</li>
+				<li>
+					<a class={ templ.KV("active", m.Route.ChildOf(routes.EnvelopeList())) } href={ routes.EnvelopeList().URL() }>
+						@icons.Mail("h-4 w-4")
+						Envelopes
+					</a>
+				</li>
+				<li>
+					<a class={ templ.KV("active", m.Route.ChildOf(routes.AttachmentList())) } href={ routes.AttachmentList().URL() }>
+						@icons.Attachment("h-4 w-4")
+						Attachments
+					</a>
+				</li>
+				<li>
+					<a class={ templ.KV("active", m.Route.ChildOf(routes.EndpointList())) } href={ routes.EndpointList().URL() }>
+						@icons.SendPlane("h-4 w-4")
+						Endpoints
+					</a>
+				</li>
+				<li>
+					<a class={ templ.KV("active", m.Route.ChildOf(routes.RuleList())) } href={ routes.RuleList().URL() }>
+						@icons.Ruler("h-4 w-4")
+						Rules
+					</a>
+				</li>
+				<li>
+					<a class={ templ.KV("active", m.Route.ChildOf(routes.TraceList())) } href={ routes.TraceList().URL() }>
+						@icons.Sketching("h-4 w-4")
+						Traces
+					</a>
+				</li>
+			</ul>
+		</div>
+	</div>
 }
-

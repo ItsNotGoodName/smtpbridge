@@ -1,15 +1,12 @@
 package components
 
-import (
-  "github.com/ItsNotGoodName/smtpbridge/internal/build"
-)
+import "github.com/ItsNotGoodName/smtpbridge/internal/build"
 
 templ Footer() {
-  <footer class="footer bg-base-100 text-base-content border-t-base-200 border-t p-10">
-    <div>
-      <a href={ templ.URL(build.Current.RepoURL) } class="link link-hover">Source code</a> 
-      <a href={ templ.URL(build.Current.LicenseURL()) } class="link link-hover">License</a> 
-    </div> 
-  </footer>
+	<footer class="footer bg-base-100 text-base-content border-t-base-200 border-t p-10">
+		<div>
+			<a href={ templ.URL(build.Current.RepoURL) } class="link link-hover">Source code</a>
+			<a href={ templ.URL(build.Current.LicenseURL()) } class="link link-hover">License</a>
+		</div>
+	</footer>
 }
-

@@ -1,167 +1,165 @@
 package components
 
 import (
-  "strconv"
-
-  "github.com/ItsNotGoodName/smtpbridge/web/routes"
+	"github.com/ItsNotGoodName/smtpbridge/internal/models"
 	"github.com/ItsNotGoodName/smtpbridge/web/helpers"
 	"github.com/ItsNotGoodName/smtpbridge/web/icons"
-	"github.com/ItsNotGoodName/smtpbridge/internal/models"
+	"github.com/ItsNotGoodName/smtpbridge/web/routes"
+	"strconv"
 )
 
-
 type EndpointFormProps struct {
-  Flash templ.Component
-  Create bool
-  Data EndpointFormData 
+	Flash  templ.Component
+	Create bool
+	Data   EndpointFormData
 }
 
 type EndpointFormData struct {
 	ID                      int64
 	Internal                bool
 	Name                    string
-  NameError               string
+	NameError               string
 	AttachmentDisable       bool
 	TextDisable             bool
 	TitleTemplate           string
-  TitleTemplateError      string
+	TitleTemplateError      string
 	BodyTemplate            string
-  BodyTemplateError       string
+	BodyTemplateError       string
 	Kind                    string
-  KindError               string
+	KindError               string
 	EndpointFormConfigProps EndpointFormConfigProps
 }
 
 templ EndpointForm(props EndpointFormProps) {
-  <form hx-post={ props.Route().URLString() } class="flex flex-col gap-4" data-loading-states>
-    if props.Data.Internal {
-      <div class="alert alert-warning">
-        @icons.Alert("h-6 w-6")
-        <span>Endpoint cannot be edited because it is internal.</span>
-      </div>
-    }
-    <div class="form-control">
-      <label class="label">
-        <span class="label-text">Name</span>
-      </label>
-      <input disabled?={ props.Data.Internal } name="Name" type="text" placeholder="Name" class="input input-bordered" value={ props.Data.Name } />
-      if props.Data.NameError != "" {
-        <label class="label">
-          <span class="label-text-alt text-error">{ props.Data.NameError }</span>
-        </label>
-      }
-    </div>
-    <div class="flex items-center justify-between">
-      <div>Text Disable</div>
-      <div>
-        <input disabled?={ props.Data.Internal } name="TextDisable" type="checkbox" class="toggle" checked?={ props.Data.TextDisable } disabled?={ props.Data.Internal } />
-      </div>
-    </div>
-    <div class="flex items-center justify-between">
-      <div>Attachment Disable</div>
-      <div>
-        <input disabled?={ props.Data.Internal } name="AttachmentDisable" type="checkbox" class="toggle" checked?={ props.Data.AttachmentDisable } disabled?={ props.Data.Internal } />
-      </div>
-    </div>
-    <div class="form-control">
-      <label class="label">
-        <span class="label-text">Title Template</span>
-      </label>
-      <textarea disabled?={ props.Data.Internal } name="TitleTemplate" placeholder="Title Template" class="textarea textarea-bordered h-24">
-        { props.Data.TitleTemplate }
-      </textarea>
-      if props.Data.TitleTemplateError != "" {
-        <label class="label">
-          <span class="label-text-alt text-error">{ props.Data.TitleTemplateError }</span>
-        </label>
-      }
-    </div>
-    <div class="form-control">
-      <label class="label">
-        <span class="label-text">Body Template</span>
-      </label>
-      <textarea disabled?={ props.Data.Internal } name="BodyTemplate" placeholder="Body Template" class="textarea textarea-bordered h-24">
-        { props.Data.BodyTemplate }
-      </textarea>
-      if props.Data.BodyTemplateError != "" {
-        <label class="label">
-          <span class="label-text-alt text-error">{ props.Data.BodyTemplateError }</span>
-        </label>
-      }
-    </div>
-    <div class="form-control" data-loading-states>
-      <label class="label">
-        <span class="label-text">Kind</span>
-        <span class="label-text-alt">
-          <span data-loading-class="loading loading-spinner loading-xs" data-loading-path={ routes.EndpointFormConfigComponent().URLString() }></span>
-        </span>
-      </label>
-      <select disabled?={ props.Data.Internal } name="Kind" class="select select-bordered" hx-get={ routes.EndpointFormConfigComponent().URLString() } hx-target="#endpoint-config">
-        <option disabled selected?={ props.Data.Kind == "" }>Select Kind</option>
-        for _, s := range helpers.EndpointSchema() {
-          <option value={ s.Kind } selected?={ props.Data.Kind == s.Kind }>{ s.Name }</option>
-        }
-      </select>
-      if props.Data.KindError != "" {
-        <label class="label">
-          <span class="label-text-alt text-error">{ props.Data.KindError }</span>
-        </label>
-      }
-    </div>
-    @EndpointFormConfig(props.Data.EndpointFormConfigProps)
-    <button disabled?={ props.Data.Internal } type="submit" class="btn btn-primary btn-block" data-loading-disable>
-      <span data-loading-class="loading loading-spinner loading-xs">
-        if props.Create {
-          Create Endpoint
-        } else {
-          Update Endpoint
-        }
-      </span>
-    </button>
-    if props.Flash != nil {
-      {! props.Flash }
-    }
-  </form>
+	<form hx-post={ props.Route().URLString() } class="flex flex-col gap-4" data-loading-states>
+		if props.Data.Internal {
+			<div class="alert alert-warning">
+				@icons.Alert("h-6 w-6")
+				<span>Endpoint cannot be edited because it is internal.</span>
+			</div>
+		}
+		<div class="form-control">
+			<label class="label">
+				<span class="label-text">Name</span>
+			</label>
+			<input disabled?={ props.Data.Internal } name="Name" type="text" placeholder="Name" class="input input-bordered" value={ props.Data.Name }/>
+			if props.Data.NameError != "" {
+				<label class="label">
+					<span class="label-text-alt text-error">{ props.Data.NameError }</span>
+				</label>
+			}
+		</div>
+		<div class="flex items-center justify-between">
+			<div>Text Disable</div>
+			<div>
+				<input disabled?={ props.Data.Internal } name="TextDisable" type="checkbox" class="toggle" checked?={ props.Data.TextDisable } disabled?={ props.Data.Internal }/>
+			</div>
+		</div>
+		<div class="flex items-center justify-between">
+			<div>Attachment Disable</div>
+			<div>
+				<input disabled?={ props.Data.Internal } name="AttachmentDisable" type="checkbox" class="toggle" checked?={ props.Data.AttachmentDisable } disabled?={ props.Data.Internal }/>
+			</div>
+		</div>
+		<div class="form-control">
+			<label class="label">
+				<span class="label-text">Title Template</span>
+			</label>
+			<textarea disabled?={ props.Data.Internal } name="TitleTemplate" placeholder="Title Template" class="textarea textarea-bordered h-24">
+				{ props.Data.TitleTemplate }
+			</textarea>
+			if props.Data.TitleTemplateError != "" {
+				<label class="label">
+					<span class="label-text-alt text-error">{ props.Data.TitleTemplateError }</span>
+				</label>
+			}
+		</div>
+		<div class="form-control">
+			<label class="label">
+				<span class="label-text">Body Template</span>
+			</label>
+			<textarea disabled?={ props.Data.Internal } name="BodyTemplate" placeholder="Body Template" class="textarea textarea-bordered h-24">
+				{ props.Data.BodyTemplate }
+			</textarea>
+			if props.Data.BodyTemplateError != "" {
+				<label class="label">
+					<span class="label-text-alt text-error">{ props.Data.BodyTemplateError }</span>
+				</label>
+			}
+		</div>
+		<div class="form-control" data-loading-states>
+			<label class="label">
+				<span class="label-text">Kind</span>
+				<span class="label-text-alt">
+					<span data-loading-class="loading loading-spinner loading-xs" data-loading-path={ routes.EndpointFormConfigComponent().URLString() }></span>
+				</span>
+			</label>
+			<select disabled?={ props.Data.Internal } name="Kind" class="select select-bordered" hx-get={ routes.EndpointFormConfigComponent().URLString() } hx-target="#endpoint-config">
+				<option disabled selected?={ props.Data.Kind == "" }>Select Kind</option>
+				for _, s := range helpers.EndpointSchema() {
+					<option value={ s.Kind } selected?={ props.Data.Kind == s.Kind }>{ s.Name }</option>
+				}
+			</select>
+			if props.Data.KindError != "" {
+				<label class="label">
+					<span class="label-text-alt text-error">{ props.Data.KindError }</span>
+				</label>
+			}
+		</div>
+		@EndpointFormConfig(props.Data.EndpointFormConfigProps)
+		<button disabled?={ props.Data.Internal } type="submit" class="btn btn-primary btn-block" data-loading-disable>
+			<span data-loading-class="loading loading-spinner loading-xs">
+				if props.Create {
+					Create Endpoint
+				} else {
+					Update Endpoint
+				}
+			</span>
+		</button>
+		if props.Flash != nil {
+			@props.Flash
+		}
+	</form>
 }
 
 type EndpointFormConfigProps struct {
-  Internal bool
-  Fields []EndpointFormConfigField
-  Error  string
+	Internal bool
+	Fields   []EndpointFormConfigField
+	Error    string
 }
 
 type EndpointFormConfigField struct {
-  models.EndpointSchemaField
-  Value       string
+	models.EndpointSchemaField
+	Value string
 }
 
 templ EndpointFormConfig(props EndpointFormConfigProps) {
-  <fieldset id="endpoint-config">
-    if len(props.Fields) > 0 {
-      <legend>Config</legend>
-      if props.Error != "" {
-        <p class="text-error">{props.Error}</p>
-      }
-      for i, f := range props.Fields {
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text">{ f.Name }</span>
-          </label>
-          <input type="hidden" name={ "Config." + strconv.Itoa(i) + ".Key"  } value={ f.Key } /> 
-          if f.Multiline{
-            <textarea disabled?={ props.Internal } name={ "Config." + strconv.Itoa(i) + ".Value" } placeholder={ f.Example } class="textarea textarea-bordered h-24">
-              { f.Value }
-            </textarea>
-          } else {
-            <input disabled?={ props.Internal } name={ "Config." + strconv.Itoa(i) + ".Value" } placeholder={ f.Example } type="text" class="input input-bordered" value={ f.Value } />
-          }
-          if f.Description != "" {
-            <label class="label">
-              <span class="label-text-alt">{ f.Description }</span>
-            </label>
-          }
-        </div>
-      }
-    }
-  </fieldset>
+	<fieldset id="endpoint-config">
+		if len(props.Fields) > 0 {
+			<legend>Config</legend>
+			if props.Error != "" {
+				<p class="text-error">{ props.Error }</p>
+			}
+			for i, f := range props.Fields {
+				<div class="form-control">
+					<label class="label">
+						<span class="label-text">{ f.Name }</span>
+					</label>
+					<input type="hidden" name={ "Config." + strconv.Itoa(i) + ".Key" } value={ f.Key }/>
+					if f.Multiline {
+						<textarea disabled?={ props.Internal } name={ "Config." + strconv.Itoa(i) + ".Value" } placeholder={ f.Example } class="textarea textarea-bordered h-24">
+							{ f.Value }
+						</textarea>
+					} else {
+						<input disabled?={ props.Internal } name={ "Config." + strconv.Itoa(i) + ".Value" } placeholder={ f.Example } type="text" class="input input-bordered" value={ f.Value }/>
+					}
+					if f.Description != "" {
+						<label class="label">
+							<span class="label-text-alt">{ f.Description }</span>
+						</label>
+					}
+				</div>
+			}
+		}
+	</fieldset>
 }

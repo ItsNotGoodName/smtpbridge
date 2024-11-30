@@ -9,6 +9,7 @@ import (
 	"github.com/ItsNotGoodName/smtpbridge/internal/core"
 	"github.com/ItsNotGoodName/smtpbridge/internal/models"
 	"github.com/ItsNotGoodName/smtpbridge/internal/trace"
+	"github.com/emersion/go-sasl"
 	"github.com/emersion/go-smtp"
 	"github.com/jhillyerd/enmime"
 	"github.com/rs/zerolog"
@@ -153,4 +154,16 @@ func (s *session) Reset() {
 func (s *session) Logout() error {
 	// s.log.Debug().Msg("Logout")
 	return nil
+}
+
+func (s *session) AuthMechanisms() []string {
+	return []string{
+		sasl.Login,
+	}
+}
+
+func (s *session) Auth(mech string) (sasl.Server, error) {
+	return sasl.NewLoginServer(func(username, password string) error {
+		return s.AuthPlain(username, password)
+	}), nil
 }
