@@ -1,91 +1,90 @@
 package pages
 
 import (
-  "strconv"
-
-  c "github.com/ItsNotGoodName/smtpbridge/web/components"
-  "github.com/ItsNotGoodName/smtpbridge/web/meta"
-  "github.com/ItsNotGoodName/smtpbridge/web/icons"
-  "github.com/ItsNotGoodName/smtpbridge/web/routes"
-  "github.com/ItsNotGoodName/smtpbridge/internal/models"
+	"github.com/ItsNotGoodName/smtpbridge/internal/models"
+	c "github.com/ItsNotGoodName/smtpbridge/web/components"
+	"github.com/ItsNotGoodName/smtpbridge/web/icons"
+	"github.com/ItsNotGoodName/smtpbridge/web/meta"
+	"github.com/ItsNotGoodName/smtpbridge/web/routes"
+	"strconv"
 )
 
 type ruleListViewProps struct {
-  Rules []models.Rule
+	Rules []models.Rule
 }
 
 templ ruleListView(m meta.Meta, props ruleListViewProps) {
 	@c.LayoutDefault(m) {
-    <div class="border-base-200 breadcrumbs border-b p-4 text-xl font-bold">
-      <ul>
-        <li>Rules</li>
-      </ul>
-    </div>
-    <div class="flex flex-col gap-4 p-4">
-      <div class="join flex items-center justify-end">
-        <a title="Create Rule" class="btn btn-sm btn-success" href={ routes.RuleCreate().URL() }>
-          @icons.Add("w-5 h-5")
-        </a>
-      </div>
-    </div>
-    <div class="mx-auto flex flex-col">
-      for _, rule := range props.Rules {
-        <div class="hover:bg-base-200 border-base-200 flex items-center justify-between gap-2 border-b first:border-t" id="rule-row">
-          <a class="flex-1 truncate py-4 pl-4" href={ routes.Rule(rule.ID).URL() }>{ rule.Name }</a>
-          <div class="flex items-center gap-2 pr-4">
-            if !rule.Internal {
-              <div data-loading-states>
-                <button title="Delete" class="btn btn-error btn-sm" hx-delete={ routes.Rule(rule.ID).URLString() } hx-confirm="Are you sure you wish to delete this rule?"  hx-target="closest #rule-row" hx-swap="outerHTML" data-loading-disable>
-                  <span data-loading-class="loading loading-spinner loading-xs">
-                    @icons.Trash("h-4 w-4")
-                  </span>
-                </button>
-              </div>
-            }
-            <div>
-              @c.RuleToggleButton(c.RuleToggleButtonProps{Enable: rule.Enable, ID: rule.ID})
-            </div>
-          </div>
-        </div>
-      }
-    </div>
+		<div class="border-base-200 breadcrumbs border-b p-4 text-xl font-bold">
+			<ul>
+				<li>Rules</li>
+			</ul>
+		</div>
+		<div class="flex flex-col gap-4 p-4">
+			<div class="join flex items-center justify-end">
+				<a title="Create Rule" class="btn btn-sm btn-success" href={ routes.RuleCreate().URL() }>
+					@icons.Add("w-5 h-5")
+				</a>
+			</div>
+		</div>
+		<div class="mx-auto flex flex-col">
+			for _, rule := range props.Rules {
+				<div class="hover:bg-base-200 border-base-200 flex items-center justify-between gap-2 border-b first:border-t" id="rule-row">
+					<a class="flex-1 truncate py-4 pl-4" href={ routes.Rule(rule.ID).URL() }>{ rule.Name }</a>
+					<div class="flex items-center gap-2 pr-4">
+						if !rule.Internal {
+							<div data-loading-states>
+								<button title="Delete" class="btn btn-error btn-sm" hx-delete={ routes.Rule(rule.ID).URLString() } hx-confirm="Are you sure you wish to delete this rule?" hx-target="closest #rule-row" hx-swap="outerHTML" data-loading-disable>
+									<span data-loading-class="loading loading-spinner loading-xs">
+										@icons.Trash("h-4 w-4")
+									</span>
+								</button>
+							</div>
+						}
+						<div>
+							@c.RuleToggleButton(c.RuleToggleButtonProps{Enable: rule.Enable, ID: rule.ID})
+						</div>
+					</div>
+				</div>
+			}
+		</div>
 	}
 }
 
 type ruleViewProps struct {
-  Rule models.Rule
-  RuleFormProps c.RuleFormProps
+	Rule          models.Rule
+	RuleFormProps c.RuleFormProps
 }
 
 templ ruleView(m meta.Meta, props ruleViewProps) {
 	@c.LayoutDefault(m) {
-    <div class="border-base-200 breadcrumbs border-b p-4 text-xl font-bold">
-      <ul>
-        <li><a href={ routes.RuleList().URL() }>Rules</a></li>
-        <li>{ strconv.FormatInt(props.Rule.ID, 10) }</li>
-      </ul>
-    </div>
-    <div class="mx-auto flex max-w-lg flex-col gap-4 p-4">
-      @c.RuleForm(props.RuleFormProps)
-      @c.RuleToggleButton(c.RuleToggleButtonProps{ID: props.Rule.ID, Enable: props.Rule.Enable})
-    </div>
+		<div class="border-base-200 breadcrumbs border-b p-4 text-xl font-bold">
+			<ul>
+				<li><a href={ routes.RuleList().URL() }>Rules</a></li>
+				<li>{ strconv.FormatInt(props.Rule.ID, 10) }</li>
+			</ul>
+		</div>
+		<div class="mx-auto flex max-w-lg flex-col gap-4 p-4">
+			@c.RuleForm(props.RuleFormProps)
+			@c.RuleToggleButton(c.RuleToggleButtonProps{ID: props.Rule.ID, Enable: props.Rule.Enable})
+		</div>
 	}
 }
 
 type ruleCreateViewProps struct {
-  RuleFormProps c.RuleFormProps
+	RuleFormProps c.RuleFormProps
 }
 
 templ ruleCreateView(m meta.Meta, props ruleCreateViewProps) {
 	@c.LayoutDefault(m) {
-    <div class="border-base-200 breadcrumbs border-b p-4 text-xl font-bold">
-      <ul>
-        <li><a href={ routes.RuleList().URL() }>Rules</a></li>
-        <li>Create</li>
-      </ul>
-    </div>
-    <div class="mx-auto max-w-lg p-4">
-      @c.RuleForm(props.RuleFormProps)
-    </div>
+		<div class="border-base-200 breadcrumbs border-b p-4 text-xl font-bold">
+			<ul>
+				<li><a href={ routes.RuleList().URL() }>Rules</a></li>
+				<li>Create</li>
+			</ul>
+		</div>
+		<div class="mx-auto max-w-lg p-4">
+			@c.RuleForm(props.RuleFormProps)
+		</div>
 	}
 }

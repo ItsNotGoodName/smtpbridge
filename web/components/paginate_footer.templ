@@ -1,34 +1,33 @@
 package components
 
 import (
-  "strconv"
-  "net/url"
+	"net/url"
+	"strconv"
 
-  "github.com/ItsNotGoodName/smtpbridge/web/helpers"
-  "github.com/ItsNotGoodName/smtpbridge/pkg/pagination"
-  "github.com/ItsNotGoodName/smtpbridge/web/routes"
+	"github.com/ItsNotGoodName/smtpbridge/pkg/pagination"
+	"github.com/ItsNotGoodName/smtpbridge/web/helpers"
+	"github.com/ItsNotGoodName/smtpbridge/web/routes"
 )
 
 type PaginateFooterProps struct {
-  Route routes.Route
-  Query url.Values
-  PageResult pagination.PageResult
+	Route      routes.Route
+	Query      url.Values
+	PageResult pagination.PageResult
 }
 
 templ PaginateFooter(props PaginateFooterProps) {
-  <div class="flex flex-col items-center justify-between gap-4 p-4 sm:flex-row">
-    <div class="mr-auto whitespace-nowrap">{ strconv.Itoa(props.PageResult.Seen()) } of { strconv.Itoa(props.PageResult.TotalItems) }</div>
-    <div class="join ml-auto">
-      <a class="join-item btn btn-sm btn-outline" disabled?={ !props.PageResult.HasPrevious() } href={ props.Route.URLQuery((helpers.Query(props.Query, "page", props.PageResult.Previous()))) }>
-        Previous
-      </a>
-      <button class="join-item btn btn-sm btn-outline">
-        { strconv.Itoa(props.PageResult.Page) } / { strconv.Itoa(props.PageResult.TotalPages) }
-      </button>
-      <a class="join-item btn btn-sm btn-outline" disabled?={ !props.PageResult.HasNext() } href={ props.Route.URLQuery(helpers.Query(props.Query, "page", props.PageResult.Next())) }>
-        Next
-      </a>
-    </div>
-  </div>
+	<div class="flex flex-col items-center justify-between gap-4 p-4 sm:flex-row">
+		<div class="mr-auto whitespace-nowrap">{ strconv.Itoa(props.PageResult.Seen()) } of { strconv.Itoa(props.PageResult.TotalItems) }</div>
+		<div class="join ml-auto">
+			<a class="join-item btn btn-sm btn-outline" disabled?={ !props.PageResult.HasPrevious() } href={ props.Route.URLQuery((helpers.Query(props.Query, "page", props.PageResult.Previous()))) }>
+				Previous
+			</a>
+			<button class="join-item btn btn-sm btn-outline">
+				{ strconv.Itoa(props.PageResult.Page) } / { strconv.Itoa(props.PageResult.TotalPages) }
+			</button>
+			<a class="join-item btn btn-sm btn-outline" disabled?={ !props.PageResult.HasNext() } href={ props.Route.URLQuery(helpers.Query(props.Query, "page", props.PageResult.Next())) }>
+				Next
+			</a>
+		</div>
+	</div>
 }
-

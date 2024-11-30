@@ -1,31 +1,30 @@
 package components
 
 import (
-  "strconv"
-
-  "github.com/ItsNotGoodName/smtpbridge/web/helpers"
-  "github.com/ItsNotGoodName/smtpbridge/internal/models"
+	"github.com/ItsNotGoodName/smtpbridge/internal/models"
+	"github.com/ItsNotGoodName/smtpbridge/web/helpers"
+	"strconv"
 )
 
 type StorageStatsProps struct {
-  Storage models.Storage
+	Storage models.Storage
 }
 
-templ StorageStats(props StorageStatsProps ) {
-  <div class="stat border-base-200">
-    <div class="stat-title">Envelope Count</div>
-    <div class="stat-value">{ strconv.FormatInt(int64(props.Storage.EnvelopeCount), 10) }</div>
-  </div>
-  <div class="stat border-base-200">
-    <div class="stat-title">Attachment Count</div>
-    <div class="stat-value">{ strconv.FormatInt(int64(props.Storage.AttachmentCount), 10) }</div>
-  </div>
-  <div class="stat border-base-200">
-    <div class="stat-title">Attachment Size</div>
-    <div class="stat-value">{ helpers.BytesHumanize(props.Storage.AttachmentSize) }</div>
-  </div>
-  <div class="stat border-base-200">
-    <div class="stat-title">Database Size</div>
-    <div class="stat-value">{ helpers.BytesHumanize(props.Storage.DatabaseSize) }</div>
-  </div>
+templ StorageStats(props StorageStatsProps) {
+	<div class="stat border-base-200">
+		<div class="stat-title">Envelope Count</div>
+		<div class="stat-value">{ strconv.FormatInt(int64(props.Storage.EnvelopeCount), 10) }</div>
+	</div>
+	<div class="stat border-base-200">
+		<div class="stat-title">Attachment Count</div>
+		<div class="stat-value">{ strconv.FormatInt(int64(props.Storage.AttachmentCount), 10) }</div>
+	</div>
+	<div class="stat border-base-200">
+		<div class="stat-title">Attachment Size</div>
+		<div class="stat-value">{ helpers.BytesHumanize(props.Storage.AttachmentSize) }</div>
+	</div>
+	<div class="stat border-base-200">
+		<div class="stat-title">Database Size</div>
+		<div class="stat-value">{ helpers.BytesHumanize(props.Storage.DatabaseSize) }</div>
+	</div>
 }

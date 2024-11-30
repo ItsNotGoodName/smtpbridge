@@ -1,45 +1,45 @@
 package pages
 
 import (
-  "strconv"
-  "net/url"
+	"net/url"
+	"strconv"
 
-  c "github.com/ItsNotGoodName/smtpbridge/web/components"
-  "github.com/ItsNotGoodName/smtpbridge/web/routes"
-  "github.com/ItsNotGoodName/smtpbridge/web/icons"
-  "github.com/ItsNotGoodName/smtpbridge/internal/models"
-  "github.com/ItsNotGoodName/smtpbridge/internal/trace"
-  "github.com/ItsNotGoodName/smtpbridge/web/meta"
+	"github.com/ItsNotGoodName/smtpbridge/internal/models"
+	"github.com/ItsNotGoodName/smtpbridge/internal/trace"
+	c "github.com/ItsNotGoodName/smtpbridge/web/components"
+	"github.com/ItsNotGoodName/smtpbridge/web/icons"
+	"github.com/ItsNotGoodName/smtpbridge/web/meta"
+	"github.com/ItsNotGoodName/smtpbridge/web/routes"
 )
 
 type traceListViewProps struct {
-  TraceListRequest models.DTOTraceListRequest
-  TraceListResult models.DTOTraceListResult
-  Query url.Values
+	TraceListRequest models.DTOTraceListRequest
+	TraceListResult  models.DTOTraceListResult
+	Query            url.Values
 }
 
 templ traceListView(m meta.Meta, props traceListViewProps) {
 	@c.LayoutDefault(m) {
-    <div class="border-base-200 breadcrumbs border-b p-4 text-xl font-bold">
-      <ul>
-        <li>Traces</li>
-      </ul>
-    </div>
-    <div class="flex flex-col gap-4 p-4">
-      <div class="join flex items-center justify-end" data-loading-states>
-        <button title="Delete All Traces" class="btn btn-sm btn-error" hx-delete={ routes.TraceList().URLString() } hx-confirm="Are you sure you wish to delete all traces?" data-loading-disable>
-          <span data-loading-class="loading loading-spinner loading-sm">
-            @icons.Trash("w-5 h-5")
-          </span>
-        </button>
-      </div>
-      @c.PaginateHeader(c.PaginateHeaderProps{
-        Route: routes.TraceList(),
-        Query: props.Query,
-        PageResult: props.TraceListResult.PageResult,
-        Ascending: props.TraceListRequest.Ascending,
-      })
-    </div>
+		<div class="border-base-200 breadcrumbs border-b p-4 text-xl font-bold">
+			<ul>
+				<li>Traces</li>
+			</ul>
+		</div>
+		<div class="flex flex-col gap-4 p-4">
+			<div class="join flex items-center justify-end" data-loading-states>
+				<button title="Delete All Traces" class="btn btn-sm btn-error" hx-delete={ routes.TraceList().URLString() } hx-confirm="Are you sure you wish to delete all traces?" data-loading-disable>
+					<span data-loading-class="loading loading-spinner loading-sm">
+						@icons.Trash("w-5 h-5")
+					</span>
+				</button>
+			</div>
+			@c.PaginateHeader(c.PaginateHeaderProps{
+				Route:      routes.TraceList(),
+				Query:      props.Query,
+				PageResult: props.TraceListResult.PageResult,
+				Ascending:  props.TraceListRequest.Ascending,
+			})
+		</div>
 		<div class="flex flex-col gap-4 px-4">
 			for _, traces := range props.TraceListResult.Traces {
 				<div class={ "w-full", templ.KV("join join-vertical", len(traces) > 1) }>
@@ -51,18 +51,19 @@ templ traceListView(m meta.Meta, props traceListViewProps) {
 									<div class="flex flex-row items-center gap-2">
 										<div class="badge btn-outline">{ strconv.Itoa(t.Seq) }</div>
 										if t.Level == trace.LevelError {
-                      @icons.ErrorWarning("fill-error h-6 w-6")
+											@icons.ErrorWarning("fill-error h-6 w-6")
 										}
 									</div>
-									<span>@c.FormatDate(m, t.CreatedAt.Time())</span>
+									<span>@c.FormatDate(m, t.CreatedAt.Time())
+</span>
 								</div>
 								<div class="font-bold">{ string(t.Action) }</div>
 							</div>
 							<div class="collapse-content bg-base-200 rounded-none">
-                <div class="border-base-content flex flex-col rounded-none border-b p-1 sm:flex-row">
-                  <div class="flex-1 font-bold">source</div>
-                  <div class="flex-1 text-right">{ t.Source }</div>
-                </div>
+								<div class="border-base-content flex flex-col rounded-none border-b p-1 sm:flex-row">
+									<div class="flex-1 font-bold">source</div>
+									<div class="flex-1 text-right">{ t.Source }</div>
+								</div>
 								for _, kv := range t.Data {
 									<div class="border-base-content flex flex-col rounded-none border-b p-1 sm:flex-row">
 										<div class="flex-1 font-bold">{ kv.Key }</div>
@@ -88,11 +89,10 @@ templ traceListView(m meta.Meta, props traceListViewProps) {
 		</div>
 		if len(props.TraceListResult.Traces) != 0 {
 			@c.PaginateFooter(c.PaginateFooterProps{
-        Route: routes.TraceList(),
-        Query: props.Query,
-        PageResult: props.TraceListResult.PageResult,
-      })
+				Route:      routes.TraceList(),
+				Query:      props.Query,
+				PageResult: props.TraceListResult.PageResult,
+			})
 		}
 	}
 }
-

@@ -20,13 +20,11 @@ func (SMTP) String() string {
 func New(backend smtp.Backend, addr string, maxMessageBytes int64) SMTP {
 	server := smtp.NewServer(backend)
 
-	enableMechLogin(backend, server)
-
 	server.Addr = addr
 	server.Domain = "localhost"
 	server.ReadTimeout = 10 * time.Second
 	server.WriteTimeout = 10 * time.Second
-	server.MaxMessageBytes = maxMessageBytes
+	server.MaxMessageBytes = 25 * 1024 * 1024
 	server.MaxRecipients = 50
 	server.AllowInsecureAuth = true
 

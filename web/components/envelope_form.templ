@@ -1,52 +1,50 @@
 package components
 
-import (
-  "github.com/ItsNotGoodName/smtpbridge/web/routes"
-)
+import "github.com/ItsNotGoodName/smtpbridge/web/routes"
 
 type EnvelopeFormProps struct {
-  Flash   templ.Component
-  Subject string
-  From    string
-  To      string
-  Body    string
+	Flash   templ.Component
+	Subject string
+	From    string
+	To      string
+	Body    string
 }
 
 templ EnvelopeForm(props EnvelopeFormProps) {
-  <form class="flex flex-col gap-4" hx-post={ routes.EnvelopeCreate().URLString() } enctype="multipart/form-data">
-    <div class="form-control">
-      <label class="label">
-        <span class="label-text">Subject</span>
-      </label>
-      <input name="subject" type="text" placeholder="Subject" class="input input-bordered" value={ props.Subject } />
-    </div>
-    <div class="form-control">
-      <label class="label">
-        <span class="label-text">From</span>
-      </label>
-      <input name="from" type="text" placeholder="From" class="input input-bordered" value={ props.From } />
-    </div>
-    <div class="form-control">
-      <label class="label">
-        <span class="label-text">To</span>
-      </label>
-      <input name="to" type="text" placeholder="To" class="input input-bordered" value={ props.To } />
-    </div>
-    <div class="form-control">
-      <label class="label">
-        <span class="label-text">Body</span>
-      </label>
-      <textarea name="body" class="textarea textarea-bordered h-24" placeholder="Body">{ props.Body }</textarea>
-    </div>
-    <div class="form-control">
-      <label class="label">
-        <span class="label-text">Attachments</span>
-      </label>
-      <input name="attachments" type="file" class="file-input file-input-bordered" multiple />
-    </div>
-    <button type="submit" class="btn btn-primary btn-block">Create Envelope</button>
-    if props.Flash != nil {
-      {! props.Flash }
-    }
-  </form>
+	<form class="flex flex-col gap-4" hx-post={ routes.EnvelopeCreate().URLString() } enctype="multipart/form-data">
+		<div class="form-control">
+			<label class="label">
+				<span class="label-text">Subject</span>
+			</label>
+			<input name="subject" type="text" placeholder="Subject" class="input input-bordered" value={ props.Subject }/>
+		</div>
+		<div class="form-control">
+			<label class="label">
+				<span class="label-text">From</span>
+			</label>
+			<input name="from" type="text" placeholder="From" class="input input-bordered" value={ props.From }/>
+		</div>
+		<div class="form-control">
+			<label class="label">
+				<span class="label-text">To</span>
+			</label>
+			<input name="to" type="text" placeholder="To" class="input input-bordered" value={ props.To }/>
+		</div>
+		<div class="form-control">
+			<label class="label">
+				<span class="label-text">Body</span>
+			</label>
+			<textarea name="body" class="textarea textarea-bordered h-24" placeholder="Body">{ props.Body }</textarea>
+		</div>
+		<div class="form-control">
+			<label class="label">
+				<span class="label-text">Attachments</span>
+			</label>
+			<input name="attachments" type="file" class="file-input file-input-bordered" multiple/>
+		</div>
+		<button type="submit" class="btn btn-primary btn-block">Create Envelope</button>
+		if props.Flash != nil {
+			@props.Flash
+		}
+	</form>
 }

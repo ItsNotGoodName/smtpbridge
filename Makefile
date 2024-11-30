@@ -59,7 +59,7 @@ gen-templ:
 # Tooling
 
 tooling-air:
-	go install github.com/cosmtrek/air@latest
+	go install github.com/air-verse/air@latest
 
 tooling-jet:
 	go install github.com/go-jet/jet/v2/cmd/jet@latest

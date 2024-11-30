@@ -1,41 +1,39 @@
 package components
 
 import (
-  "strconv"
-
-  "github.com/ItsNotGoodName/smtpbridge/web/helpers"
-  "github.com/ItsNotGoodName/smtpbridge/web/routes"
-  "github.com/ItsNotGoodName/smtpbridge/internal/models"
-  "github.com/ItsNotGoodName/smtpbridge/web/meta"
-  "github.com/ItsNotGoodName/smtpbridge/web/icons"
+	"github.com/ItsNotGoodName/smtpbridge/internal/models"
+	"github.com/ItsNotGoodName/smtpbridge/web/helpers"
+	"github.com/ItsNotGoodName/smtpbridge/web/icons"
+	"github.com/ItsNotGoodName/smtpbridge/web/meta"
+	"github.com/ItsNotGoodName/smtpbridge/web/routes"
+	"strconv"
 )
 
 type RecentEnvelopeListProps struct {
-  Envelopes []models.Envelope
+	Envelopes []models.Envelope
 }
 
 templ RecentEnvelopeList(m meta.Meta, props RecentEnvelopeListProps) {
-  <div class="card card-compact border-base-200 border">
-    <div class="card-body">
-      <h2 class="card-title">Recent Envelopes</h2>
-      <div>
-        for _, env := range props.Envelopes {
-          <a href={ routes.Envelope(env.Message.ID).URL() } class="hover:bg-base-200 border-base-200 flex flex-col gap-2 border-b p-2 first:border-t sm:flex-row">
-            <div class="w-40 font-bold">
-              { helpers.TimeHumanize(env.Message.CreatedAt.Time()) }
-            </div>
-            <div class="flex flex-1 items-center justify-between gap-2 truncate">
-              <div class="truncate">{ env.Message.Subject }</div>
-              if len(env.Attachments) != 0 {
-                <div class="tooltip tooltip-left flex items-center fill-current" data-tip={ strconv.Itoa(len(env.Attachments)) + " Attachment(s)"  }>
-                  @icons.Attachment("h-4 w-4")
-                </div>
-              }
-            </div>
-          </a>
-        }
-      </div>
-    </div>
-  </div>
+	<div class="card card-compact border-base-200 border">
+		<div class="card-body">
+			<h2 class="card-title">Recent Envelopes</h2>
+			<div>
+				for _, env := range props.Envelopes {
+					<a href={ routes.Envelope(env.Message.ID).URL() } class="hover:bg-base-200 border-base-200 flex flex-col gap-2 border-b p-2 first:border-t sm:flex-row">
+						<div class="w-40 font-bold">
+							{ helpers.TimeHumanize(env.Message.CreatedAt.Time()) }
+						</div>
+						<div class="flex flex-1 items-center justify-between gap-2 truncate">
+							<div class="truncate">{ env.Message.Subject }</div>
+							if len(env.Attachments) != 0 {
+								<div class="tooltip tooltip-left flex items-center fill-current" data-tip={ strconv.Itoa(len(env.Attachments)) + " Attachment(s)" }>
+									@icons.Attachment("h-4 w-4")
+								</div>
+							}
+						</div>
+					</a>
+				}
+			</div>
+		</div>
+	</div>
 }
-

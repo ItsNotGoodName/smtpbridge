@@ -1,36 +1,35 @@
 package components
 
 import (
-  "github.com/ItsNotGoodName/smtpbridge/web/routes"
-  "github.com/ItsNotGoodName/smtpbridge/internal/models"
-  "github.com/ItsNotGoodName/smtpbridge/web/icons"
+	"github.com/ItsNotGoodName/smtpbridge/internal/models"
+	"github.com/ItsNotGoodName/smtpbridge/web/icons"
+	"github.com/ItsNotGoodName/smtpbridge/web/routes"
 )
 
 type AttachmentCardProps struct {
-  Attachment models.Attachment
+	Attachment models.Attachment
 }
 
 templ AttachmentCard(props AttachmentCardProps) {
-  <div class="w-full sm:w-80">
-    <div class="card card-compact bg-base-100 border-base-200 border">
-      if props.Attachment.IsImage() {
-        <figure class="bg-base-content"><img src={ routes.AttachmentFile(props.Attachment.FileName()).URLString() } alt={ props.Attachment.Name }/></figure>
-      }
-      <div class="flex flex-1 flex-col justify-end gap-2 p-2">
-        <p class="break-all font-bold">{ props.Attachment.Name }</p>
-        <div class="join flex">
-          <a class="join-item btn flex flex-1 items-center" title="Envelope" href={ routes.Envelope(props.Attachment.MessageID).URLQuery("tab=" + routes.EnvelopeTabAttachments.String()) }>
-            @icons.Mail("h-5 w-5")
-          </a>
-          <a class="join-item btn flex flex-1 items-center" title="View" hx-boost="false" href={ routes.AttachmentFile(props.Attachment.FileName()).URL() }>
-            @icons.Eye("h-5 w-5")
-          </a>
-          <a class="join-item btn flex flex-1 items-center" title="Download" hx-boost="false" href={ routes.AttachmentFile(props.Attachment.FileName()).URLQuery("download=1") }>
-            @icons.Download("h-5 w-5")
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
+	<div class="w-full sm:w-80">
+		<div class="card card-compact bg-base-100 border-base-200 border">
+			if props.Attachment.IsImage() {
+				<figure class="bg-base-content"><img src={ routes.AttachmentFile(props.Attachment.FileName()).URLString() } alt={ props.Attachment.Name }/></figure>
+			}
+			<div class="flex flex-1 flex-col justify-end gap-2 p-2">
+				<p class="break-all font-bold">{ props.Attachment.Name }</p>
+				<div class="join flex">
+					<a class="join-item btn flex flex-1 items-center" title="Envelope" href={ routes.Envelope(props.Attachment.MessageID).URLQuery("tab=" + routes.EnvelopeTabAttachments.String()) }>
+						@icons.Mail("h-5 w-5")
+					</a>
+					<a class="join-item btn flex flex-1 items-center" title="View" hx-boost="false" href={ routes.AttachmentFile(props.Attachment.FileName()).URL() }>
+						@icons.Eye("h-5 w-5")
+					</a>
+					<a class="join-item btn flex flex-1 items-center" title="Download" hx-boost="false" href={ routes.AttachmentFile(props.Attachment.FileName()).URLQuery("download=1") }>
+						@icons.Download("h-5 w-5")
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
 }
-

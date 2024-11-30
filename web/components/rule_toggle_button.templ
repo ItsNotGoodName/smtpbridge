@@ -3,24 +3,24 @@ package components
 import "github.com/ItsNotGoodName/smtpbridge/web/routes"
 
 type RuleToggleButtonProps struct {
-  ID int64
-  Enable bool
+	ID     int64
+	Enable bool
 }
 
 templ RuleToggleButton(props RuleToggleButtonProps) {
-  <div data-loading-states>
-    if props.Enable {
-      <button class="btn btn-sm btn-success w-full" hx-post={ routes.RuleToggle(props.ID).URLQueryString("enable=false") } hx-target="this" hx-swap="outerHTML" data-loading-disable>
-        <span data-loading-class="loading loading-spinner loading-sm">
-          Enabled
-        </span>
-      </button>
-    } else {
-      <button class="btn btn-sm btn-error w-full" hx-post={ routes.RuleToggle(props.ID).URLQueryString("enable=true") } hx-target="this" hx-swap="outerHTML" data-loading-disable>
-        <span data-loading-class="loading loading-spinner loading-sm">
-          Disabled
-        </span>
-      </button>
-    }
-  </div>
+	<div data-loading-states>
+		if props.Enable {
+			<button class="btn btn-sm btn-success w-full" hx-post={ routes.RuleToggle(props.ID).URLQueryString("enable=false") } hx-target="this" hx-swap="outerHTML" data-loading-disable>
+				<span data-loading-class="loading loading-spinner loading-sm">
+					Enabled
+				</span>
+			</button>
+		} else {
+			<button class="btn btn-sm btn-error w-full" hx-post={ routes.RuleToggle(props.ID).URLQueryString("enable=true") } hx-target="this" hx-swap="outerHTML" data-loading-disable>
+				<span data-loading-class="loading loading-spinner loading-sm">
+					Disabled
+				</span>
+			</button>
+		}
+	</div>
 }

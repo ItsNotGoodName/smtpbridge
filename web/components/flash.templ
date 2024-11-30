@@ -1,44 +1,44 @@
 package components
 
 import (
-  "github.com/ItsNotGoodName/smtpbridge/web/routes"
 	"github.com/ItsNotGoodName/smtpbridge/web/icons"
+	"github.com/ItsNotGoodName/smtpbridge/web/routes"
 )
 
 type FlashType int
 
 const (
-  FlashTypeError FlashType = iota
-  FlashTypeSuccess
+	FlashTypeError FlashType = iota
+	FlashTypeSuccess
 )
 
 type FlashProps struct {
-  Component templ.Component
-  Type      FlashType
+	Component templ.Component
+	Type      FlashType
 }
 
 templ Flash(t FlashType, c templ.Component) {
-  <div class="flash" data-loading-hide-class="absolute hidden">
-    switch t {
-    case FlashTypeSuccess:
-      <div class="alert alert-success">
-        @icons.CheckboxCircle("h-6 w-6")
-        {! c }
-      </div>
-    default:
-    <div class="alert alert-error">
-      @icons.CloseCircle("h-6 w-6")
-      {! c }
-    </div>
-    }
-  </div>
+	<div class="flash" data-loading-hide-class="absolute hidden">
+		switch t {
+			case FlashTypeSuccess:
+				<div class="alert alert-success">
+					@icons.CheckboxCircle("h-6 w-6")
+					@c
+				</div>
+			default:
+				<div class="alert alert-error">
+					@icons.CloseCircle("h-6 w-6")
+					@c
+				</div>
+		}
+	</div>
 }
 
 templ FlashMessage(message string) {
-  <span>{message}</span>
+	<span>{ message }</span>
 }
 
 templ FlashMessageLink(message string, route routes.Route) {
-  <span>{message}</span>
-  <a class="btn btn-xs" href={ route.URL() }>View</a>
+	<span>{ message }</span>
+	<a class="btn btn-xs" href={ route.URL() }>View</a>
 }
